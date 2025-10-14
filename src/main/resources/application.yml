@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: alum-net
+  datasource:
+    url: jdbc:postgresql://localhost:5433/alumnet
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+jwt:
+  auth:
+    principleAttribute: preferred_username
+
+
+keycloak:
+  auth:
+    client-id: alumnet
+
+server:
+  port: 8200
