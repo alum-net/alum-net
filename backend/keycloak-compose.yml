@@ -1,0 +1,58 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: keycloak_db
+    environment:
+      POSTGRES_DB: keycloak_db
+      POSTGRES_USER: kc_user
+      POSTGRES_PASSWORD: kc_password
+    volumes:
+      # Persistencia de los datos de la DB
+      - postgres_data:/var/lib/postgresql/data
+      # MONTAJE DEL DUMP: Esta línea hace que PostgreSQL ejecute tu script SQL
+      # durante su primer inicio, cargando todos los datos de Keycloak.
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak_server
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+
+      KC_DB: postgres
+      KC_DB_USERNAME: kc_user
+      KC_DB_PASSWORD: kc_password
+      
+      # URL de conexión corregida para evitar el error de base de datos inexistente.
+      # El parámetro 'connectionTimeout=60000' aumenta el tiempo de espera a 60 segundos.
+      KC_DB_URL: jdbc:postgresql://db:5432/keycloak_db?connectionTimeout=60000
+      
+      KC_DB_POOL_INITIAL_SIZE: 1
+      KC_DB_POOL_MAX_SIZE: 20
+      
+      KC_HTTP_PORT: 8000 
+      KC_HOSTNAME: localhost 
+      
+      # NECESARIO para que arranque en modo 'start' (producción) sin HTTPS
+      KC_HTTP_ENABLED: true
+      KC_PROXY: edge
+      
+    command: start # Modo de producción
+    
+    ports:
+      - "8000:8000" 
+      
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: always
+
+volumes:
+  postgres_data:
