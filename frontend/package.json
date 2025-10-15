@@ -1,0 +1,17 @@
+{
+  "name": "alum-net",
+  "version": "1.0.0",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "bootstrap": "yarn install",
+    "start:mobile": "cd apps/mobile && expo start",
+    "start:web": "cd apps/web && expo start --web",
+    "android": "cd apps/mobile && expo run:android",
+    "build:web": "cd apps/web && expo build:web"
+  }
+}

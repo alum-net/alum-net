@@ -1,0 +1,12 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@alum-net/hooks/*": [
+        "packages/hooks/src/*"
+      ],
+    },
+    "strict": true
+  }
+}
