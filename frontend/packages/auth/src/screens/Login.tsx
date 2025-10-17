@@ -1,9 +1,9 @@
 import {
-  Button,
   View,
   StyleSheet,
   ActivityIndicator,
-  ScrollView,
+  Image,
+  TouchableOpacity,
   Text,
 } from "react-native";
 import * as WebBrowser from "expo-web-browser";
@@ -17,7 +17,7 @@ import {
 } from "expo-auth-session";
 import { useMMKVString } from "react-native-mmkv";
 import { storage, STORAGE_KEYS } from "@alum-net/storage";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { keycloakClientId, keycloakRealm } from "../constants";
 
 WebBrowser.maybeCompleteAuthSession();
@@ -33,10 +33,10 @@ const redirectUri = makeRedirectUri();
 export const LoginScreen = () => {
   const [refreshToken, setRefreshToken] = useMMKVString(
     STORAGE_KEYS.REFRESH_TOKEN,
-    storage
+    storage,
   );
   const discovery = useAutoDiscovery(
-    `${process.env.EXPO_PUBLIC_KEYCLOAK_URI}/realms/${keycloakRealm}`
+    `${process.env.EXPO_PUBLIC_KEYCLOAK_URI}/realms/${keycloakRealm}`,
   );
 
   const [request, response, promptAsync] = useAuthRequest(
@@ -48,7 +48,7 @@ export const LoginScreen = () => {
       scopes: ["openid", "profile", "email", "offline_access"],
       usePKCE: true,
     },
-    discovery
+    discovery,
   );
 
   useEffect(() => {
@@ -63,7 +63,7 @@ export const LoginScreen = () => {
             code_verifier: request?.codeVerifier || "",
           },
         },
-        discovery!
+        discovery!,
       )
         .then(({ accessToken, refreshToken, idToken }) => {
           storage.set(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
@@ -72,11 +72,11 @@ export const LoginScreen = () => {
         })
         .catch((error) => console.log("Auth error", error));
     }
-  }, [response]);
+  }, [response, discovery, request, setRefreshToken]);
 
   useEffect(() => {
     if (request && !refreshToken) promptAsync();
-  }, [promptAsync, request]);
+  }, [promptAsync, request, refreshToken]);
 
   if (!discovery || !response)
     return (
@@ -88,7 +88,20 @@ export const LoginScreen = () => {
   return (
     <View style={styles.container}>
       {!refreshToken && (
-        <Button title="Iniciar sesión" onPress={() => promptAsync()} />
+        <>
+          <Image
+            source={require("../assets/alumnet_logo.jpeg")}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+          <Text style={styles.title}>Bienvenido de Nuevo</Text>
+          <Text style={styles.subtitle}>
+            Inicia sesión para continuar tu camino de aprendizaje.
+          </Text>
+          <TouchableOpacity style={styles.button} onPress={() => promptAsync()}>
+            <Text style={styles.buttonText}>Iniciar Sesión</Text>
+          </TouchableOpacity>
+        </>
       )}
     </View>
   );
@@ -96,4 +109,34 @@ export const LoginScreen = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: "center", alignItems: "center" },
+  logo: {
+    width: 160,
+    height: 120,
+    marginBottom: 40,
+  },
+  title: {
+    color: "#fff",
+    fontSize: 26,
+    fontWeight: "bold",
+    marginBottom: 6,
+    textAlign: "center",
+  },
+  subtitle: {
+    color: "#ccc",
+    fontSize: 14,
+    textAlign: "center",
+    marginBottom: 30,
+  },
+  button: {
+    backgroundColor: "#aab8ff",
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#000",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
 });

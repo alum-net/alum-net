@@ -1,14 +1,16 @@
 import { Stack } from "expo-router";
 import { useMMKVString } from "react-native-mmkv";
-import { storage } from "@alum-net/storage";
+import { storage, STORAGE_KEYS } from "@alum-net/storage";
 
 const InitialLayout = () => {
-  const [token] = useMMKVString("token", storage);
+  const [refreshToken] = useMMKVString(STORAGE_KEYS.REFRESH_TOKEN, storage);
 
   return (
     <Stack>
-      <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Protected guard={!!token}>
+      <Stack.Protected guard={!refreshToken}>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+      </Stack.Protected>
+      <Stack.Protected guard={!!refreshToken}>
         <Stack.Screen name="home" />
       </Stack.Protected>
     </Stack>
