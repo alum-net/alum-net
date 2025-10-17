@@ -1,0 +1,9 @@
+{
+  "name": "@alum-net/storage",
+  "version": "1.0.0",
+  "main": "./src/index.ts",
+  "dependencies": {},
+  "peerDependencies": {
+    "react-native-mmkv": "3.3.3"
+  }
+}

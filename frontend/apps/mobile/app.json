@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "alumnet",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
@@ -14,16 +14,46 @@
       "backgroundColor": "#ffffff"
     },
     "android": {
+      "package": "alumnet.mobile",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": [
+            {
+              "scheme": "alumnet.mobile",
+              "host": "redirect"
+            },
+            {
+              "scheme": "alumnet.mobile",
+              "host": "login"
+            },
+            {
+              "scheme": "https",
+              "host": "sso.ukata.io",
+              "pathPrefix": "/auth/redirect"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ]
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-font",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "ios": {
+      "bundleIdentifier": "alumnet.mobile"
     }
   }
 }
