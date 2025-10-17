@@ -42,7 +42,7 @@ public class UserService {
             }
         }
         saveUser(userDTO);
-        response.setMessage("Successfully created userRepresentation");
+        response.setMessage("Successfully created user");
         return response;
     }
 
@@ -51,7 +51,7 @@ public class UserService {
     }
 
     private void saveUser(UserDTO userDTO) {
-        User user = UserMapper.INSTANCE.userToUserDTO(userDTO);
+        User user = UserMapper.INSTANCE.userDTOToUser(userDTO);
         userRepository.save(user);
     }
 
