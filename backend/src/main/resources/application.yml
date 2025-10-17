@@ -17,10 +17,11 @@ jwt:
   auth:
     principleAttribute: preferred_username
 
-
 keycloak:
-  auth:
     client-id: alumnet
+    url: http://localhost:8000
+    name: alum-net
+    realm: alumnet
 
 server:
   port: 8200
