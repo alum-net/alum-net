@@ -30,28 +30,28 @@ public class UserService {
     private UserRepository userRepository;
 
     public ResultResponse createUser(UserDTO userDTO) throws ExistingUserException {
-        saveUser(userDTO);
-        if(isRegisteredUser(userDTO)) {
+        if(isRegisteredUser(userDTO.getEmail()))
             throw new ExistingUserException("User with email " + userDTO.getEmail() + " already exists");
-        }
+
         UserRepresentation userRepresentation = createUserRepresentation(userDTO);
         ResultResponse response = ResultResponse.builder().build();
         try (Response keycloakResponse = keycloak.realm(properties.getRealm()).users().create(userRepresentation)){
             if (keycloakResponse.getStatus() != 201) {
-                response.addError("Error creating userRepresentation:" + keycloakResponse.getStatus());
+                response.addError("Error creating userRepresentation: " + keycloakResponse.getStatus());
                 return response;
             }
         }
-        response.setMessage("Successfully created userRepresentation");
+        saveUser(userDTO);
+        response.setMessage("Successfully created user");
         return response;
     }
 
-    private boolean isRegisteredUser(UserDTO userDTO) {
-        return keycloak.realm(properties.getRealm()).users().search(userDTO.getEmail()).stream().anyMatch(u -> u.getUsername().equals(userDTO.getEmail()));
+    private boolean isRegisteredUser(String email) {
+        return userRepository.existsById(email) || !keycloak.realm(properties.getRealm()).users().searchByEmail(email,true).isEmpty();
     }
 
     private void saveUser(UserDTO userDTO) {
-        User user = UserMapper.INSTANCE.userToUserDTO(userDTO);
+        User user = UserMapper.INSTANCE.userDTOToUser(userDTO);
         userRepository.save(user);
     }
 
@@ -62,15 +62,8 @@ public class UserService {
         user.setFirstName(userDTO.getName());
         user.setLastName(userDTO.getLastname());
         user.setEnabled(true);
-        Map<String, List<String>> roles = generateRole(userDTO);
-        user.setClientRoles(roles);
+        user.setGroups(List.of(userDTO.getRole()));
         user.setEmailVerified(true);
         return user;
-    }
-
-    private Map<String, List<String>> generateRole(UserDTO userDTO) {
-        Map<String, List<String>> roles = new HashMap<>();
-        roles.put(properties.getClientId(), List.of(userDTO.getRole()));
-        return roles;
     }
 }

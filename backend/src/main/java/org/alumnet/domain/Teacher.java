@@ -1,8 +1,8 @@
 package org.alumnet.domain;
 
 import jakarta.persistence.*;
-
 import java.util.List;
+
 
 @Entity
 @DiscriminatorValue("teacher")

@@ -8,12 +8,12 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "users")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "role", discriminatorType = DiscriminatorType.STRING)
-public class User {
+public abstract class User {
     @Id
     private String email;
     private String name;
@@ -22,5 +22,5 @@ public class User {
     @Column(name = "avatar_url")
     private String avatarUrl;
     private boolean enabled;
-    private String role;
+
 }
