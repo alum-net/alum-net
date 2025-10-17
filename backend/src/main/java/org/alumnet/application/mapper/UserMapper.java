@@ -10,6 +10,6 @@ import org.mapstruct.factory.Mappers;
 public interface UserMapper {
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
-    @Mapping(source = "email", target = "key.email")
+    @Mapping(target = "enabled", constant = "true")
     User userToUserDTO(UserDTO user);
 }

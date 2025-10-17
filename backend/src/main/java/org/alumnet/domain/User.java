@@ -1,10 +1,7 @@
 package org.alumnet.domain;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,9 +11,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
-    @EmbeddedId
-    private UserKey key;
+public abstract class User {
+    @Id
+    private String email;
     private String name;
     @Column(name = "last_name")
     private String lastname;
