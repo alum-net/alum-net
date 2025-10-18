@@ -22,5 +22,4 @@ public abstract class User {
     @Column(name = "avatar_url")
     private String avatarUrl;
     private boolean enabled;
-
 }
