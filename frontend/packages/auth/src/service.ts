@@ -4,10 +4,10 @@ import {
   refreshAsync,
   RefreshTokenRequestConfig,
   revokeAsync,
-} from "expo-auth-session";
-import * as WebBrowser from "expo-web-browser";
-import { keycloakClientId, keycloakRealm, mobileScheme } from "./constants";
-import { storage, STORAGE_KEYS } from "@alum-net/storage";
+} from 'expo-auth-session';
+import * as WebBrowser from 'expo-web-browser';
+import { keycloakClientId, keycloakRealm, mobileScheme } from './constants';
+import { storage, STORAGE_KEYS } from '@alum-net/storage';
 
 export const refresh = async () => {
   const refreshToken = storage.getString(STORAGE_KEYS.REFRESH_TOKEN);
@@ -18,12 +18,18 @@ export const refresh = async () => {
     clientId: keycloakClientId,
     refreshToken: refreshToken,
   };
-  const { accessToken, idToken } = await refreshAsync(
-    refreshTokenObject,
-    discoveryDocument!,
-  );
-  storage.set(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
-  if (idToken) storage.set(STORAGE_KEYS.ID_TOKEN, idToken);
+  try {
+    const { accessToken, idToken } = await refreshAsync(
+      refreshTokenObject,
+      discoveryDocument!,
+    );
+    storage.set(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
+    if (idToken) storage.set(STORAGE_KEYS.ID_TOKEN, idToken);
+    return accessToken;
+  } catch (error) {
+    console.log(error);
+    logout();
+  }
 };
 
 export const logout = async () => {
@@ -42,7 +48,7 @@ export const logout = async () => {
     .endSessionEndpoint!}?client_id=${keycloakClientId}&post_logout_redirect_uri=${redirectUrl}&id_token_hint=${idToken}`;
 
   const res = await WebBrowser.openAuthSessionAsync(logoutUrl, redirectUrl);
-  if (res.type === "success") {
+  if (res.type === 'success') {
     storage.clearAll();
   }
 };

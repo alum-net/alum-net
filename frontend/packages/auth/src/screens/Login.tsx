@@ -1,11 +1,5 @@
-import {
-  View,
-  StyleSheet,
-  ActivityIndicator,
-  Image,
-  TouchableOpacity,
-  Text,
-} from 'react-native';
+import { View, StyleSheet, ActivityIndicator, Image, Text } from 'react-native';
+import { Button } from 'react-native-paper';
 import * as WebBrowser from 'expo-web-browser';
 import {
   useAuthRequest,
@@ -35,13 +29,9 @@ export const LoginScreen = () => {
     STORAGE_KEYS.REFRESH_TOKEN,
     storage,
   );
-  console.log(
-    `${process.env.EXPO_PUBLIC_KEYCLOAK_URI}/realms/${keycloakRealm}`,
-  );
   const discovery = useAutoDiscovery(
     `${process.env.EXPO_PUBLIC_KEYCLOAK_URI}/realms/${keycloakRealm}`,
   );
-
   const [request, response, promptAsync] = useAuthRequest(
     {
       responseType: ResponseType.Code,
@@ -97,9 +87,9 @@ export const LoginScreen = () => {
           <Text style={styles.subtitle}>
             Inicia sesión para continuar tu camino de aprendizaje.
           </Text>
-          <TouchableOpacity style={styles.button} onPress={() => promptAsync()}>
-            <Text style={styles.buttonText}>Iniciar Sesión</Text>
-          </TouchableOpacity>
+          <Button onPress={() => promptAsync()} mode="contained">
+            Iniciar sesión
+          </Button>
         </>
       )}
     </View>
@@ -128,17 +118,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
     marginBottom: 30,
-  },
-  button: {
-    backgroundColor: '#aab8ff',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#000',
-    fontWeight: 'bold',
-    fontSize: 16,
   },
 });

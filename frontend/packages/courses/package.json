@@ -1,0 +1,13 @@
+{
+  "name": "@alum-net/courses",
+  "version": "1.0.0",
+  "main": "./src/index.ts",
+  "dependencies": {
+    "@alum-net/ui": "*"
+  },
+  "peerDependencies": {
+    "react": "19.0.0",
+    "react-native": "0.79.6",
+    "expo": "53.0.22"
+  }
+}
