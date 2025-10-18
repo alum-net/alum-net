@@ -1,5 +1,7 @@
 package org.alumnet.application.enums;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum UserRole {
     STUDENT("student"),
     TEACHER("teacher"),
@@ -11,6 +13,7 @@ public enum UserRole {
         this.value = value;
     }
 
+    @JsonValue
     public String getValue() {
         return value;
     }
