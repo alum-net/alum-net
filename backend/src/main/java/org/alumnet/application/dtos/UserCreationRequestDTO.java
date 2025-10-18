@@ -9,24 +9,21 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserCreationRequestDTO {
-    @NotNull(message = "Name cannot be null")
-    @NotEmpty(message = "Name cannot be empty")
+    @NotBlank(message = "El nombre del usuario no puede estar vacío")
     private String name;
 
-    @NotNull(message = "Lastname cannot be null")
-    @NotEmpty(message = "Lastname cannot be empty")
+    @NotBlank(message = "El apellido del usuario no puede estar vacío")
     private String lastname;
 
-    @NotNull(message = "Role cannot be null")
-    @NotEmpty(message = "Role cannot be empty")
-    private String role;
+    @NotNull(message = "Debe seleccionarse un grupo (students, teachers o admins)")
+    private String group;
 
-    @Email(message = "Email should be valid")
-    @NotBlank(message = "Email is required")
+    @Email(message = "Debe ser un email valido")
+    @NotBlank(message = "Debe ingresar un email")
     private String email;
 
-    @NotBlank(message = "Password is required")
-    @Size(min = 6, message = "Password must be at least 6 characters")
+    @NotBlank(message = "Debe ingresar una contraseña")
+    @Size(min = 6, message = "La contraseña debe tener al menos 6 caracteres")
     private String password;
 
 }
