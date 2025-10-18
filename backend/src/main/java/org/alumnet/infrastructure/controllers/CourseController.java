@@ -21,9 +21,18 @@ public class CourseController {
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<ResultResponse<Void>> create(@Valid @RequestBody CourseCreationRequestDTO courseDTO) {
         courseService.create(courseDTO);
-        ResultResponse<Void> resultResponse = ResultResponse.<Void>builder().message("Curso creado correctamente").build();
+        ResultResponse<Void> resultResponse = ResultResponse.<Void>builder()
+                .success(true)
+                .message("Curso creado correctamente").build();
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(resultResponse);
+    }
+
+    @DeleteMapping("/{courseId}")
+    @PreAuthorize("hasRole('admin')")
+    public ResponseEntity<Void> deleteCourse(@PathVariable int courseId) {
+        courseService.deleteCourse(courseId);
+        return ResponseEntity.noContent().build();
     }
 
 }
