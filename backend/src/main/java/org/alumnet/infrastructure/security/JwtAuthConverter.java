@@ -17,8 +17,6 @@ import java.util.stream.Collectors;
 @Component
 public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationToken> {
 
-    @Value("${keycloak.auth.client-id}")
-    private String keycloakClientId;
     @Value("${jwt.auth.principleAttribute}")
     private String jwtAuthPrincipleAttribute;
 

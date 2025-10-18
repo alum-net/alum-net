@@ -7,10 +7,10 @@ services:
       POSTGRES_USER: kc_user
       POSTGRES_PASSWORD: kc_password
     ports:
-      - "8001:8001"
+      - "8001:5432"
     volumes:
       # Persistencia de los datos de la DB
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/kc/data
       # MONTAJE DEL DUMP: Esta línea hace que PostgreSQL ejecute tu script SQL
       # durante su primer inicio, cargando todos los datos de Keycloak.
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
@@ -44,8 +44,7 @@ services:
 
       # NECESARIO para que arranque en modo 'start' (producción) sin HTTPS
       KC_HTTP_ENABLED: true
-      KC_PROXY_HEADERS: xforwarded
-      KC_HOSTNAME_STRICT_BACKCHANNEL: false
+      KC_PROXY: edge
 
     command: start # Modo de producción
 

@@ -1,4 +1,8 @@
-This is the repository for the AlumNet application.
+Comandos para limpiar y volver a cargar los contenedores (tras cambio de init o alguna config):
+```
+docker compose -f .\keycloak-compose.yml -f .\db-compose.yml down
 
-To run the project:
-...
+docker compose -f .\keycloak-compose.yml -f .\db-compose.yml down --volumes
+
+docker compose -f .\keycloak-compose.yml -f .\db-compose.yml up -d --build
+```
