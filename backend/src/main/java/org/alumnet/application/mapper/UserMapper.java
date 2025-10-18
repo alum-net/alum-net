@@ -2,24 +2,22 @@ package org.alumnet.application.mapper;
 
 import org.alumnet.application.dtos.UserCreationRequestDTO;
 import org.alumnet.application.dtos.UserDTO;
-import org.alumnet.application.enums.UserRole;
 import org.alumnet.domain.Administrator;
 import org.alumnet.domain.Student;
 import org.alumnet.domain.Teacher;
 import org.alumnet.domain.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
     default User userDTOToUserCreationRequest(UserCreationRequestDTO userCreationRequestDTO) {
-        return switch (userCreationRequestDTO.getRole()) {
+        return switch (userCreationRequestDTO.getGroup()) {
             case "students" -> studentCreationDTOToStudent(userCreationRequestDTO);
             case "teachers" -> teacherCreationDTOToTeacher(userCreationRequestDTO);
             case "admins" -> administratorCreationDTOToAdministrator(userCreationRequestDTO);
-            default -> throw new IllegalArgumentException("Unknown role: " + userCreationRequestDTO.getRole());
+            default -> throw new IllegalArgumentException("Unknown role: " + userCreationRequestDTO.getGroup());
         };
     }
 

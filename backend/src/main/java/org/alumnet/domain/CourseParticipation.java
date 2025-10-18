@@ -19,5 +19,5 @@ public class CourseParticipation {
     private Course course;
 
     @Column(name = "grade")
-    private Integer grade;
+    private Double grade;
 }

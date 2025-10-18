@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CourseDTO {
+public class CourseCreationRequestDTO {
 
     @NotBlank(message = "El nombre del curso no puede estar vacío")
     private String name;

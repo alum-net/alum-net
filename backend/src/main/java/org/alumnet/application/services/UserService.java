@@ -20,7 +20,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -91,7 +90,7 @@ public class UserService {
         user.setFirstName(userCreationRequestDTO.getName());
         user.setLastName(userCreationRequestDTO.getLastname());
         user.setEnabled(true);
-        user.setGroups(List.of(userCreationRequestDTO.getRole()));
+        user.setGroups(List.of(userCreationRequestDTO.getGroup()));
         user.setEmailVerified(true);
         return user;
     }

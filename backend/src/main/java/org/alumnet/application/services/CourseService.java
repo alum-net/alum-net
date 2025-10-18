@@ -22,7 +22,7 @@ public class CourseService {
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
 
-    public Course create(CourseDTO courseDTO) {
+    public void create(CourseDTO courseDTO) {
 
         validateDates(courseDTO.getStartDate(), courseDTO.getEndDate());
 
@@ -53,7 +53,7 @@ public class CourseService {
                 .teachers(teachers)
                 .build();
 
-        return courseRepository.save(course);
+        courseRepository.save(course);
     }
 
     private static void validateTeachers(List<String> teacherEmails, List<Teacher> teachers) {
