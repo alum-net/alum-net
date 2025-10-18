@@ -57,13 +57,11 @@ public class UserController {
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
-            // 3. Manejo de error: ResultResponse<Void>
             ResultResponse<Void> errorResponse = ResultResponse.<Void>builder()
                     .success(false)
                     .message("Error al obtener usuarios: " + e.getMessage())
                     .build();
 
-            // Devuelve el objeto de error, que es compatible gracias al <?>
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
