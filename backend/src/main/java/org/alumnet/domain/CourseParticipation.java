@@ -3,16 +3,21 @@ package org.alumnet.domain;
 import jakarta.persistence.*;
 
 @Entity
-public class CourseParticipation extends Participation{
+public class CourseParticipation {
+
     @EmbeddedId
     private CourseParticipationId id;
 
     @ManyToOne
-    @JoinColumn(name = "email")
-    @MapsId("email")
+    @JoinColumn(name = "student_email", referencedColumnName = "email")
+    @MapsId("studentEmail")
     private Student student;
+
     @ManyToOne
-    @JoinColumn(name = "id")
-    @MapsId("id")
+    @JoinColumn(name = "course_id", referencedColumnName = "id")
+    @MapsId("courseId")
     private Course course;
+
+    @Column(name = "grade")
+    private Integer grade;
 }
