@@ -30,11 +30,6 @@
             {
               "scheme": "alumnet.mobile",
               "host": "login"
-            },
-            {
-              "scheme": "https",
-              "host": "sso.ukata.io",
-              "pathPrefix": "/auth/redirect"
             }
           ],
           "category": [
@@ -51,9 +46,6 @@
     ],
     "experiments": {
       "typedRoutes": true
-    },
-    "ios": {
-      "bundleIdentifier": "alumnet.mobile"
     }
   }
 }

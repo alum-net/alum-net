@@ -1,5 +1,5 @@
-import { AuthScreen } from "@alum-net/auth";
+import { LoginScreen } from '@alum-net/auth';
 
 export default function Login() {
-  return <AuthScreen />;
+  return <LoginScreen />;
 }

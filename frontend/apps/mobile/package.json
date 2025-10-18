@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@alum-net/auth": "*",
+    "@alum-net/storage": "*",
+    "expo-router": "~5.1.7",
     "expo-status-bar": "^1.11.1"
   },
   "private": true

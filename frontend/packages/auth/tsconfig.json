@@ -4,10 +4,7 @@
     "strict": true,
     "paths": {
       "@/*": [
-        "./*"
-      ],
-      "@shared-assets/*": [
-        "../../packages/assets"
+        "./apps/web/*"
       ]
     }
   },

@@ -1,11 +1,10 @@
-import { Button, View } from "react-native";
-import { useAuth } from "@alum-net/auth";
+import { logout } from '@alum-net/auth';
+import { Button, View } from 'react-native';
 
 export default function Profile() {
-  const { logout } = useAuth();
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Button title="Logout" onPress={() => logout()} />
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Button title="Cerrar sesión" onPress={() => logout()} />
     </View>
   );
 }

@@ -4,11 +4,8 @@
     "strict": true,
     "paths": {
       "@/*": [
-        "./*"
+        "./apps/mobile/*"
       ],
-      "@shared-assets/*": [
-        "../../packages/assets"
-      ]
     }
   },
   "include": [

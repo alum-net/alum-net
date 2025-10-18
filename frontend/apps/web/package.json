@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@alum-net/auth": "*",
+    "@alum-net/storage": "*",
     "expo-blur": "~14.1.5",
     "expo-constants": "~17.1.7",
     "expo-haptics": "~14.1.4",

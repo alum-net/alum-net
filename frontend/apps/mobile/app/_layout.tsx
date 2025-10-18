@@ -1,49 +1,37 @@
-import { useRouter, useSegments } from "expo-router";
-import { useEffect } from "react";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { Stack } from 'expo-router';
+import { useEffect } from 'react';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 import {
   DarkTheme,
   DefaultTheme,
   ThemeProvider,
-} from "@react-navigation/native";
-import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
-import * as SplashScreen from "expo-splash-screen";
-import "react-native-reanimated";
+} from '@react-navigation/native';
+import { useFonts } from 'expo-font';
+import * as SplashScreen from 'expo-splash-screen';
+import 'react-native-reanimated';
 
-import { useColorScheme } from "../components/useColorScheme";
+import { useColorScheme } from '../components/useColorScheme';
+import { storage, STORAGE_KEYS } from '@alum-net/storage';
+import { useMMKVString } from 'react-native-mmkv';
 
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
-} from "expo-router";
-
-export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: "index",
-};
+} from 'expo-router';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 const InitialLayout = () => {
-  const segments = useSegments();
-  const router = useRouter();
-
-  useEffect(() => {
-    const inTabsGroup = segments[0] === "(tabs)";
-
-    if (!isLoggedIn && inTabsGroup) {
-      router.replace("/");
-    } else if (isLoggedIn && !inTabsGroup) {
-      router.replace("/(tabs)/home");
-    }
-  }, [isLoggedIn, segments]);
-
+  const [refreshToken] = useMMKVString(STORAGE_KEYS.REFRESH_TOKEN, storage);
   return (
     <Stack>
-      <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Protected guard={!refreshToken}>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+      </Stack.Protected>
+      <Stack.Protected guard={!!refreshToken}>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      </Stack.Protected>
       <Stack.Screen name="+not-found" />
     </Stack>
   );
@@ -51,7 +39,7 @@ const InitialLayout = () => {
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
     ...FontAwesome.font,
   });
 
@@ -77,7 +65,7 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <InitialLayout />
     </ThemeProvider>
   );
