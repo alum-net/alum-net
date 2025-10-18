@@ -1,16 +1,17 @@
-import { Link, Stack } from 'expo-router';
-import { StyleSheet } from 'react-native';
-
-import { Text, View } from '../components/Themed';
+import { storage, STORAGE_KEYS } from "@alum-net/storage";
+import { Link, Stack } from "expo-router";
+import { Text, View, StyleSheet } from "react-native";
+import { useMMKVString } from "react-native-mmkv";
 
 export default function NotFoundScreen() {
+  const [refreshToken] = useMMKVString(STORAGE_KEYS.REFRESH_TOKEN, storage);
   return (
     <>
-      <Stack.Screen options={{ title: 'Oops!' }} />
+      <Stack.Screen options={{ title: "Oops!" }} />
       <View style={styles.container}>
         <Text style={styles.title}>{`This screen doesn't exist.`}</Text>
 
-        <Link href="/" style={styles.link}>
+        <Link href={refreshToken ? "/(tabs)/home" : "/"} style={styles.link}>
           <Text style={styles.linkText}>Go to home screen!</Text>
         </Link>
       </View>
@@ -21,13 +22,13 @@ export default function NotFoundScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     padding: 20,
   },
   title: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   link: {
     marginTop: 15,
@@ -35,6 +36,6 @@ const styles = StyleSheet.create({
   },
   linkText: {
     fontSize: 14,
-    color: '#2e78b7',
+    color: "#2e78b7",
   },
 });

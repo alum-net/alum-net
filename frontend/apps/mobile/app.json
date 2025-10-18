@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "mobile",
+    "name": "alumnet",
     "slug": "mobile",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "alumnet",
+    "scheme": "alumnet.mobile",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
@@ -15,29 +15,12 @@
     },
     "android": {
       "package": "alumnet.mobile",
+      "edgeToEdgeEnabled": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "intentFilters": [
-        {
-          "action": "VIEW",
-          "data": [
-            {
-              "scheme": "alumnet.mobile",
-              "host": "redirect"
-            },
-            {
-              "scheme": "alumnet.mobile",
-              "host": "login"
-            }
-          ],
-          "category": [
-            "BROWSABLE",
-            "DEFAULT"
-          ]
-        }
-      ]
+      "scheme": "alumnet.mobile"
     },
     "plugins": [
       "expo-router",

@@ -10,6 +10,7 @@ module.exports = function (api) {
           alias: {},
         },
       ],
+      "@babel/plugin-proposal-export-namespace-from",
     ],
   };
 };

@@ -5,8 +5,8 @@ import {
   Image,
   TouchableOpacity,
   Text,
-} from 'react-native';
-import * as WebBrowser from 'expo-web-browser';
+} from "react-native";
+import * as WebBrowser from "expo-web-browser";
 import {
   useAuthRequest,
   makeRedirectUri,
@@ -14,21 +14,21 @@ import {
   Prompt,
   ResponseType,
   useAutoDiscovery,
-} from 'expo-auth-session';
-import { useMMKVString } from 'react-native-mmkv';
-import { storage, STORAGE_KEYS } from '@alum-net/storage';
-import { useEffect } from 'react';
-import { keycloakClientId, keycloakRealm } from '../constants';
+} from "expo-auth-session";
+import { useMMKVString } from "react-native-mmkv";
+import { storage, STORAGE_KEYS } from "@alum-net/storage";
+import { useEffect } from "react";
+import { keycloakClientId, keycloakRealm, mobileScheme } from "../constants";
 
 WebBrowser.maybeCompleteAuthSession();
 
 export function generateShortUUID() {
   return Math.random().toString(36).substring(2, 15);
 }
-// {
-//   native: "alum-net.mobile://login",
-// }
-const redirectUri = makeRedirectUri();
+
+const redirectUri = makeRedirectUri({
+  native: mobileScheme,
+});
 
 export const LoginScreen = () => {
   const [refreshToken, setRefreshToken] = useMMKVString(
@@ -45,14 +45,14 @@ export const LoginScreen = () => {
       clientId: keycloakClientId,
       redirectUri: redirectUri,
       prompt: Prompt.Login,
-      scopes: ['openid', 'profile', 'email', 'offline_access'],
+      scopes: ["openid", "profile", "email", "offline_access"],
       usePKCE: true,
     },
     discovery,
   );
 
   useEffect(() => {
-    if (response?.type === 'success') {
+    if (response?.type === "success") {
       const { code } = response.params;
       exchangeCodeAsync(
         {
@@ -60,7 +60,7 @@ export const LoginScreen = () => {
           clientId: keycloakClientId,
           redirectUri: redirectUri,
           extraParams: {
-            code_verifier: request?.codeVerifier || '',
+            code_verifier: request?.codeVerifier || "",
           },
         },
         discovery!,
@@ -70,15 +70,11 @@ export const LoginScreen = () => {
           if (idToken) storage.set(STORAGE_KEYS.ID_TOKEN, idToken);
           setRefreshToken(refreshToken);
         })
-        .catch(error => console.log('Auth error', error));
+        .catch((error) => console.log("Auth error", error));
     }
   }, [response, discovery, request, setRefreshToken]);
 
-  useEffect(() => {
-    if (request && !refreshToken) promptAsync();
-  }, [promptAsync, request, refreshToken]);
-
-  if (!discovery || !response)
+  if (!discovery)
     return (
       <View style={styles.container}>
         <ActivityIndicator />
@@ -90,7 +86,7 @@ export const LoginScreen = () => {
       {!refreshToken && (
         <>
           <Image
-            source={require('../assets/alumnet_logo.jpeg')}
+            source={require("../assets/alumnet_logo.jpeg")}
             style={styles.logo}
             resizeMode="contain"
           />
@@ -108,35 +104,38 @@ export const LoginScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "white",
+  },
   logo: {
     width: 160,
     height: 120,
     marginBottom: 40,
   },
   title: {
-    color: '#fff',
     fontSize: 26,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 6,
-    textAlign: 'center',
+    textAlign: "center",
   },
   subtitle: {
-    color: '#ccc',
     fontSize: 14,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 30,
   },
   button: {
-    backgroundColor: '#aab8ff',
+    backgroundColor: "#aab8ff",
     paddingVertical: 15,
     paddingHorizontal: 20,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
   },
   buttonText: {
-    color: '#000',
-    fontWeight: 'bold',
+    color: "#000",
+    fontWeight: "bold",
     fontSize: 16,
   },
 });
