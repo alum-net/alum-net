@@ -1,7 +1,7 @@
 package org.alumnet.application.services;
 
 import lombok.RequiredArgsConstructor;
-import org.alumnet.application.dtos.CourseDTO;
+import org.alumnet.application.dtos.CourseCreationRequestDTO;
 import org.alumnet.domain.Course;
 import org.alumnet.domain.Teacher;
 import org.alumnet.domain.repositories.CourseRepository;
@@ -22,31 +22,31 @@ public class CourseService {
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
 
-    public void create(CourseDTO courseDTO) {
+    public void create(CourseCreationRequestDTO courseCreationRequestDTO) {
 
-        validateDates(courseDTO.getStartDate(), courseDTO.getEndDate());
+        validateDates(courseCreationRequestDTO.getStartDate(), courseCreationRequestDTO.getEndDate());
 
-        validateGrade(courseDTO.getApprovalGrade());
+        validateGrade(courseCreationRequestDTO.getApprovalGrade());
 
         List<Teacher> teachers = userRepository
-                .findAllById(courseDTO.getTeachersEmails())
+                .findAllById(courseCreationRequestDTO.getTeachersEmails())
                 .stream()
                 .filter(user -> user instanceof Teacher)
                 .map(user -> (Teacher) user)
                 .collect(Collectors.toList());
 
-        validateTeachers(courseDTO.getTeachersEmails(), teachers);
+        validateTeachers(courseCreationRequestDTO.getTeachersEmails(), teachers);
 
-        Date startDate = Date.from(courseDTO.getStartDate()
+        Date startDate = Date.from(courseCreationRequestDTO.getStartDate()
                 .atStartOfDay(ZoneId.systemDefault()).toInstant());
-        Date endDate = Date.from(courseDTO.getEndDate()
+        Date endDate = Date.from(courseCreationRequestDTO.getEndDate()
                 .atStartOfDay(ZoneId.systemDefault()).toInstant());
 
         Course course = Course.builder()
-                .name(courseDTO.getName().trim())
-                .description(courseDTO.getDescription().trim())
-                .shift(courseDTO.getShift())
-                .approvalGrade(courseDTO.getApprovalGrade())
+                .name(courseCreationRequestDTO.getName().trim())
+                .description(courseCreationRequestDTO.getDescription().trim())
+                .shift(courseCreationRequestDTO.getShift())
+                .approvalGrade(courseCreationRequestDTO.getApprovalGrade())
                 .startDate(startDate)
                 .endDate(endDate)
                 .enabled(true)
