@@ -2,10 +2,10 @@
 -- PostgreSQL database dump
 --
 
-\restrict sCr1V3Nwk95amSeXWEaad5EqoyWasyVEGNk8aqXeZeZP5ZbPWAfDullEwFhmyGs
-
 -- Dumped from database version 15.14
--- Dumped by pg_dump version 16.10 (Ubuntu 16.10-0ubuntu0.24.04.1)
+-- Dumped by pg_dump version 17.2
+
+-- Started on 2025-10-18 11:55:36 -03
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -18,11 +18,13 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
 
 --
+-- TOC entry 214 (class 1259 OID 16385)
 -- Name: admin_event_entity; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -46,6 +48,7 @@ CREATE TABLE public.admin_event_entity (
 ALTER TABLE public.admin_event_entity OWNER TO kc_user;
 
 --
+-- TOC entry 215 (class 1259 OID 16390)
 -- Name: associated_policy; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -58,6 +61,7 @@ CREATE TABLE public.associated_policy (
 ALTER TABLE public.associated_policy OWNER TO kc_user;
 
 --
+-- TOC entry 216 (class 1259 OID 16393)
 -- Name: authentication_execution; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -78,6 +82,7 @@ CREATE TABLE public.authentication_execution (
 ALTER TABLE public.authentication_execution OWNER TO kc_user;
 
 --
+-- TOC entry 217 (class 1259 OID 16397)
 -- Name: authentication_flow; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -95,6 +100,7 @@ CREATE TABLE public.authentication_flow (
 ALTER TABLE public.authentication_flow OWNER TO kc_user;
 
 --
+-- TOC entry 218 (class 1259 OID 16405)
 -- Name: authenticator_config; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -108,6 +114,7 @@ CREATE TABLE public.authenticator_config (
 ALTER TABLE public.authenticator_config OWNER TO kc_user;
 
 --
+-- TOC entry 219 (class 1259 OID 16408)
 -- Name: authenticator_config_entry; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -121,6 +128,7 @@ CREATE TABLE public.authenticator_config_entry (
 ALTER TABLE public.authenticator_config_entry OWNER TO kc_user;
 
 --
+-- TOC entry 220 (class 1259 OID 16413)
 -- Name: broker_link; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -138,6 +146,7 @@ CREATE TABLE public.broker_link (
 ALTER TABLE public.broker_link OWNER TO kc_user;
 
 --
+-- TOC entry 221 (class 1259 OID 16418)
 -- Name: client; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -174,6 +183,7 @@ CREATE TABLE public.client (
 ALTER TABLE public.client OWNER TO kc_user;
 
 --
+-- TOC entry 222 (class 1259 OID 16436)
 -- Name: client_attributes; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -187,6 +197,7 @@ CREATE TABLE public.client_attributes (
 ALTER TABLE public.client_attributes OWNER TO kc_user;
 
 --
+-- TOC entry 223 (class 1259 OID 16441)
 -- Name: client_auth_flow_bindings; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -200,6 +211,7 @@ CREATE TABLE public.client_auth_flow_bindings (
 ALTER TABLE public.client_auth_flow_bindings OWNER TO kc_user;
 
 --
+-- TOC entry 224 (class 1259 OID 16444)
 -- Name: client_initial_access; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -216,6 +228,7 @@ CREATE TABLE public.client_initial_access (
 ALTER TABLE public.client_initial_access OWNER TO kc_user;
 
 --
+-- TOC entry 225 (class 1259 OID 16447)
 -- Name: client_node_registrations; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -229,6 +242,7 @@ CREATE TABLE public.client_node_registrations (
 ALTER TABLE public.client_node_registrations OWNER TO kc_user;
 
 --
+-- TOC entry 226 (class 1259 OID 16450)
 -- Name: client_scope; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -244,6 +258,7 @@ CREATE TABLE public.client_scope (
 ALTER TABLE public.client_scope OWNER TO kc_user;
 
 --
+-- TOC entry 227 (class 1259 OID 16455)
 -- Name: client_scope_attributes; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -257,6 +272,7 @@ CREATE TABLE public.client_scope_attributes (
 ALTER TABLE public.client_scope_attributes OWNER TO kc_user;
 
 --
+-- TOC entry 228 (class 1259 OID 16460)
 -- Name: client_scope_client; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -270,6 +286,7 @@ CREATE TABLE public.client_scope_client (
 ALTER TABLE public.client_scope_client OWNER TO kc_user;
 
 --
+-- TOC entry 229 (class 1259 OID 16466)
 -- Name: client_scope_role_mapping; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -282,6 +299,7 @@ CREATE TABLE public.client_scope_role_mapping (
 ALTER TABLE public.client_scope_role_mapping OWNER TO kc_user;
 
 --
+-- TOC entry 230 (class 1259 OID 16469)
 -- Name: component; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -299,6 +317,7 @@ CREATE TABLE public.component (
 ALTER TABLE public.component OWNER TO kc_user;
 
 --
+-- TOC entry 231 (class 1259 OID 16474)
 -- Name: component_config; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -313,6 +332,7 @@ CREATE TABLE public.component_config (
 ALTER TABLE public.component_config OWNER TO kc_user;
 
 --
+-- TOC entry 232 (class 1259 OID 16479)
 -- Name: composite_role; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -325,6 +345,7 @@ CREATE TABLE public.composite_role (
 ALTER TABLE public.composite_role OWNER TO kc_user;
 
 --
+-- TOC entry 233 (class 1259 OID 16482)
 -- Name: credential; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -345,6 +366,7 @@ CREATE TABLE public.credential (
 ALTER TABLE public.credential OWNER TO kc_user;
 
 --
+-- TOC entry 234 (class 1259 OID 16488)
 -- Name: databasechangelog; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -369,6 +391,7 @@ CREATE TABLE public.databasechangelog (
 ALTER TABLE public.databasechangelog OWNER TO kc_user;
 
 --
+-- TOC entry 235 (class 1259 OID 16493)
 -- Name: databasechangeloglock; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -383,6 +406,7 @@ CREATE TABLE public.databasechangeloglock (
 ALTER TABLE public.databasechangeloglock OWNER TO kc_user;
 
 --
+-- TOC entry 236 (class 1259 OID 16496)
 -- Name: default_client_scope; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -396,6 +420,7 @@ CREATE TABLE public.default_client_scope (
 ALTER TABLE public.default_client_scope OWNER TO kc_user;
 
 --
+-- TOC entry 237 (class 1259 OID 16500)
 -- Name: event_entity; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -417,6 +442,7 @@ CREATE TABLE public.event_entity (
 ALTER TABLE public.event_entity OWNER TO kc_user;
 
 --
+-- TOC entry 238 (class 1259 OID 16505)
 -- Name: fed_user_attribute; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -436,6 +462,7 @@ CREATE TABLE public.fed_user_attribute (
 ALTER TABLE public.fed_user_attribute OWNER TO kc_user;
 
 --
+-- TOC entry 239 (class 1259 OID 16510)
 -- Name: fed_user_consent; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -455,6 +482,7 @@ CREATE TABLE public.fed_user_consent (
 ALTER TABLE public.fed_user_consent OWNER TO kc_user;
 
 --
+-- TOC entry 240 (class 1259 OID 16515)
 -- Name: fed_user_consent_cl_scope; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -467,6 +495,7 @@ CREATE TABLE public.fed_user_consent_cl_scope (
 ALTER TABLE public.fed_user_consent_cl_scope OWNER TO kc_user;
 
 --
+-- TOC entry 241 (class 1259 OID 16518)
 -- Name: fed_user_credential; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -488,6 +517,7 @@ CREATE TABLE public.fed_user_credential (
 ALTER TABLE public.fed_user_credential OWNER TO kc_user;
 
 --
+-- TOC entry 242 (class 1259 OID 16523)
 -- Name: fed_user_group_membership; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -502,6 +532,7 @@ CREATE TABLE public.fed_user_group_membership (
 ALTER TABLE public.fed_user_group_membership OWNER TO kc_user;
 
 --
+-- TOC entry 243 (class 1259 OID 16526)
 -- Name: fed_user_required_action; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -516,6 +547,7 @@ CREATE TABLE public.fed_user_required_action (
 ALTER TABLE public.fed_user_required_action OWNER TO kc_user;
 
 --
+-- TOC entry 244 (class 1259 OID 16532)
 -- Name: fed_user_role_mapping; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -530,6 +562,7 @@ CREATE TABLE public.fed_user_role_mapping (
 ALTER TABLE public.fed_user_role_mapping OWNER TO kc_user;
 
 --
+-- TOC entry 245 (class 1259 OID 16535)
 -- Name: federated_identity; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -546,6 +579,7 @@ CREATE TABLE public.federated_identity (
 ALTER TABLE public.federated_identity OWNER TO kc_user;
 
 --
+-- TOC entry 246 (class 1259 OID 16540)
 -- Name: federated_user; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -559,6 +593,7 @@ CREATE TABLE public.federated_user (
 ALTER TABLE public.federated_user OWNER TO kc_user;
 
 --
+-- TOC entry 247 (class 1259 OID 16545)
 -- Name: group_attribute; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -573,6 +608,7 @@ CREATE TABLE public.group_attribute (
 ALTER TABLE public.group_attribute OWNER TO kc_user;
 
 --
+-- TOC entry 248 (class 1259 OID 16551)
 -- Name: group_role_mapping; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -585,6 +621,7 @@ CREATE TABLE public.group_role_mapping (
 ALTER TABLE public.group_role_mapping OWNER TO kc_user;
 
 --
+-- TOC entry 249 (class 1259 OID 16554)
 -- Name: identity_provider; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -610,6 +647,7 @@ CREATE TABLE public.identity_provider (
 ALTER TABLE public.identity_provider OWNER TO kc_user;
 
 --
+-- TOC entry 250 (class 1259 OID 16566)
 -- Name: identity_provider_config; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -623,6 +661,7 @@ CREATE TABLE public.identity_provider_config (
 ALTER TABLE public.identity_provider_config OWNER TO kc_user;
 
 --
+-- TOC entry 251 (class 1259 OID 16571)
 -- Name: identity_provider_mapper; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -638,6 +677,7 @@ CREATE TABLE public.identity_provider_mapper (
 ALTER TABLE public.identity_provider_mapper OWNER TO kc_user;
 
 --
+-- TOC entry 252 (class 1259 OID 16576)
 -- Name: idp_mapper_config; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -651,6 +691,7 @@ CREATE TABLE public.idp_mapper_config (
 ALTER TABLE public.idp_mapper_config OWNER TO kc_user;
 
 --
+-- TOC entry 253 (class 1259 OID 16581)
 -- Name: jgroups_ping; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -666,6 +707,7 @@ CREATE TABLE public.jgroups_ping (
 ALTER TABLE public.jgroups_ping OWNER TO kc_user;
 
 --
+-- TOC entry 254 (class 1259 OID 16586)
 -- Name: keycloak_group; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -682,6 +724,7 @@ CREATE TABLE public.keycloak_group (
 ALTER TABLE public.keycloak_group OWNER TO kc_user;
 
 --
+-- TOC entry 255 (class 1259 OID 16592)
 -- Name: keycloak_role; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -700,6 +743,7 @@ CREATE TABLE public.keycloak_role (
 ALTER TABLE public.keycloak_role OWNER TO kc_user;
 
 --
+-- TOC entry 256 (class 1259 OID 16598)
 -- Name: migration_model; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -713,6 +757,7 @@ CREATE TABLE public.migration_model (
 ALTER TABLE public.migration_model OWNER TO kc_user;
 
 --
+-- TOC entry 257 (class 1259 OID 16602)
 -- Name: offline_client_session; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -731,6 +776,7 @@ CREATE TABLE public.offline_client_session (
 ALTER TABLE public.offline_client_session OWNER TO kc_user;
 
 --
+-- TOC entry 258 (class 1259 OID 16610)
 -- Name: offline_user_session; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -750,6 +796,7 @@ CREATE TABLE public.offline_user_session (
 ALTER TABLE public.offline_user_session OWNER TO kc_user;
 
 --
+-- TOC entry 259 (class 1259 OID 16617)
 -- Name: org; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -768,6 +815,7 @@ CREATE TABLE public.org (
 ALTER TABLE public.org OWNER TO kc_user;
 
 --
+-- TOC entry 260 (class 1259 OID 16622)
 -- Name: org_domain; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -782,6 +830,7 @@ CREATE TABLE public.org_domain (
 ALTER TABLE public.org_domain OWNER TO kc_user;
 
 --
+-- TOC entry 261 (class 1259 OID 16627)
 -- Name: policy_config; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -795,6 +844,7 @@ CREATE TABLE public.policy_config (
 ALTER TABLE public.policy_config OWNER TO kc_user;
 
 --
+-- TOC entry 262 (class 1259 OID 16632)
 -- Name: protocol_mapper; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -811,6 +861,7 @@ CREATE TABLE public.protocol_mapper (
 ALTER TABLE public.protocol_mapper OWNER TO kc_user;
 
 --
+-- TOC entry 263 (class 1259 OID 16637)
 -- Name: protocol_mapper_config; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -824,6 +875,7 @@ CREATE TABLE public.protocol_mapper_config (
 ALTER TABLE public.protocol_mapper_config OWNER TO kc_user;
 
 --
+-- TOC entry 264 (class 1259 OID 16642)
 -- Name: realm; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -887,6 +939,7 @@ CREATE TABLE public.realm (
 ALTER TABLE public.realm OWNER TO kc_user;
 
 --
+-- TOC entry 265 (class 1259 OID 16675)
 -- Name: realm_attribute; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -900,6 +953,7 @@ CREATE TABLE public.realm_attribute (
 ALTER TABLE public.realm_attribute OWNER TO kc_user;
 
 --
+-- TOC entry 266 (class 1259 OID 16680)
 -- Name: realm_default_groups; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -912,6 +966,7 @@ CREATE TABLE public.realm_default_groups (
 ALTER TABLE public.realm_default_groups OWNER TO kc_user;
 
 --
+-- TOC entry 267 (class 1259 OID 16683)
 -- Name: realm_enabled_event_types; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -924,6 +979,7 @@ CREATE TABLE public.realm_enabled_event_types (
 ALTER TABLE public.realm_enabled_event_types OWNER TO kc_user;
 
 --
+-- TOC entry 268 (class 1259 OID 16686)
 -- Name: realm_events_listeners; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -936,6 +992,7 @@ CREATE TABLE public.realm_events_listeners (
 ALTER TABLE public.realm_events_listeners OWNER TO kc_user;
 
 --
+-- TOC entry 269 (class 1259 OID 16689)
 -- Name: realm_localizations; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -949,6 +1006,7 @@ CREATE TABLE public.realm_localizations (
 ALTER TABLE public.realm_localizations OWNER TO kc_user;
 
 --
+-- TOC entry 270 (class 1259 OID 16694)
 -- Name: realm_required_credential; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -964,6 +1022,7 @@ CREATE TABLE public.realm_required_credential (
 ALTER TABLE public.realm_required_credential OWNER TO kc_user;
 
 --
+-- TOC entry 271 (class 1259 OID 16701)
 -- Name: realm_smtp_config; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -977,6 +1036,7 @@ CREATE TABLE public.realm_smtp_config (
 ALTER TABLE public.realm_smtp_config OWNER TO kc_user;
 
 --
+-- TOC entry 272 (class 1259 OID 16706)
 -- Name: realm_supported_locales; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -989,6 +1049,7 @@ CREATE TABLE public.realm_supported_locales (
 ALTER TABLE public.realm_supported_locales OWNER TO kc_user;
 
 --
+-- TOC entry 273 (class 1259 OID 16709)
 -- Name: redirect_uris; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -1001,6 +1062,7 @@ CREATE TABLE public.redirect_uris (
 ALTER TABLE public.redirect_uris OWNER TO kc_user;
 
 --
+-- TOC entry 274 (class 1259 OID 16712)
 -- Name: required_action_config; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -1014,6 +1076,7 @@ CREATE TABLE public.required_action_config (
 ALTER TABLE public.required_action_config OWNER TO kc_user;
 
 --
+-- TOC entry 275 (class 1259 OID 16717)
 -- Name: required_action_provider; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -1032,6 +1095,7 @@ CREATE TABLE public.required_action_provider (
 ALTER TABLE public.required_action_provider OWNER TO kc_user;
 
 --
+-- TOC entry 276 (class 1259 OID 16724)
 -- Name: resource_attribute; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -1046,6 +1110,7 @@ CREATE TABLE public.resource_attribute (
 ALTER TABLE public.resource_attribute OWNER TO kc_user;
 
 --
+-- TOC entry 277 (class 1259 OID 16730)
 -- Name: resource_policy; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -1058,6 +1123,7 @@ CREATE TABLE public.resource_policy (
 ALTER TABLE public.resource_policy OWNER TO kc_user;
 
 --
+-- TOC entry 278 (class 1259 OID 16733)
 -- Name: resource_scope; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -1070,6 +1136,7 @@ CREATE TABLE public.resource_scope (
 ALTER TABLE public.resource_scope OWNER TO kc_user;
 
 --
+-- TOC entry 279 (class 1259 OID 16736)
 -- Name: resource_server; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -1084,6 +1151,7 @@ CREATE TABLE public.resource_server (
 ALTER TABLE public.resource_server OWNER TO kc_user;
 
 --
+-- TOC entry 280 (class 1259 OID 16741)
 -- Name: resource_server_perm_ticket; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -1103,6 +1171,7 @@ CREATE TABLE public.resource_server_perm_ticket (
 ALTER TABLE public.resource_server_perm_ticket OWNER TO kc_user;
 
 --
+-- TOC entry 281 (class 1259 OID 16746)
 -- Name: resource_server_policy; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -1121,6 +1190,7 @@ CREATE TABLE public.resource_server_policy (
 ALTER TABLE public.resource_server_policy OWNER TO kc_user;
 
 --
+-- TOC entry 282 (class 1259 OID 16751)
 -- Name: resource_server_resource; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -1139,6 +1209,7 @@ CREATE TABLE public.resource_server_resource (
 ALTER TABLE public.resource_server_resource OWNER TO kc_user;
 
 --
+-- TOC entry 283 (class 1259 OID 16757)
 -- Name: resource_server_scope; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -1154,6 +1225,7 @@ CREATE TABLE public.resource_server_scope (
 ALTER TABLE public.resource_server_scope OWNER TO kc_user;
 
 --
+-- TOC entry 284 (class 1259 OID 16762)
 -- Name: resource_uris; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -1166,6 +1238,7 @@ CREATE TABLE public.resource_uris (
 ALTER TABLE public.resource_uris OWNER TO kc_user;
 
 --
+-- TOC entry 285 (class 1259 OID 16765)
 -- Name: revoked_token; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -1178,6 +1251,7 @@ CREATE TABLE public.revoked_token (
 ALTER TABLE public.revoked_token OWNER TO kc_user;
 
 --
+-- TOC entry 286 (class 1259 OID 16768)
 -- Name: role_attribute; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -1192,6 +1266,7 @@ CREATE TABLE public.role_attribute (
 ALTER TABLE public.role_attribute OWNER TO kc_user;
 
 --
+-- TOC entry 287 (class 1259 OID 16773)
 -- Name: scope_mapping; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -1204,6 +1279,7 @@ CREATE TABLE public.scope_mapping (
 ALTER TABLE public.scope_mapping OWNER TO kc_user;
 
 --
+-- TOC entry 288 (class 1259 OID 16776)
 -- Name: scope_policy; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -1216,6 +1292,7 @@ CREATE TABLE public.scope_policy (
 ALTER TABLE public.scope_policy OWNER TO kc_user;
 
 --
+-- TOC entry 289 (class 1259 OID 16779)
 -- Name: server_config; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -1229,6 +1306,7 @@ CREATE TABLE public.server_config (
 ALTER TABLE public.server_config OWNER TO kc_user;
 
 --
+-- TOC entry 290 (class 1259 OID 16785)
 -- Name: user_attribute; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -1246,6 +1324,7 @@ CREATE TABLE public.user_attribute (
 ALTER TABLE public.user_attribute OWNER TO kc_user;
 
 --
+-- TOC entry 291 (class 1259 OID 16791)
 -- Name: user_consent; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -1263,6 +1342,7 @@ CREATE TABLE public.user_consent (
 ALTER TABLE public.user_consent OWNER TO kc_user;
 
 --
+-- TOC entry 292 (class 1259 OID 16796)
 -- Name: user_consent_client_scope; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -1275,6 +1355,7 @@ CREATE TABLE public.user_consent_client_scope (
 ALTER TABLE public.user_consent_client_scope OWNER TO kc_user;
 
 --
+-- TOC entry 293 (class 1259 OID 16799)
 -- Name: user_entity; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -1298,6 +1379,7 @@ CREATE TABLE public.user_entity (
 ALTER TABLE public.user_entity OWNER TO kc_user;
 
 --
+-- TOC entry 294 (class 1259 OID 16807)
 -- Name: user_federation_config; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -1311,6 +1393,7 @@ CREATE TABLE public.user_federation_config (
 ALTER TABLE public.user_federation_config OWNER TO kc_user;
 
 --
+-- TOC entry 295 (class 1259 OID 16812)
 -- Name: user_federation_mapper; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -1326,6 +1409,7 @@ CREATE TABLE public.user_federation_mapper (
 ALTER TABLE public.user_federation_mapper OWNER TO kc_user;
 
 --
+-- TOC entry 296 (class 1259 OID 16817)
 -- Name: user_federation_mapper_config; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -1339,6 +1423,7 @@ CREATE TABLE public.user_federation_mapper_config (
 ALTER TABLE public.user_federation_mapper_config OWNER TO kc_user;
 
 --
+-- TOC entry 297 (class 1259 OID 16822)
 -- Name: user_federation_provider; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -1357,6 +1442,7 @@ CREATE TABLE public.user_federation_provider (
 ALTER TABLE public.user_federation_provider OWNER TO kc_user;
 
 --
+-- TOC entry 298 (class 1259 OID 16827)
 -- Name: user_group_membership; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -1370,6 +1456,7 @@ CREATE TABLE public.user_group_membership (
 ALTER TABLE public.user_group_membership OWNER TO kc_user;
 
 --
+-- TOC entry 299 (class 1259 OID 16830)
 -- Name: user_required_action; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -1382,6 +1469,7 @@ CREATE TABLE public.user_required_action (
 ALTER TABLE public.user_required_action OWNER TO kc_user;
 
 --
+-- TOC entry 300 (class 1259 OID 16834)
 -- Name: user_role_mapping; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -1394,6 +1482,7 @@ CREATE TABLE public.user_role_mapping (
 ALTER TABLE public.user_role_mapping OWNER TO kc_user;
 
 --
+-- TOC entry 301 (class 1259 OID 16837)
 -- Name: web_origins; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -1406,6 +1495,7 @@ CREATE TABLE public.web_origins (
 ALTER TABLE public.web_origins OWNER TO kc_user;
 
 --
+-- TOC entry 302 (class 1259 OID 16840)
 -- Name: workflow_state; Type: TABLE; Schema: public; Owner: kc_user
 --
 
@@ -1423,6 +1513,8 @@ CREATE TABLE public.workflow_state (
 ALTER TABLE public.workflow_state OWNER TO kc_user;
 
 --
+-- TOC entry 4211 (class 0 OID 16385)
+-- Dependencies: 214
 -- Data for Name: admin_event_entity; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -1431,6 +1523,8 @@ COPY public.admin_event_entity (id, admin_event_time, realm_id, operation_type, 
 
 
 --
+-- TOC entry 4212 (class 0 OID 16390)
+-- Dependencies: 215
 -- Data for Name: associated_policy; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -1439,6 +1533,8 @@ COPY public.associated_policy (policy_id, associated_policy_id) FROM stdin;
 
 
 --
+-- TOC entry 4213 (class 0 OID 16393)
+-- Dependencies: 216
 -- Data for Name: authentication_execution; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -1550,6 +1646,8 @@ d688768b-16fb-4645-85d7-49426dff1026	\N	idp-add-organization-member	000c9ecc-9c3
 
 
 --
+-- TOC entry 4214 (class 0 OID 16397)
+-- Dependencies: 217
 -- Data for Name: authentication_flow; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -1597,6 +1695,8 @@ a9df4bfa-8957-40ee-9a79-82c4de6838fa	saml ecp	SAML ECP Profile Authentication Fl
 
 
 --
+-- TOC entry 4215 (class 0 OID 16405)
+-- Dependencies: 218
 -- Data for Name: authenticator_config; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -1613,6 +1713,8 @@ d8629046-b03c-423b-803e-9a3c2a687f33	create unique user config	000c9ecc-9c3a-44d
 
 
 --
+-- TOC entry 4216 (class 0 OID 16408)
+-- Dependencies: 219
 -- Data for Name: authenticator_config_entry; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -1629,6 +1731,8 @@ d8629046-b03c-423b-803e-9a3c2a687f33	false	require.password.update.after.registr
 
 
 --
+-- TOC entry 4217 (class 0 OID 16413)
+-- Dependencies: 220
 -- Data for Name: broker_link; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -1637,6 +1741,8 @@ COPY public.broker_link (identity_provider, storage_provider_id, realm_id, broke
 
 
 --
+-- TOC entry 4218 (class 0 OID 16418)
+-- Dependencies: 221
 -- Data for Name: client; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -1655,10 +1761,13 @@ d6950149-318e-4aa6-b269-0054a67501d6	t	f	alumnet-realm-realm	0	f	\N	\N	t	\N	f	06
 f386953e-2fb0-4093-b0a6-bc07803ce34e	t	t	security-admin-console	0	t	\N	/admin/alumnet-realm/console/	f	\N	f	000c9ecc-9c3a-44d3-94fe-941ff152490f	openid-connect	0	f	f	${client_security-admin-console}	f	client-secret	${authAdminUrl}	\N	\N	t	f	f	f
 1a31b1fd-ab20-4aac-adc8-622b23f431e6	t	t	admin-cli	0	t	\N	\N	f	\N	f	000c9ecc-9c3a-44d3-94fe-941ff152490f	openid-connect	0	f	f	${client_admin-cli}	f	client-secret	\N	\N	\N	f	f	t	f
 a17e62f0-27d3-4e2f-9362-451b9cc24dc3	t	t	alumnet	0	t	\N		f		f	000c9ecc-9c3a-44d3-94fe-941ff152490f	openid-connect	-1	t	f	alumnet	f	client-secret			\N	t	f	t	f
+b9a6b3be-9f94-4272-8e8e-a71b8b9050bb	t	t	alum-net	0	f	ijFpRq7suAnWIGpZHxDvREvbBT4ByiWZ		f		f	0666ea4e-c88f-4e30-bf74-4874c0b2484d	openid-connect	-1	t	f		f	client-secret			\N	t	t	t	t
 \.
 
 
 --
+-- TOC entry 4219 (class 0 OID 16436)
+-- Dependencies: 222
 -- Data for Name: client_attributes; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -1683,10 +1792,23 @@ a17e62f0-27d3-4e2f-9362-451b9cc24dc3	oidc.ciba.grant.enabled	false
 a17e62f0-27d3-4e2f-9362-451b9cc24dc3	dpop.bound.access.tokens	false
 a17e62f0-27d3-4e2f-9362-451b9cc24dc3	backchannel.logout.session.required	true
 a17e62f0-27d3-4e2f-9362-451b9cc24dc3	backchannel.logout.revoke.offline.tokens	false
+b9a6b3be-9f94-4272-8e8e-a71b8b9050bb	client.secret.creation.time	1760569235
+b9a6b3be-9f94-4272-8e8e-a71b8b9050bb	standard.token.exchange.enabled	false
+b9a6b3be-9f94-4272-8e8e-a71b8b9050bb	oauth2.device.authorization.grant.enabled	false
+b9a6b3be-9f94-4272-8e8e-a71b8b9050bb	oidc.ciba.grant.enabled	false
+b9a6b3be-9f94-4272-8e8e-a71b8b9050bb	dpop.bound.access.tokens	false
+b9a6b3be-9f94-4272-8e8e-a71b8b9050bb	backchannel.logout.session.required	true
+b9a6b3be-9f94-4272-8e8e-a71b8b9050bb	backchannel.logout.revoke.offline.tokens	false
+a17e62f0-27d3-4e2f-9362-451b9cc24dc3	realm_client	false
+a17e62f0-27d3-4e2f-9362-451b9cc24dc3	display.on.consent.screen	false
+a17e62f0-27d3-4e2f-9362-451b9cc24dc3	frontchannel.logout.session.required	true
+a17e62f0-27d3-4e2f-9362-451b9cc24dc3	post.logout.redirect.uris	http://localhost:8081##http://localhost:8082##alumnet.mobile://auth
 \.
 
 
 --
+-- TOC entry 4220 (class 0 OID 16441)
+-- Dependencies: 223
 -- Data for Name: client_auth_flow_bindings; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -1695,6 +1817,8 @@ COPY public.client_auth_flow_bindings (client_id, flow_id, binding_name) FROM st
 
 
 --
+-- TOC entry 4221 (class 0 OID 16444)
+-- Dependencies: 224
 -- Data for Name: client_initial_access; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -1703,6 +1827,8 @@ COPY public.client_initial_access (id, realm_id, "timestamp", expiration, count,
 
 
 --
+-- TOC entry 4222 (class 0 OID 16447)
+-- Dependencies: 225
 -- Data for Name: client_node_registrations; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -1711,6 +1837,8 @@ COPY public.client_node_registrations (client_id, value, name) FROM stdin;
 
 
 --
+-- TOC entry 4223 (class 0 OID 16450)
+-- Dependencies: 226
 -- Data for Name: client_scope; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -1747,6 +1875,8 @@ a63914be-3f59-4780-98f4-ed55a3bb4d1e	basic	000c9ecc-9c3a-44d3-94fe-941ff152490f	
 
 
 --
+-- TOC entry 4224 (class 0 OID 16455)
+-- Dependencies: 227
 -- Data for Name: client_scope_attributes; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -1823,6 +1953,8 @@ a63914be-3f59-4780-98f4-ed55a3bb4d1e	false	include.in.token.scope
 
 
 --
+-- TOC entry 4225 (class 0 OID 16460)
+-- Dependencies: 228
 -- Data for Name: client_scope_client; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -1970,10 +2102,23 @@ a17e62f0-27d3-4e2f-9362-451b9cc24dc3	0f21e46c-0abc-44e7-b9c5-2da49b32e298	f
 a17e62f0-27d3-4e2f-9362-451b9cc24dc3	748440bd-2511-49b1-911a-d7358db20a62	f
 a17e62f0-27d3-4e2f-9362-451b9cc24dc3	7b1c264b-9d0c-4b3b-b16e-69fc224d9f7f	f
 a17e62f0-27d3-4e2f-9362-451b9cc24dc3	18650c31-3ce4-4b1e-8f73-875ae273569d	f
+b9a6b3be-9f94-4272-8e8e-a71b8b9050bb	62575e76-6395-4763-8bef-09e8e8d59993	t
+b9a6b3be-9f94-4272-8e8e-a71b8b9050bb	62f74fe4-018f-4b9a-bbc3-cfdd9e1fb856	t
+b9a6b3be-9f94-4272-8e8e-a71b8b9050bb	7e8f2efc-a69f-4c37-940d-aabff960c64b	t
+b9a6b3be-9f94-4272-8e8e-a71b8b9050bb	01a2c8df-abd8-444c-8e7f-61d62c869545	t
+b9a6b3be-9f94-4272-8e8e-a71b8b9050bb	593c1616-ca62-42db-94eb-f3c5487a52da	t
+b9a6b3be-9f94-4272-8e8e-a71b8b9050bb	c5eed9dc-700f-4362-8804-04f04da04765	t
+b9a6b3be-9f94-4272-8e8e-a71b8b9050bb	e0494fe5-b7de-45d8-bb95-af39b1cc1ffc	f
+b9a6b3be-9f94-4272-8e8e-a71b8b9050bb	354e93d1-efa3-497f-984f-8d4a0a76c2a6	f
+b9a6b3be-9f94-4272-8e8e-a71b8b9050bb	96bb40cf-535c-4937-ae0f-0c913bf5952f	f
+b9a6b3be-9f94-4272-8e8e-a71b8b9050bb	688617ce-f549-4120-a885-33b3dfae6282	f
+b9a6b3be-9f94-4272-8e8e-a71b8b9050bb	68d40b24-a216-4a20-84b6-81420d7a0c95	f
 \.
 
 
 --
+-- TOC entry 4226 (class 0 OID 16466)
+-- Dependencies: 229
 -- Data for Name: client_scope_role_mapping; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -1984,6 +2129,8 @@ f8e4d1e8-7103-4704-97a3-1ee62aa86660	5c4bc45a-6893-4c05-8fdc-3c81acf61bd7
 
 
 --
+-- TOC entry 4227 (class 0 OID 16469)
+-- Dependencies: 230
 -- Data for Name: component; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -2018,6 +2165,8 @@ b10d8026-9a9d-436f-9145-ba329ba95703	Allowed Client Scopes	000c9ecc-9c3a-44d3-94
 
 
 --
+-- TOC entry 4228 (class 0 OID 16474)
+-- Dependencies: 231
 -- Data for Name: component_config; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -2102,6 +2251,8 @@ cbb7dd06-dc50-4403-9364-20cea7e28ce2	1bd5d631-de1b-4941-8608-3b6ce996c7cc	kc.use
 
 
 --
+-- TOC entry 4229 (class 0 OID 16479)
+-- Dependencies: 232
 -- Data for Name: composite_role; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -2186,18 +2337,22 @@ ce17e30f-1745-49ec-a4e0-8e29422c83d8	3e48e728-f874-4e1f-b04f-7e9dcd067f10
 
 
 --
+-- TOC entry 4230 (class 0 OID 16482)
+-- Dependencies: 233
 -- Data for Name: credential; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
 COPY public.credential (id, salt, type, user_id, created_date, user_label, secret_data, credential_data, priority, version) FROM stdin;
 a9fa30e3-628e-4d8e-b154-06400d310753	\N	password	017b322f-033a-4d6c-a258-8ca95786e66e	1760475834604	My password	{"value":"aVLN09QwCEP3Pu35bxD4byv24lsXstD7UZevSOIuXr8=","salt":"pBkDoqwIhEXhkGUTLqeHKQ==","additionalParameters":{}}	{"hashIterations":5,"algorithm":"argon2","additionalParameters":{"hashLength":["32"],"memory":["7168"],"type":["id"],"version":["1.3"],"parallelism":["1"]}}	10	1
 636e7742-f388-4b5a-99e7-3f05f821afde	\N	password	467fca2a-add9-4201-ab6b-ecd48914da54	1760476216674	My password	{"value":"D6hIqfaAOdjlfK2/H4VjNszjyhZ9qZSUbBo+fGQh/Hk=","salt":"lMtphN3xo77p8s/IUROahg==","additionalParameters":{}}	{"hashIterations":5,"algorithm":"argon2","additionalParameters":{"hashLength":["32"],"memory":["7168"],"type":["id"],"version":["1.3"],"parallelism":["1"]}}	10	1
-f96a5587-355e-48cc-b113-4bfdb533e43a	\N	password	4c0a6f96-ef5e-4a79-9dc4-581d694cb03f	1760734913917	My password	{"value":"Rtt7BNHiydF+WnOiPyB+Wt0SR3cqpTZokBxZKETv0kE=","salt":"JAETGQzBkiPYTJ+nutiCDQ==","additionalParameters":{}}	{"hashIterations":5,"algorithm":"argon2","additionalParameters":{"hashLength":["32"],"memory":["7168"],"type":["id"],"version":["1.3"],"parallelism":["1"]}}	10	3
-681437b3-10f4-40c4-81cb-aa457a8afdee	\N	password	c1a46183-c520-424e-80fe-2aad53113eff	1760737402673	My password	{"value":"3t3FGyfOh8sun0Rh2b/8osxZInOXgHvu9mSiyJXF8yg=","salt":"pI7veSH8XZrS0T4ruJ7SDQ==","additionalParameters":{}}	{"hashIterations":5,"algorithm":"argon2","additionalParameters":{"hashLength":["32"],"memory":["7168"],"type":["id"],"version":["1.3"],"parallelism":["1"]}}	10	1
+62cedfe4-187e-4168-9eff-8bb5b8dbf647	\N	password	7a7ffec9-1041-4c28-8fec-f8e958db8bbf	1760559060710	My password	{"value":"UALpI5NEARwBRUEhhH4iqO+3rEbbKLyotyQv8tUnkEk=","salt":"wQ+ac2ZyS/gYBxU/TQ1sbQ==","additionalParameters":{}}	{"hashIterations":5,"algorithm":"argon2","additionalParameters":{"hashLength":["32"],"memory":["7168"],"type":["id"],"version":["1.3"],"parallelism":["1"]}}	10	1
+b204c29f-926f-4bfd-8703-98285627f065	\N	password	dbd69f1a-4a1a-4797-972b-ec0494972068	1760568810998	My password	{"value":"/6qHNpmfaQXUc5rmcuFaOF6PM9C8Rg3g+As5q/ndlqk=","salt":"gO7LZUpxpZehtmrDwo/KrA==","additionalParameters":{}}	{"hashIterations":5,"algorithm":"argon2","additionalParameters":{"hashLength":["32"],"memory":["7168"],"type":["id"],"version":["1.3"],"parallelism":["1"]}}	10	1
 \.
 
 
 --
+-- TOC entry 4231 (class 0 OID 16488)
+-- Dependencies: 234
 -- Data for Name: databasechangelog; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -2371,6 +2526,8 @@ unique-consentuser-mysql	keycloak	META-INF/jpa-changelog-25.0.0.xml	2025-10-14 2
 
 
 --
+-- TOC entry 4232 (class 0 OID 16493)
+-- Dependencies: 235
 -- Data for Name: databasechangeloglock; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -2381,6 +2538,8 @@ COPY public.databasechangeloglock (id, locked, lockgranted, lockedby) FROM stdin
 
 
 --
+-- TOC entry 4233 (class 0 OID 16496)
+-- Dependencies: 236
 -- Data for Name: default_client_scope; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -2415,6 +2574,8 @@ COPY public.default_client_scope (realm_id, scope_id, default_scope) FROM stdin;
 
 
 --
+-- TOC entry 4234 (class 0 OID 16500)
+-- Dependencies: 237
 -- Data for Name: event_entity; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -2423,6 +2584,8 @@ COPY public.event_entity (id, client_id, details_json, error, ip_address, realm_
 
 
 --
+-- TOC entry 4235 (class 0 OID 16505)
+-- Dependencies: 238
 -- Data for Name: fed_user_attribute; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -2431,6 +2594,8 @@ COPY public.fed_user_attribute (id, name, user_id, realm_id, storage_provider_id
 
 
 --
+-- TOC entry 4236 (class 0 OID 16510)
+-- Dependencies: 239
 -- Data for Name: fed_user_consent; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -2439,6 +2604,8 @@ COPY public.fed_user_consent (id, client_id, user_id, realm_id, storage_provider
 
 
 --
+-- TOC entry 4237 (class 0 OID 16515)
+-- Dependencies: 240
 -- Data for Name: fed_user_consent_cl_scope; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -2447,6 +2614,8 @@ COPY public.fed_user_consent_cl_scope (user_consent_id, scope_id) FROM stdin;
 
 
 --
+-- TOC entry 4238 (class 0 OID 16518)
+-- Dependencies: 241
 -- Data for Name: fed_user_credential; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -2455,6 +2624,8 @@ COPY public.fed_user_credential (id, salt, type, created_date, user_id, realm_id
 
 
 --
+-- TOC entry 4239 (class 0 OID 16523)
+-- Dependencies: 242
 -- Data for Name: fed_user_group_membership; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -2463,6 +2634,8 @@ COPY public.fed_user_group_membership (group_id, user_id, realm_id, storage_prov
 
 
 --
+-- TOC entry 4240 (class 0 OID 16526)
+-- Dependencies: 243
 -- Data for Name: fed_user_required_action; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -2471,6 +2644,8 @@ COPY public.fed_user_required_action (required_action, user_id, realm_id, storag
 
 
 --
+-- TOC entry 4241 (class 0 OID 16532)
+-- Dependencies: 244
 -- Data for Name: fed_user_role_mapping; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -2479,6 +2654,8 @@ COPY public.fed_user_role_mapping (role_id, user_id, realm_id, storage_provider_
 
 
 --
+-- TOC entry 4242 (class 0 OID 16535)
+-- Dependencies: 245
 -- Data for Name: federated_identity; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -2487,6 +2664,8 @@ COPY public.federated_identity (identity_provider, realm_id, federated_user_id, 
 
 
 --
+-- TOC entry 4243 (class 0 OID 16540)
+-- Dependencies: 246
 -- Data for Name: federated_user; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -2495,6 +2674,8 @@ COPY public.federated_user (id, storage_provider_id, realm_id) FROM stdin;
 
 
 --
+-- TOC entry 4244 (class 0 OID 16545)
+-- Dependencies: 247
 -- Data for Name: group_attribute; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -2503,6 +2684,8 @@ COPY public.group_attribute (id, name, value, group_id) FROM stdin;
 
 
 --
+-- TOC entry 4245 (class 0 OID 16551)
+-- Dependencies: 248
 -- Data for Name: group_role_mapping; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -2514,6 +2697,8 @@ e0d10597-bf56-4ce3-8d60-fcc45260c6b6	ea0097c4-3325-494e-904b-ef6fef8c9ddb
 
 
 --
+-- TOC entry 4246 (class 0 OID 16554)
+-- Dependencies: 249
 -- Data for Name: identity_provider; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -2522,6 +2707,8 @@ COPY public.identity_provider (internal_id, enabled, provider_alias, provider_id
 
 
 --
+-- TOC entry 4247 (class 0 OID 16566)
+-- Dependencies: 250
 -- Data for Name: identity_provider_config; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -2530,6 +2717,8 @@ COPY public.identity_provider_config (identity_provider_id, value, name) FROM st
 
 
 --
+-- TOC entry 4248 (class 0 OID 16571)
+-- Dependencies: 251
 -- Data for Name: identity_provider_mapper; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -2538,6 +2727,8 @@ COPY public.identity_provider_mapper (id, name, idp_alias, idp_mapper_name, real
 
 
 --
+-- TOC entry 4249 (class 0 OID 16576)
+-- Dependencies: 252
 -- Data for Name: idp_mapper_config; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -2546,15 +2737,19 @@ COPY public.idp_mapper_config (idp_mapper_id, value, name) FROM stdin;
 
 
 --
+-- TOC entry 4250 (class 0 OID 16581)
+-- Dependencies: 253
 -- Data for Name: jgroups_ping; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
 COPY public.jgroups_ping (address, name, cluster_name, ip, coord) FROM stdin;
-uuid://00000000-0000-0000-0000-000000000004	b92c4d7e7b23-3644	ISPN	172.19.0.5:7800	t
+uuid://00000000-0000-0000-0000-000000000009	64f2e52e058a-60631	ISPN	172.19.0.5:7800	t
 \.
 
 
 --
+-- TOC entry 4251 (class 0 OID 16586)
+-- Dependencies: 254
 -- Data for Name: keycloak_group; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -2566,6 +2761,8 @@ caf0000d-bab0-4414-9096-2430000ac9b1	students	 	000c9ecc-9c3a-44d3-94fe-941ff152
 
 
 --
+-- TOC entry 4252 (class 0 OID 16592)
+-- Dependencies: 255
 -- Data for Name: keycloak_role; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -2658,42 +2855,41 @@ e0d10597-bf56-4ce3-8d60-fcc45260c6b6	a17e62f0-27d3-4e2f-9362-451b9cc24dc3	t		tea
 
 
 --
+-- TOC entry 4253 (class 0 OID 16598)
+-- Dependencies: 256
 -- Data for Name: migration_model; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
 COPY public.migration_model (id, version, update_time) FROM stdin;
 x5rd4	26.4.0	1760474919
-e8lft	26.4.1	1760734430
 \.
 
 
 --
+-- TOC entry 4254 (class 0 OID 16602)
+-- Dependencies: 257
 -- Data for Name: offline_client_session; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
 COPY public.offline_client_session (user_session_id, client_id, offline_flag, "timestamp", data, client_storage_provider, external_client_id, version) FROM stdin;
-f507708f-e00d-901a-a262-b0da322d6e94	46c97fed-5865-497a-90cc-eeb6a263032a	0	1760741793	{"authMethod":"openid-connect","redirectUri":"http://localhost:8000/admin/master/console/#/alumnet-realm/users/4c0a6f96-ef5e-4a79-9dc4-581d694cb03f/credentials","notes":{"clientId":"46c97fed-5865-497a-90cc-eeb6a263032a","iss":"http://localhost:8000/realms/master","startedAt":"1760741792","response_type":"code","level-of-authentication":"-1","code_challenge_method":"S256","nonce":"ac63475c-bb37-42ec-a3ef-b4f672a89106","response_mode":"query","scope":"openid","userSessionStartedAt":"1760741792","redirect_uri":"http://localhost:8000/admin/master/console/#/alumnet-realm/users/4c0a6f96-ef5e-4a79-9dc4-581d694cb03f/credentials","state":"8719e1aa-581f-4db3-ac66-e40dde2b89e6","code_challenge":"kgy0NJ60a1IXezIF8Yme3rOh1vyLfM8VsFNdUqhTQX4","SSO_AUTH":"true"}}	local	local	1
-ff03cdbb-8b90-c2ce-a976-25760b75e272	a17e62f0-27d3-4e2f-9362-451b9cc24dc3	0	1760741160	{"authMethod":"openid-connect","notes":{"clientId":"a17e62f0-27d3-4e2f-9362-451b9cc24dc3","userSessionStartedAt":"1760741160","iss":"http://localhost:8000/realms/alumnet-realm","startedAt":"1760741160","level-of-authentication":"-1"}}	local	local	0
-eb3a5f7f-908f-b9fe-ce52-0e1e95d544de	a17e62f0-27d3-4e2f-9362-451b9cc24dc3	0	1760741207	{"authMethod":"openid-connect","notes":{"clientId":"a17e62f0-27d3-4e2f-9362-451b9cc24dc3","userSessionStartedAt":"1760741207","iss":"http://localhost:8000/realms/alumnet-realm","startedAt":"1760741207","level-of-authentication":"-1"}}	local	local	0
-10fbd332-fe8a-cd68-9063-296bb828ba9d	a17e62f0-27d3-4e2f-9362-451b9cc24dc3	0	1760741554	{"authMethod":"openid-connect","notes":{"clientId":"a17e62f0-27d3-4e2f-9362-451b9cc24dc3","userSessionStartedAt":"1760741554","iss":"http://localhost:8000/realms/alumnet-realm","startedAt":"1760741554","level-of-authentication":"-1"}}	local	local	0
-38a1ff87-4496-ec36-61f2-63beaf8557f6	a17e62f0-27d3-4e2f-9362-451b9cc24dc3	0	1760741576	{"authMethod":"openid-connect","notes":{"clientId":"a17e62f0-27d3-4e2f-9362-451b9cc24dc3","userSessionStartedAt":"1760741576","iss":"http://localhost:8000/realms/alumnet-realm","startedAt":"1760741576","level-of-authentication":"-1"}}	local	local	0
+673e1bad-fcce-9183-d9bd-af0b85145f9b	46c97fed-5865-497a-90cc-eeb6a263032a	0	1760799198	{"authMethod":"openid-connect","redirectUri":"http://localhost:8000/admin/master/console/","notes":{"clientId":"46c97fed-5865-497a-90cc-eeb6a263032a","iss":"http://localhost:8000/realms/master","startedAt":"1760799077","response_type":"code","level-of-authentication":"-1","code_challenge_method":"S256","nonce":"b49c297f-59e5-44f0-b982-6581b7a92138","response_mode":"query","scope":"openid","userSessionStartedAt":"1760799077","redirect_uri":"http://localhost:8000/admin/master/console/","state":"a85c3dac-035c-401f-89e0-45b6831fa07b","code_challenge":"tBxGyxWBcNGItP9BJr0BNhFBJJMyUjSNPtPnh6AON2I","SSO_AUTH":"true"}}	local	local	6
 \.
 
 
 --
+-- TOC entry 4255 (class 0 OID 16610)
+-- Dependencies: 258
 -- Data for Name: offline_user_session; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
 COPY public.offline_user_session (user_session_id, user_id, realm_id, created_on, offline_flag, data, last_session_refresh, broker_session_id, version) FROM stdin;
-ff03cdbb-8b90-c2ce-a976-25760b75e272	4c0a6f96-ef5e-4a79-9dc4-581d694cb03f	000c9ecc-9c3a-44d3-94fe-941ff152490f	1760741160	0	{"ipAddress":"172.19.0.1","authMethod":"openid-connect","rememberMe":false,"started":0,"notes":{"KC_DEVICE_NOTE":"eyJpcEFkZHJlc3MiOiIxNzIuMTkuMC4xIiwib3MiOiJPdGhlciIsIm9zVmVyc2lvbiI6IlVua25vd24iLCJicm93c2VyIjoiUG9zdG1hblJ1bnRpbWUvNy40OC4wIiwiZGV2aWNlIjoiT3RoZXIiLCJsYXN0QWNjZXNzIjowLCJtb2JpbGUiOmZhbHNlfQ==","authenticators-completed":"{\\"3962038b-57d5-49ba-aae2-338012ed70fb\\":1760741160,\\"5bce9eaf-0e32-45e4-8935-6783a63ef919\\":1760741160}"},"state":"LOGGED_IN"}	1760741160	\N	0
-eb3a5f7f-908f-b9fe-ce52-0e1e95d544de	4c0a6f96-ef5e-4a79-9dc4-581d694cb03f	000c9ecc-9c3a-44d3-94fe-941ff152490f	1760741207	0	{"ipAddress":"172.19.0.1","authMethod":"openid-connect","rememberMe":false,"started":0,"notes":{"KC_DEVICE_NOTE":"eyJpcEFkZHJlc3MiOiIxNzIuMTkuMC4xIiwib3MiOiJPdGhlciIsIm9zVmVyc2lvbiI6IlVua25vd24iLCJicm93c2VyIjoiUG9zdG1hblJ1bnRpbWUvNy40OC4wIiwiZGV2aWNlIjoiT3RoZXIiLCJsYXN0QWNjZXNzIjowLCJtb2JpbGUiOmZhbHNlfQ==","authenticators-completed":"{\\"3962038b-57d5-49ba-aae2-338012ed70fb\\":1760741207,\\"5bce9eaf-0e32-45e4-8935-6783a63ef919\\":1760741207}"},"state":"LOGGED_IN"}	1760741207	\N	0
-10fbd332-fe8a-cd68-9063-296bb828ba9d	c1a46183-c520-424e-80fe-2aad53113eff	000c9ecc-9c3a-44d3-94fe-941ff152490f	1760741554	0	{"ipAddress":"172.19.0.1","authMethod":"openid-connect","rememberMe":false,"started":0,"notes":{"KC_DEVICE_NOTE":"eyJpcEFkZHJlc3MiOiIxNzIuMTkuMC4xIiwib3MiOiJPdGhlciIsIm9zVmVyc2lvbiI6IlVua25vd24iLCJicm93c2VyIjoiQXBhY2hlLUh0dHBDbGllbnQvNC41LjE0IiwiZGV2aWNlIjoiT3RoZXIiLCJsYXN0QWNjZXNzIjowLCJtb2JpbGUiOmZhbHNlfQ==","authenticators-completed":"{\\"3962038b-57d5-49ba-aae2-338012ed70fb\\":1760741554,\\"5bce9eaf-0e32-45e4-8935-6783a63ef919\\":1760741554}"},"state":"LOGGED_IN"}	1760741554	\N	0
-38a1ff87-4496-ec36-61f2-63beaf8557f6	4c0a6f96-ef5e-4a79-9dc4-581d694cb03f	000c9ecc-9c3a-44d3-94fe-941ff152490f	1760741576	0	{"ipAddress":"172.19.0.1","authMethod":"openid-connect","rememberMe":false,"started":0,"notes":{"KC_DEVICE_NOTE":"eyJpcEFkZHJlc3MiOiIxNzIuMTkuMC4xIiwib3MiOiJPdGhlciIsIm9zVmVyc2lvbiI6IlVua25vd24iLCJicm93c2VyIjoiUG9zdG1hblJ1bnRpbWUvNy40OC4wIiwiZGV2aWNlIjoiT3RoZXIiLCJsYXN0QWNjZXNzIjowLCJtb2JpbGUiOmZhbHNlfQ==","authenticators-completed":"{\\"3962038b-57d5-49ba-aae2-338012ed70fb\\":1760741576,\\"5bce9eaf-0e32-45e4-8935-6783a63ef919\\":1760741576}"},"state":"LOGGED_IN"}	1760741576	\N	0
-f507708f-e00d-901a-a262-b0da322d6e94	017b322f-033a-4d6c-a258-8ca95786e66e	0666ea4e-c88f-4e30-bf74-4874c0b2484d	1760741792	0	{"ipAddress":"172.19.0.1","authMethod":"openid-connect","rememberMe":false,"started":0,"notes":{"KC_DEVICE_NOTE":"eyJpcEFkZHJlc3MiOiIxNzIuMTkuMC4xIiwib3MiOiJMaW51eCIsIm9zVmVyc2lvbiI6IlVua25vd24iLCJicm93c2VyIjoiQ2hyb21lLzEzOS4wLjAiLCJkZXZpY2UiOiJPdGhlciIsImxhc3RBY2Nlc3MiOjAsIm1vYmlsZSI6ZmFsc2V9","AUTH_TIME":"1760741792","authenticators-completed":"{\\"5aaadf80-5068-4eca-a6e0-471a910db927\\":1760741792,\\"ef34f8ae-5e2f-42a9-8b94-a4d4838d3412\\":1760741793}"},"state":"LOGGED_IN"}	1760741793	\N	1
+673e1bad-fcce-9183-d9bd-af0b85145f9b	017b322f-033a-4d6c-a258-8ca95786e66e	0666ea4e-c88f-4e30-bf74-4874c0b2484d	1760799077	0	{"ipAddress":"172.19.0.1","authMethod":"openid-connect","rememberMe":false,"started":0,"notes":{"KC_DEVICE_NOTE":"eyJpcEFkZHJlc3MiOiIxNzIuMTkuMC4xIiwib3MiOiJNYWMgT1MgWCIsIm9zVmVyc2lvbiI6IjEwLjE1LjciLCJicm93c2VyIjoiQ2hyb21lLzE0MS4wLjAiLCJkZXZpY2UiOiJNYWMiLCJsYXN0QWNjZXNzIjowLCJtb2JpbGUiOmZhbHNlfQ==","AUTH_TIME":"1760799077","authenticators-completed":"{\\"5aaadf80-5068-4eca-a6e0-471a910db927\\":1760799077,\\"ef34f8ae-5e2f-42a9-8b94-a4d4838d3412\\":1760799126}"},"state":"LOGGED_IN"}	1760799198	\N	6
 \.
 
 
 --
+-- TOC entry 4256 (class 0 OID 16617)
+-- Dependencies: 259
 -- Data for Name: org; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -2702,6 +2898,8 @@ COPY public.org (id, enabled, realm_id, group_id, name, description, alias, redi
 
 
 --
+-- TOC entry 4257 (class 0 OID 16622)
+-- Dependencies: 260
 -- Data for Name: org_domain; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -2710,6 +2908,8 @@ COPY public.org_domain (id, name, verified, org_id) FROM stdin;
 
 
 --
+-- TOC entry 4258 (class 0 OID 16627)
+-- Dependencies: 261
 -- Data for Name: policy_config; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -2718,6 +2918,8 @@ COPY public.policy_config (policy_id, name, value) FROM stdin;
 
 
 --
+-- TOC entry 4259 (class 0 OID 16632)
+-- Dependencies: 262
 -- Data for Name: protocol_mapper; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -2798,6 +3000,8 @@ b4d3fb7c-03d4-42fd-a77e-d4c3c6faed03	locale	openid-connect	oidc-usermodel-attrib
 
 
 --
+-- TOC entry 4260 (class 0 OID 16637)
+-- Dependencies: 263
 -- Data for Name: protocol_mapper_config; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3222,6 +3426,8 @@ b4d3fb7c-03d4-42fd-a77e-d4c3c6faed03	String	jsonType.label
 
 
 --
+-- TOC entry 4261 (class 0 OID 16642)
+-- Dependencies: 264
 -- Data for Name: realm; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3232,6 +3438,8 @@ COPY public.realm (id, access_code_lifespan, user_action_lifespan, access_token_
 
 
 --
+-- TOC entry 4262 (class 0 OID 16675)
+-- Dependencies: 265
 -- Data for Name: realm_attribute; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3322,6 +3530,8 @@ client-policies.policies	000c9ecc-9c3a-44d3-94fe-941ff152490f	{"policies":[]}
 
 
 --
+-- TOC entry 4263 (class 0 OID 16680)
+-- Dependencies: 266
 -- Data for Name: realm_default_groups; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3330,6 +3540,8 @@ COPY public.realm_default_groups (realm_id, group_id) FROM stdin;
 
 
 --
+-- TOC entry 4264 (class 0 OID 16683)
+-- Dependencies: 267
 -- Data for Name: realm_enabled_event_types; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3338,6 +3550,8 @@ COPY public.realm_enabled_event_types (realm_id, value) FROM stdin;
 
 
 --
+-- TOC entry 4265 (class 0 OID 16686)
+-- Dependencies: 268
 -- Data for Name: realm_events_listeners; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3348,6 +3562,8 @@ COPY public.realm_events_listeners (realm_id, value) FROM stdin;
 
 
 --
+-- TOC entry 4266 (class 0 OID 16689)
+-- Dependencies: 269
 -- Data for Name: realm_localizations; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3356,6 +3572,8 @@ COPY public.realm_localizations (realm_id, locale, texts) FROM stdin;
 
 
 --
+-- TOC entry 4267 (class 0 OID 16694)
+-- Dependencies: 270
 -- Data for Name: realm_required_credential; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3366,6 +3584,8 @@ password	password	t	t	000c9ecc-9c3a-44d3-94fe-941ff152490f
 
 
 --
+-- TOC entry 4268 (class 0 OID 16701)
+-- Dependencies: 271
 -- Data for Name: realm_smtp_config; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3374,6 +3594,8 @@ COPY public.realm_smtp_config (realm_id, value, name) FROM stdin;
 
 
 --
+-- TOC entry 4269 (class 0 OID 16706)
+-- Dependencies: 272
 -- Data for Name: realm_supported_locales; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3382,6 +3604,8 @@ COPY public.realm_supported_locales (realm_id, value) FROM stdin;
 
 
 --
+-- TOC entry 4270 (class 0 OID 16709)
+-- Dependencies: 273
 -- Data for Name: redirect_uris; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3392,11 +3616,19 @@ COPY public.redirect_uris (client_id, value) FROM stdin;
 09f537ab-f042-4fdc-90e5-93431b52d758	/realms/alumnet-realm/account/*
 0755204d-499f-4aa8-9844-73c138cd6e72	/realms/alumnet-realm/account/*
 f386953e-2fb0-4093-b0a6-bc07803ce34e	/admin/alumnet-realm/console/*
-a17e62f0-27d3-4e2f-9362-451b9cc24dc3	/*
+b9a6b3be-9f94-4272-8e8e-a71b8b9050bb	alumnet.mobile://login*
+b9a6b3be-9f94-4272-8e8e-a71b8b9050bb	alumnet.mobile://redirect*
+b9a6b3be-9f94-4272-8e8e-a71b8b9050bb	alumnet.mobile://redirect
+b9a6b3be-9f94-4272-8e8e-a71b8b9050bb	alumnet.mobile://login
+a17e62f0-27d3-4e2f-9362-451b9cc24dc3	alumnet.mobile://auth
+a17e62f0-27d3-4e2f-9362-451b9cc24dc3	http://localhost:8082
+a17e62f0-27d3-4e2f-9362-451b9cc24dc3	http://localhost:8081
 \.
 
 
 --
+-- TOC entry 4271 (class 0 OID 16712)
+-- Dependencies: 274
 -- Data for Name: required_action_config; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3405,6 +3637,8 @@ COPY public.required_action_config (required_action_id, value, name) FROM stdin;
 
 
 --
+-- TOC entry 4272 (class 0 OID 16717)
+-- Dependencies: 275
 -- Data for Name: required_action_provider; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3441,6 +3675,8 @@ f9572e72-74b6-49c2-80d6-b57a21e7a2a2	update_user_locale	Update User Locale	000c9
 
 
 --
+-- TOC entry 4273 (class 0 OID 16724)
+-- Dependencies: 276
 -- Data for Name: resource_attribute; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3449,6 +3685,8 @@ COPY public.resource_attribute (id, name, value, resource_id) FROM stdin;
 
 
 --
+-- TOC entry 4274 (class 0 OID 16730)
+-- Dependencies: 277
 -- Data for Name: resource_policy; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3457,6 +3695,8 @@ COPY public.resource_policy (resource_id, policy_id) FROM stdin;
 
 
 --
+-- TOC entry 4275 (class 0 OID 16733)
+-- Dependencies: 278
 -- Data for Name: resource_scope; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3465,6 +3705,8 @@ COPY public.resource_scope (resource_id, scope_id) FROM stdin;
 
 
 --
+-- TOC entry 4276 (class 0 OID 16736)
+-- Dependencies: 279
 -- Data for Name: resource_server; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3473,6 +3715,8 @@ COPY public.resource_server (id, allow_rs_remote_mgmt, policy_enforce_mode, deci
 
 
 --
+-- TOC entry 4277 (class 0 OID 16741)
+-- Dependencies: 280
 -- Data for Name: resource_server_perm_ticket; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3481,6 +3725,8 @@ COPY public.resource_server_perm_ticket (id, owner, requester, created_timestamp
 
 
 --
+-- TOC entry 4278 (class 0 OID 16746)
+-- Dependencies: 281
 -- Data for Name: resource_server_policy; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3489,6 +3735,8 @@ COPY public.resource_server_policy (id, name, description, type, decision_strate
 
 
 --
+-- TOC entry 4279 (class 0 OID 16751)
+-- Dependencies: 282
 -- Data for Name: resource_server_resource; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3497,6 +3745,8 @@ COPY public.resource_server_resource (id, name, type, icon_uri, owner, resource_
 
 
 --
+-- TOC entry 4280 (class 0 OID 16757)
+-- Dependencies: 283
 -- Data for Name: resource_server_scope; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3505,6 +3755,8 @@ COPY public.resource_server_scope (id, name, icon_uri, resource_server_id, displ
 
 
 --
+-- TOC entry 4281 (class 0 OID 16762)
+-- Dependencies: 284
 -- Data for Name: resource_uris; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3513,6 +3765,8 @@ COPY public.resource_uris (resource_id, value) FROM stdin;
 
 
 --
+-- TOC entry 4282 (class 0 OID 16765)
+-- Dependencies: 285
 -- Data for Name: revoked_token; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3521,6 +3775,8 @@ COPY public.revoked_token (id, expire) FROM stdin;
 
 
 --
+-- TOC entry 4283 (class 0 OID 16768)
+-- Dependencies: 286
 -- Data for Name: role_attribute; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3529,6 +3785,8 @@ COPY public.role_attribute (id, role_id, name, value) FROM stdin;
 
 
 --
+-- TOC entry 4284 (class 0 OID 16773)
+-- Dependencies: 287
 -- Data for Name: scope_mapping; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3541,6 +3799,8 @@ COPY public.scope_mapping (client_id, role_id) FROM stdin;
 
 
 --
+-- TOC entry 4285 (class 0 OID 16776)
+-- Dependencies: 288
 -- Data for Name: scope_policy; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3549,16 +3809,20 @@ COPY public.scope_policy (scope_id, policy_id) FROM stdin;
 
 
 --
+-- TOC entry 4286 (class 0 OID 16779)
+-- Dependencies: 289
 -- Data for Name: server_config; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
 COPY public.server_config (server_config_key, value, version) FROM stdin;
 crt_jgroups	{"prvKey":"MIIEogIBAAKCAQEAqy45qOB3jHX0/w5eQzvzlvQNDG/hs9wPJjxMbsIyoFJUNYSXyUDg+XY8VnFPeSQ5rzUYLBsEonTrtqjYgHqT9iOEcHV0dQiwv46F0joRHsaoKdAD2V+0oXRkmwuOozQMd8OVU+RJx9/fteGnrsX2uDsSXSjFS/NOJhv9NteFGeKCat2pTcwlLp/UjLITPUSmKYjfu9W6JpD37Wb92rQ7jEmoCAoeKbZp86Lflwaxj4JCQpRyJUFjZjpqesO8T6+BRliF4UkVZ7/v1Lvp+uDXhW9fwYCUR943c6r09uDOiT1PuJsGy0EXWU1OHJj9gwHgUhozlsmMQT/cpRTMC34biQIDAQABAoIBAAJuhq0qeyhIqLFS3+3ulRhI4UKS+E7YynJNmvxbz+JNKRsVhh56yHdiwZqsw2dCJ3ugsnY18Avqw0p1/ZVdqGpvuLrsQDpFZFVkTexdnM6mHc9yQAu/e05r294D/QO+gorVAXMOpCmtuXzY9svZzhZx6GHgaWUZ0Ltj3GYCC8cBVcv7CQv+GbW65gueVFLOQ7L+swQ60tuz97F9F7yStmkHaPGcxer0VLUdwNvwOMkDqXww1+M+TZrdXtxrWYCl/dxkp2WKqZaSr0UQ27e4QaRSeS2zghIiHSII23qIqg5/wpSaPXyggJDWA7PfIE2nURlNLKgxnNXu348ZcCAZQTECgYEA1gQmUfeGaRGL88paaHLK/ytI15Y+Qwjdb5sN4+dnGXy3OHB7iM4/5PdpA8IYXv5g6Lnldf4G92Nx942B4mZCDL3LTXgIu8tZvE37RiHMaRSdNH9WpGtfpTi6weQ+lja02dNtC7IO/6X4/X9NSnQ5QHXqO0bsNnemN4GNNLMdj20CgYEAzMLg2sQ4njAokAzB0p/3ueUeNPyqI6eCwNc4Cus0HXUWJ9FhESuMnDwrBFZryUpW1QmOPdkVV53f5aX7NGDnrZ87nHKVjldOUmRYfBfH47H1OlV/hCuiy2JDGart80JcKwC56uladexdPaww+px/0xwuVOBtI1E98Za+hiY6Pw0CgYBpjM5hapSNySue5tPD46meQ3i/asf2Q68CVhR5rCy68zlhyogCpsX4ZNUUF2vxnb+px9UVZl2FMTSKBO5j/E7i/dAAuwyDofz10/fzVMP9pz8JHyxaFuKrF9lzut/rMbvsGkwTkpO3HeI5E8nIyJ1b30vQRGBHVKdThL9hmF0h2QKBgHWio/Gq92gR/Mu9OIEb/AMlWTRR0CFJtDm7q2vCcp9VzBO2G5D0twRvILuONsBe4AHmSnzHwZYjkiTqNaaC4bcCmwmnXrp29/0nvxoTw3fRnjQUOH0jYJR98FTHuYqenjrqYOVPiPPkhjDPQxhHXrxXHVsP0EORAghQdUa2oZHlAoGATTvADFwBQjaxrs4NDgH4SYlPFnO4014gYogsI9qCveAEoiXB8IRV0JZ1H9xZVoTQT/I09gGWY7GohyKBGSiAKuaYjdPny2D2KsIkkuLQIV6xf7+9j7X9LwJH3WJyeK1U6xpfAexbil5MuvslB39mktAxAjQNAHcEcBWpT7cnYJo=","pubKey":"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqy45qOB3jHX0/w5eQzvzlvQNDG/hs9wPJjxMbsIyoFJUNYSXyUDg+XY8VnFPeSQ5rzUYLBsEonTrtqjYgHqT9iOEcHV0dQiwv46F0joRHsaoKdAD2V+0oXRkmwuOozQMd8OVU+RJx9/fteGnrsX2uDsSXSjFS/NOJhv9NteFGeKCat2pTcwlLp/UjLITPUSmKYjfu9W6JpD37Wb92rQ7jEmoCAoeKbZp86Lflwaxj4JCQpRyJUFjZjpqesO8T6+BRliF4UkVZ7/v1Lvp+uDXhW9fwYCUR943c6r09uDOiT1PuJsGy0EXWU1OHJj9gwHgUhozlsmMQT/cpRTMC34biQIDAQAB","crt":"MIICnTCCAYUCBgGZ5HttdjANBgkqhkiG9w0BAQsFADASMRAwDgYDVQQDDAdqZ3JvdXBzMB4XDTI1MTAxNDIwNDY1OFoXDTI1MTIxMzIwNDgzOFowEjEQMA4GA1UEAwwHamdyb3VwczCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKsuOajgd4x19P8OXkM785b0DQxv4bPcDyY8TG7CMqBSVDWEl8lA4Pl2PFZxT3kkOa81GCwbBKJ067ao2IB6k/YjhHB1dHUIsL+OhdI6ER7GqCnQA9lftKF0ZJsLjqM0DHfDlVPkScff37Xhp67F9rg7El0oxUvzTiYb/TbXhRnigmrdqU3MJS6f1IyyEz1EpimI37vVuiaQ9+1m/dq0O4xJqAgKHim2afOi35cGsY+CQkKUciVBY2Y6anrDvE+vgUZYheFJFWe/79S76frg14VvX8GAlEfeN3Oq9Pbgzok9T7ibBstBF1lNThyY/YMB4FIaM5bJjEE/3KUUzAt+G4kCAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAXkhOiVbRBlXmqhrBohnk7kuCDFfb+cBBQs2Mxj84qwFKZC/MMbDIZ5mJfbUlTfaXInGQJj83rX9JkF9QkPcB6Ut7TBMV2AWPoXpm6QSnYbdjuUnuk2Edj6PiDSydZJ7lca+xKxwNu9YZ7sjWUzfKvZqZaEaDV2/Lo7t/MkHjRnRn+AsgfBklTx/Dq/TQ0TAySushizUvEGwAsJPfFT8E7hbyFIB7IOWbz3TpJnnMTCZHfg6oMXZHm+rU2nM0eQkFCE3ruyNP4gE5uww50GMQP1OJ2CKo5ALKXVFOUeISItA9JpXp+/UEFTkyv9jd7aVfwXKhwChPA/pEnxLwDO5Maw==","alias":"b2224341-7b42-47e3-a01e-298b26cb36e2","generatedMillis":1760474918319}	0
-JGROUPS_ADDRESS_SEQUENCE	4	4
+JGROUPS_ADDRESS_SEQUENCE	9	9
 \.
 
 
 --
+-- TOC entry 4287 (class 0 OID 16785)
+-- Dependencies: 290
 -- Data for Name: user_attribute; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3567,6 +3831,8 @@ COPY public.user_attribute (name, value, user_id, id, long_value_hash, long_valu
 
 
 --
+-- TOC entry 4288 (class 0 OID 16791)
+-- Dependencies: 291
 -- Data for Name: user_consent; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3575,6 +3841,8 @@ COPY public.user_consent (id, client_id, user_id, created_date, last_updated_dat
 
 
 --
+-- TOC entry 4289 (class 0 OID 16796)
+-- Dependencies: 292
 -- Data for Name: user_consent_client_scope; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3583,6 +3851,8 @@ COPY public.user_consent_client_scope (user_consent_id, scope_id) FROM stdin;
 
 
 --
+-- TOC entry 4290 (class 0 OID 16799)
+-- Dependencies: 293
 -- Data for Name: user_entity; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3591,15 +3861,14 @@ COPY public.user_entity (id, email, email_constraint, email_verified, enabled, f
 59d446ec-8c0a-48b4-9785-14f26007ddbf	roma.student@alumnet.com	roma.student@alumnet.com	t	t	\N	Roma	Marccielo	000c9ecc-9c3a-44d3-94fe-941ff152490f	roma.student@alumnet.com	1760476294956	\N	0
 467fca2a-add9-4201-ab6b-ecd48914da54	roman.teacher@alumnet.com	roman.teacher@alumnet.com	t	t	\N	Roman	Rodriguez	000c9ecc-9c3a-44d3-94fe-941ff152490f	roman.teacher@alumnet.com	1760476113872	\N	0
 4c0a6f96-ef5e-4a79-9dc4-581d694cb03f	ramon.admin@alumnet.com	ramon.admin@alumnet.com	t	t	\N	Ramon	Fernandez	000c9ecc-9c3a-44d3-94fe-941ff152490f	ramon.admin@alumnet.com	1760476252537	\N	0
-c1a46183-c520-424e-80fe-2aad53113eff	develop@alumnet.com	develop@alumnet.com	f	t	\N	develop	develop	000c9ecc-9c3a-44d3-94fe-941ff152490f	develop@alumnet.com	1760737366245	\N	0
-81738073-dc49-4377-b873-13ff7b286425	test@alumnet.com	test@alumnet.com	t	t	\N	German	Burgos	000c9ecc-9c3a-44d3-94fe-941ff152490f	test@alumnet.com	1760738314833	\N	0
-55d0ae0d-9c9f-4048-806b-86216e2b5ffd	test2@alumnet.com	test2@alumnet.com	t	t	\N	German	Burgos	000c9ecc-9c3a-44d3-94fe-941ff152490f	test2@alumnet.com	1760738406860	\N	0
-c44a2d90-26c0-4f6d-bb0f-b6aed3e38585	test5@alumnet.com	test5@alumnet.com	t	t	\N	German	Burgos	000c9ecc-9c3a-44d3-94fe-941ff152490f	test5@alumnet.com	1760741338370	\N	0
-6d68af46-7044-48df-8e48-4fadaa96916a	test6@alumnet.com	test6@alumnet.com	t	t	\N	German	Burgos	000c9ecc-9c3a-44d3-94fe-941ff152490f	test6@alumnet.com	1760741592464	\N	0
+7a7ffec9-1041-4c28-8fec-f8e958db8bbf	federicomaciel.dev@gmail.com	federicomaciel.dev@gmail.com	t	t	\N	fede	maciel	0666ea4e-c88f-4e30-bf74-4874c0b2484d	federicomaciel.dev@gmail.com	1760559001885	\N	0
+dbd69f1a-4a1a-4797-972b-ec0494972068	\N	fdc94f9a-149e-4365-b86d-0d40f585a8d5	t	t	\N	\N	\N	0666ea4e-c88f-4e30-bf74-4874c0b2484d	admin	1760568798500	\N	0
 \.
 
 
 --
+-- TOC entry 4291 (class 0 OID 16807)
+-- Dependencies: 294
 -- Data for Name: user_federation_config; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3608,6 +3877,8 @@ COPY public.user_federation_config (user_federation_provider_id, value, name) FR
 
 
 --
+-- TOC entry 4292 (class 0 OID 16812)
+-- Dependencies: 295
 -- Data for Name: user_federation_mapper; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3616,6 +3887,8 @@ COPY public.user_federation_mapper (id, name, federation_provider_id, federation
 
 
 --
+-- TOC entry 4293 (class 0 OID 16817)
+-- Dependencies: 296
 -- Data for Name: user_federation_mapper_config; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3624,6 +3897,8 @@ COPY public.user_federation_mapper_config (user_federation_mapper_id, value, nam
 
 
 --
+-- TOC entry 4294 (class 0 OID 16822)
+-- Dependencies: 297
 -- Data for Name: user_federation_provider; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3632,6 +3907,8 @@ COPY public.user_federation_provider (id, changed_sync_period, display_name, ful
 
 
 --
+-- TOC entry 4295 (class 0 OID 16827)
+-- Dependencies: 298
 -- Data for Name: user_group_membership; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3639,13 +3916,12 @@ COPY public.user_group_membership (group_id, user_id, membership_type) FROM stdi
 ea0097c4-3325-494e-904b-ef6fef8c9ddb	467fca2a-add9-4201-ab6b-ecd48914da54	UNMANAGED
 0a9fda05-f683-4ad3-bf5c-e5000da2ee6a	4c0a6f96-ef5e-4a79-9dc4-581d694cb03f	UNMANAGED
 caf0000d-bab0-4414-9096-2430000ac9b1	59d446ec-8c0a-48b4-9785-14f26007ddbf	UNMANAGED
-caf0000d-bab0-4414-9096-2430000ac9b1	55d0ae0d-9c9f-4048-806b-86216e2b5ffd	UNMANAGED
-caf0000d-bab0-4414-9096-2430000ac9b1	c44a2d90-26c0-4f6d-bb0f-b6aed3e38585	UNMANAGED
-caf0000d-bab0-4414-9096-2430000ac9b1	6d68af46-7044-48df-8e48-4fadaa96916a	UNMANAGED
 \.
 
 
 --
+-- TOC entry 4296 (class 0 OID 16830)
+-- Dependencies: 299
 -- Data for Name: user_required_action; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3654,6 +3930,8 @@ COPY public.user_required_action (user_id, required_action) FROM stdin;
 
 
 --
+-- TOC entry 4297 (class 0 OID 16834)
+-- Dependencies: 300
 -- Data for Name: user_role_mapping; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3666,59 +3944,77 @@ a094f044-1586-4448-b116-3d30223d17fb	017b322f-033a-4d6c-a258-8ca95786e66e
 0fc1515d-32eb-4643-b9e9-646337839092	467fca2a-add9-4201-ab6b-ecd48914da54
 0fc1515d-32eb-4643-b9e9-646337839092	4c0a6f96-ef5e-4a79-9dc4-581d694cb03f
 0fc1515d-32eb-4643-b9e9-646337839092	59d446ec-8c0a-48b4-9785-14f26007ddbf
-0fc1515d-32eb-4643-b9e9-646337839092	c1a46183-c520-424e-80fe-2aad53113eff
-e48a3acd-c896-4624-988a-2b697bbdaf6d	c1a46183-c520-424e-80fe-2aad53113eff
-25b46a59-f021-43ea-885c-2e43d7daca46	c1a46183-c520-424e-80fe-2aad53113eff
-8bdb3d68-fe5a-4d3e-b81b-5a63cca0ad7a	c1a46183-c520-424e-80fe-2aad53113eff
-55ebdd66-30a9-4981-8ed1-e3260dacfb49	c1a46183-c520-424e-80fe-2aad53113eff
-8abb284b-e04d-42e8-97ff-028021fc669f	c1a46183-c520-424e-80fe-2aad53113eff
-1679332a-b26f-49dc-b35e-ab358ac09320	c1a46183-c520-424e-80fe-2aad53113eff
-95afcb48-6cfe-4db6-98fb-751c3d0cfcea	c1a46183-c520-424e-80fe-2aad53113eff
-4ebb0d5e-bcf4-4432-859f-a84422fada5d	c1a46183-c520-424e-80fe-2aad53113eff
-f56c19f8-d803-405e-9f32-15f28dba1b1c	c1a46183-c520-424e-80fe-2aad53113eff
-e285353b-de98-44a9-b14f-cfb2ed73d59e	c1a46183-c520-424e-80fe-2aad53113eff
-139e8d31-d815-44f9-b55b-4e70a39b1813	c1a46183-c520-424e-80fe-2aad53113eff
-713a0132-1077-44c2-a7a8-547a9ed2aeea	c1a46183-c520-424e-80fe-2aad53113eff
-c5e4e6b1-7b07-4319-a558-1446a413ad29	c1a46183-c520-424e-80fe-2aad53113eff
-4aed72c9-e297-4154-845b-74da79442fcb	c1a46183-c520-424e-80fe-2aad53113eff
-320ad00d-df4f-49b7-8c60-9ef7d526b76c	c1a46183-c520-424e-80fe-2aad53113eff
-fa192e7f-b3b8-434c-80e4-c6e8fc3bf76c	c1a46183-c520-424e-80fe-2aad53113eff
-7212e416-3619-4e82-a2fc-d449342d80fc	c1a46183-c520-424e-80fe-2aad53113eff
-89b91be0-4af3-4bca-88c0-900efb01528b	c1a46183-c520-424e-80fe-2aad53113eff
-5abccc3f-f706-4749-a154-538b77bae7fa	c1a46183-c520-424e-80fe-2aad53113eff
-6de68c76-5d6c-4550-8007-d52230f81a84	c1a46183-c520-424e-80fe-2aad53113eff
-e0d10597-bf56-4ce3-8d60-fcc45260c6b6	c1a46183-c520-424e-80fe-2aad53113eff
-39fb8cd7-7bd2-428b-a1e3-552fa1b7982f	c1a46183-c520-424e-80fe-2aad53113eff
-e1972537-b603-4513-8723-e87bedb2e453	c1a46183-c520-424e-80fe-2aad53113eff
-50808e75-e563-4c76-9f0b-b6e8dcce4553	c1a46183-c520-424e-80fe-2aad53113eff
-ed6337a6-c983-42f5-ae2d-7763679ed969	c1a46183-c520-424e-80fe-2aad53113eff
-8a963c36-ca66-45f9-af62-ce439801f0d3	c1a46183-c520-424e-80fe-2aad53113eff
-066e990c-a27d-42f7-9b22-28581ae2fc3e	c1a46183-c520-424e-80fe-2aad53113eff
-d190edde-d97c-4347-a73a-7ebaa3f71449	c1a46183-c520-424e-80fe-2aad53113eff
-07e4b0a1-8f96-4b79-a5ed-49afe41df3dc	c1a46183-c520-424e-80fe-2aad53113eff
-5d9a4233-4be8-4091-bdf1-c1bfd736d4c9	c1a46183-c520-424e-80fe-2aad53113eff
-2370e307-8bf6-47d9-a4d0-2fde0e8d0947	c1a46183-c520-424e-80fe-2aad53113eff
-5c4bc45a-6893-4c05-8fdc-3c81acf61bd7	c1a46183-c520-424e-80fe-2aad53113eff
-8936874f-9c3a-42d8-9e1f-43c82c66a384	c1a46183-c520-424e-80fe-2aad53113eff
-0fc1515d-32eb-4643-b9e9-646337839092	81738073-dc49-4377-b873-13ff7b286425
-0fc1515d-32eb-4643-b9e9-646337839092	55d0ae0d-9c9f-4048-806b-86216e2b5ffd
-0fc1515d-32eb-4643-b9e9-646337839092	c44a2d90-26c0-4f6d-bb0f-b6aed3e38585
-0fc1515d-32eb-4643-b9e9-646337839092	6d68af46-7044-48df-8e48-4fadaa96916a
+83d02c9a-4d21-4e86-b3a5-c4772f85ec6a	7a7ffec9-1041-4c28-8fec-f8e958db8bbf
+83d02c9a-4d21-4e86-b3a5-c4772f85ec6a	dbd69f1a-4a1a-4797-972b-ec0494972068
+ce17e30f-1745-49ec-a4e0-8e29422c83d8	dbd69f1a-4a1a-4797-972b-ec0494972068
+b2132454-dffa-40df-838e-3e33b208644f	dbd69f1a-4a1a-4797-972b-ec0494972068
+a0219b69-16e6-4455-a1ac-f04e2a236a21	dbd69f1a-4a1a-4797-972b-ec0494972068
+a094f044-1586-4448-b116-3d30223d17fb	dbd69f1a-4a1a-4797-972b-ec0494972068
+3e48e728-f874-4e1f-b04f-7e9dcd067f10	dbd69f1a-4a1a-4797-972b-ec0494972068
+d8ded547-7d41-45e7-8b23-afdffccd6b3d	dbd69f1a-4a1a-4797-972b-ec0494972068
+94b1c888-87d1-42d7-800e-394728dff586	dbd69f1a-4a1a-4797-972b-ec0494972068
+82e8e12e-0fea-4e53-928d-bf2bf3dbbfb0	dbd69f1a-4a1a-4797-972b-ec0494972068
+b95c529b-ef8d-44f5-bd1f-47086213315b	dbd69f1a-4a1a-4797-972b-ec0494972068
+252664c3-be38-45a1-9b54-4aab298efebb	dbd69f1a-4a1a-4797-972b-ec0494972068
+6ecee205-0556-4b16-821b-7b7966ff5aa3	dbd69f1a-4a1a-4797-972b-ec0494972068
+7d606dfa-83ae-4fd6-b145-669374409aeb	dbd69f1a-4a1a-4797-972b-ec0494972068
+408d0cfa-f8ce-4c05-ba7f-dec9bd2f4e96	dbd69f1a-4a1a-4797-972b-ec0494972068
+6792f9a3-3403-4275-8837-0d545d88f733	dbd69f1a-4a1a-4797-972b-ec0494972068
+ce317b98-57bd-42a3-9c5c-9e7cfa251ffe	dbd69f1a-4a1a-4797-972b-ec0494972068
+184274b4-465f-488e-a749-0e637b189160	dbd69f1a-4a1a-4797-972b-ec0494972068
+70cd2784-d68e-4e35-9484-b6dcd23efd61	dbd69f1a-4a1a-4797-972b-ec0494972068
+a3c1321a-81aa-4c38-9457-0fc0e6aaa38f	dbd69f1a-4a1a-4797-972b-ec0494972068
+86ac1f47-c9c3-496f-ac21-085e5c3f3eb8	dbd69f1a-4a1a-4797-972b-ec0494972068
+cae3c546-c55a-461d-935b-4be9d51908e6	dbd69f1a-4a1a-4797-972b-ec0494972068
+9ba15469-de14-41f9-bcd1-414eb48e1a9b	dbd69f1a-4a1a-4797-972b-ec0494972068
+b048a423-d753-4aab-96d2-7ccd2c95df3c	dbd69f1a-4a1a-4797-972b-ec0494972068
+24553704-44e0-471d-b658-08468aa95a9b	dbd69f1a-4a1a-4797-972b-ec0494972068
+f84e5f2a-426c-480c-af6c-a761651fe8e6	dbd69f1a-4a1a-4797-972b-ec0494972068
+ca9bb414-b703-46f3-8e7d-4a51c3737765	dbd69f1a-4a1a-4797-972b-ec0494972068
+b2ff4369-7e5f-4f20-aef4-2764ddeaa3e4	dbd69f1a-4a1a-4797-972b-ec0494972068
+aec83f14-d848-4342-8baf-0d3315d64503	dbd69f1a-4a1a-4797-972b-ec0494972068
+398283d5-3e77-4fcc-aa45-3b230886f441	dbd69f1a-4a1a-4797-972b-ec0494972068
+b04d8676-b711-42ec-bc86-ceed0bd5d485	dbd69f1a-4a1a-4797-972b-ec0494972068
+039eb199-78d8-4477-808f-cb22d297afce	dbd69f1a-4a1a-4797-972b-ec0494972068
+938bcef4-4540-4c66-9ee2-77cfabca87b6	dbd69f1a-4a1a-4797-972b-ec0494972068
+d6212e65-08f9-485f-9c21-b4edcc3c9fc7	dbd69f1a-4a1a-4797-972b-ec0494972068
+8306760f-c0b3-4469-bedd-9c5fe077bb9d	dbd69f1a-4a1a-4797-972b-ec0494972068
+8bc720dc-4b8f-4d3a-83ff-925e52e7e6a9	dbd69f1a-4a1a-4797-972b-ec0494972068
+ff586ac2-3b94-4487-8bb8-63d98dbb16b3	dbd69f1a-4a1a-4797-972b-ec0494972068
+6e79f3fa-e216-4384-bdc3-9ce95fce8b14	dbd69f1a-4a1a-4797-972b-ec0494972068
+610438f2-3ea4-4429-b731-d60216d7f238	dbd69f1a-4a1a-4797-972b-ec0494972068
+5c6c5f60-bb29-49d0-b151-51fdb8306e49	dbd69f1a-4a1a-4797-972b-ec0494972068
+e41b30e3-875e-4a6c-8d39-2a32ae06d63b	dbd69f1a-4a1a-4797-972b-ec0494972068
+f828f806-416b-4f7c-b254-cf4d93e2e7f5	dbd69f1a-4a1a-4797-972b-ec0494972068
+4aae8d25-631f-4113-ba73-dac0102881d2	dbd69f1a-4a1a-4797-972b-ec0494972068
+4cf8544f-937f-4f77-92c3-51bf5c9847f7	dbd69f1a-4a1a-4797-972b-ec0494972068
+a8be5c2f-be83-41b8-9cb9-f35cc4ee82a1	dbd69f1a-4a1a-4797-972b-ec0494972068
+aeceae38-c935-4f5c-8dec-6455461c925c	dbd69f1a-4a1a-4797-972b-ec0494972068
+e195f23a-b529-42d7-af77-64e73199f801	dbd69f1a-4a1a-4797-972b-ec0494972068
+274ab78e-1f1f-40bc-8e10-5458e91db17b	dbd69f1a-4a1a-4797-972b-ec0494972068
+3d7dc8fc-820b-44bd-9b75-d39b972ef2b9	dbd69f1a-4a1a-4797-972b-ec0494972068
+f22cac6b-f114-401d-9504-cfe1917dae1c	dbd69f1a-4a1a-4797-972b-ec0494972068
+d4801f2c-c1c0-4e24-bdba-e9a41dd21d93	dbd69f1a-4a1a-4797-972b-ec0494972068
 \.
 
 
 --
+-- TOC entry 4298 (class 0 OID 16837)
+-- Dependencies: 301
 -- Data for Name: web_origins; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
 COPY public.web_origins (client_id, value) FROM stdin;
 46c97fed-5865-497a-90cc-eeb6a263032a	+
 f386953e-2fb0-4093-b0a6-bc07803ce34e	+
+a17e62f0-27d3-4e2f-9362-451b9cc24dc3	*
 a17e62f0-27d3-4e2f-9362-451b9cc24dc3	/*
 \.
 
 
 --
+-- TOC entry 4299 (class 0 OID 16840)
+-- Dependencies: 302
 -- Data for Name: workflow_state; Type: TABLE DATA; Schema: public; Owner: kc_user
 --
 
@@ -3727,6 +4023,7 @@ COPY public.workflow_state (execution_id, resource_id, workflow_id, workflow_pro
 
 
 --
+-- TOC entry 3855 (class 2606 OID 16847)
 -- Name: org_domain ORG_DOMAIN_pkey; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -3735,6 +4032,7 @@ ALTER TABLE ONLY public.org_domain
 
 
 --
+-- TOC entry 3847 (class 2606 OID 16849)
 -- Name: org ORG_pkey; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -3743,6 +4041,7 @@ ALTER TABLE ONLY public.org
 
 
 --
+-- TOC entry 3947 (class 2606 OID 16851)
 -- Name: server_config SERVER_CONFIG_pkey; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -3751,6 +4050,7 @@ ALTER TABLE ONLY public.server_config
 
 
 --
+-- TOC entry 3827 (class 2606 OID 16853)
 -- Name: keycloak_role UK_J3RWUVD56ONTGSUHOGM184WW2-2; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -3759,6 +4059,7 @@ ALTER TABLE ONLY public.keycloak_role
 
 
 --
+-- TOC entry 3719 (class 2606 OID 16855)
 -- Name: client_auth_flow_bindings c_cli_flow_bind; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -3767,6 +4068,7 @@ ALTER TABLE ONLY public.client_auth_flow_bindings
 
 
 --
+-- TOC entry 3734 (class 2606 OID 16857)
 -- Name: client_scope_client c_cli_scope_bind; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -3775,6 +4077,7 @@ ALTER TABLE ONLY public.client_scope_client
 
 
 --
+-- TOC entry 3721 (class 2606 OID 16859)
 -- Name: client_initial_access cnstr_client_init_acc_pk; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -3783,6 +4086,7 @@ ALTER TABLE ONLY public.client_initial_access
 
 
 --
+-- TOC entry 3874 (class 2606 OID 16861)
 -- Name: realm_default_groups con_group_id_def_groups; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -3791,6 +4095,7 @@ ALTER TABLE ONLY public.realm_default_groups
 
 
 --
+-- TOC entry 3709 (class 2606 OID 16863)
 -- Name: broker_link constr_broker_link_pk; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -3799,6 +4104,7 @@ ALTER TABLE ONLY public.broker_link
 
 
 --
+-- TOC entry 3746 (class 2606 OID 16865)
 -- Name: component_config constr_component_config_pk; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -3807,6 +4113,7 @@ ALTER TABLE ONLY public.component_config
 
 
 --
+-- TOC entry 3742 (class 2606 OID 16867)
 -- Name: component constr_component_pk; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -3815,6 +4122,7 @@ ALTER TABLE ONLY public.component
 
 
 --
+-- TOC entry 3786 (class 2606 OID 16869)
 -- Name: fed_user_required_action constr_fed_required_action; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -3823,6 +4131,7 @@ ALTER TABLE ONLY public.fed_user_required_action
 
 
 --
+-- TOC entry 3766 (class 2606 OID 16871)
 -- Name: fed_user_attribute constr_fed_user_attr_pk; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -3831,6 +4140,7 @@ ALTER TABLE ONLY public.fed_user_attribute
 
 
 --
+-- TOC entry 3771 (class 2606 OID 16873)
 -- Name: fed_user_consent constr_fed_user_consent_pk; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -3839,6 +4149,7 @@ ALTER TABLE ONLY public.fed_user_consent
 
 
 --
+-- TOC entry 3778 (class 2606 OID 16875)
 -- Name: fed_user_credential constr_fed_user_cred_pk; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -3847,6 +4158,7 @@ ALTER TABLE ONLY public.fed_user_credential
 
 
 --
+-- TOC entry 3782 (class 2606 OID 16877)
 -- Name: fed_user_group_membership constr_fed_user_group; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -3855,6 +4167,7 @@ ALTER TABLE ONLY public.fed_user_group_membership
 
 
 --
+-- TOC entry 3790 (class 2606 OID 16879)
 -- Name: fed_user_role_mapping constr_fed_user_role; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -3863,6 +4176,7 @@ ALTER TABLE ONLY public.fed_user_role_mapping
 
 
 --
+-- TOC entry 3798 (class 2606 OID 16881)
 -- Name: federated_user constr_federated_user; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -3871,6 +4185,7 @@ ALTER TABLE ONLY public.federated_user
 
 
 --
+-- TOC entry 3876 (class 2606 OID 16883)
 -- Name: realm_default_groups constr_realm_default_groups; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -3879,6 +4194,7 @@ ALTER TABLE ONLY public.realm_default_groups
 
 
 --
+-- TOC entry 3879 (class 2606 OID 16885)
 -- Name: realm_enabled_event_types constr_realm_enabl_event_types; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -3887,6 +4203,7 @@ ALTER TABLE ONLY public.realm_enabled_event_types
 
 
 --
+-- TOC entry 3882 (class 2606 OID 16887)
 -- Name: realm_events_listeners constr_realm_events_listeners; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -3895,6 +4212,7 @@ ALTER TABLE ONLY public.realm_events_listeners
 
 
 --
+-- TOC entry 3891 (class 2606 OID 16889)
 -- Name: realm_supported_locales constr_realm_supported_locales; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -3903,6 +4221,7 @@ ALTER TABLE ONLY public.realm_supported_locales
 
 
 --
+-- TOC entry 3807 (class 2606 OID 16891)
 -- Name: identity_provider constraint_2b; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -3911,6 +4230,7 @@ ALTER TABLE ONLY public.identity_provider
 
 
 --
+-- TOC entry 3716 (class 2606 OID 16893)
 -- Name: client_attributes constraint_3c; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -3919,6 +4239,7 @@ ALTER TABLE ONLY public.client_attributes
 
 
 --
+-- TOC entry 3762 (class 2606 OID 16895)
 -- Name: event_entity constraint_4; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -3927,6 +4248,7 @@ ALTER TABLE ONLY public.event_entity
 
 
 --
+-- TOC entry 3794 (class 2606 OID 16897)
 -- Name: federated_identity constraint_40; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -3935,6 +4257,7 @@ ALTER TABLE ONLY public.federated_identity
 
 
 --
+-- TOC entry 3866 (class 2606 OID 16899)
 -- Name: realm constraint_4a; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -3943,6 +4266,7 @@ ALTER TABLE ONLY public.realm
 
 
 --
+-- TOC entry 3982 (class 2606 OID 16901)
 -- Name: user_federation_provider constraint_5c; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -3951,6 +4275,7 @@ ALTER TABLE ONLY public.user_federation_provider
 
 
 --
+-- TOC entry 3711 (class 2606 OID 16903)
 -- Name: client constraint_7; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -3959,6 +4284,7 @@ ALTER TABLE ONLY public.client
 
 
 --
+-- TOC entry 3941 (class 2606 OID 16905)
 -- Name: scope_mapping constraint_81; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -3967,6 +4293,7 @@ ALTER TABLE ONLY public.scope_mapping
 
 
 --
+-- TOC entry 3724 (class 2606 OID 16907)
 -- Name: client_node_registrations constraint_84; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -3975,6 +4302,7 @@ ALTER TABLE ONLY public.client_node_registrations
 
 
 --
+-- TOC entry 3871 (class 2606 OID 16909)
 -- Name: realm_attribute constraint_9; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -3983,6 +4311,7 @@ ALTER TABLE ONLY public.realm_attribute
 
 
 --
+-- TOC entry 3887 (class 2606 OID 16911)
 -- Name: realm_required_credential constraint_92; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -3991,6 +4320,7 @@ ALTER TABLE ONLY public.realm_required_credential
 
 
 --
+-- TOC entry 3829 (class 2606 OID 16913)
 -- Name: keycloak_role constraint_a; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -3999,6 +4329,7 @@ ALTER TABLE ONLY public.keycloak_role
 
 
 --
+-- TOC entry 3691 (class 2606 OID 16915)
 -- Name: admin_event_entity constraint_admin_event_entity; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4007,6 +4338,7 @@ ALTER TABLE ONLY public.admin_event_entity
 
 
 --
+-- TOC entry 3707 (class 2606 OID 16917)
 -- Name: authenticator_config_entry constraint_auth_cfg_pk; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4015,6 +4347,7 @@ ALTER TABLE ONLY public.authenticator_config_entry
 
 
 --
+-- TOC entry 3697 (class 2606 OID 16919)
 -- Name: authentication_execution constraint_auth_exec_pk; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4023,6 +4356,7 @@ ALTER TABLE ONLY public.authentication_execution
 
 
 --
+-- TOC entry 3701 (class 2606 OID 16921)
 -- Name: authentication_flow constraint_auth_flow_pk; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4031,6 +4365,7 @@ ALTER TABLE ONLY public.authentication_flow
 
 
 --
+-- TOC entry 3704 (class 2606 OID 16923)
 -- Name: authenticator_config constraint_auth_pk; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4039,6 +4374,7 @@ ALTER TABLE ONLY public.authenticator_config
 
 
 --
+-- TOC entry 3991 (class 2606 OID 16925)
 -- Name: user_role_mapping constraint_c; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4047,6 +4383,7 @@ ALTER TABLE ONLY public.user_role_mapping
 
 
 --
+-- TOC entry 3749 (class 2606 OID 16927)
 -- Name: composite_role constraint_composite_role; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4055,6 +4392,7 @@ ALTER TABLE ONLY public.composite_role
 
 
 --
+-- TOC entry 3814 (class 2606 OID 16929)
 -- Name: identity_provider_config constraint_d; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4063,6 +4401,7 @@ ALTER TABLE ONLY public.identity_provider_config
 
 
 --
+-- TOC entry 3858 (class 2606 OID 16931)
 -- Name: policy_config constraint_dpc; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4071,6 +4410,7 @@ ALTER TABLE ONLY public.policy_config
 
 
 --
+-- TOC entry 3889 (class 2606 OID 16933)
 -- Name: realm_smtp_config constraint_e; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4079,6 +4419,7 @@ ALTER TABLE ONLY public.realm_smtp_config
 
 
 --
+-- TOC entry 3753 (class 2606 OID 16935)
 -- Name: credential constraint_f; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4087,6 +4428,7 @@ ALTER TABLE ONLY public.credential
 
 
 --
+-- TOC entry 3974 (class 2606 OID 16937)
 -- Name: user_federation_config constraint_f9; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4095,6 +4437,7 @@ ALTER TABLE ONLY public.user_federation_config
 
 
 --
+-- TOC entry 3912 (class 2606 OID 16939)
 -- Name: resource_server_perm_ticket constraint_fapmt; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4103,6 +4446,7 @@ ALTER TABLE ONLY public.resource_server_perm_ticket
 
 
 --
+-- TOC entry 3923 (class 2606 OID 16941)
 -- Name: resource_server_resource constraint_farsr; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4111,6 +4455,7 @@ ALTER TABLE ONLY public.resource_server_resource
 
 
 --
+-- TOC entry 3918 (class 2606 OID 16943)
 -- Name: resource_server_policy constraint_farsrp; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4119,6 +4464,7 @@ ALTER TABLE ONLY public.resource_server_policy
 
 
 --
+-- TOC entry 3694 (class 2606 OID 16945)
 -- Name: associated_policy constraint_farsrpap; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4127,6 +4473,7 @@ ALTER TABLE ONLY public.associated_policy
 
 
 --
+-- TOC entry 3904 (class 2606 OID 16947)
 -- Name: resource_policy constraint_farsrpp; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4135,6 +4482,7 @@ ALTER TABLE ONLY public.resource_policy
 
 
 --
+-- TOC entry 3928 (class 2606 OID 16949)
 -- Name: resource_server_scope constraint_farsrs; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4143,6 +4491,7 @@ ALTER TABLE ONLY public.resource_server_scope
 
 
 --
+-- TOC entry 3907 (class 2606 OID 16951)
 -- Name: resource_scope constraint_farsrsp; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4151,6 +4500,7 @@ ALTER TABLE ONLY public.resource_scope
 
 
 --
+-- TOC entry 3944 (class 2606 OID 16953)
 -- Name: scope_policy constraint_farsrsps; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4159,6 +4509,7 @@ ALTER TABLE ONLY public.scope_policy
 
 
 --
+-- TOC entry 3966 (class 2606 OID 16955)
 -- Name: user_entity constraint_fb; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4167,6 +4518,7 @@ ALTER TABLE ONLY public.user_entity
 
 
 --
+-- TOC entry 3980 (class 2606 OID 16957)
 -- Name: user_federation_mapper_config constraint_fedmapper_cfg_pm; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4175,6 +4527,7 @@ ALTER TABLE ONLY public.user_federation_mapper_config
 
 
 --
+-- TOC entry 3976 (class 2606 OID 16959)
 -- Name: user_federation_mapper constraint_fedmapperpm; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4183,6 +4536,7 @@ ALTER TABLE ONLY public.user_federation_mapper
 
 
 --
+-- TOC entry 3776 (class 2606 OID 16961)
 -- Name: fed_user_consent_cl_scope constraint_fgrntcsnt_clsc_pm; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4191,6 +4545,7 @@ ALTER TABLE ONLY public.fed_user_consent_cl_scope
 
 
 --
+-- TOC entry 3962 (class 2606 OID 16963)
 -- Name: user_consent_client_scope constraint_grntcsnt_clsc_pm; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4199,6 +4554,7 @@ ALTER TABLE ONLY public.user_consent_client_scope
 
 
 --
+-- TOC entry 3955 (class 2606 OID 16965)
 -- Name: user_consent constraint_grntcsnt_pm; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4207,6 +4563,7 @@ ALTER TABLE ONLY public.user_consent
 
 
 --
+-- TOC entry 3823 (class 2606 OID 16967)
 -- Name: keycloak_group constraint_group; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4215,6 +4572,7 @@ ALTER TABLE ONLY public.keycloak_group
 
 
 --
+-- TOC entry 3800 (class 2606 OID 16969)
 -- Name: group_attribute constraint_group_attribute_pk; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4223,6 +4581,7 @@ ALTER TABLE ONLY public.group_attribute
 
 
 --
+-- TOC entry 3804 (class 2606 OID 16971)
 -- Name: group_role_mapping constraint_group_role; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4231,6 +4590,7 @@ ALTER TABLE ONLY public.group_role_mapping
 
 
 --
+-- TOC entry 3816 (class 2606 OID 16973)
 -- Name: identity_provider_mapper constraint_idpm; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4239,6 +4599,7 @@ ALTER TABLE ONLY public.identity_provider_mapper
 
 
 --
+-- TOC entry 3819 (class 2606 OID 16975)
 -- Name: idp_mapper_config constraint_idpmconfig; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4247,6 +4608,7 @@ ALTER TABLE ONLY public.idp_mapper_config
 
 
 --
+-- TOC entry 3821 (class 2606 OID 16977)
 -- Name: jgroups_ping constraint_jgroups_ping; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4255,6 +4617,7 @@ ALTER TABLE ONLY public.jgroups_ping
 
 
 --
+-- TOC entry 3833 (class 2606 OID 16979)
 -- Name: migration_model constraint_migmod; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4263,6 +4626,7 @@ ALTER TABLE ONLY public.migration_model
 
 
 --
+-- TOC entry 3840 (class 2606 OID 16981)
 -- Name: offline_client_session constraint_offl_cl_ses_pk3; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4271,6 +4635,7 @@ ALTER TABLE ONLY public.offline_client_session
 
 
 --
+-- TOC entry 3842 (class 2606 OID 16983)
 -- Name: offline_user_session constraint_offl_us_ses_pk2; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4279,6 +4644,7 @@ ALTER TABLE ONLY public.offline_user_session
 
 
 --
+-- TOC entry 3860 (class 2606 OID 16985)
 -- Name: protocol_mapper constraint_pcm; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4287,6 +4653,7 @@ ALTER TABLE ONLY public.protocol_mapper
 
 
 --
+-- TOC entry 3864 (class 2606 OID 16987)
 -- Name: protocol_mapper_config constraint_pmconfig; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4295,6 +4662,7 @@ ALTER TABLE ONLY public.protocol_mapper_config
 
 
 --
+-- TOC entry 3894 (class 2606 OID 16989)
 -- Name: redirect_uris constraint_redirect_uris; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4303,6 +4671,7 @@ ALTER TABLE ONLY public.redirect_uris
 
 
 --
+-- TOC entry 3897 (class 2606 OID 16991)
 -- Name: required_action_config constraint_req_act_cfg_pk; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4311,6 +4680,7 @@ ALTER TABLE ONLY public.required_action_config
 
 
 --
+-- TOC entry 3899 (class 2606 OID 16993)
 -- Name: required_action_provider constraint_req_act_prv_pk; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4319,6 +4689,7 @@ ALTER TABLE ONLY public.required_action_provider
 
 
 --
+-- TOC entry 3988 (class 2606 OID 16995)
 -- Name: user_required_action constraint_required_action; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4327,6 +4698,7 @@ ALTER TABLE ONLY public.user_required_action
 
 
 --
+-- TOC entry 3933 (class 2606 OID 16997)
 -- Name: resource_uris constraint_resour_uris_pk; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4335,6 +4707,7 @@ ALTER TABLE ONLY public.resource_uris
 
 
 --
+-- TOC entry 3938 (class 2606 OID 16999)
 -- Name: role_attribute constraint_role_attribute_pk; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4343,6 +4716,7 @@ ALTER TABLE ONLY public.role_attribute
 
 
 --
+-- TOC entry 3935 (class 2606 OID 17001)
 -- Name: revoked_token constraint_rt; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4351,6 +4725,7 @@ ALTER TABLE ONLY public.revoked_token
 
 
 --
+-- TOC entry 3949 (class 2606 OID 17003)
 -- Name: user_attribute constraint_user_attribute_pk; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4359,6 +4734,7 @@ ALTER TABLE ONLY public.user_attribute
 
 
 --
+-- TOC entry 3985 (class 2606 OID 17005)
 -- Name: user_group_membership constraint_user_group; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4367,6 +4743,7 @@ ALTER TABLE ONLY public.user_group_membership
 
 
 --
+-- TOC entry 3994 (class 2606 OID 17007)
 -- Name: web_origins constraint_web_origins; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4375,6 +4752,7 @@ ALTER TABLE ONLY public.web_origins
 
 
 --
+-- TOC entry 3756 (class 2606 OID 17009)
 -- Name: databasechangeloglock databasechangeloglock_pkey; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4383,6 +4761,7 @@ ALTER TABLE ONLY public.databasechangeloglock
 
 
 --
+-- TOC entry 3732 (class 2606 OID 17011)
 -- Name: client_scope_attributes pk_cl_tmpl_attr; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4391,6 +4770,7 @@ ALTER TABLE ONLY public.client_scope_attributes
 
 
 --
+-- TOC entry 3727 (class 2606 OID 17013)
 -- Name: client_scope pk_cli_template; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4399,6 +4779,7 @@ ALTER TABLE ONLY public.client_scope
 
 
 --
+-- TOC entry 3910 (class 2606 OID 17015)
 -- Name: resource_server pk_resource_server; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4407,6 +4788,7 @@ ALTER TABLE ONLY public.resource_server
 
 
 --
+-- TOC entry 3740 (class 2606 OID 17017)
 -- Name: client_scope_role_mapping pk_template_scope; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4415,6 +4797,7 @@ ALTER TABLE ONLY public.client_scope_role_mapping
 
 
 --
+-- TOC entry 3999 (class 2606 OID 17019)
 -- Name: workflow_state pk_workflow_state; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4423,6 +4806,7 @@ ALTER TABLE ONLY public.workflow_state
 
 
 --
+-- TOC entry 3760 (class 2606 OID 17021)
 -- Name: default_client_scope r_def_cli_scope_bind; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4431,6 +4815,7 @@ ALTER TABLE ONLY public.default_client_scope
 
 
 --
+-- TOC entry 3885 (class 2606 OID 17023)
 -- Name: realm_localizations realm_localizations_pkey; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4439,6 +4824,7 @@ ALTER TABLE ONLY public.realm_localizations
 
 
 --
+-- TOC entry 3902 (class 2606 OID 17025)
 -- Name: resource_attribute res_attr_pk; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4447,6 +4833,7 @@ ALTER TABLE ONLY public.resource_attribute
 
 
 --
+-- TOC entry 3825 (class 2606 OID 17027)
 -- Name: keycloak_group sibling_names; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4455,6 +4842,7 @@ ALTER TABLE ONLY public.keycloak_group
 
 
 --
+-- TOC entry 3812 (class 2606 OID 17029)
 -- Name: identity_provider uk_2daelwnibji49avxsrtuf6xj33; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4463,6 +4851,7 @@ ALTER TABLE ONLY public.identity_provider
 
 
 --
+-- TOC entry 3714 (class 2606 OID 17031)
 -- Name: client uk_b71cjlbenv945rb6gcon438at; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4471,6 +4860,7 @@ ALTER TABLE ONLY public.client
 
 
 --
+-- TOC entry 3729 (class 2606 OID 17033)
 -- Name: client_scope uk_cli_scope; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4479,6 +4869,7 @@ ALTER TABLE ONLY public.client_scope
 
 
 --
+-- TOC entry 3970 (class 2606 OID 17035)
 -- Name: user_entity uk_dykn684sl8up1crfei6eckhd7; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4487,6 +4878,7 @@ ALTER TABLE ONLY public.user_entity
 
 
 --
+-- TOC entry 3958 (class 2606 OID 17037)
 -- Name: user_consent uk_external_consent; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4495,6 +4887,7 @@ ALTER TABLE ONLY public.user_consent
 
 
 --
+-- TOC entry 3926 (class 2606 OID 17039)
 -- Name: resource_server_resource uk_frsr6t700s9v50bu18ws5ha6; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4503,6 +4896,7 @@ ALTER TABLE ONLY public.resource_server_resource
 
 
 --
+-- TOC entry 3916 (class 2606 OID 17041)
 -- Name: resource_server_perm_ticket uk_frsr6t700s9v50bu18ws5pmt; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4511,6 +4905,7 @@ ALTER TABLE ONLY public.resource_server_perm_ticket
 
 
 --
+-- TOC entry 3921 (class 2606 OID 17043)
 -- Name: resource_server_policy uk_frsrpt700s9v50bu18ws5ha6; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4519,6 +4914,7 @@ ALTER TABLE ONLY public.resource_server_policy
 
 
 --
+-- TOC entry 3931 (class 2606 OID 17045)
 -- Name: resource_server_scope uk_frsrst700s9v50bu18ws5ha6; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4527,6 +4923,7 @@ ALTER TABLE ONLY public.resource_server_scope
 
 
 --
+-- TOC entry 3960 (class 2606 OID 17047)
 -- Name: user_consent uk_local_consent; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4535,6 +4932,7 @@ ALTER TABLE ONLY public.user_consent
 
 
 --
+-- TOC entry 3836 (class 2606 OID 17049)
 -- Name: migration_model uk_migration_update_time; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4543,6 +4941,7 @@ ALTER TABLE ONLY public.migration_model
 
 
 --
+-- TOC entry 3838 (class 2606 OID 17051)
 -- Name: migration_model uk_migration_version; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4551,6 +4950,7 @@ ALTER TABLE ONLY public.migration_model
 
 
 --
+-- TOC entry 3849 (class 2606 OID 17053)
 -- Name: org uk_org_alias; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4559,6 +4959,7 @@ ALTER TABLE ONLY public.org
 
 
 --
+-- TOC entry 3851 (class 2606 OID 17055)
 -- Name: org uk_org_group; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4567,6 +4968,7 @@ ALTER TABLE ONLY public.org
 
 
 --
+-- TOC entry 3853 (class 2606 OID 17057)
 -- Name: org uk_org_name; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4575,6 +4977,7 @@ ALTER TABLE ONLY public.org
 
 
 --
+-- TOC entry 3869 (class 2606 OID 17059)
 -- Name: realm uk_orvsdmla56612eaefiq6wl5oi; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4583,6 +4986,7 @@ ALTER TABLE ONLY public.realm
 
 
 --
+-- TOC entry 3972 (class 2606 OID 17061)
 -- Name: user_entity uk_ru8tt6t700s9v50bu18ws5ha6; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4591,6 +4995,7 @@ ALTER TABLE ONLY public.user_entity
 
 
 --
+-- TOC entry 4001 (class 2606 OID 17063)
 -- Name: workflow_state uq_workflow_resource; Type: CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -4599,6 +5004,7 @@ ALTER TABLE ONLY public.workflow_state
 
 
 --
+-- TOC entry 3767 (class 1259 OID 17064)
 -- Name: fed_user_attr_long_values; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4606,6 +5012,7 @@ CREATE INDEX fed_user_attr_long_values ON public.fed_user_attribute USING btree 
 
 
 --
+-- TOC entry 3768 (class 1259 OID 17065)
 -- Name: fed_user_attr_long_values_lower_case; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4613,6 +5020,7 @@ CREATE INDEX fed_user_attr_long_values_lower_case ON public.fed_user_attribute U
 
 
 --
+-- TOC entry 3692 (class 1259 OID 17066)
 -- Name: idx_admin_event_time; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4620,6 +5028,7 @@ CREATE INDEX idx_admin_event_time ON public.admin_event_entity USING btree (real
 
 
 --
+-- TOC entry 3695 (class 1259 OID 17067)
 -- Name: idx_assoc_pol_assoc_pol_id; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4627,6 +5036,7 @@ CREATE INDEX idx_assoc_pol_assoc_pol_id ON public.associated_policy USING btree 
 
 
 --
+-- TOC entry 3705 (class 1259 OID 17068)
 -- Name: idx_auth_config_realm; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4634,6 +5044,7 @@ CREATE INDEX idx_auth_config_realm ON public.authenticator_config USING btree (r
 
 
 --
+-- TOC entry 3698 (class 1259 OID 17069)
 -- Name: idx_auth_exec_flow; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4641,6 +5052,7 @@ CREATE INDEX idx_auth_exec_flow ON public.authentication_execution USING btree (
 
 
 --
+-- TOC entry 3699 (class 1259 OID 17070)
 -- Name: idx_auth_exec_realm_flow; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4648,6 +5060,7 @@ CREATE INDEX idx_auth_exec_realm_flow ON public.authentication_execution USING b
 
 
 --
+-- TOC entry 3702 (class 1259 OID 17071)
 -- Name: idx_auth_flow_realm; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4655,6 +5068,7 @@ CREATE INDEX idx_auth_flow_realm ON public.authentication_flow USING btree (real
 
 
 --
+-- TOC entry 3735 (class 1259 OID 17072)
 -- Name: idx_cl_clscope; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4662,6 +5076,7 @@ CREATE INDEX idx_cl_clscope ON public.client_scope_client USING btree (scope_id)
 
 
 --
+-- TOC entry 3717 (class 1259 OID 17073)
 -- Name: idx_client_att_by_name_value; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4669,6 +5084,7 @@ CREATE INDEX idx_client_att_by_name_value ON public.client_attributes USING btre
 
 
 --
+-- TOC entry 3712 (class 1259 OID 17074)
 -- Name: idx_client_id; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4676,6 +5092,7 @@ CREATE INDEX idx_client_id ON public.client USING btree (client_id);
 
 
 --
+-- TOC entry 3722 (class 1259 OID 17075)
 -- Name: idx_client_init_acc_realm; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4683,6 +5100,7 @@ CREATE INDEX idx_client_init_acc_realm ON public.client_initial_access USING btr
 
 
 --
+-- TOC entry 3730 (class 1259 OID 17076)
 -- Name: idx_clscope_attrs; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4690,6 +5108,7 @@ CREATE INDEX idx_clscope_attrs ON public.client_scope_attributes USING btree (sc
 
 
 --
+-- TOC entry 3736 (class 1259 OID 17077)
 -- Name: idx_clscope_cl; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4697,6 +5116,7 @@ CREATE INDEX idx_clscope_cl ON public.client_scope_client USING btree (client_id
 
 
 --
+-- TOC entry 3861 (class 1259 OID 17078)
 -- Name: idx_clscope_protmap; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4704,6 +5124,7 @@ CREATE INDEX idx_clscope_protmap ON public.protocol_mapper USING btree (client_s
 
 
 --
+-- TOC entry 3737 (class 1259 OID 17079)
 -- Name: idx_clscope_role; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4711,6 +5132,7 @@ CREATE INDEX idx_clscope_role ON public.client_scope_role_mapping USING btree (s
 
 
 --
+-- TOC entry 3747 (class 1259 OID 17080)
 -- Name: idx_compo_config_compo; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4718,6 +5140,7 @@ CREATE INDEX idx_compo_config_compo ON public.component_config USING btree (comp
 
 
 --
+-- TOC entry 3743 (class 1259 OID 17081)
 -- Name: idx_component_provider_type; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4725,6 +5148,7 @@ CREATE INDEX idx_component_provider_type ON public.component USING btree (provid
 
 
 --
+-- TOC entry 3744 (class 1259 OID 17082)
 -- Name: idx_component_realm; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4732,6 +5156,7 @@ CREATE INDEX idx_component_realm ON public.component USING btree (realm_id);
 
 
 --
+-- TOC entry 3750 (class 1259 OID 17083)
 -- Name: idx_composite; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4739,6 +5164,7 @@ CREATE INDEX idx_composite ON public.composite_role USING btree (composite);
 
 
 --
+-- TOC entry 3751 (class 1259 OID 17084)
 -- Name: idx_composite_child; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4746,6 +5172,7 @@ CREATE INDEX idx_composite_child ON public.composite_role USING btree (child_rol
 
 
 --
+-- TOC entry 3757 (class 1259 OID 17085)
 -- Name: idx_defcls_realm; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4753,6 +5180,7 @@ CREATE INDEX idx_defcls_realm ON public.default_client_scope USING btree (realm_
 
 
 --
+-- TOC entry 3758 (class 1259 OID 17086)
 -- Name: idx_defcls_scope; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4760,6 +5188,7 @@ CREATE INDEX idx_defcls_scope ON public.default_client_scope USING btree (scope_
 
 
 --
+-- TOC entry 3763 (class 1259 OID 17087)
 -- Name: idx_event_entity_user_id_type; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4767,6 +5196,7 @@ CREATE INDEX idx_event_entity_user_id_type ON public.event_entity USING btree (u
 
 
 --
+-- TOC entry 3764 (class 1259 OID 17088)
 -- Name: idx_event_time; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4774,6 +5204,7 @@ CREATE INDEX idx_event_time ON public.event_entity USING btree (realm_id, event_
 
 
 --
+-- TOC entry 3795 (class 1259 OID 17089)
 -- Name: idx_fedidentity_feduser; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4781,6 +5212,7 @@ CREATE INDEX idx_fedidentity_feduser ON public.federated_identity USING btree (f
 
 
 --
+-- TOC entry 3796 (class 1259 OID 17090)
 -- Name: idx_fedidentity_user; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4788,6 +5220,7 @@ CREATE INDEX idx_fedidentity_user ON public.federated_identity USING btree (user
 
 
 --
+-- TOC entry 3769 (class 1259 OID 17091)
 -- Name: idx_fu_attribute; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4795,6 +5228,7 @@ CREATE INDEX idx_fu_attribute ON public.fed_user_attribute USING btree (user_id,
 
 
 --
+-- TOC entry 3772 (class 1259 OID 17092)
 -- Name: idx_fu_cnsnt_ext; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4802,6 +5236,7 @@ CREATE INDEX idx_fu_cnsnt_ext ON public.fed_user_consent USING btree (user_id, c
 
 
 --
+-- TOC entry 3773 (class 1259 OID 17093)
 -- Name: idx_fu_consent; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4809,6 +5244,7 @@ CREATE INDEX idx_fu_consent ON public.fed_user_consent USING btree (user_id, cli
 
 
 --
+-- TOC entry 3774 (class 1259 OID 17094)
 -- Name: idx_fu_consent_ru; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4816,6 +5252,7 @@ CREATE INDEX idx_fu_consent_ru ON public.fed_user_consent USING btree (realm_id,
 
 
 --
+-- TOC entry 3779 (class 1259 OID 17095)
 -- Name: idx_fu_credential; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4823,6 +5260,7 @@ CREATE INDEX idx_fu_credential ON public.fed_user_credential USING btree (user_i
 
 
 --
+-- TOC entry 3780 (class 1259 OID 17096)
 -- Name: idx_fu_credential_ru; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4830,6 +5268,7 @@ CREATE INDEX idx_fu_credential_ru ON public.fed_user_credential USING btree (rea
 
 
 --
+-- TOC entry 3783 (class 1259 OID 17097)
 -- Name: idx_fu_group_membership; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4837,6 +5276,7 @@ CREATE INDEX idx_fu_group_membership ON public.fed_user_group_membership USING b
 
 
 --
+-- TOC entry 3784 (class 1259 OID 17098)
 -- Name: idx_fu_group_membership_ru; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4844,6 +5284,7 @@ CREATE INDEX idx_fu_group_membership_ru ON public.fed_user_group_membership USIN
 
 
 --
+-- TOC entry 3787 (class 1259 OID 17099)
 -- Name: idx_fu_required_action; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4851,6 +5292,7 @@ CREATE INDEX idx_fu_required_action ON public.fed_user_required_action USING btr
 
 
 --
+-- TOC entry 3788 (class 1259 OID 17100)
 -- Name: idx_fu_required_action_ru; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4858,6 +5300,7 @@ CREATE INDEX idx_fu_required_action_ru ON public.fed_user_required_action USING 
 
 
 --
+-- TOC entry 3791 (class 1259 OID 17101)
 -- Name: idx_fu_role_mapping; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4865,6 +5308,7 @@ CREATE INDEX idx_fu_role_mapping ON public.fed_user_role_mapping USING btree (us
 
 
 --
+-- TOC entry 3792 (class 1259 OID 17102)
 -- Name: idx_fu_role_mapping_ru; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4872,6 +5316,7 @@ CREATE INDEX idx_fu_role_mapping_ru ON public.fed_user_role_mapping USING btree 
 
 
 --
+-- TOC entry 3801 (class 1259 OID 17103)
 -- Name: idx_group_att_by_name_value; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4879,6 +5324,7 @@ CREATE INDEX idx_group_att_by_name_value ON public.group_attribute USING btree (
 
 
 --
+-- TOC entry 3802 (class 1259 OID 17104)
 -- Name: idx_group_attr_group; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4886,6 +5332,7 @@ CREATE INDEX idx_group_attr_group ON public.group_attribute USING btree (group_i
 
 
 --
+-- TOC entry 3805 (class 1259 OID 17105)
 -- Name: idx_group_role_mapp_group; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4893,6 +5340,7 @@ CREATE INDEX idx_group_role_mapp_group ON public.group_role_mapping USING btree 
 
 
 --
+-- TOC entry 3817 (class 1259 OID 17106)
 -- Name: idx_id_prov_mapp_realm; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4900,6 +5348,7 @@ CREATE INDEX idx_id_prov_mapp_realm ON public.identity_provider_mapper USING btr
 
 
 --
+-- TOC entry 3808 (class 1259 OID 17107)
 -- Name: idx_ident_prov_realm; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4907,6 +5356,7 @@ CREATE INDEX idx_ident_prov_realm ON public.identity_provider USING btree (realm
 
 
 --
+-- TOC entry 3809 (class 1259 OID 17108)
 -- Name: idx_idp_for_login; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4914,6 +5364,7 @@ CREATE INDEX idx_idp_for_login ON public.identity_provider USING btree (realm_id
 
 
 --
+-- TOC entry 3810 (class 1259 OID 17109)
 -- Name: idx_idp_realm_org; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4921,6 +5372,7 @@ CREATE INDEX idx_idp_realm_org ON public.identity_provider USING btree (realm_id
 
 
 --
+-- TOC entry 3830 (class 1259 OID 17110)
 -- Name: idx_keycloak_role_client; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4928,6 +5380,7 @@ CREATE INDEX idx_keycloak_role_client ON public.keycloak_role USING btree (clien
 
 
 --
+-- TOC entry 3831 (class 1259 OID 17111)
 -- Name: idx_keycloak_role_realm; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4935,6 +5388,7 @@ CREATE INDEX idx_keycloak_role_realm ON public.keycloak_role USING btree (realm)
 
 
 --
+-- TOC entry 3843 (class 1259 OID 17112)
 -- Name: idx_offline_uss_by_broker_session_id; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4942,6 +5396,7 @@ CREATE INDEX idx_offline_uss_by_broker_session_id ON public.offline_user_session
 
 
 --
+-- TOC entry 3844 (class 1259 OID 17113)
 -- Name: idx_offline_uss_by_last_session_refresh; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4949,6 +5404,7 @@ CREATE INDEX idx_offline_uss_by_last_session_refresh ON public.offline_user_sess
 
 
 --
+-- TOC entry 3845 (class 1259 OID 17114)
 -- Name: idx_offline_uss_by_user; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4956,6 +5412,7 @@ CREATE INDEX idx_offline_uss_by_user ON public.offline_user_session USING btree 
 
 
 --
+-- TOC entry 3856 (class 1259 OID 17115)
 -- Name: idx_org_domain_org_id; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4963,6 +5420,7 @@ CREATE INDEX idx_org_domain_org_id ON public.org_domain USING btree (org_id);
 
 
 --
+-- TOC entry 3913 (class 1259 OID 17116)
 -- Name: idx_perm_ticket_owner; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4970,6 +5428,7 @@ CREATE INDEX idx_perm_ticket_owner ON public.resource_server_perm_ticket USING b
 
 
 --
+-- TOC entry 3914 (class 1259 OID 17117)
 -- Name: idx_perm_ticket_requester; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4977,6 +5436,7 @@ CREATE INDEX idx_perm_ticket_requester ON public.resource_server_perm_ticket USI
 
 
 --
+-- TOC entry 3862 (class 1259 OID 17118)
 -- Name: idx_protocol_mapper_client; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4984,6 +5444,7 @@ CREATE INDEX idx_protocol_mapper_client ON public.protocol_mapper USING btree (c
 
 
 --
+-- TOC entry 3872 (class 1259 OID 17119)
 -- Name: idx_realm_attr_realm; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4991,6 +5452,7 @@ CREATE INDEX idx_realm_attr_realm ON public.realm_attribute USING btree (realm_i
 
 
 --
+-- TOC entry 3725 (class 1259 OID 17120)
 -- Name: idx_realm_clscope; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -4998,6 +5460,7 @@ CREATE INDEX idx_realm_clscope ON public.client_scope USING btree (realm_id);
 
 
 --
+-- TOC entry 3877 (class 1259 OID 17121)
 -- Name: idx_realm_def_grp_realm; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5005,6 +5468,7 @@ CREATE INDEX idx_realm_def_grp_realm ON public.realm_default_groups USING btree 
 
 
 --
+-- TOC entry 3883 (class 1259 OID 17122)
 -- Name: idx_realm_evt_list_realm; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5012,6 +5476,7 @@ CREATE INDEX idx_realm_evt_list_realm ON public.realm_events_listeners USING btr
 
 
 --
+-- TOC entry 3880 (class 1259 OID 17123)
 -- Name: idx_realm_evt_types_realm; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5019,6 +5484,7 @@ CREATE INDEX idx_realm_evt_types_realm ON public.realm_enabled_event_types USING
 
 
 --
+-- TOC entry 3867 (class 1259 OID 17124)
 -- Name: idx_realm_master_adm_cli; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5026,6 +5492,7 @@ CREATE INDEX idx_realm_master_adm_cli ON public.realm USING btree (master_admin_
 
 
 --
+-- TOC entry 3892 (class 1259 OID 17125)
 -- Name: idx_realm_supp_local_realm; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5033,6 +5500,7 @@ CREATE INDEX idx_realm_supp_local_realm ON public.realm_supported_locales USING 
 
 
 --
+-- TOC entry 3895 (class 1259 OID 17126)
 -- Name: idx_redir_uri_client; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5040,6 +5508,7 @@ CREATE INDEX idx_redir_uri_client ON public.redirect_uris USING btree (client_id
 
 
 --
+-- TOC entry 3900 (class 1259 OID 17127)
 -- Name: idx_req_act_prov_realm; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5047,6 +5516,7 @@ CREATE INDEX idx_req_act_prov_realm ON public.required_action_provider USING btr
 
 
 --
+-- TOC entry 3905 (class 1259 OID 17128)
 -- Name: idx_res_policy_policy; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5054,6 +5524,7 @@ CREATE INDEX idx_res_policy_policy ON public.resource_policy USING btree (policy
 
 
 --
+-- TOC entry 3908 (class 1259 OID 17129)
 -- Name: idx_res_scope_scope; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5061,6 +5532,7 @@ CREATE INDEX idx_res_scope_scope ON public.resource_scope USING btree (scope_id)
 
 
 --
+-- TOC entry 3919 (class 1259 OID 17130)
 -- Name: idx_res_serv_pol_res_serv; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5068,6 +5540,7 @@ CREATE INDEX idx_res_serv_pol_res_serv ON public.resource_server_policy USING bt
 
 
 --
+-- TOC entry 3924 (class 1259 OID 17131)
 -- Name: idx_res_srv_res_res_srv; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5075,6 +5548,7 @@ CREATE INDEX idx_res_srv_res_res_srv ON public.resource_server_resource USING bt
 
 
 --
+-- TOC entry 3929 (class 1259 OID 17132)
 -- Name: idx_res_srv_scope_res_srv; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5082,6 +5556,7 @@ CREATE INDEX idx_res_srv_scope_res_srv ON public.resource_server_scope USING btr
 
 
 --
+-- TOC entry 3936 (class 1259 OID 17133)
 -- Name: idx_rev_token_on_expire; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5089,6 +5564,7 @@ CREATE INDEX idx_rev_token_on_expire ON public.revoked_token USING btree (expire
 
 
 --
+-- TOC entry 3939 (class 1259 OID 17134)
 -- Name: idx_role_attribute; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5096,6 +5572,7 @@ CREATE INDEX idx_role_attribute ON public.role_attribute USING btree (role_id);
 
 
 --
+-- TOC entry 3738 (class 1259 OID 17135)
 -- Name: idx_role_clscope; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5103,6 +5580,7 @@ CREATE INDEX idx_role_clscope ON public.client_scope_role_mapping USING btree (r
 
 
 --
+-- TOC entry 3942 (class 1259 OID 17136)
 -- Name: idx_scope_mapping_role; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5110,6 +5588,7 @@ CREATE INDEX idx_scope_mapping_role ON public.scope_mapping USING btree (role_id
 
 
 --
+-- TOC entry 3945 (class 1259 OID 17137)
 -- Name: idx_scope_policy_policy; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5117,6 +5596,7 @@ CREATE INDEX idx_scope_policy_policy ON public.scope_policy USING btree (policy_
 
 
 --
+-- TOC entry 3834 (class 1259 OID 17138)
 -- Name: idx_update_time; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5124,6 +5604,7 @@ CREATE INDEX idx_update_time ON public.migration_model USING btree (update_time)
 
 
 --
+-- TOC entry 3963 (class 1259 OID 17139)
 -- Name: idx_usconsent_clscope; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5131,6 +5612,7 @@ CREATE INDEX idx_usconsent_clscope ON public.user_consent_client_scope USING btr
 
 
 --
+-- TOC entry 3964 (class 1259 OID 17140)
 -- Name: idx_usconsent_scope_id; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5138,6 +5620,7 @@ CREATE INDEX idx_usconsent_scope_id ON public.user_consent_client_scope USING bt
 
 
 --
+-- TOC entry 3950 (class 1259 OID 17141)
 -- Name: idx_user_attribute; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5145,6 +5628,7 @@ CREATE INDEX idx_user_attribute ON public.user_attribute USING btree (user_id);
 
 
 --
+-- TOC entry 3951 (class 1259 OID 17142)
 -- Name: idx_user_attribute_name; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5152,6 +5636,7 @@ CREATE INDEX idx_user_attribute_name ON public.user_attribute USING btree (name,
 
 
 --
+-- TOC entry 3956 (class 1259 OID 17143)
 -- Name: idx_user_consent; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5159,6 +5644,7 @@ CREATE INDEX idx_user_consent ON public.user_consent USING btree (user_id);
 
 
 --
+-- TOC entry 3754 (class 1259 OID 17144)
 -- Name: idx_user_credential; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5166,6 +5652,7 @@ CREATE INDEX idx_user_credential ON public.credential USING btree (user_id);
 
 
 --
+-- TOC entry 3967 (class 1259 OID 17145)
 -- Name: idx_user_email; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5173,6 +5660,7 @@ CREATE INDEX idx_user_email ON public.user_entity USING btree (email);
 
 
 --
+-- TOC entry 3986 (class 1259 OID 17146)
 -- Name: idx_user_group_mapping; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5180,6 +5668,7 @@ CREATE INDEX idx_user_group_mapping ON public.user_group_membership USING btree 
 
 
 --
+-- TOC entry 3989 (class 1259 OID 17147)
 -- Name: idx_user_reqactions; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5187,6 +5676,7 @@ CREATE INDEX idx_user_reqactions ON public.user_required_action USING btree (use
 
 
 --
+-- TOC entry 3992 (class 1259 OID 17148)
 -- Name: idx_user_role_mapping; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5194,6 +5684,7 @@ CREATE INDEX idx_user_role_mapping ON public.user_role_mapping USING btree (user
 
 
 --
+-- TOC entry 3968 (class 1259 OID 17149)
 -- Name: idx_user_service_account; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5201,6 +5692,7 @@ CREATE INDEX idx_user_service_account ON public.user_entity USING btree (realm_i
 
 
 --
+-- TOC entry 3977 (class 1259 OID 17150)
 -- Name: idx_usr_fed_map_fed_prv; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5208,6 +5700,7 @@ CREATE INDEX idx_usr_fed_map_fed_prv ON public.user_federation_mapper USING btre
 
 
 --
+-- TOC entry 3978 (class 1259 OID 17151)
 -- Name: idx_usr_fed_map_realm; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5215,6 +5708,7 @@ CREATE INDEX idx_usr_fed_map_realm ON public.user_federation_mapper USING btree 
 
 
 --
+-- TOC entry 3983 (class 1259 OID 17152)
 -- Name: idx_usr_fed_prv_realm; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5222,6 +5716,7 @@ CREATE INDEX idx_usr_fed_prv_realm ON public.user_federation_provider USING btre
 
 
 --
+-- TOC entry 3995 (class 1259 OID 17153)
 -- Name: idx_web_orig_client; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5229,6 +5724,7 @@ CREATE INDEX idx_web_orig_client ON public.web_origins USING btree (client_id);
 
 
 --
+-- TOC entry 3996 (class 1259 OID 17154)
 -- Name: idx_workflow_state_provider; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5236,6 +5732,7 @@ CREATE INDEX idx_workflow_state_provider ON public.workflow_state USING btree (r
 
 
 --
+-- TOC entry 3997 (class 1259 OID 17155)
 -- Name: idx_workflow_state_step; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5243,6 +5740,7 @@ CREATE INDEX idx_workflow_state_step ON public.workflow_state USING btree (workf
 
 
 --
+-- TOC entry 3952 (class 1259 OID 17156)
 -- Name: user_attr_long_values; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5250,6 +5748,7 @@ CREATE INDEX user_attr_long_values ON public.user_attribute USING btree (long_va
 
 
 --
+-- TOC entry 3953 (class 1259 OID 17157)
 -- Name: user_attr_long_values_lower_case; Type: INDEX; Schema: public; Owner: kc_user
 --
 
@@ -5257,6 +5756,7 @@ CREATE INDEX user_attr_long_values_lower_case ON public.user_attribute USING btr
 
 
 --
+-- TOC entry 4022 (class 2606 OID 17158)
 -- Name: identity_provider fk2b4ebc52ae5c3b34; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5265,6 +5765,7 @@ ALTER TABLE ONLY public.identity_provider
 
 
 --
+-- TOC entry 4008 (class 2606 OID 17163)
 -- Name: client_attributes fk3c47c64beacca966; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5273,6 +5774,7 @@ ALTER TABLE ONLY public.client_attributes
 
 
 --
+-- TOC entry 4019 (class 2606 OID 17168)
 -- Name: federated_identity fk404288b92ef007a6; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5281,6 +5783,7 @@ ALTER TABLE ONLY public.federated_identity
 
 
 --
+-- TOC entry 4010 (class 2606 OID 17173)
 -- Name: client_node_registrations fk4129723ba992f594; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5289,6 +5792,7 @@ ALTER TABLE ONLY public.client_node_registrations
 
 
 --
+-- TOC entry 4038 (class 2606 OID 17178)
 -- Name: redirect_uris fk_1burs8pb4ouj97h5wuppahv9f; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5297,6 +5801,7 @@ ALTER TABLE ONLY public.redirect_uris
 
 
 --
+-- TOC entry 4064 (class 2606 OID 17183)
 -- Name: user_federation_provider fk_1fj32f6ptolw2qy60cd8n01e8; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5305,6 +5810,7 @@ ALTER TABLE ONLY public.user_federation_provider
 
 
 --
+-- TOC entry 4035 (class 2606 OID 17188)
 -- Name: realm_required_credential fk_5hg65lybevavkqfki3kponh9v; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5313,6 +5819,7 @@ ALTER TABLE ONLY public.realm_required_credential
 
 
 --
+-- TOC entry 4040 (class 2606 OID 17193)
 -- Name: resource_attribute fk_5hrm2vlf9ql5fu022kqepovbr; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5321,6 +5828,7 @@ ALTER TABLE ONLY public.resource_attribute
 
 
 --
+-- TOC entry 4057 (class 2606 OID 17198)
 -- Name: user_attribute fk_5hrm2vlf9ql5fu043kqepovbr; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5329,6 +5837,7 @@ ALTER TABLE ONLY public.user_attribute
 
 
 --
+-- TOC entry 4066 (class 2606 OID 17203)
 -- Name: user_required_action fk_6qj3w1jw9cvafhe19bwsiuvmd; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5337,6 +5846,7 @@ ALTER TABLE ONLY public.user_required_action
 
 
 --
+-- TOC entry 4026 (class 2606 OID 17208)
 -- Name: keycloak_role fk_6vyqfe4cn4wlq8r6kt5vdsj5c; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5345,6 +5855,7 @@ ALTER TABLE ONLY public.keycloak_role
 
 
 --
+-- TOC entry 4036 (class 2606 OID 17213)
 -- Name: realm_smtp_config fk_70ej8xdxgxd0b9hh6180irr0o; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5353,6 +5864,7 @@ ALTER TABLE ONLY public.realm_smtp_config
 
 
 --
+-- TOC entry 4031 (class 2606 OID 17218)
 -- Name: realm_attribute fk_8shxd6l3e9atqukacxgpffptw; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5361,6 +5873,7 @@ ALTER TABLE ONLY public.realm_attribute
 
 
 --
+-- TOC entry 4015 (class 2606 OID 17223)
 -- Name: composite_role fk_a63wvekftu8jo1pnj81e7mce2; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5369,6 +5882,7 @@ ALTER TABLE ONLY public.composite_role
 
 
 --
+-- TOC entry 4004 (class 2606 OID 17228)
 -- Name: authentication_execution fk_auth_exec_flow; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5377,6 +5891,7 @@ ALTER TABLE ONLY public.authentication_execution
 
 
 --
+-- TOC entry 4005 (class 2606 OID 17233)
 -- Name: authentication_execution fk_auth_exec_realm; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5385,6 +5900,7 @@ ALTER TABLE ONLY public.authentication_execution
 
 
 --
+-- TOC entry 4006 (class 2606 OID 17238)
 -- Name: authentication_flow fk_auth_flow_realm; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5393,6 +5909,7 @@ ALTER TABLE ONLY public.authentication_flow
 
 
 --
+-- TOC entry 4007 (class 2606 OID 17243)
 -- Name: authenticator_config fk_auth_realm; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5401,6 +5918,7 @@ ALTER TABLE ONLY public.authenticator_config
 
 
 --
+-- TOC entry 4067 (class 2606 OID 17248)
 -- Name: user_role_mapping fk_c4fqv34p1mbylloxang7b1q3l; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5409,6 +5927,7 @@ ALTER TABLE ONLY public.user_role_mapping
 
 
 --
+-- TOC entry 4011 (class 2606 OID 17253)
 -- Name: client_scope_attributes fk_cl_scope_attr_scope; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5417,6 +5936,7 @@ ALTER TABLE ONLY public.client_scope_attributes
 
 
 --
+-- TOC entry 4012 (class 2606 OID 17258)
 -- Name: client_scope_role_mapping fk_cl_scope_rm_scope; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5425,6 +5945,7 @@ ALTER TABLE ONLY public.client_scope_role_mapping
 
 
 --
+-- TOC entry 4028 (class 2606 OID 17263)
 -- Name: protocol_mapper fk_cli_scope_mapper; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5433,6 +5954,7 @@ ALTER TABLE ONLY public.protocol_mapper
 
 
 --
+-- TOC entry 4009 (class 2606 OID 17268)
 -- Name: client_initial_access fk_client_init_acc_realm; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5441,6 +5963,7 @@ ALTER TABLE ONLY public.client_initial_access
 
 
 --
+-- TOC entry 4014 (class 2606 OID 17273)
 -- Name: component_config fk_component_config; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5449,6 +5972,7 @@ ALTER TABLE ONLY public.component_config
 
 
 --
+-- TOC entry 4013 (class 2606 OID 17278)
 -- Name: component fk_component_realm; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5457,6 +5981,7 @@ ALTER TABLE ONLY public.component
 
 
 --
+-- TOC entry 4032 (class 2606 OID 17283)
 -- Name: realm_default_groups fk_def_groups_realm; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5465,6 +5990,7 @@ ALTER TABLE ONLY public.realm_default_groups
 
 
 --
+-- TOC entry 4063 (class 2606 OID 17288)
 -- Name: user_federation_mapper_config fk_fedmapper_cfg; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5473,6 +5999,7 @@ ALTER TABLE ONLY public.user_federation_mapper_config
 
 
 --
+-- TOC entry 4061 (class 2606 OID 17293)
 -- Name: user_federation_mapper fk_fedmapperpm_fedprv; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5481,6 +6008,7 @@ ALTER TABLE ONLY public.user_federation_mapper
 
 
 --
+-- TOC entry 4062 (class 2606 OID 17298)
 -- Name: user_federation_mapper fk_fedmapperpm_realm; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5489,6 +6017,7 @@ ALTER TABLE ONLY public.user_federation_mapper
 
 
 --
+-- TOC entry 4002 (class 2606 OID 17303)
 -- Name: associated_policy fk_frsr5s213xcx4wnkog82ssrfy; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5497,6 +6026,7 @@ ALTER TABLE ONLY public.associated_policy
 
 
 --
+-- TOC entry 4055 (class 2606 OID 17308)
 -- Name: scope_policy fk_frsrasp13xcx4wnkog82ssrfy; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5505,6 +6035,7 @@ ALTER TABLE ONLY public.scope_policy
 
 
 --
+-- TOC entry 4045 (class 2606 OID 17313)
 -- Name: resource_server_perm_ticket fk_frsrho213xcx4wnkog82sspmt; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5513,6 +6044,7 @@ ALTER TABLE ONLY public.resource_server_perm_ticket
 
 
 --
+-- TOC entry 4050 (class 2606 OID 17318)
 -- Name: resource_server_resource fk_frsrho213xcx4wnkog82ssrfy; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5521,6 +6053,7 @@ ALTER TABLE ONLY public.resource_server_resource
 
 
 --
+-- TOC entry 4046 (class 2606 OID 17323)
 -- Name: resource_server_perm_ticket fk_frsrho213xcx4wnkog83sspmt; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5529,6 +6062,7 @@ ALTER TABLE ONLY public.resource_server_perm_ticket
 
 
 --
+-- TOC entry 4047 (class 2606 OID 17328)
 -- Name: resource_server_perm_ticket fk_frsrho213xcx4wnkog84sspmt; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5537,6 +6071,7 @@ ALTER TABLE ONLY public.resource_server_perm_ticket
 
 
 --
+-- TOC entry 4003 (class 2606 OID 17333)
 -- Name: associated_policy fk_frsrpas14xcx4wnkog82ssrfy; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5545,6 +6080,7 @@ ALTER TABLE ONLY public.associated_policy
 
 
 --
+-- TOC entry 4056 (class 2606 OID 17338)
 -- Name: scope_policy fk_frsrpass3xcx4wnkog82ssrfy; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5553,6 +6089,7 @@ ALTER TABLE ONLY public.scope_policy
 
 
 --
+-- TOC entry 4048 (class 2606 OID 17343)
 -- Name: resource_server_perm_ticket fk_frsrpo2128cx4wnkog82ssrfy; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5561,6 +6098,7 @@ ALTER TABLE ONLY public.resource_server_perm_ticket
 
 
 --
+-- TOC entry 4049 (class 2606 OID 17348)
 -- Name: resource_server_policy fk_frsrpo213xcx4wnkog82ssrfy; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5569,6 +6107,7 @@ ALTER TABLE ONLY public.resource_server_policy
 
 
 --
+-- TOC entry 4043 (class 2606 OID 17353)
 -- Name: resource_scope fk_frsrpos13xcx4wnkog82ssrfy; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5577,6 +6116,7 @@ ALTER TABLE ONLY public.resource_scope
 
 
 --
+-- TOC entry 4041 (class 2606 OID 17358)
 -- Name: resource_policy fk_frsrpos53xcx4wnkog82ssrfy; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5585,6 +6125,7 @@ ALTER TABLE ONLY public.resource_policy
 
 
 --
+-- TOC entry 4042 (class 2606 OID 17363)
 -- Name: resource_policy fk_frsrpp213xcx4wnkog82ssrfy; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5593,6 +6134,7 @@ ALTER TABLE ONLY public.resource_policy
 
 
 --
+-- TOC entry 4044 (class 2606 OID 17368)
 -- Name: resource_scope fk_frsrps213xcx4wnkog82ssrfy; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5601,6 +6143,7 @@ ALTER TABLE ONLY public.resource_scope
 
 
 --
+-- TOC entry 4051 (class 2606 OID 17373)
 -- Name: resource_server_scope fk_frsrso213xcx4wnkog82ssrfy; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5609,6 +6152,7 @@ ALTER TABLE ONLY public.resource_server_scope
 
 
 --
+-- TOC entry 4016 (class 2606 OID 17378)
 -- Name: composite_role fk_gr7thllb9lu8q4vqa4524jjy8; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5617,6 +6161,7 @@ ALTER TABLE ONLY public.composite_role
 
 
 --
+-- TOC entry 4059 (class 2606 OID 17383)
 -- Name: user_consent_client_scope fk_grntcsnt_clsc_usc; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5625,6 +6170,7 @@ ALTER TABLE ONLY public.user_consent_client_scope
 
 
 --
+-- TOC entry 4058 (class 2606 OID 17388)
 -- Name: user_consent fk_grntcsnt_user; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5633,6 +6179,7 @@ ALTER TABLE ONLY public.user_consent
 
 
 --
+-- TOC entry 4020 (class 2606 OID 17393)
 -- Name: group_attribute fk_group_attribute_group; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5641,6 +6188,7 @@ ALTER TABLE ONLY public.group_attribute
 
 
 --
+-- TOC entry 4021 (class 2606 OID 17398)
 -- Name: group_role_mapping fk_group_role_group; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5649,6 +6197,7 @@ ALTER TABLE ONLY public.group_role_mapping
 
 
 --
+-- TOC entry 4033 (class 2606 OID 17403)
 -- Name: realm_enabled_event_types fk_h846o4h0w8epx5nwedrf5y69j; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5657,6 +6206,7 @@ ALTER TABLE ONLY public.realm_enabled_event_types
 
 
 --
+-- TOC entry 4034 (class 2606 OID 17408)
 -- Name: realm_events_listeners fk_h846o4h0w8epx5nxev9f5y69j; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5665,6 +6215,7 @@ ALTER TABLE ONLY public.realm_events_listeners
 
 
 --
+-- TOC entry 4024 (class 2606 OID 17413)
 -- Name: identity_provider_mapper fk_idpm_realm; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5673,6 +6224,7 @@ ALTER TABLE ONLY public.identity_provider_mapper
 
 
 --
+-- TOC entry 4025 (class 2606 OID 17418)
 -- Name: idp_mapper_config fk_idpmconfig; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5681,6 +6233,7 @@ ALTER TABLE ONLY public.idp_mapper_config
 
 
 --
+-- TOC entry 4068 (class 2606 OID 17423)
 -- Name: web_origins fk_lojpho213xcx4wnkog82ssrfy; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5689,6 +6242,7 @@ ALTER TABLE ONLY public.web_origins
 
 
 --
+-- TOC entry 4054 (class 2606 OID 17428)
 -- Name: scope_mapping fk_ouse064plmlr732lxjcn1q5f1; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5697,6 +6251,7 @@ ALTER TABLE ONLY public.scope_mapping
 
 
 --
+-- TOC entry 4029 (class 2606 OID 17433)
 -- Name: protocol_mapper fk_pcm_realm; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5705,6 +6260,7 @@ ALTER TABLE ONLY public.protocol_mapper
 
 
 --
+-- TOC entry 4017 (class 2606 OID 17438)
 -- Name: credential fk_pfyr0glasqyl0dei3kl69r6v0; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5713,6 +6269,7 @@ ALTER TABLE ONLY public.credential
 
 
 --
+-- TOC entry 4030 (class 2606 OID 17443)
 -- Name: protocol_mapper_config fk_pmconfig; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5721,6 +6278,7 @@ ALTER TABLE ONLY public.protocol_mapper_config
 
 
 --
+-- TOC entry 4018 (class 2606 OID 17448)
 -- Name: default_client_scope fk_r_def_cli_scope_realm; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5729,6 +6287,7 @@ ALTER TABLE ONLY public.default_client_scope
 
 
 --
+-- TOC entry 4039 (class 2606 OID 17453)
 -- Name: required_action_provider fk_req_act_realm; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5737,6 +6296,7 @@ ALTER TABLE ONLY public.required_action_provider
 
 
 --
+-- TOC entry 4052 (class 2606 OID 17458)
 -- Name: resource_uris fk_resource_server_uris; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5745,6 +6305,7 @@ ALTER TABLE ONLY public.resource_uris
 
 
 --
+-- TOC entry 4053 (class 2606 OID 17463)
 -- Name: role_attribute fk_role_attribute_id; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5753,6 +6314,7 @@ ALTER TABLE ONLY public.role_attribute
 
 
 --
+-- TOC entry 4037 (class 2606 OID 17468)
 -- Name: realm_supported_locales fk_supported_locales_realm; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5761,6 +6323,7 @@ ALTER TABLE ONLY public.realm_supported_locales
 
 
 --
+-- TOC entry 4060 (class 2606 OID 17473)
 -- Name: user_federation_config fk_t13hpu1j94r2ebpekr39x5eu5; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5769,6 +6332,7 @@ ALTER TABLE ONLY public.user_federation_config
 
 
 --
+-- TOC entry 4065 (class 2606 OID 17478)
 -- Name: user_group_membership fk_user_group_user; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5777,6 +6341,7 @@ ALTER TABLE ONLY public.user_group_membership
 
 
 --
+-- TOC entry 4027 (class 2606 OID 17483)
 -- Name: policy_config fkdc34197cf864c4e43; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5785,6 +6350,7 @@ ALTER TABLE ONLY public.policy_config
 
 
 --
+-- TOC entry 4023 (class 2606 OID 17488)
 -- Name: identity_provider_config fkdc4897cf864c4e43; Type: FK CONSTRAINT; Schema: public; Owner: kc_user
 --
 
@@ -5792,9 +6358,9 @@ ALTER TABLE ONLY public.identity_provider_config
     ADD CONSTRAINT fkdc4897cf864c4e43 FOREIGN KEY (identity_provider_id) REFERENCES public.identity_provider(internal_id);
 
 
+-- Completed on 2025-10-18 11:55:37 -03
+
 --
 -- PostgreSQL database dump complete
 --
-
-\unrestrict sCr1V3Nwk95amSeXWEaad5EqoyWasyVEGNk8aqXeZeZP5ZbPWAfDullEwFhmyGs
 

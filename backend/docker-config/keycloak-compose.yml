@@ -22,7 +22,7 @@ services:
     restart: always
 
   keycloak:
-    image: quay.io/keycloak/keycloak:latest
+    image: quay.io/keycloak/keycloak:26.4.0
     container_name: keycloak_server
     environment:
       KEYCLOAK_ADMIN: admin

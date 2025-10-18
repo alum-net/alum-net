@@ -1,14 +1,15 @@
 module.exports = function (api) {
   api.cache(true);
   return {
-    presets: ['babel-preset-expo'],
+    presets: ["babel-preset-expo"],
     plugins: [
-      ['module-resolver', {
-        root: ['./'],
-        alias: {
-          "@alum-net/hooks": "../../packages/hooks/src"
-        }
-      }]
-    ]
+      [
+        "module-resolver",
+        {
+          root: ["./"],
+          alias: {},
+        },
+      ],
+    ],
   };
 };
