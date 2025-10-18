@@ -1,41 +1,40 @@
-import { Stack } from "expo-router";
-import { useEffect } from "react";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { useFonts } from "expo-font";
-import * as SplashScreen from "expo-splash-screen";
-import "react-native-reanimated";
+import { Stack } from 'expo-router';
+import { useEffect } from 'react';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useFonts } from 'expo-font';
+import * as SplashScreen from 'expo-splash-screen';
+import 'react-native-reanimated';
+import { PaperProvider } from 'react-native-paper';
+import { storage, STORAGE_KEYS } from '@alum-net/storage';
+import { THEME } from '@alum-net/ui';
+import { useMMKVString } from 'react-native-mmkv';
 
-import { storage, STORAGE_KEYS } from "@alum-net/storage";
-import { useMMKVString } from "react-native-mmkv";
+export { ErrorBoundary } from 'expo-router';
 
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from "expo-router";
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 const InitialLayout = () => {
   const [refreshToken] = useMMKVString(STORAGE_KEYS.REFRESH_TOKEN, storage);
 
   return (
-    <Stack>
-      <Stack.Protected guard={!refreshToken}>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-      </Stack.Protected>
-      <Stack.Protected guard={!!refreshToken}>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      </Stack.Protected>
-      <Stack.Screen name="+not-found" />
-      <Stack.Screen name="auth" options={{ headerShown: false }} />
-    </Stack>
+    <PaperProvider theme={THEME}>
+      <Stack>
+        <Stack.Protected guard={!refreshToken}>
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+        </Stack.Protected>
+        <Stack.Protected guard={!!refreshToken}>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        </Stack.Protected>
+        <Stack.Screen name="+not-found" />
+        <Stack.Screen name="auth" options={{ headerShown: false }} />
+      </Stack>
+    </PaperProvider>
   );
 };
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
     ...FontAwesome.font,
   });
 
