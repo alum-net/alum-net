@@ -1,4 +1,4 @@
-package org.alumnet.application.dtos;
+package org.alumnet.application.dtos.responses;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,9 +12,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ResultResponse {
+public class ResultResponse <T>{
     private boolean success;
     private String message;
+    private T data;
     @Builder.Default
     private List<String> errors = new ArrayList<>();
 
