@@ -5,9 +5,12 @@ import org.alumnet.application.dtos.CourseCreationRequestDTO;
 import org.alumnet.domain.Course;
 import org.alumnet.domain.Teacher;
 import org.alumnet.domain.repositories.CourseRepository;
+import org.alumnet.domain.repositories.ParticipationRepository;
 import org.alumnet.domain.repositories.UserRepository;
+import org.alumnet.infrastructure.exceptions.ActiveCourseException;
 import org.alumnet.infrastructure.exceptions.InvalidAttributeException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -21,6 +24,7 @@ public class CourseService {
 
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
+    private final ParticipationRepository participationRepository;
 
     public void create(CourseCreationRequestDTO courseCreationRequestDTO) {
 
@@ -54,6 +58,18 @@ public class CourseService {
                 .build();
 
         courseRepository.save(course);
+    }
+
+    @Transactional
+    public void deleteCourse(int courseId) {
+        boolean courseActive = courseRepository.isCourseActive(courseId);
+        boolean hasEnrolledStudents = participationRepository.hasEnrolledStudents(courseId);
+
+        if (courseActive && hasEnrolledStudents) {
+            throw new ActiveCourseException("El curso está activo y tiene estudiantes matriculados.");
+        }
+
+        courseRepository.deactivateCourse(courseId);
     }
 
     private static void validateTeachers(List<String> teacherEmails, List<Teacher> teachers) {
