@@ -15,6 +15,7 @@ import software.amazon.awssdk.services.s3.model.ServerSideEncryption;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
@@ -38,20 +39,7 @@ public class S3FileStorageService {
                     "content-type", file.getContentType()
             );
 
-            PutObjectRequest putRequest = PutObjectRequest.builder()
-                    .bucket(s3Properties.getBucketName())
-                    .key(key)
-                    .contentType(file.getContentType())
-                    .contentLength(file.getSize())
-                    .metadata(metadata)
-                    .serverSideEncryption(ServerSideEncryption.AES256)
-                    .build();
-
-            RequestBody requestBody = RequestBody.fromInputStream(
-                    file.getInputStream(), file.getSize()
-            );
-
-            PutObjectResponse response = s3Client.putObject(putRequest, requestBody);
+            PutObjectResponse response = s3Client.putObject(createPutObjectRequest(file, key, metadata), createAWSrequestBody(file));
 
             log.info("Archivo subido exitosamente a S3: bucket={}, key={}, etag={}",
                     s3Properties.getBucketName(), key, response.eTag());
@@ -66,6 +54,24 @@ public class S3FileStorageService {
             );
         }
     }
+
+    private static RequestBody createAWSrequestBody(MultipartFile file) throws IOException {
+        return RequestBody.fromInputStream(
+                file.getInputStream(), file.getSize()
+        );
+    }
+
+    private PutObjectRequest createPutObjectRequest(MultipartFile file, String key, Map<String, String> metadata) {
+        return PutObjectRequest.builder()
+                .bucket(s3Properties.getBucketName())
+                .key(key)
+                .contentType(file.getContentType())
+                .contentLength(file.getSize())
+                .metadata(metadata)
+                .serverSideEncryption(ServerSideEncryption.AES256)
+                .build();
+    }
+
     private String generateS3Key(String fileExtension) {
         String uniqueId = UUID.randomUUID().toString();
 

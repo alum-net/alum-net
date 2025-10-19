@@ -37,35 +37,47 @@ public class SectionService {
         Section section = sectionMapper.toSectionWithCourse(sectionDTO,course);
 
         if (files != null && !files.isEmpty()) {
-            List<SectionResource> sectionResources = new ArrayList<>();
-
-            files.forEach(file -> {
-
-                String fileExtension = getFileExtension(file.getOriginalFilename());
-                String s3Key = s3FileStorageService.store(file, fileExtension);
-
-                Resource resource = Resource.builder()
-                        .name(file.getOriginalFilename())
-                        .url(s3Key)
-                        .extension(fileExtension)
-                        .type(ResourceType.COURSE)
-                        .sizeInBytes(file.getSize())
-                        .build();
-
-                resource = resourceRepository.save(resource);
-                SectionResource sectionResource = SectionResource.builder()
-                        .title(file.getOriginalFilename())
-                        .section(section)
-                        .resource(resource)
-                        .build();
-
-                sectionResources.add(sectionResource);
-            });
-            section.setSectionResources(sectionResources);
+            uploadAndLinkFilesToSection(files, section);
         }
 
         course.getSections().add(section);
         courseService.updateCourse(course);
+    }
+
+    private void uploadAndLinkFilesToSection(List<MultipartFile> files, Section section) {
+        List<SectionResource> sectionResources = new ArrayList<>();
+
+        files.forEach(file -> {
+
+            String fileExtension = getFileExtension(file.getOriginalFilename());
+            String s3Key = s3FileStorageService.store(file, fileExtension);
+
+            Resource resource = createResource(file, s3Key, fileExtension);
+
+            resource = resourceRepository.save(resource);
+            SectionResource sectionResource = createSectionResource(section, file, resource);
+
+            sectionResources.add(sectionResource);
+        });
+        section.setSectionResources(sectionResources);
+    }
+
+    private static SectionResource createSectionResource(Section section, MultipartFile file, Resource resource) {
+        return SectionResource.builder()
+                .title(file.getOriginalFilename())
+                .section(section)
+                .resource(resource)
+                .build();
+    }
+
+    private static Resource createResource(MultipartFile file, String s3Key, String fileExtension) {
+        return Resource.builder()
+                .name(file.getOriginalFilename())
+                .url(s3Key)
+                .extension(fileExtension)
+                .type(ResourceType.COURSE)
+                .sizeInBytes(file.getSize())
+                .build();
     }
 
     private String getFileExtension(String filename) {
