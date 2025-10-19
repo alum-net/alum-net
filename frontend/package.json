@@ -22,6 +22,7 @@
   "dependencies": {
     "@expo/vector-icons": "^14.0.0",
     "@react-navigation/native": "^7.1.6",
+    "@tanstack/react-query": "^5.90.5",
     "axios": "^1.12.2",
     "expo": "53.0.22",
     "expo-constants": "~17.1.7",
@@ -41,6 +42,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
+    "@tanstack/eslint-plugin-query": "^5.91.2",
     "@types/jest": "^29.5.12",
     "@types/react": "~18.3.12",
     "@types/react-test-renderer": "^18.3.0",
@@ -48,7 +50,7 @@
     "@typescript-eslint/parser": "^8.46.1",
     "babel-plugin-module-resolver": "^5.0.2",
     "eslint": "^9.38.0",
-    "eslint-config-expo": "^10.0.0",
+    "eslint-config-expo": "~9.2.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-prettier": "^5.5.4",
@@ -59,7 +61,8 @@
     "jest-expo": "^53.0.10",
     "prettier": "^3.6.2",
     "react-test-renderer": "18.3.1",
-    "typescript": "~5.3.3"
+    "typescript": "~5.3.3",
+    "typescript-eslint": "^8.46.1"
   },
   "resolutions": {
     "@expo/config-plugins": "~10.1.1"

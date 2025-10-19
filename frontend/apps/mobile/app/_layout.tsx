@@ -8,27 +8,30 @@ import { PaperProvider } from 'react-native-paper';
 import { storage, STORAGE_KEYS } from '@alum-net/storage';
 import { THEME } from '@alum-net/ui';
 import { useMMKVString } from 'react-native-mmkv';
-
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 export { ErrorBoundary } from 'expo-router';
 
 SplashScreen.preventAutoHideAsync();
+const queryClient = new QueryClient();
 
 const InitialLayout = () => {
   const [refreshToken] = useMMKVString(STORAGE_KEYS.REFRESH_TOKEN, storage);
 
   return (
-    <PaperProvider theme={THEME}>
-      <Stack>
-        <Stack.Protected guard={!refreshToken}>
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-        </Stack.Protected>
-        <Stack.Protected guard={!!refreshToken}>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        </Stack.Protected>
-        <Stack.Screen name="+not-found" />
-        <Stack.Screen name="auth" options={{ headerShown: false }} />
-      </Stack>
-    </PaperProvider>
+    <QueryClientProvider client={queryClient}>
+      <PaperProvider theme={THEME}>
+        <Stack>
+          <Stack.Protected guard={!refreshToken}>
+            <Stack.Screen name="index" options={{ headerShown: false }} />
+          </Stack.Protected>
+          <Stack.Protected guard={!!refreshToken}>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          </Stack.Protected>
+          <Stack.Screen name="+not-found" />
+          <Stack.Screen name="auth" options={{ headerShown: false }} />
+        </Stack>
+      </PaperProvider>
+    </QueryClientProvider>
   );
 };
 
