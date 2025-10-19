@@ -1,4 +1,4 @@
-import { ReactElement, useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { View, StyleSheet, Platform, FlatList } from 'react-native';
 import { Button, Text } from 'react-native-paper';
