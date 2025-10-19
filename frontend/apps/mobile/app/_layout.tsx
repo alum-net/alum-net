@@ -9,6 +9,7 @@ import { storage, STORAGE_KEYS } from '@alum-net/storage';
 import { THEME } from '@alum-net/ui';
 import { useMMKVString } from 'react-native-mmkv';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 export { ErrorBoundary } from 'expo-router';
 
 SplashScreen.preventAutoHideAsync();
@@ -19,18 +20,20 @@ const InitialLayout = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <PaperProvider theme={THEME}>
-        <Stack>
-          <Stack.Protected guard={!refreshToken}>
-            <Stack.Screen name="index" options={{ headerShown: false }} />
-          </Stack.Protected>
-          <Stack.Protected guard={!!refreshToken}>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          </Stack.Protected>
-          <Stack.Screen name="+not-found" />
-          <Stack.Screen name="auth" options={{ headerShown: false }} />
-        </Stack>
-      </PaperProvider>
+      <KeyboardProvider>
+        <PaperProvider theme={THEME}>
+          <Stack>
+            <Stack.Protected guard={!refreshToken}>
+              <Stack.Screen name="index" options={{ headerShown: false }} />
+            </Stack.Protected>
+            <Stack.Protected guard={!!refreshToken}>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            </Stack.Protected>
+            <Stack.Screen name="+not-found" />
+            <Stack.Screen name="auth" options={{ headerShown: false }} />
+          </Stack>
+        </PaperProvider>
+      </KeyboardProvider>
     </QueryClientProvider>
   );
 };

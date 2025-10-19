@@ -1,6 +1,6 @@
 import { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { View, ScrollView, StyleSheet, Platform } from 'react-native';
+import { View, StyleSheet, Platform, FlatList } from 'react-native';
 import { Button, Text } from 'react-native-paper';
 import { FiltersDirectory, FilterName, CourseShift } from '../types';
 import { getCourses } from '../service';
@@ -37,7 +37,7 @@ export function CoursesDashboard({
     }),
     [courseName, teacherName, shift, year, myCourses],
   );
-  const filtersTimeout = useRef<NodeJS.Timeout>();
+  const filtersTimeout = useRef<NodeJS.Timeout | number>();
   const { data } = useQuery({
     queryKey: ['courses', buildQueryParams(filters), currentPage],
     queryFn: () => getCourses(filters, currentPage),
@@ -79,38 +79,41 @@ export function CoursesDashboard({
 
   return (
     <View style={styles.container}>
-      {filterComponent({ setFilters, filters })}
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.coursesGrid}
-      >
-        {data?.map(course => (
-          <CourseCard key={course.id} course={course} />
-        ))}
-        {data?.length === 0 ? (
+      <FlatList
+        style={styles.flatList}
+        ListHeaderComponent={() => filterComponent({ setFilters, filters })}
+        data={data}
+        keyExtractor={item => item.id.toString()}
+        renderItem={({ item }) => <CourseCard course={item} />}
+        numColumns={Platform.OS === 'web' ? undefined : 2}
+        columnWrapperStyle={styles.coursesGrid}
+        key={Platform.OS === 'web' ? 'web' : 'mobile'}
+        ListEmptyComponent={
           <Text style={styles.noResults}>No se encontraron cursos</Text>
-        ) : (
-          <View style={styles.paginationContainer}>
-            {/* TODO: revisar como usar la logica del paginado */}
-            <Button
-              mode="contained-tonal"
-              onPress={() => setCurrentPage(currentPage - 1)}
-              buttonColor={THEME.colors.black}
-              labelStyle={styles.paginationButtonLabel}
-            >
-              Página anterior
-            </Button>
-            <Button
-              mode="contained-tonal"
-              onPress={() => setCurrentPage(currentPage + 1)}
-              buttonColor={THEME.colors.black}
-              labelStyle={styles.paginationButtonLabel}
-            >
-              Página siguiente
-            </Button>
-          </View>
-        )}
-      </ScrollView>
+        }
+        ListFooterComponent={
+          data && data.length > 0 ? (
+            <View style={styles.paginationContainer}>
+              <Button
+                mode="contained-tonal"
+                onPress={() => setCurrentPage(currentPage - 1)}
+                buttonColor={THEME.colors.black}
+                labelStyle={styles.paginationButtonLabel}
+              >
+                Página anterior
+              </Button>
+              <Button
+                mode="contained-tonal"
+                onPress={() => setCurrentPage(currentPage + 1)}
+                buttonColor={THEME.colors.black}
+                labelStyle={styles.paginationButtonLabel}
+              >
+                Página siguiente
+              </Button>
+            </View>
+          ) : null
+        }
+      />
     </View>
   );
 }
@@ -123,16 +126,11 @@ const styles = StyleSheet.create({
     elevation: 0,
     borderBottomWidth: 1,
   },
-  scrollView: {
+  flatList: {
     flex: 1,
-  },
-  coursesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
     padding: 8,
-    gap: 16,
-    justifyContent: Platform.OS === 'web' ? 'flex-start' : 'space-between',
   },
+  coursesGrid: { gap: 15, justifyContent: 'space-around' },
   noResults: {
     color: 'red',
     textAlign: 'center',
@@ -144,6 +142,7 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-around',
+    marginVertical: 16,
   },
   paginationButtonLabel: {
     color: 'white',

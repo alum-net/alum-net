@@ -1,15 +1,8 @@
 import { FilterBar } from '@alum-net/courses/src/components/filter-bar';
 import { FiltersDirectory, FilterName } from '@alum-net/courses/src/types';
 import { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import {
-  Button,
-  Divider,
-  IconButton,
-  Portal,
-  Surface,
-} from 'react-native-paper';
-import { ScrollView } from 'react-native-reanimated/lib/typescript/Animated';
+import { Modal, StyleSheet, Text, View } from 'react-native';
+import { Button, Divider, IconButton, Portal } from 'react-native-paper';
 
 export default function CourseFilters({
   filters,
@@ -24,26 +17,41 @@ export default function CourseFilters({
     <>
       <Button
         mode="elevated"
-        onPress={() => setDisplayFilters(!displayFilters)}
+        style={{ marginVertical: 10 }}
+        onPress={() => setDisplayFilters(true)}
       >
         Filtros
       </Button>
       <Portal>
-        {displayFilters && (
-          <Surface style={styles.modalContainer} elevation={5}>
+        <Modal
+          onRequestClose={() => setDisplayFilters(false)}
+          visible={displayFilters}
+          backdropColor="#373737b5"
+          animationType="fade"
+        >
+          <View style={styles.modalContainer}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Filtros</Text>
-              <IconButton icon="close" iconColor="#ffffff" size={24} />
+              <IconButton
+                icon="close"
+                iconColor="black"
+                size={24}
+                onPress={() => setDisplayFilters(false)}
+              />
             </View>
             <Divider style={styles.modalDivider} />
-            <ScrollView style={styles.modalContent}>
-              <FilterBar filters={filters} setFilters={setFilters} />
-              <Button mode="contained" onPress={() => console.log('aplique')}>
-                Aplicar Filtros
-              </Button>
-            </ScrollView>
-          </Surface>
-        )}
+            <FilterBar filters={filters} setFilters={setFilters} />
+            <Button
+              mode="contained"
+              onPress={() => {
+                setDisplayFilters(false);
+              }}
+              style={{ marginTop: 20 }}
+            >
+              Aplicar Filtros
+            </Button>
+          </View>
+        </Modal>
       </Portal>
     </>
   );
@@ -51,26 +59,21 @@ export default function CourseFilters({
 
 const styles = StyleSheet.create({
   modalContainer: {
-    backgroundColor: THEME.colors.black,
+    padding: 20,
     margin: 20,
+    backgroundColor: 'white',
     borderRadius: 8,
-    maxHeight: '80%',
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
   },
   modalTitle: {
-    color: '#ffffff',
     fontSize: 20,
     fontWeight: 'bold',
   },
   modalDivider: {
     backgroundColor: '#333333',
-  },
-  modalContent: {
-    padding: 16,
   },
 });

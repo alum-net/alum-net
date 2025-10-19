@@ -1,13 +1,13 @@
 import { logout } from '@alum-net/auth';
-import { View } from 'react-native';
 import { Button } from 'react-native-paper';
+import Screen from '../../components/screen';
 
 export default function Profile() {
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    <Screen>
       <Button mode="contained-tonal" onPress={() => logout()}>
         Cerrar sesión
       </Button>
-    </View>
+    </Screen>
   );
 }

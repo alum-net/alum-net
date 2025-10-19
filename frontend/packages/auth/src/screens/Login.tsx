@@ -87,7 +87,13 @@ export const LoginScreen = () => {
           <Text style={styles.subtitle}>
             Inicia sesión para continuar tu camino de aprendizaje.
           </Text>
-          <Button onPress={() => promptAsync()} mode="contained">
+          <Button
+            onPress={() => {
+              console.log('hola');
+              promptAsync();
+            }}
+            mode="contained"
+          >
             Iniciar sesión
           </Button>
         </>

@@ -30,6 +30,7 @@ export const CourseCard = ({ course }: { course: Course }) => {
 const styles = StyleSheet.create({
   card: {
     minWidth: Platform.OS === 'web' ? 200 : undefined,
+    width: Platform.OS === 'android' ? '45%' : undefined,
     marginBottom: 16,
   },
   cardHeader: {

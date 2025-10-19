@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { SHIFTS } from '../constants';
-import { StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 import { Button, Checkbox, Menu, TextInput } from 'react-native-paper';
 import { FiltersDirectory, FilterName } from '../types';
 import { useUserInfo } from '@alum-net/users';
@@ -36,7 +36,7 @@ export const FilterBar = ({
         mode="outlined"
         style={styles.filterInput}
         outlineColor="#333333"
-        defaultValue=""
+        defaultValue={filters.courseName}
         activeOutlineColor={THEME.colors.secondary}
       />
       <TextInput
@@ -46,7 +46,7 @@ export const FilterBar = ({
         style={styles.filterInput}
         outlineColor="#333333"
         activeOutlineColor={THEME.colors.secondary}
-        defaultValue=""
+        defaultValue={filters.teacherName}
       />
       <TextInput
         label="Año"
@@ -57,6 +57,7 @@ export const FilterBar = ({
         outlineColor="#333333"
         activeOutlineColor={THEME.colors.secondary}
         placeholder={`0-${maxYear}`}
+        defaultValue={filters.year}
       />
 
       <Menu
@@ -116,9 +117,11 @@ const styles = StyleSheet.create({
   filterInput: {
     flex: 1,
     minWidth: 180,
+    maxHeight: Platform.OS === 'android' ? 60 : undefined,
   },
   filterInputYear: {
     width: 120,
+    maxHeight: Platform.OS === 'android' ? 60 : undefined,
   },
   shiftButton: {
     borderColor: '#333333',
