@@ -2,7 +2,9 @@
   "name": "@alum-net/users",
   "version": "1.0.0",
   "main": "./src/index.ts",
-  "dependencies": {},
+  "dependencies": {
+    "@alum-net/auth": "*"
+  },
   "peerDependencies": {
     "react": "19.0.0",
     "react-native": "0.79.6",

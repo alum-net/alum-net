@@ -12,7 +12,7 @@ import {
 import { useMMKVString } from 'react-native-mmkv';
 import { storage, STORAGE_KEYS } from '@alum-net/storage';
 import { useEffect } from 'react';
-import { keycloakClientId, keycloakRealm, mobileScheme } from '../constants';
+import { keycloakClientId, keycloakRealm, authScheme } from '../constants';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -21,7 +21,7 @@ export function generateShortUUID() {
 }
 
 const redirectUri = makeRedirectUri({
-  native: mobileScheme,
+  native: authScheme,
 });
 
 export const LoginScreen = () => {
@@ -89,7 +89,6 @@ export const LoginScreen = () => {
           </Text>
           <Button
             onPress={() => {
-              console.log('hola');
               promptAsync();
             }}
             mode="contained"

@@ -1,5 +1,9 @@
-export const keycloakRealm = "alumnet-realm";
+export const keycloakRealm = 'alumnet-realm';
 
-export const keycloakClientId = "alumnet";
+export const keycloakClientId = 'alumnet';
 
-export const mobileScheme = "alumnet.mobile://auth";
+const mobileScheme = 'alumnet.mobile://';
+
+export const authScheme = `${mobileScheme}auth`;
+
+export const profileScheme = `${mobileScheme}profile`;
