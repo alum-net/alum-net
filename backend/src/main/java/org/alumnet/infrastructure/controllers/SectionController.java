@@ -1,6 +1,7 @@
 package org.alumnet.infrastructure.controllers;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.SectionCreationRequestDTO;
 import org.alumnet.application.dtos.responses.ResultResponse;
 import org.alumnet.application.services.SectionService;
@@ -15,10 +16,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/sections")
+@RequiredArgsConstructor
 public class SectionController {
 
-    @Autowired
-    private SectionService sectionService;
+
+    private final SectionService sectionService;
 
     @PostMapping (path = "/{courseId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('teacher')")

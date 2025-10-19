@@ -8,10 +8,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 import software.amazon.awssdk.services.s3.model.ServerSideEncryption;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
+import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,10 +27,11 @@ public class S3FileStorageService {
 
     private final S3Client s3Client;
     private final AmazonS3Config.S3Properties s3Properties;
+    private final S3Presigner s3Presigner;
 
-    public void store(MultipartFile file) throws FileStorageException {
+    public String store(MultipartFile file, String fileExtension) throws FileStorageException {
         try {
-            String key = generateS3Key(file.getOriginalFilename());
+            String key = generateS3Key(fileExtension);
 
             Map<String, String> metadata = Map.of(
                     "original-filename", file.getOriginalFilename(),
@@ -51,27 +56,34 @@ public class S3FileStorageService {
             log.info("Archivo subido exitosamente a S3: bucket={}, key={}, etag={}",
                     s3Properties.getBucketName(), key, response.eTag());
 
+            return key;
 
         } catch (Exception e) {
             log.error("Error subiendo archivo a S3: {}", file.getOriginalFilename(), e);
-            throw new FileStorageException(String.format("Error almacenando archivo en S3: %s", file.getOriginalFilename()), "upload");
+            throw new FileStorageException(
+                    String.format("Error almacenando archivo en S3: %s", file.getOriginalFilename()),
+                    "upload"
+            );
         }
     }
-    private String generateS3Key(String originalFilename) {
-        String extension = getFileExtension(originalFilename);
+    private String generateS3Key(String fileExtension) {
         String uniqueId = UUID.randomUUID().toString();
 
         return String.format("%s_%s",
                 uniqueId,
-                extension.isEmpty() ? "" : "." + extension
+                fileExtension.isEmpty() ? "" : "." + fileExtension
         );
     }
+    public String generatePresignedUrl(String key, Duration expiration) {
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(s3Properties.getBucketName())
+                .key(key)
+                .build();
 
+        PresignedGetObjectRequest presignedRequest = s3Presigner.presignGetObject(r ->
+                r.signatureDuration(expiration)
+                        .getObjectRequest(getObjectRequest));
 
-    private String getFileExtension(String filename) {
-        return Optional.ofNullable(filename)
-                .filter(f -> f.contains("."))
-                .map(f -> f.substring(filename.lastIndexOf(".") + 1))
-                .orElse("");
+        return presignedRequest.url().toString();
     }
 }

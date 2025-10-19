@@ -3,6 +3,7 @@ package org.alumnet.application.services;
 import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.CourseCreationRequestDTO;
 import org.alumnet.domain.Course;
+import org.alumnet.domain.Section;
 import org.alumnet.domain.users.Teacher;
 import org.alumnet.domain.repositories.CourseRepository;
 import org.alumnet.domain.repositories.ParticipationRepository;
@@ -98,4 +99,5 @@ public class CourseService {
     public void updateCourse(Course course) {
         courseRepository.save(course);
     }
+
 }

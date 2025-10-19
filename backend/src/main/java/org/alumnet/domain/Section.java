@@ -3,6 +3,9 @@ package org.alumnet.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Builder
 @Getter
@@ -17,4 +20,7 @@ public class Section {
     @MapsId("courseId")
     @JoinColumn(name = "course_id", referencedColumnName = "id")
     private Course course;
+
+    @OneToMany(mappedBy = "section", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SectionResource> sectionResources = new ArrayList<>();
 }

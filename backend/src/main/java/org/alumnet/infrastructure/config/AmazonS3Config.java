@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 @Configuration
 @EnableConfigurationProperties(AmazonS3Config.S3Properties.class)
@@ -19,6 +20,18 @@ public class AmazonS3Config {
                 .credentialsProvider(DefaultCredentialsProvider.create())
                 .build();
     }
+
+
+    @Bean
+    public S3Presigner s3Presigner(S3Properties properties) {
+        return S3Presigner.builder()
+                .region(Region.of(properties.getRegion()))
+                .credentialsProvider(DefaultCredentialsProvider.create())
+                .build();
+
+    }
+
+
     @ConfigurationProperties(prefix = "aws.s3")
     @Data
     public static class S3Properties {
