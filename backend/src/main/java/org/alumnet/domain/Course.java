@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.alumnet.application.enums.ShiftType;
+import org.alumnet.domain.users.Teacher;
 
 import java.util.Date;
 import java.util.List;
@@ -51,5 +52,8 @@ public class Course {
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
     private List<CourseParticipation> participations;
+
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+    private List<Section> sections;
 
 }

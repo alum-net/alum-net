@@ -7,7 +7,7 @@ import org.alumnet.application.dtos.UserDTO;
 import org.alumnet.application.dtos.UserFilterDTO;
 import org.alumnet.application.mapper.UserMapper;
 import org.alumnet.application.specifications.UserSpecification;
-import org.alumnet.domain.User;
+import org.alumnet.domain.users.User;
 import org.alumnet.domain.repositories.UserRepository;
 import org.alumnet.infrastructure.config.KeycloakProperties;
 import org.alumnet.infrastructure.exceptions.ExistingUserException;

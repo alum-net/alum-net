@@ -3,7 +3,7 @@ package org.alumnet.application.services;
 import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.CourseCreationRequestDTO;
 import org.alumnet.domain.Course;
-import org.alumnet.domain.Teacher;
+import org.alumnet.domain.users.Teacher;
 import org.alumnet.domain.repositories.CourseRepository;
 import org.alumnet.domain.repositories.ParticipationRepository;
 import org.alumnet.domain.repositories.UserRepository;
@@ -88,5 +88,14 @@ public class CourseService {
         if (approvalGrade == null || approvalGrade < 0.0 || approvalGrade > 1.0) {
             throw new InvalidAttributeException("La nota mínima debe estar entre 0.0 y 1.0");
         }
+    }
+
+    public Course findById(int courseId) {
+        return courseRepository.findById(courseId)
+                .orElseThrow(() -> new InvalidAttributeException("Curso con id " + courseId + " no encontrado"));
+    }
+
+    public void updateCourse(Course course) {
+        courseRepository.save(course);
     }
 }

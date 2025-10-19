@@ -1,6 +1,7 @@
 package org.alumnet.domain;
 
 import jakarta.persistence.*;
+import org.alumnet.domain.users.Student;
 
 @Entity
 public class CourseParticipation {

@@ -1,10 +1,10 @@
 package org.alumnet.application.specifications;
 
 import org.alumnet.application.dtos.UserFilterDTO;
-import org.alumnet.domain.Administrator;
-import org.alumnet.domain.Student;
-import org.alumnet.domain.Teacher;
-import org.alumnet.domain.User;
+import org.alumnet.domain.users.Administrator;
+import org.alumnet.domain.users.Student;
+import org.alumnet.domain.users.Teacher;
+import org.alumnet.domain.users.User;
 import org.springframework.data.jpa.domain.Specification;
 
 import jakarta.persistence.criteria.Predicate;

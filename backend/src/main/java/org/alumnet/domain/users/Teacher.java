@@ -1,6 +1,8 @@
-package org.alumnet.domain;
+package org.alumnet.domain.users;
 
 import jakarta.persistence.*;
+import org.alumnet.domain.Course;
+
 import java.util.List;
 
 
