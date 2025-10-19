@@ -34,7 +34,8 @@ const styles = StyleSheet.create({
   createButton: {
     backgroundColor: THEME.colors.primary,
     alignSelf: 'flex-end',
-    margin: 16,
+    marginHorizontal: 16,
+    marginBottom: 16,
   },
   createButtonLabel: {
     color: 'white',

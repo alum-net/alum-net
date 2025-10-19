@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 8,
-    alignItems: 'flex-end',
+    alignItems: 'flex-start',
   },
   buttonLabel: {
     fontSize: 12,

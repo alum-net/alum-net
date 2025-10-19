@@ -85,7 +85,7 @@ export function CoursesDashboard({
         data={data}
         keyExtractor={item => item.id.toString()}
         renderItem={({ item }) => <CourseCard course={item} />}
-        numColumns={Platform.OS === 'web' ? undefined : 2}
+        numColumns={Platform.OS === 'web' ? 4 : 2}
         columnWrapperStyle={styles.coursesGrid}
         key={Platform.OS === 'web' ? 'web' : 'mobile'}
         ListEmptyComponent={

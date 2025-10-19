@@ -113,6 +113,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#333333',
     flexWrap: 'wrap',
     alignItems: 'center',
+    marginBottom: 15,
   },
   filterInput: {
     flex: 1,
