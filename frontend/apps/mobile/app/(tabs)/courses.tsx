@@ -5,7 +5,7 @@ import Screen from '../../components/screen';
 export default function CoursesSearch() {
   return (
     <Screen scrollable={false} edges={['top']}>
-      <CoursesDashboard filterComponent={CourseFilters} />
+      <CoursesDashboard FilterComponent={CourseFilters} />
     </Screen>
   );
 }

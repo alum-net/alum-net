@@ -1,3 +1,4 @@
+import { ShiftOption } from './types';
 export const courses = [
   {
     id: 1,
@@ -140,7 +141,8 @@ export const courses = [
     isMyCourse: true,
   },
 ];
-export const SHIFTS = [
+
+export const SHIFTS: ShiftOption[] = [
   { label: 'Todos los turnos', value: 'all' },
   { label: 'Mañana', value: 'morning' },
   { label: 'Tarde', value: 'afternoon' },

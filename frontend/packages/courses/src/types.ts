@@ -20,3 +20,12 @@ export interface FiltersDirectory {
 }
 
 export type FilterName = keyof FiltersDirectory;
+
+export interface ShiftOption {
+  label: string;
+  value: 'all' | CourseShift;
+}
+
+export interface FilterBarRef {
+  getFilters: () => FiltersDirectory;
+}

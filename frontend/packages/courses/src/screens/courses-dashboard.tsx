@@ -1,87 +1,52 @@
-import { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
+import { ReactElement, useCallback, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { View, StyleSheet, Platform, FlatList } from 'react-native';
 import { Button, Text } from 'react-native-paper';
-import { FiltersDirectory, FilterName, CourseShift } from '../types';
+import { FiltersDirectory } from '../types';
 import { getCourses } from '../service';
 import { CourseCard } from '../components/course-card';
 import { buildQueryParams } from '../helpers';
 import { THEME } from '@alum-net/ui/src/constants';
 
-const timeoutDelay = 500;
-
 export function CoursesDashboard({
-  filterComponent,
+  FilterComponent,
 }: {
-  filterComponent: ({
-    filters,
-    setFilters,
-  }: {
-    filters: FiltersDirectory;
-    setFilters: (filterName: FilterName, value?: string | boolean) => void;
-  }) => ReactNode;
+  FilterComponent: React.MemoExoticComponent<
+    React.FC<{
+      initialFilters: FiltersDirectory;
+      onApplyFilters: (filters: FiltersDirectory) => void;
+    }>
+  >;
 }) {
-  const [courseName, setCourseName] = useState('');
-  const [teacherName, setTeacherName] = useState('');
-  const [year, setYear] = useState('');
-  const [shift, setShift] = useState<CourseShift | 'all'>('all');
-  const [myCourses, setMyCourses] = useState(false);
+  const [appliedFilters, setAppliedFilters] = useState<FiltersDirectory>({
+    courseName: '',
+    teacherName: '',
+    year: '',
+    shift: 'all',
+    myCourses: false,
+  });
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const filters = useMemo(
-    () => ({
-      courseName: courseName,
-      teacherName: teacherName,
-      shift: shift,
-      year: year,
-      myCourses: myCourses,
-    }),
-    [courseName, teacherName, shift, year, myCourses],
-  );
-  const filtersTimeout = useRef<NodeJS.Timeout | number>();
+
   const { data } = useQuery({
-    queryKey: ['courses', buildQueryParams(filters), currentPage],
-    queryFn: () => getCourses(filters, currentPage),
+    queryKey: ['courses', buildQueryParams(appliedFilters), currentPage],
+    queryFn: () => getCourses(appliedFilters, currentPage),
   });
 
-  const setFilters = useCallback(
-    (filterName: FilterName, value?: string | boolean) => {
-      switch (filterName) {
-        case 'courseName':
-          if (filtersTimeout.current) clearTimeout(filtersTimeout.current);
-          filtersTimeout.current = setTimeout(() => {
-            setCourseName(value as string);
-          }, timeoutDelay);
-          break;
-        case 'teacherName':
-          if (filtersTimeout.current) clearTimeout(filtersTimeout.current);
-          filtersTimeout.current = setTimeout(() => {
-            setTeacherName(value as string);
-          }, timeoutDelay);
-          break;
-        case 'year':
-          if (filtersTimeout.current) clearTimeout(filtersTimeout.current);
-          filtersTimeout.current = setTimeout(() => {
-            setYear(value as string);
-          }, timeoutDelay);
-          break;
-        case 'shift':
-          setShift(value as CourseShift | 'all');
-          break;
-        case 'myCourses':
-          setMyCourses(value as boolean);
-          break;
-        default:
-          break;
-      }
-    },
-    [],
-  );
+  const handleApplyFilters = useCallback((filters: FiltersDirectory) => {
+    setAppliedFilters(filters);
+    setCurrentPage(1); // Reset to first page when filters change
+  }, []);
 
   return (
     <View style={styles.container}>
       <FlatList
         style={styles.flatList}
-        ListHeaderComponent={() => filterComponent({ setFilters, filters })}
+        ListHeaderComponent={
+          <FilterComponent
+            initialFilters={appliedFilters}
+            onApplyFilters={handleApplyFilters}
+          />
+        }
         data={data}
         keyExtractor={item => item.id.toString()}
         renderItem={({ item }) => <CourseCard course={item} />}

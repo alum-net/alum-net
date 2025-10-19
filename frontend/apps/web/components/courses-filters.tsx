@@ -1,21 +1,25 @@
 import { FilterBar } from '@alum-net/courses';
-import { FilterName, FiltersDirectory } from '@alum-net/courses/src/types';
+import { FiltersDirectory } from '@alum-net/courses/src/types';
 import { THEME } from '@alum-net/ui';
 import { useUserInfo } from '@alum-net/users';
+import { memo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button } from 'react-native-paper';
 
-export default function CourseFilters({
-  filters,
-  setFilters,
+function CourseFilters({
+  initialFilters,
+  onApplyFilters,
 }: {
-  filters: FiltersDirectory;
-  setFilters: (filterName: FilterName, value?: string | boolean) => void;
+  initialFilters: FiltersDirectory;
+  onApplyFilters: (filters: FiltersDirectory) => void;
 }) {
   const { userInfo } = useUserInfo();
   return (
     <View>
-      <FilterBar filters={filters} setFilters={setFilters} />
+      <FilterBar
+        initialFilters={initialFilters}
+        onApplyFilters={onApplyFilters}
+      />
       {userInfo?.role === 'admin' && (
         <Button
           mode="contained"
@@ -29,6 +33,8 @@ export default function CourseFilters({
     </View>
   );
 }
+
+export default memo(CourseFilters);
 
 const styles = StyleSheet.create({
   createButton: {

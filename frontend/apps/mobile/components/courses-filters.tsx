@@ -1,17 +1,26 @@
 import { FilterBar } from '@alum-net/courses/src/components/filter-bar';
-import { FiltersDirectory, FilterName } from '@alum-net/courses/src/types';
-import { useState } from 'react';
+import { FiltersDirectory, FilterBarRef } from '@alum-net/courses/src/types';
+import { memo, useCallback, useRef, useState } from 'react';
 import { Modal, StyleSheet, Text, View } from 'react-native';
 import { Button, Divider, IconButton, Portal } from 'react-native-paper';
 
-export default function CourseFilters({
-  filters,
-  setFilters,
+function CourseFilters({
+  initialFilters,
+  onApplyFilters,
 }: {
-  filters: FiltersDirectory;
-  setFilters: (filterName: FilterName, value?: string | boolean) => void;
+  initialFilters: FiltersDirectory;
+  onApplyFilters: (filters: FiltersDirectory) => void;
 }) {
   const [displayFilters, setDisplayFilters] = useState(false);
+  const filterBarRef = useRef<FilterBarRef>(null);
+
+  const applyFilters = useCallback(
+    (filters: FiltersDirectory) => {
+      setDisplayFilters(false);
+      onApplyFilters(filters);
+    },
+    [onApplyFilters, setDisplayFilters],
+  );
 
   return (
     <>
@@ -22,13 +31,13 @@ export default function CourseFilters({
       >
         Filtros
       </Button>
-      <Portal>
-        <Modal
-          onRequestClose={() => setDisplayFilters(false)}
-          visible={displayFilters}
-          backdropColor="#373737b5"
-          animationType="fade"
-        >
+      <Modal
+        onRequestClose={() => setDisplayFilters(false)}
+        visible={displayFilters}
+        backdropColor="#373737b5"
+        animationType="fade"
+      >
+        <Portal.Host>
           <View style={styles.modalContainer}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Filtros</Text>
@@ -40,22 +49,19 @@ export default function CourseFilters({
               />
             </View>
             <Divider style={styles.modalDivider} />
-            <FilterBar filters={filters} setFilters={setFilters} />
-            <Button
-              mode="contained"
-              onPress={() => {
-                setDisplayFilters(false);
-              }}
-              style={{ marginTop: 20 }}
-            >
-              Aplicar Filtros
-            </Button>
+            <FilterBar
+              ref={filterBarRef}
+              initialFilters={initialFilters}
+              onApplyFilters={applyFilters}
+            />
           </View>
-        </Modal>
-      </Portal>
+        </Portal.Host>
+      </Modal>
     </>
   );
 }
+
+export default memo(CourseFilters);
 
 const styles = StyleSheet.create({
   modalContainer: {
