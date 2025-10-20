@@ -1,0 +1,12 @@
+{
+  "name": "@alum-net/ui",
+  "version": "1.0.0",
+  "main": "./src/index.ts",
+  "dependencies": {},
+  "peerDependencies": {
+    "react": "19.0.0",
+    "react-native": "0.79.6",
+    "expo": "53.0.22",
+    "react-native-paper": "^5.14.5"
+  }
+}

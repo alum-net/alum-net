@@ -1,12 +1,6 @@
-import {
-  View,
-  StyleSheet,
-  ActivityIndicator,
-  Image,
-  TouchableOpacity,
-  Text,
-} from "react-native";
-import * as WebBrowser from "expo-web-browser";
+import { View, StyleSheet, ActivityIndicator, Image, Text } from 'react-native';
+import { Button } from 'react-native-paper';
+import * as WebBrowser from 'expo-web-browser';
 import {
   useAuthRequest,
   makeRedirectUri,
@@ -14,11 +8,11 @@ import {
   Prompt,
   ResponseType,
   useAutoDiscovery,
-} from "expo-auth-session";
-import { useMMKVString } from "react-native-mmkv";
-import { storage, STORAGE_KEYS } from "@alum-net/storage";
-import { useEffect } from "react";
-import { keycloakClientId, keycloakRealm, mobileScheme } from "../constants";
+} from 'expo-auth-session';
+import { useMMKVString } from 'react-native-mmkv';
+import { storage, STORAGE_KEYS } from '@alum-net/storage';
+import { useEffect } from 'react';
+import { keycloakClientId, keycloakRealm, authScheme } from '../constants';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -27,7 +21,7 @@ export function generateShortUUID() {
 }
 
 const redirectUri = makeRedirectUri({
-  native: mobileScheme,
+  native: authScheme,
 });
 
 export const LoginScreen = () => {
@@ -38,21 +32,20 @@ export const LoginScreen = () => {
   const discovery = useAutoDiscovery(
     `${process.env.EXPO_PUBLIC_KEYCLOAK_URI}/realms/${keycloakRealm}`,
   );
-
   const [request, response, promptAsync] = useAuthRequest(
     {
       responseType: ResponseType.Code,
       clientId: keycloakClientId,
       redirectUri: redirectUri,
       prompt: Prompt.Login,
-      scopes: ["openid", "profile", "email", "offline_access"],
+      scopes: ['openid', 'profile', 'email', 'offline_access'],
       usePKCE: true,
     },
     discovery,
   );
 
   useEffect(() => {
-    if (response?.type === "success") {
+    if (response?.type === 'success') {
       const { code } = response.params;
       exchangeCodeAsync(
         {
@@ -60,7 +53,7 @@ export const LoginScreen = () => {
           clientId: keycloakClientId,
           redirectUri: redirectUri,
           extraParams: {
-            code_verifier: request?.codeVerifier || "",
+            code_verifier: request?.codeVerifier || '',
           },
         },
         discovery!,
@@ -70,7 +63,7 @@ export const LoginScreen = () => {
           if (idToken) storage.set(STORAGE_KEYS.ID_TOKEN, idToken);
           setRefreshToken(refreshToken);
         })
-        .catch((error) => console.log("Auth error", error));
+        .catch(error => console.log('Auth error', error));
     }
   }, [response, discovery, request, setRefreshToken]);
 
@@ -86,7 +79,7 @@ export const LoginScreen = () => {
       {!refreshToken && (
         <>
           <Image
-            source={require("../assets/alumnet_logo.jpeg")}
+            source={require('../assets/alumnet_logo.jpeg')}
             style={styles.logo}
             resizeMode="contain"
           />
@@ -94,9 +87,14 @@ export const LoginScreen = () => {
           <Text style={styles.subtitle}>
             Inicia sesión para continuar tu camino de aprendizaje.
           </Text>
-          <TouchableOpacity style={styles.button} onPress={() => promptAsync()}>
-            <Text style={styles.buttonText}>Iniciar Sesión</Text>
-          </TouchableOpacity>
+          <Button
+            onPress={() => {
+              promptAsync();
+            }}
+            mode="contained"
+          >
+            Iniciar sesión
+          </Button>
         </>
       )}
     </View>
@@ -106,9 +104,9 @@ export const LoginScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "white",
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
   },
   logo: {
     width: 160,
@@ -117,25 +115,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 26,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginBottom: 6,
-    textAlign: "center",
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: 14,
-    textAlign: "center",
+    textAlign: 'center',
     marginBottom: 30,
-  },
-  button: {
-    backgroundColor: "#aab8ff",
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "#000",
-    fontWeight: "bold",
-    fontSize: 16,
   },
 });
