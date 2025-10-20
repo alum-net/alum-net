@@ -29,9 +29,10 @@ RUN ./gradlew clean build --no-daemon -x test
 # Usamos el JRE 24 para asegurar la compatibilidad total en runtime.
 # -----------------------------------------------------------
 FROM eclipse-temurin:24-jre
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
 # Puerto de la aplicación
-EXPOSE 8080
+EXPOSE 8080 8787
 
 # Ruta al JAR compilado
 ARG JAR_FILE=/app/build/libs/*.jar
@@ -40,4 +41,4 @@ ARG JAR_FILE=/app/build/libs/*.jar
 COPY --from=builder ${JAR_FILE} /app.jar
 
 # Comando de entrada: Ejecuta la aplicación
-ENTRYPOINT ["java", "-jar", "/app.jar", "--debug"]
+ENTRYPOINT ["java","-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8787", "-jar", "/app.jar" ]
