@@ -11,6 +11,9 @@ services:
     volumes:
       - mongo_data:/data/db
     restart: always
+    networks:
+      - red-alumnet
+
   postgres:
     image: postgres:15-alpine
     container_name: postgres_db
@@ -28,6 +31,26 @@ services:
       timeout: 5s
       retries: 5
     restart: always
+    networks:
+      - red-alumnet
+
+  backend:
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    container_name: backend
+    ports:
+      - "8080:8080"
+      - "8787:8787"
+    env_file:
+      - .env
+    networks:
+      - red-alumnet
+
 volumes:
   mongo_data:
   postgres_data:
+
+networks:
+  red-alumnet:
+    driver: bridge

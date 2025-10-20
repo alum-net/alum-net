@@ -5,7 +5,7 @@
 -- Dumped from database version 15.14
 -- Dumped by pg_dump version 17.2
 
--- Started on 2025-10-18 11:55:36 -03
+-- Started on 2025-10-19 21:41:56 -03
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -17,7 +17,6 @@ SET check_function_bodies = false;
 SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
-
 
 SET default_tablespace = '';
 
@@ -2347,6 +2346,8 @@ a9fa30e3-628e-4d8e-b154-06400d310753	\N	password	017b322f-033a-4d6c-a258-8ca9578
 636e7742-f388-4b5a-99e7-3f05f821afde	\N	password	467fca2a-add9-4201-ab6b-ecd48914da54	1760476216674	My password	{"value":"D6hIqfaAOdjlfK2/H4VjNszjyhZ9qZSUbBo+fGQh/Hk=","salt":"lMtphN3xo77p8s/IUROahg==","additionalParameters":{}}	{"hashIterations":5,"algorithm":"argon2","additionalParameters":{"hashLength":["32"],"memory":["7168"],"type":["id"],"version":["1.3"],"parallelism":["1"]}}	10	1
 62cedfe4-187e-4168-9eff-8bb5b8dbf647	\N	password	7a7ffec9-1041-4c28-8fec-f8e958db8bbf	1760559060710	My password	{"value":"UALpI5NEARwBRUEhhH4iqO+3rEbbKLyotyQv8tUnkEk=","salt":"wQ+ac2ZyS/gYBxU/TQ1sbQ==","additionalParameters":{}}	{"hashIterations":5,"algorithm":"argon2","additionalParameters":{"hashLength":["32"],"memory":["7168"],"type":["id"],"version":["1.3"],"parallelism":["1"]}}	10	1
 b204c29f-926f-4bfd-8703-98285627f065	\N	password	dbd69f1a-4a1a-4797-972b-ec0494972068	1760568810998	My password	{"value":"/6qHNpmfaQXUc5rmcuFaOF6PM9C8Rg3g+As5q/ndlqk=","salt":"gO7LZUpxpZehtmrDwo/KrA==","additionalParameters":{}}	{"hashIterations":5,"algorithm":"argon2","additionalParameters":{"hashLength":["32"],"memory":["7168"],"type":["id"],"version":["1.3"],"parallelism":["1"]}}	10	1
+6f50a44a-890b-4d87-bd6f-8130f2713da0	\N	password	fbe8d18b-bdba-44fa-82ac-f791fb87a550	1760919595128	My password	{"value":"MXj241OUViLLccYwICn8OCTRvaot58HQmadtK/7i//0=","salt":"LOEvyU/G/RyauMYRSC7nGQ==","additionalParameters":{}}	{"hashIterations":5,"algorithm":"argon2","additionalParameters":{"hashLength":["32"],"memory":["7168"],"type":["id"],"version":["1.3"],"parallelism":["1"]}}	10	1
+af02dcc3-e7f1-4abb-a8b2-268fab8a4687	\N	password	4c0a6f96-ef5e-4a79-9dc4-581d694cb03f	1760919820403	\N	{"value":"Ah6pes/Hz/9keV7dmVxSTiFuSWPa/jJipvrg/qo1n90=","salt":"NuY2FkcXTuOJGJnzIc+FcA==","additionalParameters":{}}	{"hashIterations":5,"algorithm":"argon2","additionalParameters":{"hashLength":["32"],"memory":["7168"],"type":["id"],"version":["1.3"],"parallelism":["1"]}}	10	3
 \.
 
 
@@ -2743,7 +2744,7 @@ COPY public.idp_mapper_config (idp_mapper_id, value, name) FROM stdin;
 --
 
 COPY public.jgroups_ping (address, name, cluster_name, ip, coord) FROM stdin;
-uuid://00000000-0000-0000-0000-000000000009	64f2e52e058a-60631	ISPN	172.19.0.5:7800	t
+uuid://00000000-0000-0000-0000-00000000000b	37859e67656b-59835	ISPN	172.20.0.6:7800	t
 \.
 
 
@@ -2872,7 +2873,22 @@ x5rd4	26.4.0	1760474919
 --
 
 COPY public.offline_client_session (user_session_id, client_id, offline_flag, "timestamp", data, client_storage_provider, external_client_id, version) FROM stdin;
-673e1bad-fcce-9183-d9bd-af0b85145f9b	46c97fed-5865-497a-90cc-eeb6a263032a	0	1760799198	{"authMethod":"openid-connect","redirectUri":"http://localhost:8000/admin/master/console/","notes":{"clientId":"46c97fed-5865-497a-90cc-eeb6a263032a","iss":"http://localhost:8000/realms/master","startedAt":"1760799077","response_type":"code","level-of-authentication":"-1","code_challenge_method":"S256","nonce":"b49c297f-59e5-44f0-b982-6581b7a92138","response_mode":"query","scope":"openid","userSessionStartedAt":"1760799077","redirect_uri":"http://localhost:8000/admin/master/console/","state":"a85c3dac-035c-401f-89e0-45b6831fa07b","code_challenge":"tBxGyxWBcNGItP9BJr0BNhFBJJMyUjSNPtPnh6AON2I","SSO_AUTH":"true"}}	local	local	6
+4b606976-81f9-7c30-5814-fa6d03f93b3f	46c97fed-5865-497a-90cc-eeb6a263032a	0	1760918696	{"authMethod":"openid-connect","redirectUri":"http://localhost:8000/admin/master/console/","notes":{"clientId":"46c97fed-5865-497a-90cc-eeb6a263032a","iss":"http://localhost:8000/realms/master","startedAt":"1760917250","response_type":"code","level-of-authentication":"-1","code_challenge_method":"S256","nonce":"62b591e4-7cd5-4f1c-8ee4-6469e2567658","response_mode":"query","scope":"openid","userSessionStartedAt":"1760917250","redirect_uri":"http://localhost:8000/admin/master/console/","state":"4538750a-c603-4344-805e-febb87667492","code_challenge":"lOairPMA42YGsp-Mv-zwYTnBFQy7hCA5Dcj6_OS-oW0","SSO_AUTH":"true"}}	local	local	3
+e7ddf24b-13d8-493e-70cb-07618637980e	a17e62f0-27d3-4e2f-9362-451b9cc24dc3	0	1760918150	{"authMethod":"openid-connect","notes":{"clientId":"a17e62f0-27d3-4e2f-9362-451b9cc24dc3","userSessionStartedAt":"1760918150","iss":"http://localhost:8000/realms/alumnet-realm","startedAt":"1760918150","level-of-authentication":"-1"}}	local	local	0
+43231dfd-1e99-72fe-e411-a3124eb4b400	a17e62f0-27d3-4e2f-9362-451b9cc24dc3	0	1760918235	{"authMethod":"openid-connect","notes":{"clientId":"a17e62f0-27d3-4e2f-9362-451b9cc24dc3","userSessionStartedAt":"1760918235","iss":"http://localhost:8000/realms/alumnet-realm","startedAt":"1760918235","level-of-authentication":"-1"}}	local	local	0
+744993e2-5602-2802-c79f-a027b4639655	a17e62f0-27d3-4e2f-9362-451b9cc24dc3	0	1760918236	{"authMethod":"openid-connect","notes":{"clientId":"a17e62f0-27d3-4e2f-9362-451b9cc24dc3","userSessionStartedAt":"1760918236","iss":"http://localhost:8000/realms/alumnet-realm","startedAt":"1760918236","level-of-authentication":"-1"}}	local	local	0
+85e36c03-1703-609e-715a-36d1aad37440	a17e62f0-27d3-4e2f-9362-451b9cc24dc3	0	1760918364	{"authMethod":"openid-connect","notes":{"clientId":"a17e62f0-27d3-4e2f-9362-451b9cc24dc3","userSessionStartedAt":"1760918364","iss":"http://localhost:8000/realms/alumnet-realm","startedAt":"1760918364","level-of-authentication":"-1"}}	local	local	0
+7776f860-32ae-db57-87e8-d846cba68648	a17e62f0-27d3-4e2f-9362-451b9cc24dc3	0	1760918712	{"authMethod":"openid-connect","redirectUri":"http://localhost:8081","notes":{"clientId":"a17e62f0-27d3-4e2f-9362-451b9cc24dc3","scope":"openid","kc_action_status":"success","userSessionStartedAt":"1760918712","iss":"http://localhost:8000/realms/alumnet-realm","startedAt":"1760918712","response_type":"code","level-of-authentication":"-1","redirect_uri":"http://localhost:8081"}}	local	local	0
+3a96189c-4652-972f-4814-ab05054e7133	a17e62f0-27d3-4e2f-9362-451b9cc24dc3	0	1760918718	{"authMethod":"openid-connect","notes":{"clientId":"a17e62f0-27d3-4e2f-9362-451b9cc24dc3","userSessionStartedAt":"1760918718","iss":"http://localhost:8000/realms/alumnet-realm","startedAt":"1760918718","level-of-authentication":"-1"}}	local	local	0
+2c9e00ec-3030-87a2-3be1-9aa2d25fcacd	a17e62f0-27d3-4e2f-9362-451b9cc24dc3	0	1760918799	{"authMethod":"openid-connect","notes":{"clientId":"a17e62f0-27d3-4e2f-9362-451b9cc24dc3","userSessionStartedAt":"1760918799","iss":"http://localhost:8000/realms/alumnet-realm","startedAt":"1760918799","level-of-authentication":"-1"}}	local	local	0
+dd2533fe-df70-8455-9ae6-762a5a933cc3	a17e62f0-27d3-4e2f-9362-451b9cc24dc3	0	1760918901	{"authMethod":"openid-connect","notes":{"clientId":"a17e62f0-27d3-4e2f-9362-451b9cc24dc3","userSessionStartedAt":"1760918901","iss":"http://keycloak:8000/realms/alumnet-realm","startedAt":"1760918901","level-of-authentication":"-1"}}	local	local	0
+b5d8292a-e340-fe6c-e7d3-7493ce362ee1	a17e62f0-27d3-4e2f-9362-451b9cc24dc3	0	1760919492	{"authMethod":"openid-connect","notes":{"clientId":"a17e62f0-27d3-4e2f-9362-451b9cc24dc3","userSessionStartedAt":"1760919492","iss":"http://keycloak:8000/realms/alumnet-realm","startedAt":"1760919492","level-of-authentication":"-1"}}	local	local	0
+e7c5392f-ac41-eeb1-3dff-4a9dc14cd89c	46c97fed-5865-497a-90cc-eeb6a263032a	0	1760919606	{"authMethod":"openid-connect","redirectUri":"http://keycloak:8000/admin/master/console/","notes":{"clientId":"46c97fed-5865-497a-90cc-eeb6a263032a","iss":"http://keycloak:8000/realms/master","startedAt":"1760919243","response_type":"code","level-of-authentication":"-1","code_challenge_method":"S256","nonce":"629b15e0-e5c1-48d1-938c-853d4f563759","response_mode":"query","scope":"openid","userSessionStartedAt":"1760919243","redirect_uri":"http://keycloak:8000/admin/master/console/","state":"39c18517-390b-40bd-aad0-12c3418740ec","code_challenge":"8THG6zxp7VGGvTaGmVpS1tk1aWiKqZqEHm9nhjT5lDI"}}	local	local	3
+00af472d-84c2-4293-66ae-6356d9ee6e8a	a17e62f0-27d3-4e2f-9362-451b9cc24dc3	0	1760919649	{"authMethod":"openid-connect","notes":{"clientId":"a17e62f0-27d3-4e2f-9362-451b9cc24dc3","userSessionStartedAt":"1760919649","iss":"http://keycloak:8000/realms/alumnet-realm","startedAt":"1760919649","level-of-authentication":"-1"}}	local	local	0
+9f4440b4-84c7-a7be-ad9b-31102b49894b	a17e62f0-27d3-4e2f-9362-451b9cc24dc3	0	1760919659	{"authMethod":"openid-connect","notes":{"clientId":"a17e62f0-27d3-4e2f-9362-451b9cc24dc3","userSessionStartedAt":"1760919659","iss":"http://keycloak:8000/realms/alumnet-realm","startedAt":"1760919659","level-of-authentication":"-1"}}	local	local	0
+7329e6b4-de5d-6fcc-a7a8-ee18f7c6c124	a17e62f0-27d3-4e2f-9362-451b9cc24dc3	0	1760919820	{"authMethod":"openid-connect","redirectUri":"http://localhost:8081","notes":{"clientId":"a17e62f0-27d3-4e2f-9362-451b9cc24dc3","scope":"openid","kc_action_status":"success","userSessionStartedAt":"1760919820","iss":"http://keycloak:8000/realms/alumnet-realm","startedAt":"1760919820","response_type":"code","level-of-authentication":"-1","redirect_uri":"http://localhost:8081"}}	local	local	0
+fdf1819d-979b-cabd-2cc3-e392f33a481a	a17e62f0-27d3-4e2f-9362-451b9cc24dc3	0	1760920697	{"authMethod":"openid-connect","notes":{"clientId":"a17e62f0-27d3-4e2f-9362-451b9cc24dc3","userSessionStartedAt":"1760920697","iss":"http://keycloak:8000/realms/alumnet-realm","startedAt":"1760920697","level-of-authentication":"-1"}}	local	local	0
+219f79a9-652b-3103-459a-8eef9f7fa98b	46c97fed-5865-497a-90cc-eeb6a263032a	0	1760920851	{"authMethod":"openid-connect","redirectUri":"http://localhost:8000/admin/master/console/","notes":{"clientId":"46c97fed-5865-497a-90cc-eeb6a263032a","iss":"http://localhost:8000/realms/master","startedAt":"1760920851","response_type":"code","level-of-authentication":"-1","code_challenge_method":"S256","nonce":"038f3f7a-d970-4a42-a641-4baf9c37212d","response_mode":"query","scope":"openid","userSessionStartedAt":"1760920851","redirect_uri":"http://localhost:8000/admin/master/console/","state":"0c3e9a44-75db-4690-99b3-845b72e54c55","code_challenge":"PAg8uttUraaY8v6kDWXY6PlfbB-Mn9Y868sThE9BPHM"}}	local	local	0
 \.
 
 
@@ -2883,7 +2899,22 @@ COPY public.offline_client_session (user_session_id, client_id, offline_flag, "t
 --
 
 COPY public.offline_user_session (user_session_id, user_id, realm_id, created_on, offline_flag, data, last_session_refresh, broker_session_id, version) FROM stdin;
-673e1bad-fcce-9183-d9bd-af0b85145f9b	017b322f-033a-4d6c-a258-8ca95786e66e	0666ea4e-c88f-4e30-bf74-4874c0b2484d	1760799077	0	{"ipAddress":"172.19.0.1","authMethod":"openid-connect","rememberMe":false,"started":0,"notes":{"KC_DEVICE_NOTE":"eyJpcEFkZHJlc3MiOiIxNzIuMTkuMC4xIiwib3MiOiJNYWMgT1MgWCIsIm9zVmVyc2lvbiI6IjEwLjE1LjciLCJicm93c2VyIjoiQ2hyb21lLzE0MS4wLjAiLCJkZXZpY2UiOiJNYWMiLCJsYXN0QWNjZXNzIjowLCJtb2JpbGUiOmZhbHNlfQ==","AUTH_TIME":"1760799077","authenticators-completed":"{\\"5aaadf80-5068-4eca-a6e0-471a910db927\\":1760799077,\\"ef34f8ae-5e2f-42a9-8b94-a4d4838d3412\\":1760799126}"},"state":"LOGGED_IN"}	1760799198	\N	6
+e7ddf24b-13d8-493e-70cb-07618637980e	4c0a6f96-ef5e-4a79-9dc4-581d694cb03f	000c9ecc-9c3a-44d3-94fe-941ff152490f	1760918150	0	{"ipAddress":"172.20.0.1","authMethod":"openid-connect","rememberMe":false,"started":0,"notes":{"KC_DEVICE_NOTE":"eyJpcEFkZHJlc3MiOiIxNzIuMjAuMC4xIiwib3MiOiJPdGhlciIsIm9zVmVyc2lvbiI6IlVua25vd24iLCJicm93c2VyIjoiUG9zdG1hblJ1bnRpbWUvNy4zOS4xIiwiZGV2aWNlIjoiT3RoZXIiLCJsYXN0QWNjZXNzIjowLCJtb2JpbGUiOmZhbHNlfQ==","authenticators-completed":"{\\"3962038b-57d5-49ba-aae2-338012ed70fb\\":1760918150,\\"5bce9eaf-0e32-45e4-8935-6783a63ef919\\":1760918150}"},"state":"LOGGED_IN"}	1760918150	\N	0
+43231dfd-1e99-72fe-e411-a3124eb4b400	4c0a6f96-ef5e-4a79-9dc4-581d694cb03f	000c9ecc-9c3a-44d3-94fe-941ff152490f	1760918235	0	{"ipAddress":"172.20.0.1","authMethod":"openid-connect","rememberMe":false,"started":0,"notes":{"KC_DEVICE_NOTE":"eyJpcEFkZHJlc3MiOiIxNzIuMjAuMC4xIiwib3MiOiJPdGhlciIsIm9zVmVyc2lvbiI6IlVua25vd24iLCJicm93c2VyIjoiUG9zdG1hblJ1bnRpbWUvNy4zOS4xIiwiZGV2aWNlIjoiT3RoZXIiLCJsYXN0QWNjZXNzIjowLCJtb2JpbGUiOmZhbHNlfQ==","authenticators-completed":"{\\"3962038b-57d5-49ba-aae2-338012ed70fb\\":1760918235,\\"5bce9eaf-0e32-45e4-8935-6783a63ef919\\":1760918235}"},"state":"LOGGED_IN"}	1760918235	\N	0
+744993e2-5602-2802-c79f-a027b4639655	4c0a6f96-ef5e-4a79-9dc4-581d694cb03f	000c9ecc-9c3a-44d3-94fe-941ff152490f	1760918236	0	{"ipAddress":"172.20.0.1","authMethod":"openid-connect","rememberMe":false,"started":0,"notes":{"KC_DEVICE_NOTE":"eyJpcEFkZHJlc3MiOiIxNzIuMjAuMC4xIiwib3MiOiJPdGhlciIsIm9zVmVyc2lvbiI6IlVua25vd24iLCJicm93c2VyIjoiUG9zdG1hblJ1bnRpbWUvNy4zOS4xIiwiZGV2aWNlIjoiT3RoZXIiLCJsYXN0QWNjZXNzIjowLCJtb2JpbGUiOmZhbHNlfQ==","authenticators-completed":"{\\"3962038b-57d5-49ba-aae2-338012ed70fb\\":1760918236,\\"5bce9eaf-0e32-45e4-8935-6783a63ef919\\":1760918236}"},"state":"LOGGED_IN"}	1760918236	\N	0
+85e36c03-1703-609e-715a-36d1aad37440	4c0a6f96-ef5e-4a79-9dc4-581d694cb03f	000c9ecc-9c3a-44d3-94fe-941ff152490f	1760918364	0	{"ipAddress":"172.20.0.1","authMethod":"openid-connect","rememberMe":false,"started":0,"notes":{"KC_DEVICE_NOTE":"eyJpcEFkZHJlc3MiOiIxNzIuMjAuMC4xIiwib3MiOiJPdGhlciIsIm9zVmVyc2lvbiI6IlVua25vd24iLCJicm93c2VyIjoiUG9zdG1hblJ1bnRpbWUvNy4zOS4xIiwiZGV2aWNlIjoiT3RoZXIiLCJsYXN0QWNjZXNzIjowLCJtb2JpbGUiOmZhbHNlfQ==","authenticators-completed":"{\\"3962038b-57d5-49ba-aae2-338012ed70fb\\":1760918363,\\"5bce9eaf-0e32-45e4-8935-6783a63ef919\\":1760918364}"},"state":"LOGGED_IN"}	1760918364	\N	0
+4b606976-81f9-7c30-5814-fa6d03f93b3f	017b322f-033a-4d6c-a258-8ca95786e66e	0666ea4e-c88f-4e30-bf74-4874c0b2484d	1760917250	0	{"ipAddress":"172.20.0.1","authMethod":"openid-connect","rememberMe":false,"started":0,"notes":{"KC_DEVICE_NOTE":"eyJpcEFkZHJlc3MiOiIxNzIuMjAuMC4xIiwib3MiOiJNYWMgT1MgWCIsIm9zVmVyc2lvbiI6IjEwLjE1LjciLCJicm93c2VyIjoiQ2hyb21lLzE0MS4wLjAiLCJkZXZpY2UiOiJNYWMiLCJsYXN0QWNjZXNzIjowLCJtb2JpbGUiOmZhbHNlfQ==","AUTH_TIME":"1760917250","authenticators-completed":"{\\"5aaadf80-5068-4eca-a6e0-471a910db927\\":1760917250,\\"ef34f8ae-5e2f-42a9-8b94-a4d4838d3412\\":1760918695}"},"state":"LOGGED_IN"}	1760918696	\N	3
+7776f860-32ae-db57-87e8-d846cba68648	4c0a6f96-ef5e-4a79-9dc4-581d694cb03f	000c9ecc-9c3a-44d3-94fe-941ff152490f	1760918712	0	{"ipAddress":"172.20.0.1","authMethod":"openid-connect","rememberMe":false,"started":0,"notes":{"KC_DEVICE_NOTE":"eyJpcEFkZHJlc3MiOiIxNzIuMjAuMC4xIiwib3MiOiJNYWMgT1MgWCIsIm9zVmVyc2lvbiI6IjEwLjE1LjciLCJicm93c2VyIjoiQ2hyb21lLzE0MS4wLjAiLCJkZXZpY2UiOiJNYWMiLCJsYXN0QWNjZXNzIjowLCJtb2JpbGUiOmZhbHNlfQ==","AUTH_TIME":"1760918712","authenticators-completed":"{\\"f0e4251f-6f60-4a09-a6ba-214cc4e95830\\":1760918707}"},"state":"LOGGED_IN"}	1760918712	\N	0
+3a96189c-4652-972f-4814-ab05054e7133	4c0a6f96-ef5e-4a79-9dc4-581d694cb03f	000c9ecc-9c3a-44d3-94fe-941ff152490f	1760918718	0	{"ipAddress":"172.20.0.1","authMethod":"openid-connect","rememberMe":false,"started":0,"notes":{"KC_DEVICE_NOTE":"eyJpcEFkZHJlc3MiOiIxNzIuMjAuMC4xIiwib3MiOiJPdGhlciIsIm9zVmVyc2lvbiI6IlVua25vd24iLCJicm93c2VyIjoiUG9zdG1hblJ1bnRpbWUvNy4zOS4xIiwiZGV2aWNlIjoiT3RoZXIiLCJsYXN0QWNjZXNzIjowLCJtb2JpbGUiOmZhbHNlfQ==","authenticators-completed":"{\\"3962038b-57d5-49ba-aae2-338012ed70fb\\":1760918718,\\"5bce9eaf-0e32-45e4-8935-6783a63ef919\\":1760918718}"},"state":"LOGGED_IN"}	1760918718	\N	0
+2c9e00ec-3030-87a2-3be1-9aa2d25fcacd	4c0a6f96-ef5e-4a79-9dc4-581d694cb03f	000c9ecc-9c3a-44d3-94fe-941ff152490f	1760918799	0	{"ipAddress":"172.20.0.1","authMethod":"openid-connect","rememberMe":false,"started":0,"notes":{"KC_DEVICE_NOTE":"eyJpcEFkZHJlc3MiOiIxNzIuMjAuMC4xIiwib3MiOiJPdGhlciIsIm9zVmVyc2lvbiI6IlVua25vd24iLCJicm93c2VyIjoiUG9zdG1hblJ1bnRpbWUvNy4zOS4xIiwiZGV2aWNlIjoiT3RoZXIiLCJsYXN0QWNjZXNzIjowLCJtb2JpbGUiOmZhbHNlfQ==","authenticators-completed":"{\\"3962038b-57d5-49ba-aae2-338012ed70fb\\":1760918799,\\"5bce9eaf-0e32-45e4-8935-6783a63ef919\\":1760918799}"},"state":"LOGGED_IN"}	1760918799	\N	0
+dd2533fe-df70-8455-9ae6-762a5a933cc3	4c0a6f96-ef5e-4a79-9dc4-581d694cb03f	000c9ecc-9c3a-44d3-94fe-941ff152490f	1760918901	0	{"ipAddress":"172.20.0.1","authMethod":"openid-connect","rememberMe":false,"started":0,"notes":{"KC_DEVICE_NOTE":"eyJpcEFkZHJlc3MiOiIxNzIuMjAuMC4xIiwib3MiOiJPdGhlciIsIm9zVmVyc2lvbiI6IlVua25vd24iLCJicm93c2VyIjoiUG9zdG1hblJ1bnRpbWUvNy4zOS4xIiwiZGV2aWNlIjoiT3RoZXIiLCJsYXN0QWNjZXNzIjowLCJtb2JpbGUiOmZhbHNlfQ==","authenticators-completed":"{\\"3962038b-57d5-49ba-aae2-338012ed70fb\\":1760918901,\\"5bce9eaf-0e32-45e4-8935-6783a63ef919\\":1760918901}"},"state":"LOGGED_IN"}	1760918901	\N	0
+b5d8292a-e340-fe6c-e7d3-7493ce362ee1	4c0a6f96-ef5e-4a79-9dc4-581d694cb03f	000c9ecc-9c3a-44d3-94fe-941ff152490f	1760919492	0	{"ipAddress":"172.20.0.1","authMethod":"openid-connect","rememberMe":false,"started":0,"notes":{"KC_DEVICE_NOTE":"eyJpcEFkZHJlc3MiOiIxNzIuMjAuMC4xIiwib3MiOiJPdGhlciIsIm9zVmVyc2lvbiI6IlVua25vd24iLCJicm93c2VyIjoiUG9zdG1hblJ1bnRpbWUvNy4zOS4xIiwiZGV2aWNlIjoiT3RoZXIiLCJsYXN0QWNjZXNzIjowLCJtb2JpbGUiOmZhbHNlfQ==","authenticators-completed":"{\\"3962038b-57d5-49ba-aae2-338012ed70fb\\":1760919492,\\"5bce9eaf-0e32-45e4-8935-6783a63ef919\\":1760919492}"},"state":"LOGGED_IN"}	1760919492	\N	0
+e7c5392f-ac41-eeb1-3dff-4a9dc14cd89c	017b322f-033a-4d6c-a258-8ca95786e66e	0666ea4e-c88f-4e30-bf74-4874c0b2484d	1760919243	0	{"ipAddress":"172.20.0.1","authMethod":"openid-connect","rememberMe":false,"started":0,"notes":{"KC_DEVICE_NOTE":"eyJpcEFkZHJlc3MiOiIxNzIuMjAuMC4xIiwib3MiOiJNYWMgT1MgWCIsIm9zVmVyc2lvbiI6IjEwLjE1LjciLCJicm93c2VyIjoiQ2hyb21lLzE0MS4wLjAiLCJkZXZpY2UiOiJNYWMiLCJsYXN0QWNjZXNzIjowLCJtb2JpbGUiOmZhbHNlfQ==","AUTH_TIME":"1760919243","authenticators-completed":"{\\"5aaadf80-5068-4eca-a6e0-471a910db927\\":1760919243}"},"state":"LOGGED_IN"}	1760919606	\N	3
+00af472d-84c2-4293-66ae-6356d9ee6e8a	4c0a6f96-ef5e-4a79-9dc4-581d694cb03f	000c9ecc-9c3a-44d3-94fe-941ff152490f	1760919649	0	{"ipAddress":"172.20.0.1","authMethod":"openid-connect","rememberMe":false,"started":0,"notes":{"KC_DEVICE_NOTE":"eyJpcEFkZHJlc3MiOiIxNzIuMjAuMC4xIiwib3MiOiJPdGhlciIsIm9zVmVyc2lvbiI6IlVua25vd24iLCJicm93c2VyIjoiUG9zdG1hblJ1bnRpbWUvNy4zOS4xIiwiZGV2aWNlIjoiT3RoZXIiLCJsYXN0QWNjZXNzIjowLCJtb2JpbGUiOmZhbHNlfQ==","authenticators-completed":"{\\"3962038b-57d5-49ba-aae2-338012ed70fb\\":1760919649,\\"5bce9eaf-0e32-45e4-8935-6783a63ef919\\":1760919649}"},"state":"LOGGED_IN"}	1760919649	\N	0
+9f4440b4-84c7-a7be-ad9b-31102b49894b	fbe8d18b-bdba-44fa-82ac-f791fb87a550	000c9ecc-9c3a-44d3-94fe-941ff152490f	1760919659	0	{"ipAddress":"172.20.0.2","authMethod":"openid-connect","rememberMe":false,"started":0,"notes":{"KC_DEVICE_NOTE":"eyJpcEFkZHJlc3MiOiIxNzIuMjAuMC4yIiwib3MiOiJPdGhlciIsIm9zVmVyc2lvbiI6IlVua25vd24iLCJicm93c2VyIjoiQXBhY2hlLUh0dHBDbGllbnQvNC41LjE0IiwiZGV2aWNlIjoiT3RoZXIiLCJsYXN0QWNjZXNzIjowLCJtb2JpbGUiOmZhbHNlfQ==","authenticators-completed":"{\\"3962038b-57d5-49ba-aae2-338012ed70fb\\":1760919659,\\"5bce9eaf-0e32-45e4-8935-6783a63ef919\\":1760919659}"},"state":"LOGGED_IN"}	1760919659	\N	0
+7329e6b4-de5d-6fcc-a7a8-ee18f7c6c124	4c0a6f96-ef5e-4a79-9dc4-581d694cb03f	000c9ecc-9c3a-44d3-94fe-941ff152490f	1760919820	0	{"ipAddress":"172.20.0.1","authMethod":"openid-connect","rememberMe":false,"started":0,"notes":{"KC_DEVICE_NOTE":"eyJpcEFkZHJlc3MiOiIxNzIuMjAuMC4xIiwib3MiOiJNYWMgT1MgWCIsIm9zVmVyc2lvbiI6IjEwLjE1LjciLCJicm93c2VyIjoiQ2hyb21lLzE0MS4wLjAiLCJkZXZpY2UiOiJNYWMiLCJsYXN0QWNjZXNzIjowLCJtb2JpbGUiOmZhbHNlfQ==","AUTH_TIME":"1760919820","authenticators-completed":"{\\"f0e4251f-6f60-4a09-a6ba-214cc4e95830\\":1760919815}"},"state":"LOGGED_IN"}	1760919820	\N	0
+fdf1819d-979b-cabd-2cc3-e392f33a481a	4c0a6f96-ef5e-4a79-9dc4-581d694cb03f	000c9ecc-9c3a-44d3-94fe-941ff152490f	1760920697	0	{"ipAddress":"172.20.0.1","authMethod":"openid-connect","rememberMe":false,"started":0,"notes":{"KC_DEVICE_NOTE":"eyJpcEFkZHJlc3MiOiIxNzIuMjAuMC4xIiwib3MiOiJPdGhlciIsIm9zVmVyc2lvbiI6IlVua25vd24iLCJicm93c2VyIjoiUG9zdG1hblJ1bnRpbWUvNy4zOS4xIiwiZGV2aWNlIjoiT3RoZXIiLCJsYXN0QWNjZXNzIjowLCJtb2JpbGUiOmZhbHNlfQ==","authenticators-completed":"{\\"3962038b-57d5-49ba-aae2-338012ed70fb\\":1760920696,\\"5bce9eaf-0e32-45e4-8935-6783a63ef919\\":1760920697}"},"state":"LOGGED_IN"}	1760920697	\N	0
+219f79a9-652b-3103-459a-8eef9f7fa98b	017b322f-033a-4d6c-a258-8ca95786e66e	0666ea4e-c88f-4e30-bf74-4874c0b2484d	1760920851	0	{"ipAddress":"172.20.0.1","authMethod":"openid-connect","rememberMe":false,"started":0,"notes":{"KC_DEVICE_NOTE":"eyJpcEFkZHJlc3MiOiIxNzIuMjAuMC4xIiwib3MiOiJNYWMgT1MgWCIsIm9zVmVyc2lvbiI6IjEwLjE1LjciLCJicm93c2VyIjoiQ2hyb21lLzE0MS4wLjAiLCJkZXZpY2UiOiJNYWMiLCJsYXN0QWNjZXNzIjowLCJtb2JpbGUiOmZhbHNlfQ==","AUTH_TIME":"1760920851","authenticators-completed":"{\\"5aaadf80-5068-4eca-a6e0-471a910db927\\":1760920850}"},"state":"LOGGED_IN"}	1760920851	\N	0
 \.
 
 
@@ -3623,6 +3654,7 @@ b9a6b3be-9f94-4272-8e8e-a71b8b9050bb	alumnet.mobile://login
 a17e62f0-27d3-4e2f-9362-451b9cc24dc3	alumnet.mobile://auth
 a17e62f0-27d3-4e2f-9362-451b9cc24dc3	http://localhost:8082
 a17e62f0-27d3-4e2f-9362-451b9cc24dc3	http://localhost:8081
+a17e62f0-27d3-4e2f-9362-451b9cc24dc3	alumnet.mobile://profile
 \.
 
 
@@ -3816,7 +3848,7 @@ COPY public.scope_policy (scope_id, policy_id) FROM stdin;
 
 COPY public.server_config (server_config_key, value, version) FROM stdin;
 crt_jgroups	{"prvKey":"MIIEogIBAAKCAQEAqy45qOB3jHX0/w5eQzvzlvQNDG/hs9wPJjxMbsIyoFJUNYSXyUDg+XY8VnFPeSQ5rzUYLBsEonTrtqjYgHqT9iOEcHV0dQiwv46F0joRHsaoKdAD2V+0oXRkmwuOozQMd8OVU+RJx9/fteGnrsX2uDsSXSjFS/NOJhv9NteFGeKCat2pTcwlLp/UjLITPUSmKYjfu9W6JpD37Wb92rQ7jEmoCAoeKbZp86Lflwaxj4JCQpRyJUFjZjpqesO8T6+BRliF4UkVZ7/v1Lvp+uDXhW9fwYCUR943c6r09uDOiT1PuJsGy0EXWU1OHJj9gwHgUhozlsmMQT/cpRTMC34biQIDAQABAoIBAAJuhq0qeyhIqLFS3+3ulRhI4UKS+E7YynJNmvxbz+JNKRsVhh56yHdiwZqsw2dCJ3ugsnY18Avqw0p1/ZVdqGpvuLrsQDpFZFVkTexdnM6mHc9yQAu/e05r294D/QO+gorVAXMOpCmtuXzY9svZzhZx6GHgaWUZ0Ltj3GYCC8cBVcv7CQv+GbW65gueVFLOQ7L+swQ60tuz97F9F7yStmkHaPGcxer0VLUdwNvwOMkDqXww1+M+TZrdXtxrWYCl/dxkp2WKqZaSr0UQ27e4QaRSeS2zghIiHSII23qIqg5/wpSaPXyggJDWA7PfIE2nURlNLKgxnNXu348ZcCAZQTECgYEA1gQmUfeGaRGL88paaHLK/ytI15Y+Qwjdb5sN4+dnGXy3OHB7iM4/5PdpA8IYXv5g6Lnldf4G92Nx942B4mZCDL3LTXgIu8tZvE37RiHMaRSdNH9WpGtfpTi6weQ+lja02dNtC7IO/6X4/X9NSnQ5QHXqO0bsNnemN4GNNLMdj20CgYEAzMLg2sQ4njAokAzB0p/3ueUeNPyqI6eCwNc4Cus0HXUWJ9FhESuMnDwrBFZryUpW1QmOPdkVV53f5aX7NGDnrZ87nHKVjldOUmRYfBfH47H1OlV/hCuiy2JDGart80JcKwC56uladexdPaww+px/0xwuVOBtI1E98Za+hiY6Pw0CgYBpjM5hapSNySue5tPD46meQ3i/asf2Q68CVhR5rCy68zlhyogCpsX4ZNUUF2vxnb+px9UVZl2FMTSKBO5j/E7i/dAAuwyDofz10/fzVMP9pz8JHyxaFuKrF9lzut/rMbvsGkwTkpO3HeI5E8nIyJ1b30vQRGBHVKdThL9hmF0h2QKBgHWio/Gq92gR/Mu9OIEb/AMlWTRR0CFJtDm7q2vCcp9VzBO2G5D0twRvILuONsBe4AHmSnzHwZYjkiTqNaaC4bcCmwmnXrp29/0nvxoTw3fRnjQUOH0jYJR98FTHuYqenjrqYOVPiPPkhjDPQxhHXrxXHVsP0EORAghQdUa2oZHlAoGATTvADFwBQjaxrs4NDgH4SYlPFnO4014gYogsI9qCveAEoiXB8IRV0JZ1H9xZVoTQT/I09gGWY7GohyKBGSiAKuaYjdPny2D2KsIkkuLQIV6xf7+9j7X9LwJH3WJyeK1U6xpfAexbil5MuvslB39mktAxAjQNAHcEcBWpT7cnYJo=","pubKey":"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqy45qOB3jHX0/w5eQzvzlvQNDG/hs9wPJjxMbsIyoFJUNYSXyUDg+XY8VnFPeSQ5rzUYLBsEonTrtqjYgHqT9iOEcHV0dQiwv46F0joRHsaoKdAD2V+0oXRkmwuOozQMd8OVU+RJx9/fteGnrsX2uDsSXSjFS/NOJhv9NteFGeKCat2pTcwlLp/UjLITPUSmKYjfu9W6JpD37Wb92rQ7jEmoCAoeKbZp86Lflwaxj4JCQpRyJUFjZjpqesO8T6+BRliF4UkVZ7/v1Lvp+uDXhW9fwYCUR943c6r09uDOiT1PuJsGy0EXWU1OHJj9gwHgUhozlsmMQT/cpRTMC34biQIDAQAB","crt":"MIICnTCCAYUCBgGZ5HttdjANBgkqhkiG9w0BAQsFADASMRAwDgYDVQQDDAdqZ3JvdXBzMB4XDTI1MTAxNDIwNDY1OFoXDTI1MTIxMzIwNDgzOFowEjEQMA4GA1UEAwwHamdyb3VwczCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKsuOajgd4x19P8OXkM785b0DQxv4bPcDyY8TG7CMqBSVDWEl8lA4Pl2PFZxT3kkOa81GCwbBKJ067ao2IB6k/YjhHB1dHUIsL+OhdI6ER7GqCnQA9lftKF0ZJsLjqM0DHfDlVPkScff37Xhp67F9rg7El0oxUvzTiYb/TbXhRnigmrdqU3MJS6f1IyyEz1EpimI37vVuiaQ9+1m/dq0O4xJqAgKHim2afOi35cGsY+CQkKUciVBY2Y6anrDvE+vgUZYheFJFWe/79S76frg14VvX8GAlEfeN3Oq9Pbgzok9T7ibBstBF1lNThyY/YMB4FIaM5bJjEE/3KUUzAt+G4kCAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAXkhOiVbRBlXmqhrBohnk7kuCDFfb+cBBQs2Mxj84qwFKZC/MMbDIZ5mJfbUlTfaXInGQJj83rX9JkF9QkPcB6Ut7TBMV2AWPoXpm6QSnYbdjuUnuk2Edj6PiDSydZJ7lca+xKxwNu9YZ7sjWUzfKvZqZaEaDV2/Lo7t/MkHjRnRn+AsgfBklTx/Dq/TQ0TAySushizUvEGwAsJPfFT8E7hbyFIB7IOWbz3TpJnnMTCZHfg6oMXZHm+rU2nM0eQkFCE3ruyNP4gE5uww50GMQP1OJ2CKo5ALKXVFOUeISItA9JpXp+/UEFTkyv9jd7aVfwXKhwChPA/pEnxLwDO5Maw==","alias":"b2224341-7b42-47e3-a01e-298b26cb36e2","generatedMillis":1760474918319}	0
-JGROUPS_ADDRESS_SEQUENCE	9	9
+JGROUPS_ADDRESS_SEQUENCE	11	11
 \.
 
 
@@ -3863,6 +3895,8 @@ COPY public.user_entity (id, email, email_constraint, email_verified, enabled, f
 4c0a6f96-ef5e-4a79-9dc4-581d694cb03f	ramon.admin@alumnet.com	ramon.admin@alumnet.com	t	t	\N	Ramon	Fernandez	000c9ecc-9c3a-44d3-94fe-941ff152490f	ramon.admin@alumnet.com	1760476252537	\N	0
 7a7ffec9-1041-4c28-8fec-f8e958db8bbf	federicomaciel.dev@gmail.com	federicomaciel.dev@gmail.com	t	t	\N	fede	maciel	0666ea4e-c88f-4e30-bf74-4874c0b2484d	federicomaciel.dev@gmail.com	1760559001885	\N	0
 dbd69f1a-4a1a-4797-972b-ec0494972068	\N	fdc94f9a-149e-4365-b86d-0d40f585a8d5	t	t	\N	\N	\N	0666ea4e-c88f-4e30-bf74-4874c0b2484d	admin	1760568798500	\N	0
+fbe8d18b-bdba-44fa-82ac-f791fb87a550	develop@alumnet.com	develop@alumnet.com	t	t	\N	\N	\N	000c9ecc-9c3a-44d3-94fe-941ff152490f	develop@alumnet.com	1760919584640	\N	0
+daddcbb4-d04e-4833-af7e-f05a63431096	test1210@alumnet.com	test1210@alumnet.com	t	t	\N	Otro melo	Nombre teacher	000c9ecc-9c3a-44d3-94fe-941ff152490f	test1210@alumnet.com	1760919659540	\N	0
 \.
 
 
@@ -3916,6 +3950,9 @@ COPY public.user_group_membership (group_id, user_id, membership_type) FROM stdi
 ea0097c4-3325-494e-904b-ef6fef8c9ddb	467fca2a-add9-4201-ab6b-ecd48914da54	UNMANAGED
 0a9fda05-f683-4ad3-bf5c-e5000da2ee6a	4c0a6f96-ef5e-4a79-9dc4-581d694cb03f	UNMANAGED
 caf0000d-bab0-4414-9096-2430000ac9b1	59d446ec-8c0a-48b4-9785-14f26007ddbf	UNMANAGED
+0a9fda05-f683-4ad3-bf5c-e5000da2ee6a	fbe8d18b-bdba-44fa-82ac-f791fb87a550	UNMANAGED
+ea0097c4-3325-494e-904b-ef6fef8c9ddb	fbe8d18b-bdba-44fa-82ac-f791fb87a550	UNMANAGED
+ea0097c4-3325-494e-904b-ef6fef8c9ddb	daddcbb4-d04e-4833-af7e-f05a63431096	UNMANAGED
 \.
 
 
@@ -3995,6 +4032,12 @@ e195f23a-b529-42d7-af77-64e73199f801	dbd69f1a-4a1a-4797-972b-ec0494972068
 3d7dc8fc-820b-44bd-9b75-d39b972ef2b9	dbd69f1a-4a1a-4797-972b-ec0494972068
 f22cac6b-f114-401d-9504-cfe1917dae1c	dbd69f1a-4a1a-4797-972b-ec0494972068
 d4801f2c-c1c0-4e24-bdba-e9a41dd21d93	dbd69f1a-4a1a-4797-972b-ec0494972068
+0fc1515d-32eb-4643-b9e9-646337839092	fbe8d18b-bdba-44fa-82ac-f791fb87a550
+fa192e7f-b3b8-434c-80e4-c6e8fc3bf76c	fbe8d18b-bdba-44fa-82ac-f791fb87a550
+4aed72c9-e297-4154-845b-74da79442fcb	fbe8d18b-bdba-44fa-82ac-f791fb87a550
+8bdb3d68-fe5a-4d3e-b81b-5a63cca0ad7a	fbe8d18b-bdba-44fa-82ac-f791fb87a550
+c5e4e6b1-7b07-4319-a558-1446a413ad29	fbe8d18b-bdba-44fa-82ac-f791fb87a550
+0fc1515d-32eb-4643-b9e9-646337839092	daddcbb4-d04e-4833-af7e-f05a63431096
 \.
 
 
@@ -6358,7 +6401,7 @@ ALTER TABLE ONLY public.identity_provider_config
     ADD CONSTRAINT fkdc4897cf864c4e43 FOREIGN KEY (identity_provider_id) REFERENCES public.identity_provider(internal_id);
 
 
--- Completed on 2025-10-18 11:55:37 -03
+-- Completed on 2025-10-19 21:41:57 -03
 
 --
 -- PostgreSQL database dump complete

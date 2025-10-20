@@ -25,13 +25,7 @@
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="alumnet.mobile"/>
-      </intent-filter>
-      <intent-filter data-generated="true">
-        <action android:name="android.intent.action.VIEW"/>
-        <data android:scheme="alumnet.mobile" android:host="redirect"/>
-        <data android:scheme="alumnet.mobile" android:host="login"/>
-        <category android:name="android.intent.category.BROWSABLE"/>
-        <category android:name="android.intent.category.DEFAULT"/>
+        <data android:scheme="alumnet.mobile"/>
       </intent-filter>
     </activity>
   </application>

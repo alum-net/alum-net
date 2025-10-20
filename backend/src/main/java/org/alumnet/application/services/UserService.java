@@ -37,12 +37,18 @@ public class UserService {
     private UserMapper userMapper;
 
     public ResultResponse<Void> createUser(UserCreationRequestDTO userCreationRequestDTO) throws ExistingUserException {
-        if(isRegisteredUser(userCreationRequestDTO.getEmail()))
-            throw new ExistingUserException("User with email " + userCreationRequestDTO.getEmail() + " already exists");
+        try {
+            if (isRegisteredUser(userCreationRequestDTO.getEmail()))
+                throw new ExistingUserException(
+                        "User with email " + userCreationRequestDTO.getEmail() + " already exists");
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
 
         UserRepresentation userRepresentation = createUserRepresentation(userCreationRequestDTO);
         ResultResponse<Void> response = ResultResponse.<Void>builder().build();
-        try (Response keycloakResponse = keycloak.realm(properties.getRealm()).users().create(userRepresentation)){
+        try (Response keycloakResponse = keycloak.realm(properties.getRealm()).users().create(userRepresentation)) {
             if (keycloakResponse.getStatus() != 201) {
                 response.addError("Error creating userRepresentation: " + keycloakResponse.getStatus());
                 return response;
@@ -54,19 +60,17 @@ public class UserService {
         return response;
     }
 
-    public Page<UserDTO> getUsers(UserFilterDTO filter, Pageable page){
-        boolean hasFilter = filter != null && (
-                filter.getName() != null ||
+    public Page<UserDTO> getUsers(UserFilterDTO filter, Pageable page) {
+        boolean hasFilter = filter != null && (filter.getName() != null ||
                 filter.getLastname() != null ||
                 filter.getEmail() != null ||
-                filter.getRole() != null
-        );
+                filter.getRole() != null);
 
         Page<User> userPage;
 
-        if(!hasFilter){
+        if (!hasFilter) {
             userPage = userRepository.findAll(page);
-        }else{
+        } else {
             Specification<User> userSpec = UserSpecification.byFilters(filter);
             userPage = userRepository.findAll(userSpec, page);
         }
@@ -75,7 +79,8 @@ public class UserService {
     }
 
     private boolean isRegisteredUser(String email) {
-        return userRepository.existsById(email) || !keycloak.realm(properties.getRealm()).users().searchByEmail(email,true).isEmpty();
+        return userRepository.existsById(email)
+                || !keycloak.realm(properties.getRealm()).users().searchByEmail(email, true).isEmpty();
     }
 
     private void saveUser(UserCreationRequestDTO userCreationRequestDTO) {
