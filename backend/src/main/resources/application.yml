@@ -2,15 +2,16 @@ spring:
   application:
     name: alum-net
   datasource:
-    url: jdbc:postgresql://localhost:5001/alum-net
-    username: postgres
-    password: postgres
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
+
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${keycloak.url}/realms/${keycloak.realm}
+          issuer-uri: ${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}
 
   jpa:
     hibernate:
@@ -18,16 +19,18 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
 jwt:
   auth:
     principleAttribute: preferred_username
 
 keycloak:
-  client-id: alumnet
-  url: http://localhost:8000
-  realm: alumnet-realm
-  username: develop@alumnet.com
-  password: develop
+  name: alum-net    
+  client-id: ${KEYCLOAK_CLIENT_ID}
+  url: ${KEYCLOAK_URL}
+  realm: ${KEYCLOAK_REALM}
+  username: ${KEYCLOAK_USERNAME}
+  password: ${KEYCLOAK_PASSWORD}
 
 server:
-  port: 8200
+  port: ${SERVER_PORT}
