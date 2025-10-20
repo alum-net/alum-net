@@ -16,10 +16,6 @@ import { keycloakClientId, keycloakRealm, authScheme } from '../constants';
 
 WebBrowser.maybeCompleteAuthSession();
 
-export function generateShortUUID() {
-  return Math.random().toString(36).substring(2, 15);
-}
-
 const redirectUri = makeRedirectUri({
   native: authScheme,
 });
