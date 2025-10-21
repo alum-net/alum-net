@@ -2,17 +2,12 @@ package org.alumnet.application.services;
 
 import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.CourseCreationRequestDTO;
-import org.alumnet.application.enums.UserRole;
 import org.alumnet.domain.*;
 import org.alumnet.domain.repositories.CourseParticipationRepository;
 import org.alumnet.domain.repositories.CourseRepository;
 import org.alumnet.domain.repositories.ParticipationRepository;
 import org.alumnet.domain.repositories.UserRepository;
-import org.alumnet.infrastructure.exceptions.AlreadyEnrolledStudentException;
-import org.alumnet.infrastructure.exceptions.CourseNotFoundException;
-import org.alumnet.infrastructure.exceptions.ActiveCourseException;
-import org.alumnet.infrastructure.exceptions.InvalidAttributeException;
-import org.alumnet.infrastructure.exceptions.UserNotFoundException;
+import org.alumnet.infrastructure.exceptions.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,7 +60,7 @@ public class CourseService {
         courseRepository.save(course);
     }
 
-     public void addMemberToCourse(int courseId, String studentEmail) {
+    public void addMemberToCourse(int courseId, String studentEmail) {
 
         Student student = userRepository.findStudentByEmail(studentEmail)
                 .orElseThrow(UserNotFoundException::new);
@@ -88,7 +83,7 @@ public class CourseService {
 
         courseParticipationRepository.save(participation);
     }
-  
+
     @Transactional
     public void deleteCourse(int courseId) {
         boolean courseActive = courseRepository.isCourseActive(courseId);
@@ -99,6 +94,11 @@ public class CourseService {
         }
 
         courseRepository.deactivateCourse(courseId);
+    }
+
+    public void removeMemberFromCourse(Integer courseId, String userEmail) {
+        CourseParticipation userParticipation = participationRepository.findByStudentEmailAndCourseId(userEmail, courseId);
+        participationRepository.delete(userParticipation);
     }
 
     private static void validateTeachers(List<String> teacherEmails, List<Teacher> teachers) {
