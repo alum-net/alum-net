@@ -17,9 +17,9 @@ export type CourseCreationPayload = Omit<
 };
 
 export enum CourseShift {
-  'MORNING',
-  'NIGHT',
-  'AFTERNOON',
+  morning = 'MORNING',
+  night = 'NIGHT',
+  afternoon = 'AFTERNOON',
 }
 
 export interface FiltersDirectory {

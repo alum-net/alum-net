@@ -6,6 +6,7 @@ export const accessTokenInterceptor = (config: InternalAxiosRequestConfig) => {
   const token = storage.getString(STORAGE_KEYS.ACCESS_TOKEN);
 
   if (token) {
+    console.log('access ', token);
     config.headers.Authorization = `Bearer ${token}`;
   }
 
@@ -26,7 +27,7 @@ export const refreshTokenInterceptor = async (error: AxiosError<Response>) => {
   try {
     storage.delete(STORAGE_KEYS.ACCESS_TOKEN);
     const newAccessToken = await refresh();
-
+    console.log('tiro la request de nuevo');
     originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
     originalRequest._isRetry = true;
 

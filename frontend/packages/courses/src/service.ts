@@ -34,7 +34,7 @@ export const getCourses = (filters: FiltersDirectory, page: number) => {
 export const createCourse = async (courseInfo: CourseCreationPayload) => {
   console.log(courseInfo, 'creacion de curso');
   const { data }: AxiosResponse<Response> = await api.post(
-    '/courses/',
+    '/courses',
     courseInfo,
   );
 

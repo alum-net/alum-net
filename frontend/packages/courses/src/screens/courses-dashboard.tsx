@@ -5,8 +5,8 @@ import { Button, Text } from 'react-native-paper';
 import { FiltersDirectory } from '../types';
 import { getCourses } from '../service';
 import { CourseCard } from '../components/course-card';
-import { buildQueryParams } from '../helpers';
 import { THEME } from '@alum-net/ui/src/constants';
+import { QUERY_KEYS } from '@alum-net/api';
 
 export function CoursesDashboard({
   FilterComponent,
@@ -28,7 +28,7 @@ export function CoursesDashboard({
   const [currentPage, setCurrentPage] = useState<number>(1);
 
   const { data } = useQuery({
-    queryKey: ['courses', buildQueryParams(appliedFilters), currentPage],
+    queryKey: [QUERY_KEYS.getCourses],
     queryFn: () => getCourses(appliedFilters, currentPage),
   });
 

@@ -1,6 +1,8 @@
 spring:
   application:
     name: alum-net
+    cors:
+      allowed-origins: http://localhost:8081,http://localhost:8082
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5001/alum-net}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}

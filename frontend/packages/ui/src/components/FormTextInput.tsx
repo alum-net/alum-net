@@ -14,13 +14,19 @@ type FormTextInputProps<T extends FieldValues> = Omit<
   name: Path<T>;
   control: Control<T>;
   rules?: RegisterOptions<T>;
+  customOnChange?: (
+    value: string,
+    fieldOnChange: (...event: any[]) => void,
+  ) => void;
 };
 
-export function FormTextInput<T extends FieldValues>(
-  props: FormTextInputProps<T>,
-) {
-  const { name, control, rules, ...textInputProps } = props;
-
+export function FormTextInput<T extends FieldValues>({
+  name,
+  customOnChange,
+  control,
+  rules,
+  ...textInputProps
+}: FormTextInputProps<T>) {
   const {
     field,
     fieldState: { invalid },
@@ -35,7 +41,13 @@ export function FormTextInput<T extends FieldValues>(
       {...textInputProps}
       ref={field.ref}
       value={field.value}
-      onChangeText={field.onChange}
+      onChangeText={
+        customOnChange
+          ? value => {
+              customOnChange(value, field.onChange);
+            }
+          : field.onChange
+      }
       onBlur={field.onBlur}
       error={invalid}
     />

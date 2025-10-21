@@ -1,15 +1,20 @@
-import React from 'react';
+'use dom';
+import React, { useCallback } from 'react';
 import { View, ScrollView, StyleSheet, Modal } from 'react-native';
 import { Button, Text, SegmentedButtons } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { FormTextInput, THEME } from '@alum-net/ui';
+import { FormTextInput, THEME, Toast } from '@alum-net/ui';
 import { CourseCreationPayload, CourseShift } from '@alum-net/courses';
 import { createCourse } from '@alum-net/courses/src/service';
 import {
   courseCreationSchema,
   CourseFormData,
-} from '@/validations/course-creation';
+} from '../validations/course-creation';
+import FormDateInput from './date-input';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { QUERY_KEYS } from '@alum-net/api';
+import { isValidDecimal } from '@alum-net/courses/src/helpers';
 
 type CreateCourseModalProps = {
   visible: boolean;
@@ -20,6 +25,47 @@ export default function CreateCourseModal({
   visible,
   onDismiss,
 }: CreateCourseModalProps) {
+  const queryClient = useQueryClient();
+
+  const { mutate } = useMutation({
+    mutationFn: async (data: CourseCreationPayload) => {
+      console.log('lo que me pasan', data);
+      try {
+        await createCourse(data);
+        reset();
+        onDismiss();
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    onMutate: async () => {
+      Toast.success('Curso creado correctamente!');
+      await queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.getCourses],
+      });
+    },
+    onError: error => {
+      console.log(error);
+      Toast.error('Hubo un error en la creación del curso');
+    },
+  });
+
+  const onSubmit = useCallback(
+    (data: CourseFormData) => {
+      const courseData: CourseCreationPayload = {
+        name: data.name,
+        description: data.description,
+        startDate: new Date(data.startDate),
+        endDate: new Date(data.endDate),
+        shift: data.shift as CourseShift,
+        approvalGrade: parseFloat(data.approvalGrade),
+        teachersEmails: data.teachersEmails.split(',').map(e => e.trim()),
+      };
+      mutate(courseData);
+    },
+    [mutate],
+  );
+
   const {
     control,
     handleSubmit,
@@ -32,27 +78,11 @@ export default function CreateCourseModal({
       description: '',
       startDate: '',
       endDate: '',
-      shift: CourseShift.MORNING,
+      shift: CourseShift.morning,
       approvalGrade: '',
       teachersEmails: '',
     },
   });
-
-  const handleFormSubmit = async (data: CourseFormData) => {
-    const courseData: CourseCreationPayload = {
-      name: data.name,
-      description: data.description,
-      startDate: new Date(data.startDate),
-      endDate: new Date(data.endDate),
-      shift: data.shift as CourseShift,
-      approvalGrade: parseFloat(data.approvalGrade),
-      teachersEmails: data.teachersEmails.split(',').map(e => e.trim()),
-    };
-
-    await createCourse(courseData);
-    reset();
-    onDismiss();
-  };
 
   const handleCancel = () => {
     reset();
@@ -96,12 +126,10 @@ export default function CreateCourseModal({
         {errors.description && (
           <Text style={styles.errorText}>{errors.description.message}</Text>
         )}
-
-        <FormTextInput
+        <FormDateInput
           name="startDate"
           control={control}
-          label="Fecha de comienzo (YYYY-MM-DD)"
-          mode="outlined"
+          label="Fecha de comienzo"
           placeholder="2025-01-15"
           style={styles.input}
           error={!!errors.startDate}
@@ -110,11 +138,10 @@ export default function CreateCourseModal({
           <Text style={styles.errorText}>{errors.startDate.message}</Text>
         )}
 
-        <FormTextInput
+        <FormDateInput
           name="endDate"
           control={control}
-          label="Fecha de fin (YYYY-MM-DD)"
-          mode="outlined"
+          label="Fecha de fin"
           placeholder="2025-05-15"
           style={styles.input}
           error={!!errors.endDate}
@@ -130,16 +157,21 @@ export default function CreateCourseModal({
           name="shift"
           control={control}
           render={({ field }) => (
-            <SegmentedButtons
-              value={field.value}
-              onValueChange={field.onChange}
-              buttons={[
-                { value: 'MORNING', label: 'Mañana' },
-                { value: 'AFTERNOON', label: 'Tarde' },
-                { value: 'NIGHT', label: 'Noche' },
-              ]}
-              style={styles.input}
-            />
+            <>
+              <SegmentedButtons
+                value={field.value}
+                onValueChange={field.onChange}
+                buttons={[
+                  { value: 'MORNING', label: 'Mañana' },
+                  { value: 'AFTERNOON', label: 'Tarde' },
+                  { value: 'NIGHT', label: 'Noche' },
+                ]}
+                style={styles.input}
+              />
+              {errors.endDate && (
+                <Text style={styles.errorText}>{errors.endDate.message}</Text>
+              )}
+            </>
           )}
         />
 
@@ -149,6 +181,9 @@ export default function CreateCourseModal({
           label="Nota de aprobación (0-1)"
           mode="outlined"
           keyboardType="numeric"
+          customOnChange={(value, fieldOnChange) => {
+            if (isValidDecimal(value)) fieldOnChange(value);
+          }}
           placeholder="0.7"
           style={styles.input}
           error={!!errors.approvalGrade}
@@ -179,7 +214,7 @@ export default function CreateCourseModal({
           </Button>
           <Button
             mode="contained"
-            onPress={handleSubmit(handleFormSubmit)}
+            onPress={handleSubmit(onSubmit)}
             style={styles.button}
           >
             Crear curso

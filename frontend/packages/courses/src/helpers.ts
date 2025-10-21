@@ -16,11 +16,22 @@ export function buildQueryParams(filters: Partial<FiltersDirectory>): string {
 
 export const mapShiftToString = (shift: CourseShift) => {
   switch (shift) {
-    case 'MORNING':
+    case CourseShift.morning:
       return 'Mañana';
-    case 'AFTERNOON':
+    case CourseShift.afternoon:
       return 'Tarde';
-    case 'NIGHT':
+    case CourseShift.night:
       return 'Noche';
   }
 };
+
+export function isValidDecimal(value: string): boolean {
+  if (value.length > 3) return false;
+  if (value.length === 0 || value === '0.') return true;
+  const num = parseFloat(value);
+  if (isNaN(num) || num < 0 || num > 1) {
+    return false;
+  }
+  const decimalRegex = /^(0(\.\d)?|1(\.0)?|\.\d)$/;
+  return decimalRegex.test(value);
+}

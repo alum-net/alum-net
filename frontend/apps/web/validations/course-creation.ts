@@ -1,4 +1,5 @@
 import { CourseShift } from '@alum-net/courses';
+import { isValidDecimal } from '@alum-net/courses/src/helpers';
 import { z } from 'zod';
 
 export const courseCreationSchema = z
@@ -12,16 +13,18 @@ export const courseCreationSchema = z
     startDate: z.string().refine(date => {
       const parsed = new Date(date);
       return !isNaN(parsed.getTime());
-    }, 'Fecha de inicio inválida (use formato AAAA-MM-DD)'),
+    }, 'Fecha de inicio inválida'),
     endDate: z.string().refine(date => {
       const parsed = new Date(date);
       return !isNaN(parsed.getTime());
-    }, 'Fecha de finalización inválida (use formato AAAA-MM-DD)'),
+    }, 'Fecha de finalización inválida'),
     shift: z.enum(CourseShift),
-    approvalGrade: z.string().refine(val => {
-      const num = parseFloat(val);
-      return !isNaN(num) && num >= 0 && num <= 1;
-    }, 'La nota debe estar entre 0 y 1'),
+    approvalGrade: z
+      .string()
+      .min(3, 'La nota debe estar entre 0 y 1')
+      .refine(val => {
+        return isValidDecimal(val);
+      }, 'La nota debe estar entre 0 y 1'),
     teachersEmails: z.string().refine(val => {
       const emails = val
         .split(',')
