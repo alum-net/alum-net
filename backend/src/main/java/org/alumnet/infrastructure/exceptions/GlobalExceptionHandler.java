@@ -26,6 +26,10 @@ public class GlobalExceptionHandler {
     public ResultResponse<Object> handleInvalidMimeTypeException(InvalidMimeTypeException ex) {
         return ResultResponse.error(ex.getMessage(), "Tipo MIME no válido", HttpStatus.BAD_REQUEST.value());
     }
+    @ExceptionHandler(ExistingUserException.class)
+    public ResultResponse<Object> handleExistingUserException(ExistingUserException ex) {
+        return ResultResponse.error(ex.getMessage(), "El usuario ya existe", HttpStatus.CONFLICT.value());
+    }
 
 
 

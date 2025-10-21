@@ -2,6 +2,7 @@ package org.alumnet.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.alumnet.domain.resources.SectionResource;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,5 +24,13 @@ public class Section {
     private Course course;
 
     @OneToMany(mappedBy = "section", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<SectionResource> sectionResources = new ArrayList<>();
+
+
+    public void addResource(SectionResource resource) {
+        sectionResources.add(resource);
+        resource.setSection(this);
+    }
+
 }

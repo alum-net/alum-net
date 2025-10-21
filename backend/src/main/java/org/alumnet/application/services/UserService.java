@@ -36,7 +36,7 @@ public class UserService {
     @Autowired
     private UserMapper userMapper;
 
-    public ResultResponse<Void> createUser(UserCreationRequestDTO userCreationRequestDTO) throws ExistingUserException {
+    public void createUser(UserCreationRequestDTO userCreationRequestDTO) throws ExistingUserException {
         try {
             if (isRegisteredUser(userCreationRequestDTO.getEmail()))
                 throw new ExistingUserException(
@@ -47,17 +47,13 @@ public class UserService {
         }
 
         UserRepresentation userRepresentation = createUserRepresentation(userCreationRequestDTO);
-        ResultResponse<Void> response = ResultResponse.<Void>builder().build();
         try (Response keycloakResponse = keycloak.realm(properties.getRealm()).users().create(userRepresentation)) {
             if (keycloakResponse.getStatus() != 201) {
-                response.addError("Error creating userRepresentation: " + keycloakResponse.getStatus());
-                return response;
+                throw new ExistingUserException("Failed to create user in Keycloak: " + keycloakResponse.getStatusInfo().getReasonPhrase());
             }
         }
         saveUser(userCreationRequestDTO);
-        response.setMessage("Successfully created user");
-        response.setSuccess(true);
-        return response;
+
     }
 
     public Page<UserDTO> getUsers(UserFilterDTO filter, Pageable page) {

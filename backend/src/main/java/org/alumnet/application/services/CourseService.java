@@ -2,6 +2,9 @@ package org.alumnet.application.services;
 
 import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.CourseCreationRequestDTO;
+import org.alumnet.application.dtos.UserFilterDTO;
+import org.alumnet.application.enums.UserRole;
+import org.alumnet.application.specifications.UserSpecification;
 import org.alumnet.domain.Course;
 import org.alumnet.domain.CourseParticipation;
 import org.alumnet.domain.CourseParticipationId;
@@ -66,8 +69,12 @@ public class CourseService {
 
      public void addMemberToCourse(int courseId, String studentEmail) {
 
-        Student student = userRepository.findStudentByEmail(studentEmail)
+        Student student = userRepository.findOne(UserSpecification.byFilters(UserFilterDTO.builder()
+                        .email(studentEmail)
+                        .role(UserRole.STUDENT).build()))
+                .map(user -> (Student)user)
                 .orElseThrow(UserNotFoundException::new);
+
 
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(CourseNotFoundException::new);

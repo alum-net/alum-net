@@ -2,12 +2,10 @@ package org.alumnet.application.services;
 
 import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.SectionCreationRequestDTO;
-import org.alumnet.application.enums.ResourceType;
 import org.alumnet.application.mapper.SectionMapper;
 import org.alumnet.domain.Course;
-import org.alumnet.domain.Resource;
 import org.alumnet.domain.Section;
-import org.alumnet.domain.SectionResource;
+import org.alumnet.domain.resources.SectionResource;
 import org.alumnet.domain.repositories.ResourceRepository;
 import org.alumnet.domain.repositories.SectionRepository;
 import org.springframework.stereotype.Service;
@@ -27,7 +25,6 @@ public class SectionService {
     private final CourseService courseService;
     private final S3FileStorageService s3FileStorageService;
     private final SectionMapper sectionMapper;
-    private final ResourceRepository resourceRepository;
 
     public void createSection(SectionCreationRequestDTO sectionDTO, List<MultipartFile> files, int courseId) {
         if (files != null && !files.isEmpty())
@@ -40,43 +37,30 @@ public class SectionService {
             uploadAndLinkFilesToSection(files, section);
         }
 
-        course.getSections().add(section);
-        courseService.updateCourse(course);
+        sectionRepository.save(section);
     }
 
     private void uploadAndLinkFilesToSection(List<MultipartFile> files, Section section) {
-        List<SectionResource> sectionResources = new ArrayList<>();
 
         files.forEach(file -> {
 
             String fileExtension = getFileExtension(file.getOriginalFilename());
             String s3Key = s3FileStorageService.store(file, fileExtension);
 
-            Resource resource = createResource(file, s3Key, fileExtension);
-
-            resource = resourceRepository.save(resource);
-            SectionResource sectionResource = createSectionResource(section, file, resource);
-
-            sectionResources.add(sectionResource);
+            SectionResource sectionResource = createSectionResource(file, s3Key, fileExtension);
+            section.addResource(sectionResource);
         });
-        section.setSectionResources(sectionResources);
+
     }
 
-    private static SectionResource createSectionResource(Section section, MultipartFile file, Resource resource) {
+
+    private SectionResource createSectionResource(MultipartFile file, String s3Key, String fileExtension) {
         return SectionResource.builder()
-                .title(file.getOriginalFilename())
-                .section(section)
-                .resource(resource)
-                .build();
-    }
-
-    private static Resource createResource(MultipartFile file, String s3Key, String fileExtension) {
-        return Resource.builder()
                 .name(file.getOriginalFilename())
                 .url(s3Key)
                 .extension(fileExtension)
-                .type(ResourceType.COURSE)
                 .sizeInBytes(file.getSize())
+                .title(file.getOriginalFilename())
                 .build();
     }
 

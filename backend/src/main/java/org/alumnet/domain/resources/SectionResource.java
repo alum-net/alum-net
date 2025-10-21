@@ -1,20 +1,18 @@
-package org.alumnet.domain;
+package org.alumnet.domain.resources;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
+import org.alumnet.domain.Section;
 
 @Entity
-@Table(name = "section_resource")
-@Builder
+@SuperBuilder
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class SectionResource {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-
+@DiscriminatorValue("section")
+public class SectionResource extends Resource {
     private String title;
 
     @ManyToOne
@@ -23,8 +21,4 @@ public class SectionResource {
             @JoinColumn(name = "section_title", referencedColumnName = "title")
     })
     private Section section;
-
-    @ManyToOne
-    @JoinColumn(name = "resource_id")
-    private Resource resource;
 }

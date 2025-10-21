@@ -1,4 +1,4 @@
-package org.alumnet.domain;
+package org.alumnet.domain.resources;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -17,5 +17,5 @@ public class Label {
     private Integer id;
     private String name;
     @ManyToMany(mappedBy = "labels")
-    private Set<Resource> resources;
+    private Set<LibraryResource> resources;
 }
