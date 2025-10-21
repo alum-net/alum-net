@@ -110,11 +110,17 @@ public class CourseService {
     }
 
     public void removeMemberFromCourse(Integer courseId, String userEmail) {
-        CourseParticipation userParticipation = participationRepository.findByStudentEmailAndCourseId(userEmail, courseId);
+        CourseParticipation userParticipation = participationRepository
+                .findById(CourseParticipationId.builder()
+                        .studentEmail(userEmail)
+                        .courseId(courseId)
+                        .build())
+                .orElseThrow(EnrollmentNotFoundException::new);
+
         participationRepository.delete(userParticipation);
     }
 
-    private static void validateTeachers(List<String> teacherEmails, List<Teacher> teachers) {
+    private void validateTeachers(List<String> teacherEmails, List<Teacher> teachers) {
         if (teachers.size() != teacherEmails.size()) {
             throw new InvalidAttributeException("Uno o más docentes no existen o no tienen rol Teacher");
         }
@@ -126,7 +132,7 @@ public class CourseService {
         }
     }
 
-    private static void validateGrade(Double approvalGrade) {
+    private void validateGrade(Double approvalGrade) {
         if (approvalGrade == null || approvalGrade < 0.0 || approvalGrade > 1.0) {
             throw new InvalidAttributeException("La nota mínima debe estar entre 0.0 y 1.0");
         }

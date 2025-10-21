@@ -30,7 +30,8 @@ public class GlobalExceptionHandler {
     public ResultResponse<Object> handleExistingUserException(ExistingUserException ex) {
         return ResultResponse.error(ex.getMessage(), "El usuario ya existe", HttpStatus.CONFLICT.value());
     }
-
-
-
+    @ExceptionHandler(EnrollmentNotFoundException.class)
+    public ResultResponse<Object> handleEnrollmentNotFoundException(EnrollmentNotFoundException ex) {
+        return ResultResponse.error(ex.getMessage(), "El usuario no está matriculado al curso", HttpStatus.NOT_FOUND.value());
+    }
 }
