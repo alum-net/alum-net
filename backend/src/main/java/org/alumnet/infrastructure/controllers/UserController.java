@@ -30,7 +30,7 @@ public class UserController {
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<ResultResponse<Object>> createUser(@Valid @RequestBody UserCreationRequestDTO userCreationRequestDTO) {
         userService.createUser(userCreationRequestDTO);
-        return ResponseEntity.ok(ResultResponse.success("Usuario creado exitosamente", null));
+        return ResponseEntity.ok(ResultResponse.success(null, "Usuario creado exitosamente"));
     }
 
     @GetMapping(path = "/", produces = "application/json")
