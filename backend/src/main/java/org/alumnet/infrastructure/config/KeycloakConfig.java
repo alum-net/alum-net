@@ -18,13 +18,6 @@ public class KeycloakConfig {
 
     @Bean
     public Keycloak keycloakServiceAccount() {
-        log.info("Inicializando Keycloak con configuración:");
-        log.info("➡️ URL: {}", properties.getUrl());
-        log.info("➡️ Realm: {}", properties.getRealm());
-        log.info("➡️ Client ID: {}", properties.getClientId());
-        log.info("➡️ Username: {}", properties.getUsername());
-        log.info("➡️ Password: {}", properties.getPassword());
-
         return KeycloakBuilder.builder()
                 .serverUrl(properties.getUrl())
                 .realm(properties.getRealm())

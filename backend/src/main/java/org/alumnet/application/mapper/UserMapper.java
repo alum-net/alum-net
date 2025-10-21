@@ -2,10 +2,10 @@ package org.alumnet.application.mapper;
 
 import org.alumnet.application.dtos.UserCreationRequestDTO;
 import org.alumnet.application.dtos.UserDTO;
-import org.alumnet.domain.Administrator;
-import org.alumnet.domain.Student;
-import org.alumnet.domain.Teacher;
-import org.alumnet.domain.User;
+import org.alumnet.domain.users.Administrator;
+import org.alumnet.domain.users.Student;
+import org.alumnet.domain.users.Teacher;
+import org.alumnet.domain.users.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

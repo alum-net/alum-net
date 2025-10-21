@@ -20,35 +20,29 @@ public class CourseController {
 
     @PostMapping
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<ResultResponse<Void>> create(@Valid @RequestBody CourseCreationRequestDTO courseDTO) {
+    public ResponseEntity<ResultResponse<Object>> create(@Valid @RequestBody CourseCreationRequestDTO courseDTO) {
         courseService.create(courseDTO);
-        ResultResponse<Void> resultResponse = ResultResponse.<Void>builder()
-                .success(true)
-                .message("Curso creado correctamente")
-                .build();
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(resultResponse);
+                .body(ResultResponse.success("Curso creado correctamente", null));
     }
 
     @PostMapping("/{courseId}/participations")
     @PreAuthorize("hasRole('teacher')")
-    public ResponseEntity<ResultResponse<Void>> addMember(
+    public ResponseEntity<ResultResponse<Object>> addMember(
             @PathVariable int courseId,
             @Valid @RequestBody EnrollmentRequestDTO enrollmentRequest) {
         courseService.addMemberToCourse(courseId, enrollmentRequest.getStudentEmail());
-        ResultResponse<Void> response = ResultResponse.<Void>builder()
-                .success(true)
-                .message("Estudiante matriculado correctamente")
-                .build();
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ResultResponse.success("Estudiante matriculado correctamente", null));
     }
 
 
     @DeleteMapping("/{courseId}")
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<Void> deleteCourse(@PathVariable int courseId) {
+    public ResponseEntity<Object> deleteCourse(@PathVariable int courseId) {
         courseService.deleteCourse(courseId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .body(ResultResponse.success("Curso eliminado correctamente", null));
     }
 
     @DeleteMapping("/{courseId}/participations/{userEmail}")
