@@ -1,39 +1,4 @@
 services:
-  mongo:
-    image: mongo:7.0
-    container_name: mongo_db
-    ports:
-      - "27017:27017"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: admin
-      MONGO_INITDB_DATABASE: alum-net
-    volumes:
-      - mongo_data:/data/db
-    restart: always
-    networks:
-      - red-alumnet
-
-  postgres:
-    image: postgres:15-alpine
-    container_name: postgres_db
-    ports:
-      - "5001:5432"
-    environment:
-      POSTGRES_DB: alum-net
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    restart: always
-    networks:
-      - red-alumnet
-
   backend:
     build:
       context: ../

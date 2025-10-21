@@ -45,5 +45,16 @@ public class CourseController {
                 .body(ResultResponse.success("Curso eliminado correctamente", null));
     }
 
+    @DeleteMapping("/{courseId}/participations/{userEmail}")
+    @PreAuthorize("hasRole('teacher')")
+    public ResponseEntity<ResultResponse<Void>> removeMemberFromCourse(@PathVariable Integer courseId, @PathVariable String userEmail) {
+        courseService.removeMemberFromCourse(courseId, userEmail);
+        ResultResponse<Void> response = ResultResponse.<Void>builder()
+                .success(true)
+                .message("Participation deleted")
+                .build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
+    }
+
 }
 
