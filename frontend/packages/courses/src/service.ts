@@ -1,29 +1,42 @@
 import { courses } from './constants';
-import { Course, FiltersDirectory } from './types';
+import api, { Response } from '@alum-net/api';
+import {
+  CourseDisplay,
+  FiltersDirectory,
+  CourseCreationPayload,
+} from './types';
+import { AxiosResponse } from 'axios';
 
 export const getCourses = (filters: FiltersDirectory, page: number) => {
   console.log(filters);
   return courses.filter(course => {
     const matchesCourseName =
-      filters.courseName === '' ||
-      course.title.toLowerCase().includes(filters.courseName.toLowerCase());
-    const matchesTeacherName =
-      filters.teacherName === '' ||
-      course.instructor
+      filters.courseName ||
+      course.name
         .toLowerCase()
-        .includes(filters.teacherName.toLowerCase());
-    const matchesYear =
-      filters.year === '' || course.year.toString() === filters.year;
+        .includes(filters.courseName?.toLowerCase() || '');
+
+    const matchesTeacherName =
+      filters.teacherName ||
+      course.teachersNames.some(teacher =>
+        teacher
+          .toLowerCase()
+          .includes(filters.teacherName?.toLowerCase() || ''),
+      );
+
     const matchesShift =
       filters.shift === 'all' || course.shift === filters.shift;
-    const matchesMyCourses = !filters.myCourses || course.isMyCourse;
 
-    return (
-      matchesCourseName &&
-      matchesTeacherName &&
-      matchesYear &&
-      matchesShift &&
-      matchesMyCourses
-    );
-  }) as Course[];
+    return matchesCourseName && matchesTeacherName && matchesShift;
+  }) as CourseDisplay[];
+};
+
+export const createCourse = async (courseInfo: CourseCreationPayload) => {
+  console.log(courseInfo, 'creacion de curso');
+  const { data }: AxiosResponse<Response> = await api.post(
+    '/courses/',
+    courseInfo,
+  );
+
+  return data;
 };

@@ -1,4 +1,4 @@
-import { FiltersDirectory } from './types';
+import { CourseShift, FiltersDirectory } from './types';
 
 export function buildQueryParams(filters: Partial<FiltersDirectory>): string {
   const params = Object.entries(filters)
@@ -13,3 +13,14 @@ export function buildQueryParams(filters: Partial<FiltersDirectory>): string {
 
   return params ? `?${params}` : '';
 }
+
+export const mapShiftToString = (shift: CourseShift) => {
+  switch (shift) {
+    case 'MORNING':
+      return 'Mañana';
+    case 'AFTERNOON':
+      return 'Tarde';
+    case 'NIGHT':
+      return 'Noche';
+  }
+};

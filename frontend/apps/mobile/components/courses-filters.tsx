@@ -1,5 +1,6 @@
 import { FilterBar } from '@alum-net/courses/src/components/filter-bar';
 import { FiltersDirectory, FilterBarRef } from '@alum-net/courses/src/types';
+import { THEME } from '@alum-net/ui';
 import { memo, useCallback, useRef, useState } from 'react';
 import { Modal, StyleSheet, Text, View } from 'react-native';
 import { Button, Divider, IconButton, Portal } from 'react-native-paper';
@@ -34,7 +35,7 @@ function CourseFilters({
       <Modal
         onRequestClose={() => setDisplayFilters(false)}
         visible={displayFilters}
-        backdropColor="#373737b5"
+        backdropColor={THEME.colors.backdrop}
         animationType="fade"
       >
         <Portal.Host>

@@ -1,22 +1,33 @@
-export type Course = {
+export type CourseDisplay = {
   id: number;
-  title: string;
-  instructor: string;
-  status: string;
-  color: string;
-  year: number;
+  name: string;
+  teachersNames: string[];
+  startDate: Date;
+  endDate: Date;
   shift: CourseShift;
-  isMyCourse: true;
 };
 
-export type CourseShift = 'morning' | 'night' | 'afternoon';
+export type CourseCreationPayload = Omit<
+  CourseDisplay,
+  'id' | 'teachersNames'
+> & {
+  description: string;
+  approvalGrade: number;
+  teachersEmails: string[];
+};
+
+export enum CourseShift {
+  'MORNING',
+  'NIGHT',
+  'AFTERNOON',
+}
 
 export interface FiltersDirectory {
-  courseName: string;
-  teacherName: string;
-  year: string;
-  shift: 'all' | CourseShift;
-  myCourses: boolean;
+  courseName?: string;
+  teacherName?: string;
+  year?: string;
+  shift?: 'all' | CourseShift;
+  myCourses?: boolean;
 }
 
 export type FilterName = keyof FiltersDirectory;

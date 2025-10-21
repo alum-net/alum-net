@@ -4,7 +4,8 @@
   "main": "./src/index.ts",
   "dependencies": {
     "@alum-net/ui": "*",
-    "@alum-net/users": "*"
+    "@alum-net/users": "*",
+    "@alum-net/api": "*"
   },
   "peerDependencies": {
     "@tanstack/react-query": "^5.90.5",

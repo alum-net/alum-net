@@ -28,9 +28,12 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
     const courseNameRef = useRef(initialFilters.courseName || '');
     const teacherNameRef = useRef(initialFilters.teacherName || '');
     const yearRef = useRef(initialFilters.year || '');
-    const shiftRef = useRef<CourseShift | 'all'>(initialFilters.shift || 'all');
-    const myCoursesRef = useRef(initialFilters.myCourses || false);
-    const [, forceUpdate] = useState(false); // Dummy state to force re-render for checkbox and shift label
+    const [shift, setShift] = useState<CourseShift | 'all'>(
+      initialFilters.shift || 'all',
+    );
+    const [myCourses, setMyCourses] = useState(
+      initialFilters.myCourses || false,
+    );
 
     const handleYearChange = useCallback(
       (text: string) => {
@@ -42,30 +45,18 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
       [maxYear],
     );
 
-    const handleShiftChange = useCallback((value: CourseShift | 'all') => {
-      shiftRef.current = value;
-      setShiftMenuVisible(false);
-      forceUpdate(prev => !prev); // Force re-render to update selectedShiftLabel
-    }, []);
-
-    const handleMyCoursesChange = useCallback(() => {
-      myCoursesRef.current = !myCoursesRef.current;
-      forceUpdate(prev => !prev); // Force re-render to update checkbox status
-    }, []);
-
     const selectedShiftLabel =
-      SHIFTS.find(s => s.value === shiftRef.current)?.label ||
-      'Todos los turnos';
+      SHIFTS.find(s => s.value === shift)?.label || 'Todos los turnos';
 
     const getFilters = useCallback(() => {
       return {
         courseName: courseNameRef.current,
         teacherName: teacherNameRef.current,
         year: yearRef.current,
-        shift: shiftRef.current,
-        myCourses: myCoursesRef.current,
+        shift: shift,
+        myCourses: myCourses,
       };
-    }, []);
+    }, [shift, myCourses]);
 
     useImperativeHandle(ref, () => ({
       getFilters,
@@ -127,7 +118,7 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
           {SHIFTS.map(shiftOption => (
             <Menu.Item
               key={shiftOption.value}
-              onPress={() => handleShiftChange(shiftOption.value)}
+              onPress={() => setShift(shiftOption.value)}
               title={shiftOption.label}
               titleStyle={styles.menuItemTitle}
             />
@@ -137,8 +128,8 @@ export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
         {userInfo?.role !== 'admin' && (
           <View style={styles.checkboxContainer}>
             <Checkbox
-              status={myCoursesRef.current ? 'checked' : 'unchecked'}
-              onPress={handleMyCoursesChange}
+              status={myCourses ? 'checked' : 'unchecked'}
+              onPress={() => setMyCourses(!myCourses)}
               color={THEME.colors.secondary}
             />
             <Text style={styles.checkboxLabel}>Solo mis cursos</Text>
