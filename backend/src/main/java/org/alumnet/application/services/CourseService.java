@@ -6,12 +6,15 @@ import org.alumnet.application.enums.UserRole;
 import org.alumnet.domain.*;
 import org.alumnet.domain.repositories.CourseParticipationRepository;
 import org.alumnet.domain.repositories.CourseRepository;
+import org.alumnet.domain.repositories.ParticipationRepository;
 import org.alumnet.domain.repositories.UserRepository;
 import org.alumnet.infrastructure.exceptions.AlreadyEnrolledStudentException;
 import org.alumnet.infrastructure.exceptions.CourseNotFoundException;
+import org.alumnet.infrastructure.exceptions.ActiveCourseException;
 import org.alumnet.infrastructure.exceptions.InvalidAttributeException;
 import org.alumnet.infrastructure.exceptions.UserNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -26,6 +29,7 @@ public class CourseService {
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
     private final CourseParticipationRepository courseParticipationRepository;
+    private final ParticipationRepository participationRepository;
 
     public void create(CourseCreationRequestDTO courseCreationRequestDTO) {
 
@@ -61,7 +65,7 @@ public class CourseService {
         courseRepository.save(course);
     }
 
-    public void addMemberToCourse(int courseId, String studentEmail) {
+     public void addMemberToCourse(int courseId, String studentEmail) {
 
         Student student = userRepository.findStudentByEmail(studentEmail)
                 .orElseThrow(UserNotFoundException::new);
@@ -83,6 +87,18 @@ public class CourseService {
                 .build();
 
         courseParticipationRepository.save(participation);
+    }
+  
+    @Transactional
+    public void deleteCourse(int courseId) {
+        boolean courseActive = courseRepository.isCourseActive(courseId);
+        boolean hasEnrolledStudents = participationRepository.hasEnrolledStudents(courseId);
+
+        if (courseActive && hasEnrolledStudents) {
+            throw new ActiveCourseException("El curso está activo y tiene estudiantes matriculados.");
+        }
+
+        courseRepository.deactivateCourse(courseId);
     }
 
     private static void validateTeachers(List<String> teacherEmails, List<Teacher> teachers) {

@@ -1,25 +1,42 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useFonts } from 'expo-font';
+import * as SplashScreen from 'expo-splash-screen';
 import 'react-native-reanimated';
+import { PaperProvider } from 'react-native-paper';
+import { storage, STORAGE_KEYS } from '@alum-net/storage';
+import { THEME } from '@alum-net/ui';
+import { useMMKVString } from 'react-native-mmkv';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
+export { ErrorBoundary } from 'expo-router';
 
-import { useColorScheme } from '@/components/useColorScheme';
-
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from 'expo-router';
-
-export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: '(tabs)',
-};
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
+const queryClient = new QueryClient();
+
+const InitialLayout = () => {
+  const [refreshToken] = useMMKVString(STORAGE_KEYS.REFRESH_TOKEN, storage);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <KeyboardProvider>
+        <PaperProvider theme={THEME}>
+          <Stack>
+            <Stack.Protected guard={!refreshToken}>
+              <Stack.Screen name="index" options={{ headerShown: false }} />
+            </Stack.Protected>
+            <Stack.Protected guard={!!refreshToken}>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            </Stack.Protected>
+            <Stack.Screen name="+not-found" />
+            <Stack.Screen name="auth" options={{ headerShown: false }} />
+          </Stack>
+        </PaperProvider>
+      </KeyboardProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
@@ -46,14 +63,5 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  const colorScheme = useColorScheme();
-
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-      </Stack>
-    </ThemeProvider>
-  );
+  return <InitialLayout />;
 }

@@ -44,5 +44,12 @@ public class CourseController {
     }
 
 
+    @DeleteMapping("/{courseId}")
+    @PreAuthorize("hasRole('admin')")
+    public ResponseEntity<Void> deleteCourse(@PathVariable int courseId) {
+        courseService.deleteCourse(courseId);
+        return ResponseEntity.noContent().build();
+    }
+
 }
 

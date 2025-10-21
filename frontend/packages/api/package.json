@@ -1,0 +1,16 @@
+{
+  "name": "@alum-net/api",
+  "version": "1.0.0",
+  "main": "./src/index.ts",
+  "dependencies": {
+    "axios": "^1.12.2",
+    "expo-device": "~7.1.4",
+    "@alum-net/storage": "*",
+    "@alum-net/auth": "*"
+  },
+  "peerDependencies": {
+    "react": "19.0.0",
+    "react-native": "0.79.6",
+    "expo": "53.0.22"
+  }
+}
