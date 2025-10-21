@@ -132,7 +132,7 @@ public class CourseService {
         }
     }
 
-    private void validateGrade(Double approvalGrade) {
+    private static void validateGrade(Double approvalGrade) {
         if (approvalGrade == null || approvalGrade < 0.0 || approvalGrade > 1.0) {
             throw new InvalidAttributeException("La nota mínima debe estar entre 0.0 y 1.0");
         }

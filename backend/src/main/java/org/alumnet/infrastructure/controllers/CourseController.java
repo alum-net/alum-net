@@ -54,5 +54,16 @@ public class CourseController {
                         .success(null, String.format("Se desmatriculó al usuario %s del curso id %s", userEmail, courseId)));
     }
 
+    @DeleteMapping("/{courseId}/participations/{userEmail}")
+    @PreAuthorize("hasRole('teacher')")
+    public ResponseEntity<ResultResponse<Void>> removeMemberFromCourse(@PathVariable Integer courseId, @PathVariable String userEmail) {
+        courseService.removeMemberFromCourse(courseId, userEmail);
+        ResultResponse<Void> response = ResultResponse.<Void>builder()
+                .success(true)
+                .message("Participation deleted")
+                .build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
+    }
+
 }
 
