@@ -2,17 +2,19 @@ package org.alumnet.application.services;
 
 import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.CourseCreationRequestDTO;
+import org.alumnet.application.dtos.UserFilterDTO;
 import org.alumnet.application.enums.UserRole;
-import org.alumnet.domain.*;
+import org.alumnet.application.specifications.UserSpecification;
+import org.alumnet.domain.Course;
+import org.alumnet.domain.CourseParticipation;
+import org.alumnet.domain.CourseParticipationId;
 import org.alumnet.domain.repositories.CourseParticipationRepository;
 import org.alumnet.domain.repositories.CourseRepository;
 import org.alumnet.domain.repositories.ParticipationRepository;
 import org.alumnet.domain.repositories.UserRepository;
-import org.alumnet.infrastructure.exceptions.AlreadyEnrolledStudentException;
-import org.alumnet.infrastructure.exceptions.CourseNotFoundException;
-import org.alumnet.infrastructure.exceptions.ActiveCourseException;
-import org.alumnet.infrastructure.exceptions.InvalidAttributeException;
-import org.alumnet.infrastructure.exceptions.UserNotFoundException;
+import org.alumnet.domain.users.Student;
+import org.alumnet.domain.users.Teacher;
+import org.alumnet.infrastructure.exceptions.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,8 +69,12 @@ public class CourseService {
 
      public void addMemberToCourse(int courseId, String studentEmail) {
 
-        Student student = userRepository.findStudentByEmail(studentEmail)
+        Student student = userRepository.findOne(UserSpecification.byFilters(UserFilterDTO.builder()
+                        .email(studentEmail)
+                        .role(UserRole.STUDENT).build()))
+                .map(user -> (Student)user)
                 .orElseThrow(UserNotFoundException::new);
+
 
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(CourseNotFoundException::new);
@@ -88,7 +94,7 @@ public class CourseService {
 
         courseParticipationRepository.save(participation);
     }
-  
+
     @Transactional
     public void deleteCourse(int courseId) {
         boolean courseActive = courseRepository.isCourseActive(courseId);
@@ -118,4 +124,14 @@ public class CourseService {
             throw new InvalidAttributeException("La nota mínima debe estar entre 0.0 y 1.0");
         }
     }
+
+    public Course findById(int courseId) {
+        return courseRepository.findById(courseId)
+                .orElseThrow(() -> new InvalidAttributeException("Curso con id " + courseId + " no encontrado"));
+    }
+
+    public void updateCourse(Course course) {
+        courseRepository.save(course);
+    }
+
 }

@@ -3,14 +3,16 @@ package org.alumnet.application.enums;
 import lombok.Getter;
 
 @Getter
-public enum UserRole {
-    STUDENT("student"),
-    TEACHER("teacher"),
-    ADMIN("admin");
+public enum ResourceType {
+    LIBRARY("library"),
+    SECTION("section");
 
     private final String value;
 
-    UserRole(String value) {
+    ResourceType(String value) {
         this.value = value;
     }
+
 }
+
+

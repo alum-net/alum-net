@@ -1,4 +1,4 @@
-package org.alumnet.domain;
+package org.alumnet.domain.users;
 
 
 import jakarta.persistence.*;

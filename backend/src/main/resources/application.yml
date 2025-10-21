@@ -2,9 +2,9 @@ spring:
   application:
     name: alum-net
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5001/alum-net}
-    username: ${SPRING_DATASOURCE_USERNAME:postgres}
-    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   security:
@@ -26,7 +26,7 @@ jwt:
     principleAttribute: preferred_username
 
 keycloak:
-  name: alum-net    
+  name: alum-net
   client-id: ${KEYCLOAK_CLIENT_ID:alumnet}
   url: ${KEYCLOAK_URL:http://localhost:8000}
   realm: ${KEYCLOAK_REALM:alumnet-realm}
@@ -34,8 +34,16 @@ keycloak:
   password: ${KEYCLOAK_PASSWORD:develop}
 
 logging:
-  level:
-    org.springframework.security: DEBUG
-    org.springframework.security.oauth2: TRACE
+  config: classpath:logback-spring.xml
 server:
   port: ${SERVER_PORT:8200}
+
+aws:
+  s3:
+    bucket-name: ${AWS_BUCKET_NAME}
+    region: ${AWS_DEFAULT_REGION}
+    base-url: https://${aws.s3.bucket-name}.s3.${aws.s3.region}.amazonaws.com
+
+
+
+
