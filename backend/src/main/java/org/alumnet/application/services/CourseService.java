@@ -2,13 +2,17 @@ package org.alumnet.application.services;
 
 import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.CourseCreationRequestDTO;
-import org.alumnet.domain.Course;
-import org.alumnet.domain.Teacher;
+import org.alumnet.application.enums.UserRole;
+import org.alumnet.domain.*;
+import org.alumnet.domain.repositories.CourseParticipationRepository;
 import org.alumnet.domain.repositories.CourseRepository;
 import org.alumnet.domain.repositories.ParticipationRepository;
 import org.alumnet.domain.repositories.UserRepository;
+import org.alumnet.infrastructure.exceptions.AlreadyEnrolledStudentException;
+import org.alumnet.infrastructure.exceptions.CourseNotFoundException;
 import org.alumnet.infrastructure.exceptions.ActiveCourseException;
 import org.alumnet.infrastructure.exceptions.InvalidAttributeException;
+import org.alumnet.infrastructure.exceptions.UserNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +28,7 @@ public class CourseService {
 
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
+    private final CourseParticipationRepository courseParticipationRepository;
     private final ParticipationRepository participationRepository;
 
     public void create(CourseCreationRequestDTO courseCreationRequestDTO) {
@@ -60,6 +65,30 @@ public class CourseService {
         courseRepository.save(course);
     }
 
+     public void addMemberToCourse(int courseId, String studentEmail) {
+
+        Student student = userRepository.findStudentByEmail(studentEmail)
+                .orElseThrow(UserNotFoundException::new);
+
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(CourseNotFoundException::new);
+
+        CourseParticipationId id = new CourseParticipationId(studentEmail, courseId);
+
+        if (courseParticipationRepository.existsById(id)) {
+            throw new AlreadyEnrolledStudentException();
+        }
+
+        CourseParticipation participation = CourseParticipation.builder()
+                .id(id)
+                .student(student)
+                .course(course)
+                .grade(null)
+                .build();
+
+        courseParticipationRepository.save(participation);
+    }
+  
     @Transactional
     public void deleteCourse(int courseId) {
         boolean courseActive = courseRepository.isCourseActive(courseId);
