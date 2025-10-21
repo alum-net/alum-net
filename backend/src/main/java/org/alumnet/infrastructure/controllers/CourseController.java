@@ -3,6 +3,7 @@ package org.alumnet.infrastructure.controllers;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.CourseCreationRequestDTO;
+import org.alumnet.application.dtos.EnrollmentRequestDTO;
 import org.alumnet.application.dtos.responses.ResultResponse;
 import org.alumnet.application.services.CourseService;
 import org.springframework.http.HttpStatus;
@@ -23,10 +24,25 @@ public class CourseController {
         courseService.create(courseDTO);
         ResultResponse<Void> resultResponse = ResultResponse.<Void>builder()
                 .success(true)
-                .message("Curso creado correctamente").build();
+                .message("Curso creado correctamente")
+                .build();
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(resultResponse);
     }
+
+    @PostMapping("/{courseId}/participations")
+    @PreAuthorize("hasRole('teacher')")
+    public ResponseEntity<ResultResponse<Void>> addMember(
+            @PathVariable int courseId,
+            @Valid @RequestBody EnrollmentRequestDTO enrollmentRequest) {
+        courseService.addMemberToCourse(courseId, enrollmentRequest.getStudentEmail());
+        ResultResponse<Void> response = ResultResponse.<Void>builder()
+                .success(true)
+                .message("Estudiante matriculado correctamente")
+                .build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
 
     @DeleteMapping("/{courseId}")
     @PreAuthorize("hasRole('admin')")
@@ -36,3 +52,4 @@ public class CourseController {
     }
 
 }
+

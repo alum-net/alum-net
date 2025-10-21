@@ -15,6 +15,7 @@ import java.util.List;
 public class Section {
     @EmbeddedId
     private SectionId id;
+    @Column(length = 500)
     private String description;
     @ManyToOne
     @MapsId("courseId")

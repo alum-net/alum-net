@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
 @Data
 @Builder
@@ -13,6 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SectionCreationRequestDTO {
     @NotBlank(message = "El título es obligatorio")
-    @NotNull(message = "El título no puede ser nulo")
     private String title;
+    @Length(max = 500, message = "La descripción no puede superar los 500 caracteres")
+    private String description;
 }

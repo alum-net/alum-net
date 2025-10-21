@@ -1,9 +1,15 @@
 package org.alumnet.domain;
 
 import jakarta.persistence.*;
+import lombok.*;
 import org.alumnet.domain.users.Student;
 
 @Entity
+@Setter
+@Getter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class CourseParticipation {
 
     @EmbeddedId

@@ -32,4 +32,5 @@ gradlew.bat
 build/
 target/
 .vscode
+*.env
 **/.env

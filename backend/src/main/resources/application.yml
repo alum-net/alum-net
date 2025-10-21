@@ -11,7 +11,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}
+          jwk-set-uri: ${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/certs
+          valid-issuers: http://localhost:8000/realms/${KEYCLOAK_REALM},${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}
 
   jpa:
     hibernate:
@@ -25,12 +26,24 @@ jwt:
     principleAttribute: preferred_username
 
 keycloak:
-  name: alum-net    
-  client-id: ${KEYCLOAK_CLIENT_ID}
-  url: ${KEYCLOAK_URL}
-  realm: ${KEYCLOAK_REALM}
-  username: ${KEYCLOAK_USERNAME}
-  password: ${KEYCLOAK_PASSWORD}
+  name: alum-net
+  client-id: ${KEYCLOAK_CLIENT_ID:alumnet}
+  url: ${KEYCLOAK_URL:http://localhost:8000}
+  realm: ${KEYCLOAK_REALM:alumnet-realm}
+  username: ${KEYCLOAK_USERNAME:develop@alumnet.com}
+  password: ${KEYCLOAK_PASSWORD:develop}
 
+logging:
+  config: classpath:logback-spring.xml
 server:
-  port: ${SERVER_PORT}
+  port: ${SERVER_PORT:8200}
+
+aws:
+  s3:
+    bucket-name: ${AWS_BUCKET_NAME}
+    region: ${AWS_DEFAULT_REGION}
+    base-url: https://${aws.s3.bucket-name}.s3.${aws.s3.region}.amazonaws.com
+
+
+
+
