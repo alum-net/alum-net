@@ -3,6 +3,7 @@ package org.alumnet.infrastructure.controllers;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.CourseCreationRequestDTO;
+import org.alumnet.application.dtos.EnrollmentRequestDTO;
 import org.alumnet.application.dtos.responses.ResultResponse;
 import org.alumnet.application.services.CourseService;
 import org.springframework.http.HttpStatus;
@@ -19,20 +20,50 @@ public class CourseController {
 
     @PostMapping
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<ResultResponse<Void>> create(@Valid @RequestBody CourseCreationRequestDTO courseDTO) {
+    public ResponseEntity<ResultResponse<Object>> create(@Valid @RequestBody CourseCreationRequestDTO courseDTO) {
         courseService.create(courseDTO);
-        ResultResponse<Void> resultResponse = ResultResponse.<Void>builder()
-                .success(true)
-                .message("Curso creado correctamente").build();
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(resultResponse);
+                .body(ResultResponse.success(null, "Curso creado correctamente"));
     }
+
+    @PostMapping("/{courseId}/participations")
+    @PreAuthorize("hasRole('teacher')")
+    public ResponseEntity<ResultResponse<Object>> addMember(
+            @PathVariable int courseId,
+            @Valid @RequestBody EnrollmentRequestDTO enrollmentRequest) {
+        courseService.addMemberToCourse(courseId, enrollmentRequest.getStudentEmail());
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ResultResponse.success(null, "Estudiante matriculado correctamente"));
+    }
+
 
     @DeleteMapping("/{courseId}")
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<Void> deleteCourse(@PathVariable int courseId) {
+    public ResponseEntity<ResultResponse<Object>> deleteCourse(@PathVariable int courseId) {
         courseService.deleteCourse(courseId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .body(ResultResponse.success(null, "Curso eliminado correctamente"));
+    }
+
+    @DeleteMapping("/{courseId}/participations/{userEmail}")
+    @PreAuthorize("hasRole('teacher')")
+    public ResponseEntity<ResultResponse<Object>> removeMemberFromCourse(@PathVariable Integer courseId, @PathVariable String userEmail) {
+        courseService.removeMemberFromCourse(courseId, userEmail);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .body(ResultResponse
+                        .success(null, String.format("Se desmatriculó al usuario %s del curso id %s", userEmail, courseId)));
+    }
+
+    @DeleteMapping("/{courseId}/participations/{userEmail}")
+    @PreAuthorize("hasRole('teacher')")
+    public ResponseEntity<ResultResponse<Void>> removeMemberFromCourse(@PathVariable Integer courseId, @PathVariable String userEmail) {
+        courseService.removeMemberFromCourse(courseId, userEmail);
+        ResultResponse<Void> response = ResultResponse.<Void>builder()
+                .success(true)
+                .message("Participation deleted")
+                .build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
     }
 
 }
+

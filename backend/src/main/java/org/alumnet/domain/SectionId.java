@@ -9,12 +9,11 @@ import java.io.Serializable;
 @Embeddable
 @Setter
 @Getter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CourseParticipationId implements Serializable {
-    @Column(name = "student_email")
-    private String studentEmail;
+@EqualsAndHashCode
+public class SectionId implements Serializable {
+    private String title;
 
     @Column(name = "course_id")
     private Integer courseId;

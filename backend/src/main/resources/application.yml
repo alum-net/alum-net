@@ -36,8 +36,16 @@ keycloak:
   password: ${KEYCLOAK_PASSWORD:develop}
 
 logging:
-  level:
-    org.springframework.security: DEBUG
-    org.springframework.security.oauth2: TRACE
+  config: classpath:logback-spring.xml
 server:
   port: ${SERVER_PORT:8200}
+
+aws:
+  s3:
+    bucket-name: ${AWS_BUCKET_NAME}
+    region: ${AWS_DEFAULT_REGION}
+    base-url: https://${aws.s3.bucket-name}.s3.${aws.s3.region}.amazonaws.com
+
+
+
+

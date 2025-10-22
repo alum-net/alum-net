@@ -2,7 +2,8 @@ package org.alumnet.domain.repositories;
 
 import org.alumnet.domain.CourseParticipation;
 import org.alumnet.domain.CourseParticipationId;
-import org.springframework.data.jpa.repository.*;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -14,4 +15,7 @@ public interface ParticipationRepository extends JpaRepository<CourseParticipati
         where courseParticipation.course.id = :courseId
     """)
     boolean hasEnrolledStudents(@Param("courseId") int courseId);
+
+    CourseParticipation findByStudentEmailAndCourseId(String email, Integer courseId);
+
 }

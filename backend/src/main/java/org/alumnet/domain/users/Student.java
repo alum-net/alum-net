@@ -1,9 +1,10 @@
-package org.alumnet.domain;
+package org.alumnet.domain.users;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
+import org.alumnet.domain.CourseParticipation;
 
 import java.util.List;
 

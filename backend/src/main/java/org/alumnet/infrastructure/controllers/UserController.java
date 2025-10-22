@@ -28,41 +28,27 @@ public class UserController {
 
     @PostMapping(path = "/create-user", produces = "application/json")
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<ResultResponse<Void>> createUser(@Valid @RequestBody UserCreationRequestDTO userCreationRequestDTO) {
-        ResultResponse<Void> response;
-        try {
-            response = userService.createUser(userCreationRequestDTO);
-            return ResponseEntity.ok(response);
-        } catch (ExistingUserException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(ResultResponse.<Void>builder().message(e.getMessage()).build());
-        }
+    public ResponseEntity<ResultResponse<Object>> createUser(@Valid @RequestBody UserCreationRequestDTO userCreationRequestDTO) {
+        userService.createUser(userCreationRequestDTO);
+        return ResponseEntity.ok(ResultResponse.success(null, "Usuario creado exitosamente"));
     }
 
     @GetMapping(path = "/", produces = "application/json")
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<?> getUsers(
+    public ResponseEntity<PageableResultResponse<UserDTO>> getUsers(
             @PageableDefault(page = 0, size = 15) Pageable page,
             UserFilterDTO filter) {
-        try {
-            Page<UserDTO> userPage = userService.getUsers(filter, page);
+        Page<UserDTO> userPage = userService.getUsers(filter, page);
 
-            PageableResultResponse<UserDTO> response = PageableResultResponse.fromPage(
-                    userPage,
-                    userPage.getContent(),
-                    userPage.getTotalElements() > 0
-                            ? "Usuarios obtenidos exitosamente"
-                            : "No se encontraron usuarios que coincidan con los filtros"
+        PageableResultResponse<UserDTO> response = PageableResultResponse.fromPage(
+                userPage,
+                userPage.getContent(),
+                userPage.getTotalElements() > 0
+                        ? "Usuarios obtenidos exitosamente"
+                        : "No se encontraron usuarios que coincidan con los filtros"
             );
 
             return ResponseEntity.ok(response);
 
-        } catch (Exception e) {
-            ResultResponse<Void> errorResponse = ResultResponse.<Void>builder()
-                    .success(false)
-                    .message("Error al obtener usuarios: " + e.getMessage())
-                    .build();
-
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-        }
     }
 }
