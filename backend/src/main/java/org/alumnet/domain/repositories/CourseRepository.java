@@ -1,12 +1,15 @@
 package org.alumnet.domain.repositories;
 
 import org.alumnet.domain.Course;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CourseRepository extends JpaRepository<Course, Integer> {
+public interface CourseRepository extends JpaRepository<Course, Integer>, JpaSpecificationExecutor<Course> {
 
     @Query("""
       select count(c) from Course c
@@ -23,4 +26,10 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
     @Modifying
     @Query("update Course course set course.enabled = false where course.id = :courseId")
     void deactivateCourse(@Param("courseId") int courseId);
+
+    @EntityGraph(attributePaths = {"teachers"})
+    Page<Course> findAll(Pageable pageable);
+
+    @EntityGraph(attributePaths = {"teachers"})
+    Page<Course> findAll(Specification<Course> spec, Pageable pageable);
 }
