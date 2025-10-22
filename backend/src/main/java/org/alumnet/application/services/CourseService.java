@@ -2,13 +2,16 @@ package org.alumnet.application.services;
 
 import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.CourseCreationRequestDTO;
+import org.alumnet.application.dtos.CourseDTO;
+import org.alumnet.application.dtos.CourseFilterDTO;
 import org.alumnet.application.dtos.UserFilterDTO;
 import org.alumnet.application.enums.UserRole;
+import org.alumnet.application.mapper.CourseMapper;
+import org.alumnet.application.specifications.CourseSpecification;
 import org.alumnet.application.specifications.UserSpecification;
 import org.alumnet.domain.Course;
 import org.alumnet.domain.CourseParticipation;
 import org.alumnet.domain.CourseParticipationId;
-import org.alumnet.domain.*;
 import org.alumnet.domain.repositories.CourseParticipationRepository;
 import org.alumnet.domain.repositories.CourseRepository;
 import org.alumnet.domain.repositories.ParticipationRepository;
@@ -16,7 +19,10 @@ import org.alumnet.domain.repositories.UserRepository;
 import org.alumnet.domain.users.Student;
 import org.alumnet.domain.users.Teacher;
 import org.alumnet.infrastructure.exceptions.*;
-import org.alumnet.infrastructure.exceptions.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +40,9 @@ public class CourseService {
     private final UserRepository userRepository;
     private final CourseParticipationRepository courseParticipationRepository;
     private final ParticipationRepository participationRepository;
+
+    @Autowired
+    private CourseMapper courseMapper;
 
     public void create(CourseCreationRequestDTO courseCreationRequestDTO) {
 
@@ -147,4 +156,22 @@ public class CourseService {
         courseRepository.save(course);
     }
 
+    public Page<CourseDTO> getCourses(CourseFilterDTO filter, Pageable page) {
+        boolean hasFilter = filter != null && (filter.getName() != null ||
+                filter.getYear() != null ||
+                filter.getTeacherEmail() != null ||
+                filter.getShiftType() != null||
+                filter.getUserEmail() != null);
+
+        Page<Course> coursePage;
+
+        if (!hasFilter) {
+            coursePage = courseRepository.findAll(page);
+        } else {
+            Specification<Course> courseSpec = CourseSpecification.byFilters(filter);
+            coursePage = courseRepository.findAll(courseSpec, page);
+        }
+
+        return coursePage.map(courseMapper::courseToCourseDTO);
+    }
 }
