@@ -15,13 +15,13 @@ spring:
           valid-issuers: http://localhost:8000/realms/${KEYCLOAK_REALM},${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}
 
   jpa:
+    show-sql: true
+    format-sql: true
     hibernate:
       ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        show-sql: true
-        format-sql: true
 
 jwt:
   auth:

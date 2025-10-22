@@ -76,5 +76,22 @@ public class CourseController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping(path = "/{courseId}/members", produces = "application/json")
+    @PreAuthorize("hasRole('admin')")
+    public ResponseEntity<PageableResultResponse<UserDTO>> getCourseMembers(
+            @PageableDefault(page = 0, size = 15) Pageable page,
+            @PathVariable int courseId){
+
+        Page<UserDTO> userPage = courseService.getCourseMembers(courseId, page);
+
+        PageableResultResponse<UserDTO> response = PageableResultResponse.fromPage(
+                userPage,
+                userPage.getContent(),
+                "Miembros obtenidos exitosamente"
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
 }
 

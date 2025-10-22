@@ -2,6 +2,7 @@ package org.alumnet.application.specifications;
 
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Expression;
 import org.alumnet.application.dtos.CourseFilterDTO;
 import org.alumnet.application.enums.UserRole;
 import org.alumnet.domain.Course;
@@ -24,14 +25,14 @@ public class CourseSpecification {
             }
 
             if (filter.getYear() != null) {
-                jakarta.persistence.criteria.Expression<Double> datePartResult = criteriaBuilder.function(
+                Expression<Double> datePartResult = criteriaBuilder.function(
                         "DATE_PART",
                         Double.class,
                         criteriaBuilder.literal("year"),
                         root.get("startDate")
                 );
 
-                jakarta.persistence.criteria.Expression<Integer> yearAsInteger = datePartResult.as(Integer.class);
+                Expression<Integer> yearAsInteger = datePartResult.as(Integer.class);
 
                 predicates.add(criteriaBuilder.equal(
                         yearAsInteger,
