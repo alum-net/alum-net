@@ -1,27 +1,34 @@
 import { Platform, StyleSheet, Text, View } from 'react-native';
 import { Button, Card } from 'react-native-paper';
-import { Course } from '../types';
+import { CourseDisplay } from '../types';
 import { useUserInfo } from '@alum-net/users';
+import { mapShiftToString } from '../helpers';
+import DeleteCourseButton from './delete-course';
 
-export const CourseCard = ({ course }: { course: Course }) => {
+export const CourseCard = ({ course }: { course: CourseDisplay }) => {
   const { userInfo } = useUserInfo();
 
   return (
     <Card style={styles.card}>
       <Card.Content>
         <View style={styles.cardHeader}>
-          <Text style={styles.courseTitle}>{course.title}</Text>
+          <Text style={styles.courseTitle}>{course.name}</Text>
         </View>
-        <Text style={styles.instructor}>{course.instructor}</Text>
-        {userInfo?.role === 'admin' && (
-          <Button
-            mode="text"
-            style={styles.button}
-            labelStyle={styles.buttonLabel}
-          >
-            Eliminar
-          </Button>
-        )}
+        {course.teachersNames.map(name => (
+          <Text key={course.id + name} style={styles.instructor}>
+            {name}
+          </Text>
+        ))}
+        <Text style={styles.instructor}>
+          Turno: {mapShiftToString(course.shift)}
+        </Text>
+        <Text style={styles.instructor}>
+          Fecha de inicio: {course.startDate.toDateString()}
+        </Text>
+        <Text style={styles.instructor}>
+          Fecha de fin: {course.endDate.toDateString()}
+        </Text>
+        <DeleteCourseButton courseId={course.id} />
       </Card.Content>
     </Card>
   );
@@ -45,13 +52,5 @@ const styles = StyleSheet.create({
     color: '#999999',
     fontSize: 12,
     marginBottom: 12,
-  },
-  button: {
-    marginTop: 8,
-    alignItems: 'flex-start',
-  },
-  buttonLabel: {
-    fontSize: 12,
-    color: '#9e0000ff',
   },
 });

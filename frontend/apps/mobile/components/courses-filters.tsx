@@ -1,26 +1,21 @@
+import { FiltersDirectory, useCoursesFilters } from '@alum-net/courses';
 import { FilterBar } from '@alum-net/courses/src/components/filter-bar';
-import { FiltersDirectory, FilterBarRef } from '@alum-net/courses/src/types';
-import { memo, useCallback, useRef, useState } from 'react';
+import { THEME } from '@alum-net/ui';
+import { memo, useState } from 'react';
 import { Modal, StyleSheet, Text, View } from 'react-native';
 import { Button, Divider, IconButton, Portal } from 'react-native-paper';
 
-function CourseFilters({
-  initialFilters,
-  onApplyFilters,
-}: {
-  initialFilters: FiltersDirectory;
-  onApplyFilters: (filters: FiltersDirectory) => void;
-}) {
+function CourseFilters({ currentPage }: { currentPage: number }) {
   const [displayFilters, setDisplayFilters] = useState(false);
-  const filterBarRef = useRef<FilterBarRef>(null);
-
-  const applyFilters = useCallback(
-    (filters: FiltersDirectory) => {
-      setDisplayFilters(false);
-      onApplyFilters(filters);
-    },
-    [onApplyFilters, setDisplayFilters],
+  const { setAppliedFilters, appliedFilters } = useCoursesFilters(
+    currentPage,
+    true,
   );
+
+  const dismissFilters = (newFilters: FiltersDirectory) => {
+    setAppliedFilters(newFilters);
+    setDisplayFilters(false);
+  };
 
   return (
     <>
@@ -34,7 +29,7 @@ function CourseFilters({
       <Modal
         onRequestClose={() => setDisplayFilters(false)}
         visible={displayFilters}
-        backdropColor="#373737b5"
+        backdropColor={THEME.colors.backdrop}
         animationType="fade"
       >
         <Portal.Host>
@@ -50,9 +45,9 @@ function CourseFilters({
             </View>
             <Divider style={styles.modalDivider} />
             <FilterBar
-              ref={filterBarRef}
-              initialFilters={initialFilters}
-              onApplyFilters={applyFilters}
+              currentPage={currentPage}
+              onApplyFilters={dismissFilters}
+              initialFilters={appliedFilters}
             />
           </View>
         </Portal.Host>

@@ -2,7 +2,8 @@ package org.alumnet.domain.repositories;
 
 import org.alumnet.domain.CourseParticipation;
 import org.alumnet.domain.CourseParticipationId;
-import org.springframework.data.jpa.repository.*;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -22,4 +23,7 @@ public interface ParticipationRepository extends JpaRepository<CourseParticipati
 
     @Query("SELECT COUNT(cp) FROM CourseParticipation cp WHERE cp.id.courseId = :courseId")
     Integer countStudentsByCourseId(@Param("courseId") Integer courseId);
+
+    CourseParticipation findByStudentEmailAndCourseId(String email, Integer courseId);
+
 }

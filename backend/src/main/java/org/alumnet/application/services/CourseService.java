@@ -1,10 +1,11 @@
 package org.alumnet.application.services;
 
 import lombok.RequiredArgsConstructor;
-import org.alumnet.application.dtos.CourseContentDTO;
-import org.alumnet.application.dtos.CourseCreationRequestDTO;
-import org.alumnet.application.dtos.UserFilterDTO;
+import org.alumnet.application.dtos.*;
 import org.alumnet.application.enums.UserRole;
+import org.alumnet.application.mapper.CourseMapper;
+import org.alumnet.application.mapper.UserMapper;
+import org.alumnet.application.specifications.CourseSpecification;
 import org.alumnet.application.specifications.UserSpecification;
 import org.alumnet.domain.Course;
 import org.alumnet.domain.CourseParticipation;
@@ -19,9 +20,10 @@ import org.alumnet.domain.users.Teacher;
 import org.alumnet.domain.users.User;
 import org.alumnet.infrastructure.exceptions.*;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -42,6 +44,10 @@ public class CourseService {
     private final S3FileStorageService s3FileStorageService;
     @Value("${aws.s3.duration-url-hours}")
     private long urlDuration;
+
+    private final CourseMapper courseMapper;
+
+    private final UserMapper userMapper;
 
     public void create(CourseCreationRequestDTO courseCreationRequestDTO) {
 
@@ -77,7 +83,7 @@ public class CourseService {
         courseRepository.save(course);
     }
 
-     public void addMemberToCourse(int courseId, String studentEmail) {
+    public void addMemberToCourse(int courseId, String studentEmail) {
 
         Student student = userRepository.findOne(UserSpecification.byFilters(UserFilterDTO.builder()
                         .email(studentEmail)
@@ -105,19 +111,33 @@ public class CourseService {
         courseParticipationRepository.save(participation);
     }
 
-    @Transactional
     public void deleteCourse(int courseId) {
-        boolean courseActive = courseRepository.isCourseActive(courseId);
+        Course course = courseRepository
+                .findById(courseId)
+                .orElseThrow(CourseNotFoundException::new);
+
         boolean hasEnrolledStudents = participationRepository.hasEnrolledStudents(courseId);
 
-        if (courseActive && hasEnrolledStudents) {
+        if (course.isEnabled() && hasEnrolledStudents) {
             throw new ActiveCourseException("El curso está activo y tiene estudiantes matriculados.");
         }
 
-        courseRepository.deactivateCourse(courseId);
+        course.setEnabled(false);
+        courseRepository.save(course);
     }
 
-    private static void validateTeachers(List<String> teacherEmails, List<Teacher> teachers) {
+    public void removeMemberFromCourse(Integer courseId, String userEmail) {
+        CourseParticipation userParticipation = participationRepository
+                .findById(CourseParticipationId.builder()
+                        .studentEmail(userEmail)
+                        .courseId(courseId)
+                        .build())
+                .orElseThrow(EnrollmentNotFoundException::new);
+
+        participationRepository.delete(userParticipation);
+    }
+
+    private void validateTeachers(List<String> teacherEmails, List<Teacher> teachers) {
         if (teachers.size() != teacherEmails.size()) {
             throw new InvalidAttributeException("Uno o más docentes no existen o no tienen rol Teacher");
         }
@@ -140,6 +160,29 @@ public class CourseService {
                 .orElseThrow(() -> new InvalidAttributeException("Curso con id " + courseId + " no encontrado"));
     }
 
+    public Page<CourseDTO> getCourses(CourseFilterDTO filter, Pageable page) {
+        boolean hasFilter = filter != null && (filter.getName() != null ||
+                filter.getYear() != null ||
+                filter.getTeacherEmail() != null ||
+                filter.getShiftType() != null||
+                filter.getUserEmail() != null);
+
+        Page<Course> coursePage;
+
+        if (!hasFilter) {
+            coursePage = courseRepository.findAll(page);
+        } else {
+            Specification<Course> courseSpec = CourseSpecification.byFilters(filter);
+            coursePage = courseRepository.findAll(courseSpec, page);
+        }
+
+        return coursePage.map(courseMapper::courseToCourseDTO);
+    }
+
+    public Page<UserDTO> getCourseMembers(int courseId, Pageable page) {
+         Page<User> members = userRepository.findAll(UserSpecification.byCourse(courseId), page);
+         return members.map(userMapper::userToUserDTO);
+    }
 
     public CourseContentDTO getCourseContent(Pageable page, int courseId, String userId) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);

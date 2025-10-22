@@ -6,7 +6,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import 'react-native-reanimated';
 import { PaperProvider } from 'react-native-paper';
 import { storage, STORAGE_KEYS } from '@alum-net/storage';
-import { THEME } from '@alum-net/ui';
+import { THEME, ToastProvider } from '@alum-net/ui';
 import { useMMKVString } from 'react-native-mmkv';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
@@ -21,18 +21,20 @@ const InitialLayout = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <KeyboardProvider>
-        <PaperProvider theme={THEME}>
-          <Stack>
-            <Stack.Protected guard={!refreshToken}>
-              <Stack.Screen name="index" options={{ headerShown: false }} />
-            </Stack.Protected>
-            <Stack.Protected guard={!!refreshToken}>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            </Stack.Protected>
-            <Stack.Screen name="+not-found" />
-            <Stack.Screen name="auth" options={{ headerShown: false }} />
-          </Stack>
-        </PaperProvider>
+        <ToastProvider>
+          <PaperProvider theme={THEME}>
+            <Stack>
+              <Stack.Protected guard={!refreshToken}>
+                <Stack.Screen name="index" options={{ headerShown: false }} />
+              </Stack.Protected>
+              <Stack.Protected guard={!!refreshToken}>
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              </Stack.Protected>
+              <Stack.Screen name="+not-found" />
+              <Stack.Screen name="auth" options={{ headerShown: false }} />
+            </Stack>
+          </PaperProvider>
+        </ToastProvider>
       </KeyboardProvider>
     </QueryClientProvider>
   );

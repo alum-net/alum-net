@@ -1,6 +1,8 @@
 spring:
   application:
     name: alum-net
+    cors:
+      allowed-origins: http://localhost:8081,http://localhost:8082
   datasource:
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
@@ -26,7 +28,7 @@ jwt:
     principleAttribute: preferred_username
 
 keycloak:
-  name: alum-net
+  name: alum-net    
   client-id: ${KEYCLOAK_CLIENT_ID:alumnet}
   url: ${KEYCLOAK_URL:http://localhost:8000}
   realm: ${KEYCLOAK_REALM:alumnet-realm}

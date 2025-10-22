@@ -2,10 +2,7 @@ package org.alumnet.infrastructure.controllers;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.alumnet.application.dtos.CourseContentDTO;
-import org.alumnet.application.dtos.CourseCreationRequestDTO;
-import org.alumnet.application.dtos.EnrollmentRequestDTO;
-import org.alumnet.application.dtos.UserDTO;
+import org.alumnet.application.dtos.*;
 import org.alumnet.application.dtos.responses.PageableResultResponse;
 import org.alumnet.application.dtos.responses.ResultResponse;
 import org.alumnet.application.services.CourseService;
@@ -16,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
 
 @RestController
 @RequestMapping("/api/courses")
@@ -29,7 +27,7 @@ public class CourseController {
     public ResponseEntity<ResultResponse<Object>> create(@Valid @RequestBody CourseCreationRequestDTO courseDTO) {
         courseService.create(courseDTO);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ResultResponse.success("Curso creado correctamente", null));
+                .body(ResultResponse.success(null, "Curso creado correctamente"));
     }
 
     @PostMapping("/{courseId}/participations")
@@ -39,25 +37,69 @@ public class CourseController {
             @Valid @RequestBody EnrollmentRequestDTO enrollmentRequest) {
         courseService.addMemberToCourse(courseId, enrollmentRequest.getStudentEmail());
         return ResponseEntity.status(HttpStatus.OK)
-                .body(ResultResponse.success("Estudiante matriculado correctamente", null));
+                .body(ResultResponse.success(null, "Estudiante matriculado correctamente"));
     }
 
 
     @DeleteMapping("/{courseId}")
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<Object> deleteCourse(@PathVariable int courseId) {
+    public ResponseEntity<ResultResponse<Object>> deleteCourse(@PathVariable int courseId) {
         courseService.deleteCourse(courseId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
-                .body(ResultResponse.success("Curso eliminado correctamente", null));
+                .body(ResultResponse.success(null, "Curso eliminado correctamente"));
+    }
+
+    @DeleteMapping("/{courseId}/participations/{userEmail}")
+    @PreAuthorize("hasRole('teacher')")
+    public ResponseEntity<ResultResponse<Object>> removeMemberFromCourse(@PathVariable Integer courseId, @PathVariable String userEmail) {
+        courseService.removeMemberFromCourse(courseId, userEmail);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .body(ResultResponse
+                        .success(null, String.format("Se desmatriculó al usuario %s del curso id %s", userEmail, courseId)));
+    }
+
+    @GetMapping(path = "/", produces = "application/json")
+    @PreAuthorize("hasAnyRole('teacher', 'student','admin')")
+    public ResponseEntity<PageableResultResponse<CourseDTO>> getCourses(
+            CourseFilterDTO filter,
+            @PageableDefault(page = 0, size = 15) Pageable page){
+        Page<CourseDTO> coursePage = courseService.getCourses(filter, page);
+
+        PageableResultResponse<CourseDTO> response = PageableResultResponse.fromPage(
+                coursePage,
+                coursePage.getContent(),
+                coursePage.getTotalElements() > 0
+                        ? "Cursos obtenidos exitosamente"
+                        : "No se encontraron cursos que coincidan con los filtros"
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping(path = "/{courseId}/members", produces = "application/json")
+    @PreAuthorize("hasRole('admin')")
+    public ResponseEntity<PageableResultResponse<UserDTO>> getCourseMembers(
+            @PageableDefault(page = 0, size = 15) Pageable page,
+            @PathVariable int courseId){
+
+        Page<UserDTO> userPage = courseService.getCourseMembers(courseId, page);
+
+        PageableResultResponse<UserDTO> response = PageableResultResponse.fromPage(
+                userPage,
+                userPage.getContent(),
+                "Miembros obtenidos exitosamente"
+        );
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{courseId}/content/")
     @PreAuthorize("hasAnyRole('teacher', 'student','admin')")
-    public ResponseEntity<ResultResponse<CourseContentDTO>> getCourseContent(@PageableDefault (page = 0, size = 2) Pageable page,
+    public ResponseEntity<ResultResponse<CourseContentDTO>> getCourseContent(@PageableDefault (page = 0, size = 5) Pageable page,
                                                                    @PathVariable Integer courseId,
                                                                    @RequestParam String userId) {
-        CourseContentDTO userPage = courseService.getCourseContent(page,courseId,userId);
 
+        CourseContentDTO userPage = courseService.getCourseContent(page,courseId,userId);
         return ResponseEntity.ok(ResultResponse.success(userPage,"Secciones obtenidas exitosamente"));
 
     }

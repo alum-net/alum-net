@@ -1,52 +1,28 @@
-import { useCallback, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import { View, StyleSheet, Platform, FlatList } from 'react-native';
 import { Button, Text } from 'react-native-paper';
-import { FiltersDirectory } from '../types';
-import { getCourses } from '../service';
 import { CourseCard } from '../components/course-card';
-import { buildQueryParams } from '../helpers';
 import { THEME } from '@alum-net/ui/src/constants';
+import { useCourses } from '../hooks/useCourses';
 
 export function CoursesDashboard({
   FilterComponent,
 }: {
   FilterComponent: React.MemoExoticComponent<
     React.FC<{
-      initialFilters: FiltersDirectory;
-      onApplyFilters: (filters: FiltersDirectory) => void;
+      currentPage: number;
     }>
   >;
 }) {
-  const [appliedFilters, setAppliedFilters] = useState<FiltersDirectory>({
-    courseName: '',
-    teacherName: '',
-    year: '',
-    shift: 'all',
-    myCourses: false,
-  });
   const [currentPage, setCurrentPage] = useState<number>(1);
 
-  const { data } = useQuery({
-    queryKey: ['courses', buildQueryParams(appliedFilters), currentPage],
-    queryFn: () => getCourses(appliedFilters, currentPage),
-  });
-
-  const handleApplyFilters = useCallback((filters: FiltersDirectory) => {
-    setAppliedFilters(filters);
-    setCurrentPage(1); // Reset to first page when filters change
-  }, []);
+  const { data } = useCourses({});
 
   return (
     <View style={styles.container}>
       <FlatList
         style={styles.flatList}
-        ListHeaderComponent={
-          <FilterComponent
-            initialFilters={appliedFilters}
-            onApplyFilters={handleApplyFilters}
-          />
-        }
+        ListHeaderComponent={<FilterComponent currentPage={currentPage} />}
         data={data}
         keyExtractor={item => item.id.toString()}
         renderItem={({ item }) => <CourseCard course={item} />}

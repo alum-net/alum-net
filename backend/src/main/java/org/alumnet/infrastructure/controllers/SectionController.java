@@ -27,6 +27,6 @@ public class SectionController {
                                         @RequestPart (value = "resources", required = false) List<MultipartFile> files,
                                         @PathVariable int courseId) {
         sectionService.createSection(sectionDTO, files, courseId);
-        return ResponseEntity.ok().body(ResultResponse.success("Sección creada exitosamente", null));
+        return ResponseEntity.ok().body(ResultResponse.success(null, "Sección creada exitosamente"));
     }
 }

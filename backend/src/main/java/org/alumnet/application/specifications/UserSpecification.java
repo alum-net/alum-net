@@ -1,6 +1,10 @@
 package org.alumnet.application.specifications;
 
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import org.alumnet.application.dtos.UserFilterDTO;
+import org.alumnet.domain.Course;
+import org.alumnet.domain.CourseParticipation;
 import org.alumnet.domain.users.Administrator;
 import org.alumnet.domain.users.Student;
 import org.alumnet.domain.users.Teacher;
@@ -49,6 +53,29 @@ public class UserSpecification {
             }
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+    }
+
+    public static Specification<User> byCourse(int courseId){
+        return (root, query, criteriaBuilder) -> {
+            query.distinct(true);
+
+            Join<Teacher, Course> teacherCoursesJoin = criteriaBuilder.treat(root, Teacher.class)
+                    .join("courses", JoinType.LEFT);
+
+            Predicate isTeacher = criteriaBuilder.equal(
+                    teacherCoursesJoin.get("id"),
+                    courseId
+            );
+            Join<Student, CourseParticipation> studentParticipationsJoin = criteriaBuilder.treat(root, Student.class)
+                    .join("participations" , JoinType.LEFT);
+
+            Predicate isStudent = criteriaBuilder.equal(
+                    studentParticipationsJoin.get("id").get("courseId"),
+                    courseId
+            );
+
+            return criteriaBuilder.or(isTeacher, isStudent);
         };
     }
 }

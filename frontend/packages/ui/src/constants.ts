@@ -8,5 +8,8 @@ export const THEME = {
     primary: '#193254',
     secondary: '#F5A02B',
     black: '#1a1a1a',
+    secondaryContainer: '#F5A02B',
+    error: '#B00020',
+    backdrop: '#373737b5',
   },
 };
