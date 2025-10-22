@@ -1,147 +1,171 @@
-import {
-  useMemo,
-  useState,
-  useRef,
-  useCallback,
-  forwardRef,
-  useImperativeHandle,
-} from 'react';
+import { useMemo, useState, useCallback, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
 import { SHIFTS } from '../constants';
 import { Platform, StyleSheet, Text, View } from 'react-native';
-import { Button, Checkbox, Menu, TextInput } from 'react-native-paper';
-import { FiltersDirectory, CourseShift, FilterBarRef } from '../types';
+import { Button, Checkbox, Menu } from 'react-native-paper';
+import { CourseShift, FiltersDirectory } from '../types';
 import { useUserInfo } from '@alum-net/users';
-import { THEME } from '@alum-net/ui';
+import { THEME, FormTextInput } from '@alum-net/ui';
+import { useCourses } from '../hooks/useCourses';
 
-interface FilterBarProps {
-  initialFilters: FiltersDirectory;
-  onApplyFilters: (filters: FiltersDirectory) => void;
+interface FilterFormData {
+  courseName: string;
+  teacherName: string;
+  year: string;
 }
 
-export const FilterBar = forwardRef<FilterBarRef, FilterBarProps>(
-  ({ initialFilters, onApplyFilters }, ref) => {
-    const { userInfo } = useUserInfo();
-    const [shiftMenuVisible, setShiftMenuVisible] = useState(false);
-    const currentYear = useMemo(() => new Date().getFullYear(), []);
-    const maxYear = useMemo(() => currentYear + 2, [currentYear]);
+interface FilterBarProps {
+  currentPage: number;
+  onApplyFilters?: (func: () => void) => void;
+}
 
-    const courseNameRef = useRef(initialFilters.courseName || '');
-    const teacherNameRef = useRef(initialFilters.teacherName || '');
-    const yearRef = useRef(initialFilters.year || '');
-    const [shift, setShift] = useState<CourseShift | 'all'>(
-      initialFilters.shift || 'all',
-    );
-    const [myCourses, setMyCourses] = useState(
-      initialFilters.myCourses || false,
-    );
+export const FilterBar = ({ currentPage, onApplyFilters }: FilterBarProps) => {
+  const { userInfo } = useUserInfo();
+  const [shiftMenuVisible, setShiftMenuVisible] = useState(false);
+  const maxYear = useMemo(() => new Date().getFullYear() + 2, []);
 
-    const handleYearChange = useCallback(
-      (text: string) => {
-        const numValue = parseInt(text);
-        if (text === '' || (numValue >= 0 && numValue <= maxYear)) {
-          yearRef.current = text;
+  const { control, handleSubmit } = useForm<FilterFormData>({
+    defaultValues: {
+      courseName: '',
+      teacherName: '',
+      year: '',
+    },
+    mode: 'onChange',
+  });
+
+  const [shift, setShift] = useState<CourseShift | 'all'>('all');
+  const [myCourses, setMyCourses] = useState(false);
+  const [appliedFilters, setAppliedFilters] = useState<FiltersDirectory>({});
+  const { refetch } = useCourses({ appliedFilters, currentPage });
+
+  const handleYearChange = useCallback(
+    (value: string, fieldOnChange: (...event: any[]) => void) => {
+      const numValue = parseInt(value);
+      if (value === '' || (numValue >= 0 && numValue <= maxYear)) {
+        fieldOnChange(value);
+      }
+    },
+    [maxYear],
+  );
+
+  const selectedShiftLabel = useMemo(
+    () => SHIFTS.find(s => s.value === shift)?.label || 'Todos los turnos',
+    [shift],
+  );
+
+  const changeFilters = useCallback((values: FiltersDirectory) => {
+    setAppliedFilters(values);
+  }, []);
+
+  useEffect(() => {
+    refetch();
+  }, [appliedFilters, refetch]);
+
+  return (
+    <View style={styles.filterBar}>
+      <FormTextInput
+        name="courseName"
+        control={control}
+        label="Nombre del curso"
+        mode="outlined"
+        style={styles.filterInput}
+        outlineColor="#333333"
+        activeOutlineColor={THEME.colors.secondary}
+      />
+      <FormTextInput
+        name="teacherName"
+        control={control}
+        label="Nombre del profesor"
+        mode="outlined"
+        style={styles.filterInput}
+        outlineColor="#333333"
+        activeOutlineColor={THEME.colors.secondary}
+      />
+      <FormTextInput
+        name="year"
+        control={control}
+        label="Año"
+        mode="outlined"
+        keyboardType="numeric"
+        style={styles.filterInputYear}
+        outlineColor="#333333"
+        activeOutlineColor={THEME.colors.secondary}
+        placeholder={`0-${maxYear}`}
+        customOnChange={handleYearChange}
+        rules={{
+          validate: {
+            isNumber: (value: string) => {
+              if (value === '') return true;
+              const num = parseInt(value);
+              return !isNaN(num) || 'Debe ser un número';
+            },
+            inRange: (value: string) => {
+              if (value === '') return true;
+              const num = parseInt(value);
+              return (
+                (num >= 0 && num <= maxYear) ||
+                `Debe estar entre 0 y ${maxYear}`
+              );
+            },
+          },
+        }}
+      />
+
+      <Menu
+        visible={shiftMenuVisible}
+        onDismiss={() => setShiftMenuVisible(false)}
+        anchor={
+          <Button
+            mode="outlined"
+            onPress={() => setShiftMenuVisible(true)}
+            style={styles.shiftButton}
+            labelStyle={styles.shiftButtonLabel}
+            icon="chevron-down"
+            contentStyle={styles.shiftButtonContent}
+          >
+            {selectedShiftLabel}
+          </Button>
         }
-      },
-      [maxYear],
-    );
+        contentStyle={styles.menuContent}
+      >
+        {SHIFTS.map(shiftOption => (
+          <Menu.Item
+            key={shiftOption.value}
+            onPress={() => {
+              setShift(shiftOption.value);
+              setShiftMenuVisible(false);
+            }}
+            title={shiftOption.label}
+            titleStyle={styles.menuItemTitle}
+          />
+        ))}
+      </Menu>
 
-    const selectedShiftLabel =
-      SHIFTS.find(s => s.value === shift)?.label || 'Todos los turnos';
-
-    const getFilters = useCallback(() => {
-      return {
-        courseName: courseNameRef.current,
-        teacherName: teacherNameRef.current,
-        year: yearRef.current,
-        shift: shift,
-        myCourses: myCourses,
-      };
-    }, [shift, myCourses]);
-
-    useImperativeHandle(ref, () => ({
-      getFilters,
-    }));
-
-    const applyFilters = useCallback(() => {
-      onApplyFilters(getFilters());
-    }, [onApplyFilters, getFilters]);
-
-    return (
-      <View style={styles.filterBar}>
-        <TextInput
-          label="Nombre del curso"
-          onChangeText={value => (courseNameRef.current = value)}
-          mode="outlined"
-          style={styles.filterInput}
-          outlineColor="#333333"
-          defaultValue={courseNameRef.current}
-          activeOutlineColor={THEME.colors.secondary}
-        />
-        <TextInput
-          label="Nombre del profesor"
-          onChangeText={value => (teacherNameRef.current = value)}
-          mode="outlined"
-          style={styles.filterInput}
-          outlineColor="#333333"
-          activeOutlineColor={THEME.colors.secondary}
-          defaultValue={teacherNameRef.current}
-        />
-        <TextInput
-          label="Año"
-          onChangeText={handleYearChange}
-          mode="outlined"
-          keyboardType="numeric"
-          style={styles.filterInputYear}
-          outlineColor="#333333"
-          activeOutlineColor={THEME.colors.secondary}
-          placeholder={`0-${maxYear}`}
-          defaultValue={yearRef.current}
-        />
-
-        <Menu
-          visible={shiftMenuVisible}
-          onDismiss={() => setShiftMenuVisible(false)}
-          anchor={
-            <Button
-              mode="outlined"
-              onPress={() => setShiftMenuVisible(true)}
-              style={styles.shiftButton}
-              labelStyle={styles.shiftButtonLabel}
-              icon="chevron-down"
-              contentStyle={styles.shiftButtonContent}
-            >
-              {selectedShiftLabel}
-            </Button>
-          }
-          contentStyle={styles.menuContent}
-        >
-          {SHIFTS.map(shiftOption => (
-            <Menu.Item
-              key={shiftOption.value}
-              onPress={() => setShift(shiftOption.value)}
-              title={shiftOption.label}
-              titleStyle={styles.menuItemTitle}
-            />
-          ))}
-        </Menu>
-
-        {userInfo?.role !== 'admin' && (
-          <View style={styles.checkboxContainer}>
-            <Checkbox
-              status={myCourses ? 'checked' : 'unchecked'}
-              onPress={() => setMyCourses(!myCourses)}
-              color={THEME.colors.secondary}
-            />
-            <Text style={styles.checkboxLabel}>Solo mis cursos</Text>
-          </View>
+      {userInfo?.role !== 'admin' && (
+        <View style={styles.checkboxContainer}>
+          <Checkbox
+            status={myCourses ? 'checked' : 'unchecked'}
+            onPress={() => setMyCourses(!myCourses)}
+            color={THEME.colors.secondary}
+          />
+          <Text style={styles.checkboxLabel}>Solo mis cursos</Text>
+        </View>
+      )}
+      <Button
+        mode="contained"
+        onPress={handleSubmit(data =>
+          onApplyFilters
+            ? onApplyFilters(() =>
+                changeFilters({ ...data, shift: shift, myCourses: myCourses }),
+              )
+            : changeFilters({ ...data, shift: shift, myCourses: myCourses }),
         )}
-        <Button mode="contained" onPress={applyFilters}>
-          Aplicar Filtros
-        </Button>
-      </View>
-    );
-  },
-);
+      >
+        Aplicar Filtros
+      </Button>
+    </View>
+  );
+};
 
 FilterBar.displayName = 'FilterBar';
 

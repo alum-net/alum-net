@@ -1,4 +1,4 @@
-import { CourseDisplay, ShiftOption } from './types';
+import { CourseDisplay, ShiftOption, CourseShift } from './types';
 export const courses: CourseDisplay[] = [
   {
     id: 1,
@@ -6,7 +6,7 @@ export const courses: CourseDisplay[] = [
     teachersNames: ['Dr. Sarah Davis'],
     startDate: new Date('2024-01-15'),
     endDate: new Date('2024-05-15'),
-    shift: 'MORNING',
+    shift: CourseShift.morning,
   },
   {
     id: 2,
@@ -14,7 +14,7 @@ export const courses: CourseDisplay[] = [
     teachersNames: ['Prof. Tom Chang'],
     startDate: new Date('2025-01-10'),
     endDate: new Date('2025-05-10'),
-    shift: 'AFTERNOON',
+    shift: CourseShift.afternoon,
   },
   {
     id: 3,
@@ -22,7 +22,7 @@ export const courses: CourseDisplay[] = [
     teachersNames: ['Dr. Nancy Carter'],
     startDate: new Date('2024-02-01'),
     endDate: new Date('2024-06-01'),
-    shift: 'NIGHT',
+    shift: CourseShift.night,
   },
   {
     id: 4,
@@ -30,7 +30,7 @@ export const courses: CourseDisplay[] = [
     teachersNames: ['Prof. Jane Wilson'],
     startDate: new Date('2025-01-20'),
     endDate: new Date('2025-05-20'),
-    shift: 'MORNING',
+    shift: CourseShift.morning,
   },
   {
     id: 5,
@@ -38,7 +38,7 @@ export const courses: CourseDisplay[] = [
     teachersNames: ['Dr. Mike Johnson'],
     startDate: new Date('2026-01-05'),
     endDate: new Date('2026-05-05'),
-    shift: 'AFTERNOON',
+    shift: CourseShift.afternoon,
   },
   {
     id: 6,
@@ -46,7 +46,7 @@ export const courses: CourseDisplay[] = [
     teachersNames: ['Dr. Julia White'],
     startDate: new Date('2024-03-01'),
     endDate: new Date('2024-07-01'),
-    shift: 'NIGHT',
+    shift: CourseShift.night,
   },
   {
     id: 7,
@@ -54,7 +54,7 @@ export const courses: CourseDisplay[] = [
     teachersNames: ['Prof. Virginia Woolf'],
     startDate: new Date('2025-02-15'),
     endDate: new Date('2025-06-15'),
-    shift: 'MORNING',
+    shift: CourseShift.morning,
   },
   {
     id: 8,
@@ -62,7 +62,7 @@ export const courses: CourseDisplay[] = [
     teachersNames: ['Dr. Adam Smith'],
     startDate: new Date('2024-01-25'),
     endDate: new Date('2024-05-25'),
-    shift: 'AFTERNOON',
+    shift: CourseShift.afternoon,
   },
   {
     id: 9,
@@ -70,7 +70,7 @@ export const courses: CourseDisplay[] = [
     teachersNames: ['Dr. Sigmund Freud'],
     startDate: new Date('2026-02-10'),
     endDate: new Date('2026-06-10'),
-    shift: 'NIGHT',
+    shift: CourseShift.night,
   },
   {
     id: 10,
@@ -78,7 +78,7 @@ export const courses: CourseDisplay[] = [
     teachersNames: ['Prof. Philip Kotler'],
     startDate: new Date('2025-03-01'),
     endDate: new Date('2025-07-01'),
-    shift: 'MORNING',
+    shift: CourseShift.morning,
   },
   {
     id: 11,
@@ -86,7 +86,7 @@ export const courses: CourseDisplay[] = [
     teachersNames: ['Prof. Philip Kotler'],
     startDate: new Date('2025-03-01'),
     endDate: new Date('2025-07-01'),
-    shift: 'MORNING',
+    shift: CourseShift.morning,
   },
   {
     id: 12,
@@ -94,7 +94,7 @@ export const courses: CourseDisplay[] = [
     teachersNames: ['Prof. Philip Kotler'],
     startDate: new Date('2025-03-01'),
     endDate: new Date('2025-07-01'),
-    shift: 'MORNING',
+    shift: CourseShift.morning,
   },
   {
     id: 13,
@@ -102,7 +102,7 @@ export const courses: CourseDisplay[] = [
     teachersNames: ['Prof. Philip Kotler'],
     startDate: new Date('2025-03-01'),
     endDate: new Date('2025-07-01'),
-    shift: 'MORNING',
+    shift: CourseShift.morning,
   },
   {
     id: 14,
@@ -110,13 +110,13 @@ export const courses: CourseDisplay[] = [
     teachersNames: ['Prof. Philip Kotler'],
     startDate: new Date('2025-03-01'),
     endDate: new Date('2025-07-01'),
-    shift: 'MORNING',
+    shift: CourseShift.morning,
   },
 ];
 
 export const SHIFTS: ShiftOption[] = [
   { label: 'Todos los turnos', value: 'all' },
-  { label: 'Mañana', value: 'MORNING' },
-  { label: 'Tarde', value: 'AFTERNOON' },
-  { label: 'Noche', value: 'NIGHT' },
+  { label: 'Mañana', value: CourseShift.morning },
+  { label: 'Tarde', value: CourseShift.afternoon },
+  { label: 'Noche', value: CourseShift.night },
 ];

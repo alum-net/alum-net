@@ -3,6 +3,7 @@ import { Button, Card } from 'react-native-paper';
 import { CourseDisplay } from '../types';
 import { useUserInfo } from '@alum-net/users';
 import { mapShiftToString } from '../helpers';
+import DeleteCourseButton from './delete-course';
 
 export const CourseCard = ({ course }: { course: CourseDisplay }) => {
   const { userInfo } = useUserInfo();
@@ -27,15 +28,7 @@ export const CourseCard = ({ course }: { course: CourseDisplay }) => {
         <Text style={styles.instructor}>
           Fecha de fin: {course.endDate.toDateString()}
         </Text>
-        {userInfo?.role === 'admin' && (
-          <Button
-            mode="text"
-            style={styles.button}
-            labelStyle={styles.buttonLabel}
-          >
-            Eliminar
-          </Button>
-        )}
+        <DeleteCourseButton courseId={course.id} />
       </Card.Content>
     </Card>
   );
@@ -59,13 +52,5 @@ const styles = StyleSheet.create({
     color: '#999999',
     fontSize: 12,
     marginBottom: 12,
-  },
-  button: {
-    marginTop: 8,
-    alignItems: 'flex-start',
-  },
-  buttonLabel: {
-    fontSize: 12,
-    color: '#9e0000ff',
   },
 });
