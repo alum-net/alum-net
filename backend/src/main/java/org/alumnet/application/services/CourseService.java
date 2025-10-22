@@ -1,6 +1,7 @@
 package org.alumnet.application.services;
 
 import lombok.RequiredArgsConstructor;
+import org.alumnet.application.dtos.CourseContentDTO;
 import org.alumnet.application.dtos.CourseCreationRequestDTO;
 import org.alumnet.application.dtos.UserFilterDTO;
 import org.alumnet.application.enums.UserRole;
@@ -12,12 +13,17 @@ import org.alumnet.domain.repositories.CourseParticipationRepository;
 import org.alumnet.domain.repositories.CourseRepository;
 import org.alumnet.domain.repositories.ParticipationRepository;
 import org.alumnet.domain.repositories.UserRepository;
+import org.alumnet.domain.strategies.CourseContentStrategyFactory;
 import org.alumnet.domain.users.Student;
 import org.alumnet.domain.users.Teacher;
+import org.alumnet.domain.users.User;
 import org.alumnet.infrastructure.exceptions.*;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
@@ -32,6 +38,10 @@ public class CourseService {
     private final UserRepository userRepository;
     private final CourseParticipationRepository courseParticipationRepository;
     private final ParticipationRepository participationRepository;
+    private final CourseContentStrategyFactory courseContentStrategyFactory;
+    private final S3FileStorageService s3FileStorageService;
+    @Value("${aws.s3.duration-url-hours}")
+    private long urlDuration;
 
     public void create(CourseCreationRequestDTO courseCreationRequestDTO) {
 
@@ -130,8 +140,16 @@ public class CourseService {
                 .orElseThrow(() -> new InvalidAttributeException("Curso con id " + courseId + " no encontrado"));
     }
 
-    public void updateCourse(Course course) {
-        courseRepository.save(course);
+
+    public CourseContentDTO getCourseContent(Pageable page, int courseId, String userId) {
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        CourseContentDTO courseContent = courseContentStrategyFactory.getStrategy(user.getRole()).getCourseContent(userId, courseId, page);
+        updateResourceUrls(courseContent);
+        return courseContent;
     }
 
+    private void updateResourceUrls(CourseContentDTO courseContent) {
+        courseContent.getSections().getData().forEach(section -> section.getSectionResources().forEach(sectionResource
+                -> sectionResource.setUrl(s3FileStorageService.generatePresignedUrl(sectionResource.getUrl(), Duration.ofHours(urlDuration)))));
+    }
 }
