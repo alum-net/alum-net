@@ -19,14 +19,6 @@ public interface CourseRepository extends JpaRepository<Course, Integer>, JpaSpe
     """)
     long countActive(@Param("courseId") int courseId);
 
-    default boolean isCourseActive(int courseId) {
-        return countActive(courseId) > 0;
-    }
-
-    @Modifying
-    @Query("update Course course set course.enabled = false where course.id = :courseId")
-    void deactivateCourse(@Param("courseId") int courseId);
-
     @EntityGraph(attributePaths = {"teachers"})
     Page<Course> findAll(Pageable pageable);
 

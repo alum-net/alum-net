@@ -1,11 +1,15 @@
 package org.alumnet.application.services;
 
 import lombok.RequiredArgsConstructor;
+import org.alumnet.application.dtos.*;
 import org.alumnet.application.dtos.CourseCreationRequestDTO;
 import org.alumnet.application.dtos.CourseDTO;
 import org.alumnet.application.dtos.CourseFilterDTO;
 import org.alumnet.application.dtos.UserFilterDTO;
 import org.alumnet.application.enums.UserRole;
+import org.alumnet.application.mapper.CourseMapper;
+import org.alumnet.application.mapper.UserMapper;
+import org.alumnet.application.specifications.CourseSpecification;
 import org.alumnet.application.mapper.CourseMapper;
 import org.alumnet.application.specifications.CourseSpecification;
 import org.alumnet.application.specifications.UserSpecification;
@@ -18,7 +22,13 @@ import org.alumnet.domain.repositories.ParticipationRepository;
 import org.alumnet.domain.repositories.UserRepository;
 import org.alumnet.domain.users.Student;
 import org.alumnet.domain.users.Teacher;
+import org.alumnet.domain.users.User;
 import org.alumnet.infrastructure.exceptions.*;
+import org.springframework.beans.factory.BeanRegistry;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,8 +51,9 @@ public class CourseService {
     private final CourseParticipationRepository courseParticipationRepository;
     private final ParticipationRepository participationRepository;
 
-    @Autowired
-    private CourseMapper courseMapper;
+    private final CourseMapper courseMapper;
+
+    private final UserMapper userMapper;
 
     public void create(CourseCreationRequestDTO courseCreationRequestDTO) {
 
@@ -106,16 +117,19 @@ public class CourseService {
         courseParticipationRepository.save(participation);
     }
 
-    @Transactional
     public void deleteCourse(int courseId) {
-        boolean courseActive = courseRepository.isCourseActive(courseId);
+        Course course = courseRepository
+                .findById(courseId)
+                .orElseThrow(CourseNotFoundException::new);
+
         boolean hasEnrolledStudents = participationRepository.hasEnrolledStudents(courseId);
 
-        if (courseActive && hasEnrolledStudents) {
+        if (course.isEnabled() && hasEnrolledStudents) {
             throw new ActiveCourseException("El curso está activo y tiene estudiantes matriculados.");
         }
 
-        courseRepository.deactivateCourse(courseId);
+        course.setEnabled(false);
+        courseRepository.save(course);
     }
 
     public void removeMemberFromCourse(Integer courseId, String userEmail) {
@@ -152,10 +166,6 @@ public class CourseService {
                 .orElseThrow(() -> new InvalidAttributeException("Curso con id " + courseId + " no encontrado"));
     }
 
-    public void updateCourse(Course course) {
-        courseRepository.save(course);
-    }
-
     public Page<CourseDTO> getCourses(CourseFilterDTO filter, Pageable page) {
         boolean hasFilter = filter != null && (filter.getName() != null ||
                 filter.getYear() != null ||
@@ -173,5 +183,10 @@ public class CourseService {
         }
 
         return coursePage.map(courseMapper::courseToCourseDTO);
+    }
+
+    public Page<UserDTO> getCourseMembers(int courseId, Pageable page) {
+         Page<User> members = userRepository.findAll(UserSpecification.byCourse(courseId), page);
+         return members.map(userMapper::userToUserDTO);
     }
 }

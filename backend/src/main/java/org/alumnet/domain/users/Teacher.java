@@ -1,6 +1,8 @@
 package org.alumnet.domain.users;
 
-import jakarta.persistence.*;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToMany;
 import org.alumnet.domain.Course;
 
 import java.util.List;
