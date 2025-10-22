@@ -4,9 +4,9 @@ spring:
     cors:
       allowed-origins: http://localhost:8081,http://localhost:8082
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5001/alum-net}
-    username: ${SPRING_DATASOURCE_USERNAME:postgres}
-    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   security:
