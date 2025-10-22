@@ -50,6 +50,5 @@ export const createCourse = async (courseInfo: CourseCreationPayload) => {
 };
 
 export const deleteCourse = async (courseId: number) => {
-  const { data } = await api.delete(`/courses/${3}`);
-  console.log(data);
+  await api.delete(`/courses/${courseId}`);
 };

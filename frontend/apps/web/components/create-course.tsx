@@ -29,7 +29,6 @@ export default function CreateCourseModal({
 
   const { mutate } = useMutation({
     mutationFn: async (data: CourseCreationPayload) => {
-      console.log('lo que me pasan', data);
       try {
         await createCourse(data);
         reset();

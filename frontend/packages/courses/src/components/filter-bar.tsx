@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback, useEffect } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { SHIFTS } from '../constants';
 import { Platform, StyleSheet, Text, View } from 'react-native';
@@ -6,7 +6,7 @@ import { Button, Checkbox, Menu } from 'react-native-paper';
 import { CourseShift, FiltersDirectory } from '../types';
 import { useUserInfo } from '@alum-net/users';
 import { THEME, FormTextInput } from '@alum-net/ui';
-import { useCourses } from '../hooks/useCourses';
+import { useCoursesFilters } from '../hooks/useCoursesFilters';
 
 interface FilterFormData {
   courseName: string;
@@ -16,27 +16,35 @@ interface FilterFormData {
 
 interface FilterBarProps {
   currentPage: number;
-  onApplyFilters?: (func: () => void) => void;
+  onApplyFilters?: (filters: FiltersDirectory) => void;
+  initialFilters?: FiltersDirectory;
 }
 
-export const FilterBar = ({ currentPage, onApplyFilters }: FilterBarProps) => {
+export const FilterBar = ({
+  currentPage,
+  onApplyFilters,
+  initialFilters,
+}: FilterBarProps) => {
   const { userInfo } = useUserInfo();
   const [shiftMenuVisible, setShiftMenuVisible] = useState(false);
   const maxYear = useMemo(() => new Date().getFullYear() + 2, []);
 
   const { control, handleSubmit } = useForm<FilterFormData>({
     defaultValues: {
-      courseName: '',
-      teacherName: '',
-      year: '',
+      courseName: initialFilters?.courseName || '',
+      teacherName: initialFilters?.teacherName || '',
+      year: initialFilters?.year || '',
     },
     mode: 'onChange',
   });
 
-  const [shift, setShift] = useState<CourseShift | 'all'>('all');
-  const [myCourses, setMyCourses] = useState(false);
-  const [appliedFilters, setAppliedFilters] = useState<FiltersDirectory>({});
-  const { refetch } = useCourses({ appliedFilters, currentPage });
+  const [shift, setShift] = useState<CourseShift | 'all'>(
+    initialFilters?.shift || 'all',
+  );
+  const [myCourses, setMyCourses] = useState(
+    initialFilters?.myCourses || false,
+  );
+  const { setAppliedFilters } = useCoursesFilters(currentPage, !onApplyFilters);
 
   const handleYearChange = useCallback(
     (value: string, fieldOnChange: (...event: any[]) => void) => {
@@ -53,13 +61,12 @@ export const FilterBar = ({ currentPage, onApplyFilters }: FilterBarProps) => {
     [shift],
   );
 
-  const changeFilters = useCallback((values: FiltersDirectory) => {
-    setAppliedFilters(values);
-  }, []);
-
-  useEffect(() => {
-    refetch();
-  }, [appliedFilters, refetch]);
+  const changeFilters = useCallback(
+    (values: FiltersDirectory) => {
+      setAppliedFilters(values);
+    },
+    [setAppliedFilters],
+  );
 
   return (
     <View style={styles.filterBar}>
@@ -155,9 +162,11 @@ export const FilterBar = ({ currentPage, onApplyFilters }: FilterBarProps) => {
         mode="contained"
         onPress={handleSubmit(data =>
           onApplyFilters
-            ? onApplyFilters(() =>
-                changeFilters({ ...data, shift: shift, myCourses: myCourses }),
-              )
+            ? onApplyFilters({
+                ...data,
+                shift: shift,
+                myCourses: myCourses,
+              })
             : changeFilters({ ...data, shift: shift, myCourses: myCourses }),
         )}
       >
