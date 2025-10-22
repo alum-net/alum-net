@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.SectionCreationRequestDTO;
 import org.alumnet.application.dtos.responses.ResultResponse;
 import org.alumnet.application.services.SectionService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

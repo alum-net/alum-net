@@ -117,16 +117,19 @@ public class CourseService {
         courseParticipationRepository.save(participation);
     }
 
-    @Transactional
     public void deleteCourse(int courseId) {
-        boolean courseActive = courseRepository.isCourseActive(courseId);
+        Course course = courseRepository
+                .findById(courseId)
+                .orElseThrow(CourseNotFoundException::new);
+
         boolean hasEnrolledStudents = participationRepository.hasEnrolledStudents(courseId);
 
-        if (courseActive && hasEnrolledStudents) {
+        if (course.isEnabled() && hasEnrolledStudents) {
             throw new ActiveCourseException("El curso está activo y tiene estudiantes matriculados.");
         }
 
-        courseRepository.deactivateCourse(courseId);
+        course.setEnabled(false);
+        courseRepository.save(course);
     }
 
     public void removeMemberFromCourse(Integer courseId, String userEmail) {

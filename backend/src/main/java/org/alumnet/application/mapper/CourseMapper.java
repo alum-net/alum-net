@@ -10,6 +10,6 @@ public interface CourseMapper {
 
     @Mapping(target = "shiftType", source = "shift")
     @Mapping(target = "teachers", source = "teachers")
-    @Mapping(source = "course.startDate", target = "year", dateFormat = "yyyy")
+    @Mapping(source = "startDate", target = "year")
     CourseDTO courseToCourseDTO(Course course);
 }
