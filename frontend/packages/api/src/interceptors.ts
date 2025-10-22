@@ -26,7 +26,6 @@ export const refreshTokenInterceptor = async (error: AxiosError<Response>) => {
   try {
     storage.delete(STORAGE_KEYS.ACCESS_TOKEN);
     const newAccessToken = await refresh();
-
     originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
     originalRequest._isRetry = true;
 
