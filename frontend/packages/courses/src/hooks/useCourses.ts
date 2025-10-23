@@ -5,7 +5,7 @@ import { FiltersDirectory } from '../types';
 
 export const useCourses = ({
   appliedFilters = undefined,
-  currentPage = 1,
+  currentPage = 0,
 }: {
   appliedFilters?: FiltersDirectory;
   currentPage?: number;

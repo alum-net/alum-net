@@ -34,7 +34,7 @@ export const LoginScreen = () => {
       clientId: keycloakClientId,
       redirectUri: redirectUri,
       prompt: Prompt.Login,
-      scopes: ['openid', 'profile', 'email', 'offline_access'],
+      scopes: ['openid', 'email'],
       usePKCE: true,
     },
     discovery,
@@ -53,13 +53,11 @@ export const LoginScreen = () => {
           },
         },
         discovery!,
-      )
-        .then(({ accessToken, refreshToken, idToken }) => {
-          storage.set(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
-          if (idToken) storage.set(STORAGE_KEYS.ID_TOKEN, idToken);
-          setRefreshToken(refreshToken);
-        })
-        .catch(error => console.log('Auth error', error));
+      ).then(({ accessToken, refreshToken, idToken }) => {
+        storage.set(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
+        if (idToken) storage.set(STORAGE_KEYS.ID_TOKEN, idToken);
+        setRefreshToken(refreshToken);
+      });
     }
   }, [response, discovery, request, setRefreshToken]);
 

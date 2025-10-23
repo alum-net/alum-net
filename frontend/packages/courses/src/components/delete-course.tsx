@@ -4,29 +4,30 @@ import { Platform, StyleSheet } from 'react-native';
 import { Button } from 'react-native-paper';
 import { deleteCourse } from '../service';
 import { Toast } from '@alum-net/ui';
-import { QUERY_KEYS } from '@alum-net/api';
+import { PageableResponse, QUERY_KEYS } from '@alum-net/api';
 import { CourseDisplay } from '../types';
+import { UserRole } from '@alum-net/users/src/types';
 
-export default function DeleteCourseButton({ courseId }: { courseId: number }) {
-  const { userInfo } = useUserInfo();
+export default function DeleteCourseButton({ courseId }: { courseId: string }) {
+  const { data } = useUserInfo();
   const queryClient = useQueryClient();
   const { mutate } = useMutation({
     mutationFn: async () => await deleteCourse(courseId),
-    onError: error => {
-      console.log(error);
+    onError: () => {
       Toast.error('Error al eliminar curso');
     },
     onSuccess: async () => {
-      await queryClient.getQueryData([QUERY_KEYS.getCourses]);
-      await queryClient.setQueryData(
-        [QUERY_KEYS.getCourses],
-        (old: CourseDisplay[]) => old.filter(course => course.id !== courseId),
-      );
+      const oldData: PageableResponse<CourseDisplay> | undefined =
+        await queryClient.getQueryData([QUERY_KEYS.getCourses]);
+      await queryClient.setQueryData([QUERY_KEYS.getCourses], {
+        ...oldData,
+        data: oldData?.data?.filter(course => course?.id !== courseId),
+      });
       Toast.success('Curso eliminado correctamente');
     },
   });
 
-  if (Platform.OS !== 'web' || userInfo?.role !== 'admin') return null;
+  if (Platform.OS !== 'web' || data?.role !== UserRole.admin) return null;
 
   return (
     <Button

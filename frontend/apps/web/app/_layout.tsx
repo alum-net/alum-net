@@ -24,6 +24,10 @@ const InitialLayout = () => {
               <Stack.Screen name="home" options={{ headerShown: false }} />
               <Stack.Screen name="profile" options={{ headerShown: false }} />
               <Stack.Screen name="courses" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="course/[id]"
+                options={{ headerShown: false }}
+              />
             </Stack.Protected>
             <Stack.Screen name="+not-found" />
           </Stack>

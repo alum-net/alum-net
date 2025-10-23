@@ -1,5 +1,6 @@
 import {
   fetchDiscoveryAsync,
+  fetchUserInfoAsync,
   makeRedirectUri,
   refreshAsync,
   RefreshTokenRequestConfig,
@@ -24,36 +25,32 @@ export const refresh = async () => {
     clientId: keycloakClientId,
     refreshToken: refreshToken,
   };
-  try {
-    const { accessToken, idToken } = await refreshAsync(
-      refreshTokenObject,
-      discoveryDocument!,
-    );
-    storage.set(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
-    if (idToken) storage.set(STORAGE_KEYS.ID_TOKEN, idToken);
-    return accessToken;
-  } catch (error) {
-    console.log(error);
-    logout();
-  }
+  const { accessToken, idToken } = await refreshAsync(
+    refreshTokenObject,
+    discoveryDocument!,
+  );
+  storage.set(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
+  if (idToken) storage.set(STORAGE_KEYS.ID_TOKEN, idToken);
+  return accessToken;
 };
 
 export const logout = async () => {
   const accessToken = storage.getString(STORAGE_KEYS.ACCESS_TOKEN);
-  if (!accessToken) return;
-  const discoveryDocument = await fetchDiscoveryAsync(
-    `${process.env.EXPO_PUBLIC_KEYCLOAK_URI}/realms/${keycloakRealm}`,
-  );
-  await revokeAsync({ token: accessToken }, discoveryDocument!);
-  const redirectUrl = makeRedirectUri({
-    native: authScheme,
-  });
-  const idToken = storage.getString(STORAGE_KEYS.ID_TOKEN);
-  const logoutUrl = `${discoveryDocument!
-    .endSessionEndpoint!}?client_id=${keycloakClientId}&post_logout_redirect_uri=${redirectUrl}&id_token_hint=${idToken}`;
-
-  await WebBrowser.openAuthSessionAsync(logoutUrl, redirectUrl);
-  storage.clearAll();
+  try {
+    const discoveryDocument = await fetchDiscoveryAsync(
+      `${process.env.EXPO_PUBLIC_KEYCLOAK_URI}/realms/${keycloakRealm}`,
+    );
+    await revokeAsync({ token: accessToken || '' }, discoveryDocument!);
+    const redirectUrl = makeRedirectUri({
+      native: authScheme,
+    });
+    const idToken = storage.getString(STORAGE_KEYS.ID_TOKEN);
+    const logoutUrl = `${discoveryDocument!
+      .endSessionEndpoint!}?client_id=${keycloakClientId}&post_logout_redirect_uri=${redirectUrl}&id_token_hint=${idToken}`;
+    await WebBrowser.openAuthSessionAsync(logoutUrl, redirectUrl);
+  } finally {
+    storage.clearAll();
+  }
 };
 
 export const updatePassword = async () => {
@@ -66,4 +63,27 @@ export const updatePassword = async () => {
       `&kc_action=UPDATE_PASSWORD`,
   );
   return await WebBrowser.openAuthSessionAsync(url);
+};
+
+export const getKeyclaokUserInfo = async () => {
+  const accessToken = storage.getString(STORAGE_KEYS.ACCESS_TOKEN);
+  if (!accessToken) {
+    await logout();
+    throw Error('User unauthorized');
+  }
+  const discoveryDocument = await fetchDiscoveryAsync(
+    `${process.env.EXPO_PUBLIC_KEYCLOAK_URI}/realms/${keycloakRealm}`,
+  );
+
+  return (await fetchUserInfoAsync(
+    { accessToken },
+    discoveryDocument,
+  )) as Promise<{
+    email: string;
+    email_verified: boolean;
+    family_name: string;
+    given_name: string;
+    name: string;
+    sub: string;
+  }>;
 };

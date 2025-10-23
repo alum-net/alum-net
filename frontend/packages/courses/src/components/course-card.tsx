@@ -1,32 +1,38 @@
 import { Platform, StyleSheet, Text, View } from 'react-native';
-import { Button, Card } from 'react-native-paper';
+import { Card } from 'react-native-paper';
 import { CourseDisplay } from '../types';
-import { useUserInfo } from '@alum-net/users';
 import { mapShiftToString } from '../helpers';
 import DeleteCourseButton from './delete-course';
+import { Link } from 'expo-router';
 
 export const CourseCard = ({ course }: { course: CourseDisplay }) => {
-  const { userInfo } = useUserInfo();
-
   return (
     <Card style={styles.card}>
       <Card.Content>
         <View style={styles.cardHeader}>
-          <Text style={styles.courseTitle}>{course.name}</Text>
+          <Link
+            style={styles.courseTitle}
+            href={{
+              pathname: '/course/[id]',
+              params: { id: course.id, name: course.name },
+            }}
+          >
+            {course.name}
+          </Link>
         </View>
-        {course.teachersNames.map(name => (
-          <Text key={course.id + name} style={styles.instructor}>
-            {name}
+        {course.teachers.map(teacher => (
+          <Text key={teacher.email} style={styles.instructor}>
+            {teacher.name + ' ' + teacher.lastname}
           </Text>
         ))}
         <Text style={styles.instructor}>
-          Turno: {mapShiftToString(course.shift)}
+          Turno: {mapShiftToString(course.shiftType)}
         </Text>
         <Text style={styles.instructor}>
-          Fecha de inicio: {course.startDate.toDateString()}
+          Fecha de inicio: {new Date(course.startDate).toDateString()}
         </Text>
         <Text style={styles.instructor}>
-          Fecha de fin: {course.endDate.toDateString()}
+          Fecha de fin: {new Date(course.endDate).toDateString()}
         </Text>
         <DeleteCourseButton courseId={course.id} />
       </Card.Content>

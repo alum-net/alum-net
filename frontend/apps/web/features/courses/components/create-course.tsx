@@ -1,4 +1,3 @@
-'use dom';
 import React, { useCallback } from 'react';
 import { View, ScrollView, StyleSheet, Modal } from 'react-native';
 import { Button, Text, SegmentedButtons } from 'react-native-paper';
@@ -11,7 +10,7 @@ import {
   courseCreationSchema,
   CourseFormData,
 } from '../validations/course-creation';
-import FormDateInput from './date-input';
+import FormDateInput from '../../../components/date-input';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@alum-net/api';
 import { isValidDecimal } from '@alum-net/courses/src/helpers';
@@ -29,13 +28,9 @@ export default function CreateCourseModal({
 
   const { mutate } = useMutation({
     mutationFn: async (data: CourseCreationPayload) => {
-      try {
-        await createCourse(data);
-        reset();
-        onDismiss();
-      } catch (error) {
-        console.log(error);
-      }
+      await createCourse(data);
+      reset();
+      onDismiss();
     },
     onMutate: async () => {
       Toast.success('Curso creado correctamente!');
@@ -43,8 +38,7 @@ export default function CreateCourseModal({
         queryKey: [QUERY_KEYS.getCourses],
       });
     },
-    onError: error => {
-      console.log(error);
+    onError: () => {
       Toast.error('Hubo un error en la creación del curso');
     },
   });
@@ -54,9 +48,9 @@ export default function CreateCourseModal({
       const courseData: CourseCreationPayload = {
         name: data.name,
         description: data.description,
-        startDate: new Date(data.startDate),
-        endDate: new Date(data.endDate),
-        shift: data.shift as CourseShift,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        shiftType: data.shift,
         approvalGrade: parseFloat(data.approvalGrade),
         teachersEmails: data.teachersEmails.split(',').map(e => e.trim()),
       };
@@ -163,7 +157,7 @@ export default function CreateCourseModal({
                 buttons={[
                   { value: 'MORNING', label: 'Mañana' },
                   { value: 'AFTERNOON', label: 'Tarde' },
-                  { value: 'NIGHT', label: 'Noche' },
+                  { value: 'EVENING', label: 'Noche' },
                 ]}
                 style={styles.input}
               />

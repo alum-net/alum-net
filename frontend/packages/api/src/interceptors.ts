@@ -21,8 +21,6 @@ export const refreshTokenInterceptor = async (error: AxiosError<Response>) => {
 
   if (error.response?.status !== 401) return Promise.reject(error);
 
-  if (!storage.getString(STORAGE_KEYS.REFRESH_TOKEN)) return await logout();
-
   try {
     storage.delete(STORAGE_KEYS.ACCESS_TOKEN);
     const newAccessToken = await refresh();
@@ -30,8 +28,8 @@ export const refreshTokenInterceptor = async (error: AxiosError<Response>) => {
     originalRequest._isRetry = true;
 
     return axios.request(originalRequest);
-  } catch (e) {
-    console.log(e);
+  } catch (error) {
+    console.log(error);
     return await logout();
   }
 };
