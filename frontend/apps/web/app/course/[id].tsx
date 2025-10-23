@@ -1,33 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { FlatList, View } from 'react-native';
 import { Button, Card, Text, IconButton } from 'react-native-paper';
-import { useQuery } from '@tanstack/react-query';
 import { Ionicons } from '@expo/vector-icons';
-import { useLocalSearchParams, useNavigation } from 'expo-router';
-import { fetchCourse } from '@alum-net/courses/src/service';
-import { useUserInfo } from '@alum-net/users';
-import { QUERY_KEYS } from '@alum-net/api';
-import { THEME, Toast } from '@alum-net/ui';
+import { useLocalSearchParams } from 'expo-router';
+import { THEME } from '@alum-net/ui';
+import { useCourse } from '@alum-net/courses';
 
 export default function Course() {
   const { id, name } = useLocalSearchParams();
-  const { data: userInfo } = useUserInfo();
-  const { data, isLoading } = useQuery({
-    queryKey: [QUERY_KEYS.getCourse, id],
-    queryFn: () => fetchCourse(id.toString(), userInfo?.email || ''),
-  });
-  const nav = useNavigation();
+  const { data, isLoading } = useCourse(id.toString());
 
   const [expandedSections, setExpandedSections] = useState<
     Record<string, boolean>
   >({});
-
-  useEffect(() => {
-    if (data?.errors && data?.errors.length > 0) {
-      Toast.error(data.errors[0]);
-      nav.goBack();
-    }
-  }, [data?.errors, nav]);
 
   if (isLoading || !data) return <Text>Cargando...</Text>;
 
