@@ -36,10 +36,10 @@ export const refresh = async () => {
 
 export const logout = async () => {
   const accessToken = storage.getString(STORAGE_KEYS.ACCESS_TOKEN);
-  const discoveryDocument = await fetchDiscoveryAsync(
-    `${process.env.EXPO_PUBLIC_KEYCLOAK_URI}/realms/${keycloakRealm}`,
-  );
   try {
+    const discoveryDocument = await fetchDiscoveryAsync(
+      `${process.env.EXPO_PUBLIC_KEYCLOAK_URI}/realms/${keycloakRealm}`,
+    );
     await revokeAsync({ token: accessToken || '' }, discoveryDocument!);
     const redirectUrl = makeRedirectUri({
       native: authScheme,
@@ -48,8 +48,6 @@ export const logout = async () => {
     const logoutUrl = `${discoveryDocument!
       .endSessionEndpoint!}?client_id=${keycloakClientId}&post_logout_redirect_uri=${redirectUrl}&id_token_hint=${idToken}`;
     await WebBrowser.openAuthSessionAsync(logoutUrl, redirectUrl);
-  } catch (error) {
-    console.log('logout', error);
   } finally {
     storage.clearAll();
   }

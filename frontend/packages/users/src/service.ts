@@ -10,9 +10,8 @@ import type {
 
 export const getUserInfo = async () => {
   const userInfo = await getKeyclaokUserInfo();
-
-  const { data }: AxiosResponse<PageableResultResponse<UserInfo>> = await api.get(
-    'users/',
+  const { data }: AxiosResponse<PageableResponse<UserInfo>> = await api.get(
+    '/users/',
     {
       params: {
         size: 1,
