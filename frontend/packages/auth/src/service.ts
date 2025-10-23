@@ -24,36 +24,34 @@ export const refresh = async () => {
     clientId: keycloakClientId,
     refreshToken: refreshToken,
   };
-  try {
-    const { accessToken, idToken } = await refreshAsync(
-      refreshTokenObject,
-      discoveryDocument!,
-    );
-    storage.set(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
-    if (idToken) storage.set(STORAGE_KEYS.ID_TOKEN, idToken);
-    return accessToken;
-  } catch (error) {
-    console.log(error);
-    logout();
-  }
+  const { accessToken, idToken } = await refreshAsync(
+    refreshTokenObject,
+    discoveryDocument!,
+  );
+  storage.set(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
+  if (idToken) storage.set(STORAGE_KEYS.ID_TOKEN, idToken);
+  return accessToken;
 };
 
 export const logout = async () => {
   const accessToken = storage.getString(STORAGE_KEYS.ACCESS_TOKEN);
-  if (!accessToken) return;
   const discoveryDocument = await fetchDiscoveryAsync(
     `${process.env.EXPO_PUBLIC_KEYCLOAK_URI}/realms/${keycloakRealm}`,
   );
-  await revokeAsync({ token: accessToken }, discoveryDocument!);
-  const redirectUrl = makeRedirectUri({
-    native: authScheme,
-  });
-  const idToken = storage.getString(STORAGE_KEYS.ID_TOKEN);
-  const logoutUrl = `${discoveryDocument!
-    .endSessionEndpoint!}?client_id=${keycloakClientId}&post_logout_redirect_uri=${redirectUrl}&id_token_hint=${idToken}`;
-
-  await WebBrowser.openAuthSessionAsync(logoutUrl, redirectUrl);
-  storage.clearAll();
+  try {
+    await revokeAsync({ token: accessToken || '' }, discoveryDocument!);
+    const redirectUrl = makeRedirectUri({
+      native: authScheme,
+    });
+    const idToken = storage.getString(STORAGE_KEYS.ID_TOKEN);
+    const logoutUrl = `${discoveryDocument!
+      .endSessionEndpoint!}?client_id=${keycloakClientId}&post_logout_redirect_uri=${redirectUrl}&id_token_hint=${idToken}`;
+    await WebBrowser.openAuthSessionAsync(logoutUrl, redirectUrl);
+  } catch (error) {
+    console.log('logout', error);
+  } finally {
+    storage.clearAll();
+  }
 };
 
 export const updatePassword = async () => {

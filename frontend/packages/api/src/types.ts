@@ -5,9 +5,16 @@ export type Response<T = undefined> = {
   data?: T;
 };
 
-export type PaginatedResponse<T> = Response<T> & {
+type Pageable = {
   pageNumber: number;
   pageSize: number;
   totalElements: number;
   totalPages: number;
 };
+
+export type PageableContent<T> = {
+  pageable: Pageable;
+  content: T[];
+};
+
+export type PageableResponse<T> = Response<T[]> & Pageable;

@@ -23,7 +23,7 @@ export function CoursesDashboard({
       <FlatList
         style={styles.flatList}
         ListHeaderComponent={<FilterComponent currentPage={currentPage} />}
-        data={data}
+        data={data?.data}
         keyExtractor={item => item.id.toString()}
         renderItem={({ item }) => <CourseCard course={item} />}
         numColumns={Platform.OS === 'web' ? 4 : 2}
@@ -33,24 +33,28 @@ export function CoursesDashboard({
           <Text style={styles.noResults}>No se encontraron cursos</Text>
         }
         ListFooterComponent={
-          data && data.length > 0 ? (
+          data && data.totalPages > 0 ? (
             <View style={styles.paginationContainer}>
-              <Button
-                mode="contained-tonal"
-                onPress={() => setCurrentPage(currentPage - 1)}
-                buttonColor={THEME.colors.black}
-                labelStyle={styles.paginationButtonLabel}
-              >
-                Página anterior
-              </Button>
-              <Button
-                mode="contained-tonal"
-                onPress={() => setCurrentPage(currentPage + 1)}
-                buttonColor={THEME.colors.black}
-                labelStyle={styles.paginationButtonLabel}
-              >
-                Página siguiente
-              </Button>
+              {data.pageNumber > 0 && (
+                <Button
+                  mode="contained-tonal"
+                  onPress={() => setCurrentPage(currentPage - 1)}
+                  buttonColor={THEME.colors.black}
+                  labelStyle={styles.paginationButtonLabel}
+                >
+                  Página anterior
+                </Button>
+              )}
+              {data.pageNumber < data.totalPages - 1 && (
+                <Button
+                  mode="contained-tonal"
+                  onPress={() => setCurrentPage(currentPage + 1)}
+                  buttonColor={THEME.colors.black}
+                  labelStyle={styles.paginationButtonLabel}
+                >
+                  Página siguiente
+                </Button>
+              )}
             </View>
           ) : null
         }

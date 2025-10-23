@@ -1,18 +1,4 @@
-import { CourseShift, FiltersDirectory } from './types';
-
-export function buildQueryParams(filters: Partial<FiltersDirectory>): string {
-  const params = Object.entries(filters)
-    .filter(
-      ([_, value]) => value !== undefined && value !== null && value !== '',
-    )
-    .map(
-      ([key, value]) =>
-        `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`,
-    )
-    .join('&');
-
-  return params ? `?${params}` : '';
-}
+import { CourseShift } from './types';
 
 export const mapShiftToString = (shift: CourseShift) => {
   switch (shift) {
@@ -20,7 +6,7 @@ export const mapShiftToString = (shift: CourseShift) => {
       return 'Mañana';
     case CourseShift.afternoon:
       return 'Tarde';
-    case CourseShift.night:
+    case CourseShift.evening:
       return 'Noche';
   }
 };

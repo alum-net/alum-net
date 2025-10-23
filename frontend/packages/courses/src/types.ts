@@ -1,16 +1,16 @@
+import { PageableContent } from '@alum-net/api';
+import { UserInfo } from '@alum-net/users/src/types';
+
 export type CourseDisplay = {
-  id: number;
+  id: string;
   name: string;
-  teachersNames: string[];
-  startDate: Date;
-  endDate: Date;
-  shift: CourseShift;
+  teachers: UserInfo[];
+  startDate: string;
+  endDate: string;
+  shiftType: CourseShift;
 };
 
-export type CourseCreationPayload = Omit<
-  CourseDisplay,
-  'id' | 'teachersNames'
-> & {
+export type CourseCreationPayload = Omit<CourseDisplay, 'id' | 'teachers'> & {
   description: string;
   approvalGrade: number;
   teachersEmails: string[];
@@ -18,15 +18,15 @@ export type CourseCreationPayload = Omit<
 
 export enum CourseShift {
   morning = 'MORNING',
-  night = 'NIGHT',
+  evening = 'EVENING',
   afternoon = 'AFTERNOON',
 }
 
 export interface FiltersDirectory {
-  courseName?: string;
+  name?: string;
   teacherName?: string;
   year?: string;
-  shift?: 'all' | CourseShift;
+  shiftType?: CourseShift;
   myCourses?: boolean;
 }
 
@@ -34,9 +34,28 @@ export type FilterName = keyof FiltersDirectory;
 
 export interface ShiftOption {
   label: string;
-  value: 'all' | CourseShift;
+  value: undefined | CourseShift;
 }
 
 export interface FilterBarRef {
   getFilters: () => FiltersDirectory;
+}
+
+export interface SectionResource {
+  title: string;
+  name: string;
+  extension: string;
+  url: string;
+}
+
+export interface Section {
+  title: string;
+  description: string;
+  sectionResources: SectionResource[];
+}
+
+export interface CourseContent {
+  sections: PageableContent<Section>;
+  enrolledStudents?: string[];
+  totalEnrollments?: number;
 }

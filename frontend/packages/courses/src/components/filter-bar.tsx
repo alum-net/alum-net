@@ -7,9 +7,10 @@ import { CourseShift, FiltersDirectory } from '../types';
 import { useUserInfo } from '@alum-net/users';
 import { THEME, FormTextInput } from '@alum-net/ui';
 import { useCoursesFilters } from '../hooks/useCoursesFilters';
+import { UserRole } from '@alum-net/users/src/types';
 
 interface FilterFormData {
-  courseName: string;
+  name: string;
   teacherName: string;
   year: string;
 }
@@ -31,15 +32,15 @@ export const FilterBar = ({
 
   const { control, handleSubmit } = useForm<FilterFormData>({
     defaultValues: {
-      courseName: initialFilters?.courseName || '',
+      name: initialFilters?.name || '',
       teacherName: initialFilters?.teacherName || '',
       year: initialFilters?.year || '',
     },
     mode: 'onChange',
   });
 
-  const [shift, setShift] = useState<CourseShift | 'all'>(
-    initialFilters?.shift || 'all',
+  const [shiftType, setShift] = useState<CourseShift | undefined>(
+    initialFilters?.shiftType || undefined,
   );
   const [myCourses, setMyCourses] = useState(
     initialFilters?.myCourses || false,
@@ -57,8 +58,8 @@ export const FilterBar = ({
   );
 
   const selectedShiftLabel = useMemo(
-    () => SHIFTS.find(s => s.value === shift)?.label || 'Todos los turnos',
-    [shift],
+    () => SHIFTS.find(s => s.value === shiftType)?.label || 'Todos los turnos',
+    [shiftType],
   );
 
   const changeFilters = useCallback(
@@ -71,7 +72,7 @@ export const FilterBar = ({
   return (
     <View style={styles.filterBar}>
       <FormTextInput
-        name="courseName"
+        name="name"
         control={control}
         label="Nombre del curso"
         mode="outlined"
@@ -137,7 +138,7 @@ export const FilterBar = ({
       >
         {SHIFTS.map(shiftOption => (
           <Menu.Item
-            key={shiftOption.value}
+            key={shiftOption.value || ''}
             onPress={() => {
               setShift(shiftOption.value);
               setShiftMenuVisible(false);
@@ -148,7 +149,7 @@ export const FilterBar = ({
         ))}
       </Menu>
 
-      {userInfo?.role !== 'admin' && (
+      {userInfo?.role !== UserRole.admin && (
         <View style={styles.checkboxContainer}>
           <Checkbox
             status={myCourses ? 'checked' : 'unchecked'}
@@ -164,10 +165,14 @@ export const FilterBar = ({
           onApplyFilters
             ? onApplyFilters({
                 ...data,
-                shift: shift,
+                shiftType: shiftType,
                 myCourses: myCourses,
               })
-            : changeFilters({ ...data, shift: shift, myCourses: myCourses }),
+            : changeFilters({
+                ...data,
+                shiftType: shiftType,
+                myCourses: myCourses,
+              }),
         )}
       >
         Aplicar Filtros

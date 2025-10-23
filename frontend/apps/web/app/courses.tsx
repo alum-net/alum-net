@@ -1,4 +1,4 @@
-import CourseFilters from '../components/courses-filters';
+import CourseFilters from '../features/courses/components/courses-filters';
 import { CoursesDashboard } from '@alum-net/courses';
 
 export default function CoursesList() {
