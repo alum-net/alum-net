@@ -18,7 +18,6 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequ
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -30,9 +29,9 @@ public class S3FileStorageService {
     private final AmazonS3Config.S3Properties s3Properties;
     private final S3Presigner s3Presigner;
 
-    public String store(MultipartFile file, String fileExtension) throws FileStorageException {
+    public String store(MultipartFile file, String fileExtension, String filePath) throws FileStorageException {
         try {
-            String key = generateS3Key(fileExtension);
+            String key = generateS3Key(fileExtension,filePath);
 
             Map<String, String> metadata = Map.of(
                     "original-filename", file.getOriginalFilename(),
@@ -72,11 +71,11 @@ public class S3FileStorageService {
                 .build();
     }
 
-    private String generateS3Key(String fileExtension) {
+    private String generateS3Key(String fileExtension,String filePath) {
         String uniqueId = UUID.randomUUID().toString();
 
-        return String.format("%s_%s",
-                uniqueId,
+        return String.format("%s/%s_%s",
+                filePath,uniqueId,
                 fileExtension.isEmpty() ? "" : "." + fileExtension
         );
     }

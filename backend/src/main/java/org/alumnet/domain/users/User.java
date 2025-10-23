@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.alumnet.application.enums.UserRole;
 
 @Entity
 @Table(name = "users")
@@ -22,4 +23,7 @@ public abstract class User {
     @Column(name = "avatar_url")
     private String avatarUrl;
     private boolean enabled;
+
+    public abstract UserRole getRole();
+
 }
