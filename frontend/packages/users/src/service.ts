@@ -5,7 +5,6 @@ import { AxiosResponse } from 'axios';
 
 export const getUserInfo = async () => {
   const userInfo = await getKeyclaokUserInfo();
-  console.log(userInfo.email);
   const { data }: AxiosResponse<PageableResponse<UserInfo>> = await api.get(
     '/users/',
     {

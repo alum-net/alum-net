@@ -28,13 +28,9 @@ export default function CreateCourseModal({
 
   const { mutate } = useMutation({
     mutationFn: async (data: CourseCreationPayload) => {
-      try {
-        await createCourse(data);
-        reset();
-        onDismiss();
-      } catch (error) {
-        console.log(error);
-      }
+      await createCourse(data);
+      reset();
+      onDismiss();
     },
     onMutate: async () => {
       Toast.success('Curso creado correctamente!');
@@ -42,8 +38,7 @@ export default function CreateCourseModal({
         queryKey: [QUERY_KEYS.getCourses],
       });
     },
-    onError: error => {
-      console.log(error);
+    onError: () => {
       Toast.error('Hubo un error en la creación del curso');
     },
   });

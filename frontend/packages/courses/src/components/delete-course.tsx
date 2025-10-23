@@ -13,14 +13,12 @@ export default function DeleteCourseButton({ courseId }: { courseId: string }) {
   const queryClient = useQueryClient();
   const { mutate } = useMutation({
     mutationFn: async () => await deleteCourse(courseId),
-    onError: error => {
-      console.log(error);
+    onError: () => {
       Toast.error('Error al eliminar curso');
     },
     onSuccess: async () => {
       const oldData: PageableResponse<CourseDisplay> | undefined =
         await queryClient.getQueryData([QUERY_KEYS.getCourses]);
-      console.log(oldData);
       await queryClient.setQueryData([QUERY_KEYS.getCourses], {
         ...oldData,
         data: oldData?.data?.filter(course => course?.id !== courseId),

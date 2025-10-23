@@ -29,7 +29,7 @@ export const refreshTokenInterceptor = async (error: AxiosError<Response>) => {
 
     return axios.request(originalRequest);
   } catch (error) {
-    console.log('refresh', error);
+    console.log(error);
     return await logout();
   }
 };
