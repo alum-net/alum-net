@@ -103,4 +103,15 @@ public class CourseController {
 
     }
 
+    @GetMapping("/{courseId}/content/")
+    @PreAuthorize("hasAnyRole('teacher', 'student','admin')")
+    public ResponseEntity<ResultResponse<CourseContentDTO>> getCourseContent(@PageableDefault (page = 0, size = 5) Pageable page,
+                                                                   @PathVariable Integer courseId,
+                                                                   @RequestParam String userId) {
+
+        CourseContentDTO userPage = courseService.getCourseContent(page,courseId,userId);
+        return ResponseEntity.ok(ResultResponse.success(userPage,"Secciones obtenidas exitosamente"));
+
+    }
+
 }
