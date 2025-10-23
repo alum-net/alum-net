@@ -2,17 +2,22 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useRouter, usePathname } from 'expo-router';
 import { THEME } from '@alum-net/ui';
+import { useUserInfo } from '@alum-net/users/src/hooks/useUserInfo'
 
 export default function WebHeader() {
   const router = useRouter();
   const pathname = usePathname();
 
+  const { data: userInfo } = useUserInfo();
+  const isAdmin = (userInfo?.role as unknown as string) === 'ADMIN';
+
   const navItems: {
     label: string;
-    route: '/home' | '/profile' | '/courses';
+    route: '/home' | '/profile' | '/users' | '/courses';
   }[] = [
     { label: 'Inicio', route: '/home' },
     { label: 'Cursos', route: '/courses' },
+    ...(isAdmin ? [{ label: 'Usuarios', route: '/users' as const }] : []),
     // { label: "Mensajes", route: "/messages" },
     { label: 'Perfil', route: '/profile' },
   ];
