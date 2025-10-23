@@ -24,13 +24,14 @@ public class UserController {
 
     @PostMapping(path = "/create-user", produces = "application/json")
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<ResultResponse<Object>> createUser(@Valid @RequestBody UserCreationRequestDTO userCreationRequestDTO) {
+    public ResponseEntity<ResultResponse<Object>> createUser(
+            @Valid @RequestBody UserCreationRequestDTO userCreationRequestDTO) {
         userService.createUser(userCreationRequestDTO);
         return ResponseEntity.ok(ResultResponse.success(null, "Usuario creado exitosamente"));
     }
 
     @GetMapping(path = "/", produces = "application/json")
-    @PreAuthorize("hasRole('admin')")
+    @PreAuthorize("hasAnyRole('admin', 'teacher', 'student')")
     public ResponseEntity<PageableResultResponse<UserDTO>> getUsers(
             @PageableDefault(page = 0, size = 15) Pageable page,
             UserFilterDTO filter) {
@@ -41,10 +42,9 @@ public class UserController {
                 userPage.getContent(),
                 userPage.getTotalElements() > 0
                         ? "Usuarios obtenidos exitosamente"
-                        : "No se encontraron usuarios que coincidan con los filtros"
-            );
+                        : "No se encontraron usuarios que coincidan con los filtros");
 
-            return ResponseEntity.ok(response);
+        return ResponseEntity.ok(response);
 
     }
 }

@@ -3,6 +3,7 @@ import {
   CourseDisplay,
   FiltersDirectory,
   CourseCreationPayload,
+  CourseContent,
 } from './types';
 import { AxiosResponse } from 'axios';
 
@@ -32,4 +33,12 @@ export const createCourse = async (courseInfo: CourseCreationPayload) => {
 
 export const deleteCourse = async (courseId: string) => {
   await api.delete(`/courses/${courseId}`);
+};
+
+export const fetchCourse = async (courseId: string, userEmail: string) => {
+  const { data }: AxiosResponse<Response<CourseContent>> = await api.get(
+    `/courses/${courseId}/?userId=${userEmail}`,
+  );
+
+  return data;
 };

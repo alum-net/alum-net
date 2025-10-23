@@ -9,7 +9,7 @@ import { CourseDisplay } from '../types';
 import { UserRole } from '@alum-net/users/src/types';
 
 export default function DeleteCourseButton({ courseId }: { courseId: string }) {
-  const { userInfo } = useUserInfo();
+  const { data } = useUserInfo();
   const queryClient = useQueryClient();
   const { mutate } = useMutation({
     mutationFn: async () => await deleteCourse(courseId),
@@ -29,7 +29,7 @@ export default function DeleteCourseButton({ courseId }: { courseId: string }) {
     },
   });
 
-  if (Platform.OS !== 'web' || userInfo?.role !== UserRole.admin) return null;
+  if (Platform.OS !== 'web' || data?.role !== UserRole.admin) return null;
 
   return (
     <Button

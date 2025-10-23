@@ -34,7 +34,7 @@ export const LoginScreen = () => {
       clientId: keycloakClientId,
       redirectUri: redirectUri,
       prompt: Prompt.Login,
-      scopes: ['openid', 'profile', 'email', 'offline_access'],
+      scopes: ['openid', 'email'],
       usePKCE: true,
     },
     discovery,

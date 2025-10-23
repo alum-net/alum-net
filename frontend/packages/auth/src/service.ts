@@ -1,5 +1,6 @@
 import {
   fetchDiscoveryAsync,
+  fetchUserInfoAsync,
   makeRedirectUri,
   refreshAsync,
   RefreshTokenRequestConfig,
@@ -64,4 +65,27 @@ export const updatePassword = async () => {
       `&kc_action=UPDATE_PASSWORD`,
   );
   return await WebBrowser.openAuthSessionAsync(url);
+};
+
+export const getKeyclaokUserInfo = async () => {
+  const accessToken = storage.getString(STORAGE_KEYS.ACCESS_TOKEN);
+  if (!accessToken) {
+    await logout();
+    throw Error('User unauthorized');
+  }
+  const discoveryDocument = await fetchDiscoveryAsync(
+    `${process.env.EXPO_PUBLIC_KEYCLOAK_URI}/realms/${keycloakRealm}`,
+  );
+
+  return (await fetchUserInfoAsync(
+    { accessToken },
+    discoveryDocument,
+  )) as Promise<{
+    email: string;
+    email_verified: boolean;
+    family_name: string;
+    given_name: string;
+    name: string;
+    sub: string;
+  }>;
 };

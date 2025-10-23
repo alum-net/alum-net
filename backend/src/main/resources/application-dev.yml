@@ -2,7 +2,7 @@ spring:
   application:
     name: alum-net
     cors:
-      allowed-origins: http://localhost:3000,http://frontend:3000
+      allowed-origins: http://localhost:8081,http://localhost:8082
   datasource:
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}

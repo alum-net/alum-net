@@ -8,13 +8,13 @@ import CreateCourseModal from './create-course';
 import { UserRole } from '@alum-net/users/src/types';
 
 function CourseFilters({ currentPage }: { currentPage: number }) {
-  const { userInfo } = useUserInfo();
+  const { data } = useUserInfo();
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   return (
     <View>
       <FilterBar currentPage={currentPage} />
-      {userInfo?.role === UserRole.admin && (
+      {data?.role === UserRole.admin && (
         <>
           <Button
             mode="contained"

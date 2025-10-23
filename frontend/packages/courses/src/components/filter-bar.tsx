@@ -26,7 +26,7 @@ export const FilterBar = ({
   onApplyFilters,
   initialFilters,
 }: FilterBarProps) => {
-  const { userInfo } = useUserInfo();
+  const { data } = useUserInfo();
   const [shiftMenuVisible, setShiftMenuVisible] = useState(false);
   const maxYear = useMemo(() => new Date().getFullYear() + 2, []);
 
@@ -149,7 +149,7 @@ export const FilterBar = ({
         ))}
       </Menu>
 
-      {userInfo?.role !== UserRole.admin && (
+      {data?.role !== UserRole.admin && (
         <View style={styles.checkboxContainer}>
           <Checkbox
             status={myCourses ? 'checked' : 'unchecked'}

@@ -14,7 +14,7 @@ export const CourseCard = ({ course }: { course: CourseDisplay }) => {
             style={styles.courseTitle}
             href={{
               pathname: '/course/[id]',
-              params: { id: course.id },
+              params: { id: course.id, name: course.name },
             }}
           >
             {course.name}

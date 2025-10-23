@@ -1,17 +1,17 @@
 import { useQuery } from '@tanstack/react-query';
-import { UserInfo } from '../types';
 import { getUserInfo } from '../service';
+import { QUERY_KEYS } from '@alum-net/api';
 
 export const useUserInfo = () => {
-  const { data, isLoading, refetch } = useQuery<UserInfo>({
-    queryKey: ['userInfo'],
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: [QUERY_KEYS.getUserInfo],
     queryFn: getUserInfo,
-    // enabled: false,
     retry: 2,
+    staleTime: Infinity,
   });
 
   return {
-    userInfo: data,
+    data,
     isLoading,
     refetch,
   };

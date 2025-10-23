@@ -29,6 +29,10 @@ const InitialLayout = () => {
               </Stack.Protected>
               <Stack.Protected guard={!!refreshToken}>
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen
+                  name="course/[id]"
+                  options={{ headerShown: false }}
+                />
               </Stack.Protected>
               <Stack.Screen name="+not-found" />
               <Stack.Screen name="auth" options={{ headerShown: false }} />
