@@ -5,13 +5,11 @@ import org.alumnet.application.dtos.SectionCreationRequestDTO;
 import org.alumnet.application.mapper.SectionMapper;
 import org.alumnet.domain.Course;
 import org.alumnet.domain.Section;
-import org.alumnet.domain.resources.SectionResource;
-import org.alumnet.domain.repositories.ResourceRepository;
 import org.alumnet.domain.repositories.SectionRepository;
+import org.alumnet.domain.resources.SectionResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,11 +39,12 @@ public class SectionService {
     }
 
     private void uploadAndLinkFilesToSection(List<MultipartFile> files, Section section) {
+        String folderPath = "courses/" + section.getCourse().getId() + "/sections/" + section.getId().getTitle() + "/resources/";
 
         files.forEach(file -> {
 
             String fileExtension = getFileExtension(file.getOriginalFilename());
-            String s3Key = s3FileStorageService.store(file, fileExtension);
+            String s3Key = s3FileStorageService.store(file, fileExtension,folderPath);
 
             SectionResource sectionResource = createSectionResource(file, s3Key, fileExtension);
             section.addResource(sectionResource);

@@ -3,6 +3,7 @@ package org.alumnet.domain.users;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
+import org.alumnet.application.enums.UserRole;
 import org.alumnet.domain.Course;
 
 import java.util.List;
@@ -13,4 +14,10 @@ import java.util.List;
 public class Teacher extends User {
     @ManyToMany(mappedBy = "teachers")
     private List<Course> courses;
+
+    @Override
+    public UserRole getRole() {
+        return UserRole.TEACHER;
+    }
+
 }

@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface ParticipationRepository extends JpaRepository<CourseParticipation, CourseParticipationId> {
 
@@ -15,6 +17,12 @@ public interface ParticipationRepository extends JpaRepository<CourseParticipati
         where courseParticipation.course.id = :courseId
     """)
     boolean hasEnrolledStudents(@Param("courseId") int courseId);
+
+    @Query("SELECT cp.student.email as student " + "FROM CourseParticipation cp WHERE cp.id.courseId = :courseId")
+    List<String> findStudentsEmailsByCourseId(@Param("courseId") Integer courseId);
+
+    @Query("SELECT COUNT(cp) FROM CourseParticipation cp WHERE cp.id.courseId = :courseId")
+    Integer countStudentsByCourseId(@Param("courseId") Integer courseId);
 
     CourseParticipation findByStudentEmailAndCourseId(String email, Integer courseId);
 

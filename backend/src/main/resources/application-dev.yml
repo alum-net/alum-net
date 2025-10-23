@@ -1,0 +1,54 @@
+spring:
+  application:
+    name: alum-net
+    cors:
+      allowed-origins: http://localhost:3000,http://frontend:3000
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/certs
+          valid-issuers: http://localhost:8000/realms/${KEYCLOAK_REALM},${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+jwt:
+  auth:
+    principleAttribute: preferred_username
+
+keycloak:
+  name: alum-net
+  client-id: ${KEYCLOAK_CLIENT_ID:alumnet}
+  url: ${KEYCLOAK_URL:http://localhost:8000}
+  realm: ${KEYCLOAK_REALM:alumnet-realm}
+  username: ${KEYCLOAK_USERNAME:develop@alumnet.com}
+  password: ${KEYCLOAK_PASSWORD:develop}
+
+logging:
+  config: classpath:logback-spring.xml
+server:
+  port: ${SERVER_PORT:8200}
+
+aws:
+  s3:
+    region: ${AWS_DEFAULT_REGION}
+    bucket-name: ${AWS_BUCKET_NAME}
+    base-url: https://${aws.s3.bucket-name}.s3.${aws.s3.region}.amazonaws.com
+    duration-url-hours: 1
+
+
+
+

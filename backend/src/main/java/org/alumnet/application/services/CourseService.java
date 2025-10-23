@@ -2,15 +2,9 @@ package org.alumnet.application.services;
 
 import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.*;
-import org.alumnet.application.dtos.CourseCreationRequestDTO;
-import org.alumnet.application.dtos.CourseDTO;
-import org.alumnet.application.dtos.CourseFilterDTO;
-import org.alumnet.application.dtos.UserFilterDTO;
 import org.alumnet.application.enums.UserRole;
 import org.alumnet.application.mapper.CourseMapper;
 import org.alumnet.application.mapper.UserMapper;
-import org.alumnet.application.specifications.CourseSpecification;
-import org.alumnet.application.mapper.CourseMapper;
 import org.alumnet.application.specifications.CourseSpecification;
 import org.alumnet.application.specifications.UserSpecification;
 import org.alumnet.domain.Course;
@@ -20,22 +14,18 @@ import org.alumnet.domain.repositories.CourseParticipationRepository;
 import org.alumnet.domain.repositories.CourseRepository;
 import org.alumnet.domain.repositories.ParticipationRepository;
 import org.alumnet.domain.repositories.UserRepository;
+import org.alumnet.domain.strategies.CourseContentStrategyFactory;
 import org.alumnet.domain.users.Student;
 import org.alumnet.domain.users.Teacher;
 import org.alumnet.domain.users.User;
 import org.alumnet.infrastructure.exceptions.*;
-import org.springframework.beans.factory.BeanRegistry;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
@@ -50,6 +40,10 @@ public class CourseService {
     private final UserRepository userRepository;
     private final CourseParticipationRepository courseParticipationRepository;
     private final ParticipationRepository participationRepository;
+    private final CourseContentStrategyFactory courseContentStrategyFactory;
+    private final S3FileStorageService s3FileStorageService;
+    @Value("${aws.s3.duration-url-hours}")
+    private long urlDuration;
 
     private final CourseMapper courseMapper;
 
@@ -188,5 +182,17 @@ public class CourseService {
     public Page<UserDTO> getCourseMembers(int courseId, Pageable page) {
          Page<User> members = userRepository.findAll(UserSpecification.byCourse(courseId), page);
          return members.map(userMapper::userToUserDTO);
+    }
+
+    public CourseContentDTO getCourseContent(Pageable page, int courseId, String userId) {
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        CourseContentDTO courseContent = courseContentStrategyFactory.getStrategy(user.getRole()).getCourseContent(userId, courseId, page);
+        updateResourceUrls(courseContent);
+        return courseContent;
+    }
+
+    private void updateResourceUrls(CourseContentDTO courseContent) {
+        courseContent.getSections().getData().forEach(section -> section.getSectionResources().forEach(sectionResource
+                -> sectionResource.setUrl(s3FileStorageService.generatePresignedUrl(sectionResource.getUrl(), Duration.ofHours(urlDuration)))));
     }
 }
