@@ -2,7 +2,7 @@ package org.alumnet.infrastructure.controllers;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.alumnet.application.dtos.SectionCreationRequestDTO;
+import org.alumnet.application.dtos.SectionRequestDTO;
 import org.alumnet.application.dtos.responses.ResultResponse;
 import org.alumnet.application.services.SectionService;
 import org.springframework.http.MediaType;
@@ -23,10 +23,18 @@ public class SectionController {
 
     @PostMapping (path = "/{courseId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('teacher')")
-    public ResponseEntity<ResultResponse<Object>> createSection(@RequestPart("section") @Valid SectionCreationRequestDTO sectionDTO,
+    public ResponseEntity<ResultResponse<Object>> createSection(@RequestPart("section") @Valid SectionRequestDTO sectionDTO,
                                         @RequestPart (value = "resources", required = false) List<MultipartFile> files,
                                         @PathVariable int courseId) {
         sectionService.createSection(sectionDTO, files, courseId);
         return ResponseEntity.ok().body(ResultResponse.success(null, "Sección creada exitosamente"));
+    }
+
+    @DeleteMapping("/{courseId}/{title}")
+    @PreAuthorize("hasRole('teacher')")
+    public ResponseEntity<ResultResponse<Object>> deleteSection(@PathVariable int courseId,
+                                                                @PathVariable String title) {
+        sectionService.deleteSection(courseId, title);
+        return ResponseEntity.ok().body(ResultResponse.success(null, "Sección eliminada exitosamente"));
     }
 }

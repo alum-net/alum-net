@@ -2,7 +2,7 @@ package org.alumnet.domain.strategies;
 
 import org.alumnet.application.dtos.CourseContentDTO;
 import org.alumnet.application.dtos.responses.PageableResultResponse;
-import org.alumnet.application.dtos.responses.SectionDTO;
+import org.alumnet.application.dtos.SectionDTO;
 import org.alumnet.application.mapper.SectionMapper;
 import org.alumnet.domain.repositories.CourseRepository;
 import org.alumnet.domain.repositories.ParticipationRepository;

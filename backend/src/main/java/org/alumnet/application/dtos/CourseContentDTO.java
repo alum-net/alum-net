@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.alumnet.application.dtos.responses.PageableResultResponse;
-import org.alumnet.application.dtos.responses.SectionDTO;
 
 import java.util.List;
 

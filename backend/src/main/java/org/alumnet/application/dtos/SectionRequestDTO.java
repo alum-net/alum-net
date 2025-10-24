@@ -1,7 +1,6 @@
 package org.alumnet.application.dtos;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,9 +11,9 @@ import org.hibernate.validator.constraints.Length;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SectionCreationRequestDTO {
+public class SectionRequestDTO {
     @NotBlank(message = "El título es obligatorio")
-    private String title;
+    protected String title;
     @Length(max = 500, message = "La descripción no puede superar los 500 caracteres")
-    private String description;
+    protected String description;
 }

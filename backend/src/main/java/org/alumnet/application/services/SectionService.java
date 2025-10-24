@@ -1,12 +1,14 @@
 package org.alumnet.application.services;
 
 import lombok.RequiredArgsConstructor;
-import org.alumnet.application.dtos.SectionCreationRequestDTO;
+import org.alumnet.application.dtos.SectionRequestDTO;
 import org.alumnet.application.mapper.SectionMapper;
 import org.alumnet.domain.Course;
 import org.alumnet.domain.Section;
+import org.alumnet.domain.SectionId;
 import org.alumnet.domain.repositories.SectionRepository;
 import org.alumnet.domain.resources.SectionResource;
+import org.alumnet.infrastructure.exceptions.SectionNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,7 +26,7 @@ public class SectionService {
     private final S3FileStorageService s3FileStorageService;
     private final SectionMapper sectionMapper;
 
-    public void createSection(SectionCreationRequestDTO sectionDTO, List<MultipartFile> files, int courseId) {
+    public void createSection(SectionRequestDTO sectionDTO, List<MultipartFile> files, int courseId) {
         if (files != null && !files.isEmpty())
             fileValidationService.validateFiles(files);
 
@@ -39,7 +41,7 @@ public class SectionService {
     }
 
     private void uploadAndLinkFilesToSection(List<MultipartFile> files, Section section) {
-        String folderPath = "courses/" + section.getCourse().getId() + "/sections/" + section.getId().getTitle() + "/resources/";
+        String folderPath = buildSectionResourcePath(section);
 
         files.forEach(file -> {
 
@@ -50,6 +52,11 @@ public class SectionService {
             section.addResource(sectionResource);
         });
 
+    }
+    private String buildSectionResourcePath(Section section) {
+        return String.format("courses/%d/sections/%s/resources",
+                section.getCourse().getId(),
+                section.getId().getTitle());
     }
 
 
@@ -71,4 +78,13 @@ public class SectionService {
     }
 
 
+    public void deleteSection(Integer courseId, String title) {
+        Section section = sectionRepository.findById(SectionId.builder()
+                .courseId(courseId)
+                .title(title).build())
+                .orElseThrow(SectionNotFoundException::new);
+
+        s3FileStorageService.deleteFolder("courses/" + courseId + "/sections/" + title + "/resources/");
+        sectionRepository.delete(section);
+    }
 }
