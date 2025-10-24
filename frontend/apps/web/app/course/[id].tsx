@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams } from 'expo-router';
 import { THEME } from '@alum-net/ui';
 import { useCourse } from '@alum-net/courses';
+import CourseMembersCard from './course-members-card';
 
 export default function Course() {
   const { id, name } = useLocalSearchParams();
@@ -95,11 +96,11 @@ export default function Course() {
               </Card.Content>
             </Card>
 
-            <Card style={{ marginTop: 16 }}>
-              <Card.Title
-                title={`Miembros (${data.data?.totalEnrollments ?? 0})`}
-              />
-            </Card>
+            <CourseMembersCard
+              courseId={id.toString()}
+              totalEnrollments={data.data?.totalEnrollments ?? 0}
+            />
+
           </>
         }
       />
