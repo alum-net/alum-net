@@ -45,6 +45,7 @@ aws:
     bucket-name: ${AWS_BUCKET_NAME}
     region: ${AWS_DEFAULT_REGION}
     base-url: https://${aws.s3.bucket-name}.s3.${aws.s3.region}.amazonaws.com
+    duration-url-hours: 1
 
 
 

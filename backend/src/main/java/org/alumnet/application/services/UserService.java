@@ -11,6 +11,7 @@ import org.alumnet.domain.users.User;
 import org.alumnet.infrastructure.config.KeycloakProperties;
 import org.alumnet.infrastructure.exceptions.ExistingUserException;
 import org.keycloak.admin.client.Keycloak;
+import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -92,6 +94,13 @@ public class UserService {
         user.setEnabled(true);
         user.setGroups(List.of(userCreationRequestDTO.getGroup()));
         user.setEmailVerified(true);
+
+        CredentialRepresentation credential = new CredentialRepresentation();
+        credential.setType(CredentialRepresentation.PASSWORD);
+        credential.setValue(userCreationRequestDTO.getPassword());
+        credential.setTemporary(false);
+
+        user.setCredentials(Collections.singletonList(credential));
         return user;
     }
 }

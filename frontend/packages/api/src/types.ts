@@ -1,8 +1,9 @@
 export type Response<T = undefined> = {
   errors: string[];
   message: string;
-  success: true;
+  success: boolean;
   data?: T;
+  statusCode: number;
 };
 
 type Pageable = {
@@ -10,6 +11,8 @@ type Pageable = {
   pageSize: number;
   totalElements: number;
   totalPages: number;
+  page: number;
+  size: number;
 };
 
 export type PageableContent<T> = {
