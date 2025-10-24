@@ -10,7 +10,6 @@ import CourseMembersCard from './course-members-card';
 export default function Course() {
   const { id, name } = useLocalSearchParams();
   const { data, isLoading } = useCourse(id.toString());
-  const courseId = id?.toString?.() ?? '';
 
   const [expandedSections, setExpandedSections] = useState<
     Record<string, boolean>
@@ -98,7 +97,7 @@ export default function Course() {
             </Card>
 
             <CourseMembersCard
-              courseId={courseId}
+              courseId={id.toString()}
               totalEnrollments={data.data?.totalEnrollments ?? 0}
             />
 
