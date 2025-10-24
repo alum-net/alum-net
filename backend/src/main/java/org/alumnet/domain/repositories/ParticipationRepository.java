@@ -13,15 +13,28 @@ import java.util.List;
 public interface ParticipationRepository extends JpaRepository<CourseParticipation, CourseParticipationId> {
 
     @Query("""
-        select (count(courseParticipation) > 0) from CourseParticipation courseParticipation
-        where courseParticipation.course.id = :courseId
-    """)
+    select (count(cp) > 0) from CourseParticipation cp
+    where cp.course.id = :courseId
+    and cp.course.enabled = true     
+    and cp.student.enabled = true   
+""")
     boolean hasEnrolledStudents(@Param("courseId") int courseId);
 
-    @Query("SELECT cp.student.email as student " + "FROM CourseParticipation cp WHERE cp.id.courseId = :courseId")
+    @Query("""
+    SELECT cp.student.email as student 
+    FROM CourseParticipation cp 
+    WHERE cp.course.id = :courseId
+    AND cp.course.enabled = true     
+    AND cp.student.enabled = true     
+""")
     List<String> findStudentsEmailsByCourseId(@Param("courseId") Integer courseId);
 
-    @Query("SELECT COUNT(cp) FROM CourseParticipation cp WHERE cp.id.courseId = :courseId")
+    @Query("""
+    SELECT COUNT(cp) FROM CourseParticipation cp 
+    WHERE cp.course.id = :courseId
+    AND cp.course.enabled = true    
+    AND cp.student.enabled = true   
+""")
     Integer countStudentsByCourseId(@Param("courseId") Integer courseId);
 
     CourseParticipation findByStudentEmailAndCourseId(String email, Integer courseId);
