@@ -1,7 +1,7 @@
 package org.alumnet.application.mapper;
 
-import org.alumnet.application.dtos.SectionCreationRequestDTO;
-import org.alumnet.application.dtos.responses.SectionDTO;
+import org.alumnet.application.dtos.SectionRequestDTO;
+import org.alumnet.application.dtos.SectionDTO;
 import org.alumnet.domain.Course;
 import org.alumnet.domain.Section;
 import org.alumnet.domain.SectionId;
@@ -14,9 +14,9 @@ public interface SectionMapper {
     @Mapping(source = "title", target = "id.title")
     @Mapping(target = "course", ignore = true)
     @Mapping(target = "id.courseId", ignore = true)
-    Section sectionCreationRequestDTOToSection(SectionCreationRequestDTO section);
+    Section sectionCreationRequestDTOToSection(SectionRequestDTO section);
 
-    default Section toSectionWithCourse(SectionCreationRequestDTO dto, Course course) {
+    default Section toSectionWithCourse(SectionRequestDTO dto, Course course) {
         Section section = sectionCreationRequestDTOToSection(dto);
 
         if (section.getId() == null) {

@@ -1,10 +1,9 @@
-package org.alumnet.application.dtos.responses;
+package org.alumnet.application.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.alumnet.application.dtos.SectionResourceDTO;
 
 import java.util.List;
 
