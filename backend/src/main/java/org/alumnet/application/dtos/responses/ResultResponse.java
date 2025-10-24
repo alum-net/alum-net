@@ -17,39 +17,29 @@ import java.util.List;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ResultResponse <T>{
-    private boolean success;
     private String message;
-    private int statusCode;
     private T data;
     @Builder.Default
     private List<String> errors = new ArrayList<>();
 
-    public void addError(String error) {
-        this.errors.add(error);
-        this.success = false;
-    }
-
     public static <T> ResultResponse<T> success(T data, String message) {
         ResultResponse<T> response = new ResultResponse<>();
-        response.setSuccess(true);
         response.setMessage(message);
         response.setData(data);
         response.setErrors(null);
         return response;
     }
 
-    public static <T> ResultResponse<T> error(List<String> errors, String message, int statusCode) {
+    public static <T> ResultResponse<T> error(List<String> errors, String message) {
         ResultResponse<T> response = new ResultResponse<>();
-        response.setSuccess(false);
         response.setMessage(message);
         response.setData(null);
-        response.setStatusCode(statusCode);
         response.setErrors(errors);
         return response;
     }
 
-    public static <T> ResultResponse<T> error(String error, String message, int statusCode) {
-        return error(Collections.singletonList(error), message, statusCode);
+    public static <T> ResultResponse<T> error(String error, String message) {
+        return error(Collections.singletonList(error), message);
     }
 
 }
