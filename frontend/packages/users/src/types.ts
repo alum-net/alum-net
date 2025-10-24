@@ -12,3 +12,10 @@ export interface UserInfo {
   lastname: string;
   name: string;
 }
+
+export type UserFilterDTO = {
+  name?: string;
+  lastname?: string;
+  email?: string;
+  role?: UserRole | '';
+};

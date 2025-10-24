@@ -1,7 +1,11 @@
-import { getKeyclaokUserInfo } from '@alum-net/auth';
-import { UserInfo } from './types';
 import api, { PageableResponse } from '@alum-net/api';
 import { AxiosResponse } from 'axios';
+import { getKeyclaokUserInfo } from '@alum-net/auth';
+import type {
+  UserFilterDTO,
+  UserInfo,
+  UserRole,
+} from './types';
 
 export const getUserInfo = async () => {
   const userInfo = await getKeyclaokUserInfo();
@@ -15,5 +19,42 @@ export const getUserInfo = async () => {
     },
   );
 
-  return data.data?.[0];
+  return data?.data?.[0];
 };
+
+
+function buildQueryString(queryParams: Record<string, string | number | undefined | null>): string {
+  const searchParams = new URLSearchParams();
+
+  Object.entries(queryParams).forEach(([key, value]) => {
+    if (value === '' || value === undefined || value === null) return;
+    searchParams.append(key, String(value));
+  });
+
+  return searchParams.toString();
+}
+
+export async function fetchUsers(opts: {
+  page: number;
+  size: number;
+  filter?: UserFilterDTO;
+}): Promise<PageableResponse<UserInfo>> {
+  const { page, size, filter } = opts;
+
+  const normalizedRole = (filter?.role && String(filter.role).toUpperCase()) as
+    | UserRole
+    | ''
+    | undefined;
+
+  const queryString = buildQueryString({
+    page,
+    size,
+    name: filter?.name,
+    lastname: filter?.lastname,
+    email: filter?.email,
+    role: normalizedRole || undefined,
+  });
+
+  const res = await api.get<PageableResponse<UserInfo>>(`users/?${queryString}`);
+  return res.data;
+}
