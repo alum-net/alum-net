@@ -77,7 +77,7 @@ public class CourseController {
         }
 
         @GetMapping(path = "/{courseId}/members", produces = "application/json")
-        @PreAuthorize("hasRole('admin', 'teacher')")
+        @PreAuthorize("hasAnyRole('admin','teacher')")
         public ResponseEntity<PageableResultResponse<UserDTO>> getCourseMembers(
                         @PageableDefault(page = 0, size = 15) Pageable page,
                         @PathVariable int courseId) {
