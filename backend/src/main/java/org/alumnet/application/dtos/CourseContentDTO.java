@@ -19,5 +19,5 @@ public class CourseContentDTO {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     List<String> enrolledStudents;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    Integer totalEnrollments;
+    Integer totalMembers;
 }

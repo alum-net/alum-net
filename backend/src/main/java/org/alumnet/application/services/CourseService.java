@@ -138,24 +138,6 @@ public class CourseService {
         participationRepository.delete(userParticipation);
     }
 
-    private void validateTeachers(List<String> teacherEmails, List<Teacher> teachers) {
-        if (teachers.size() != teacherEmails.size()) {
-            throw new InvalidAttributeException("Uno o más docentes no existen o no tienen rol Teacher");
-        }
-    }
-
-    private void validateDates(LocalDate startDate, LocalDate endDate) {
-        if (!startDate.isBefore(endDate)) {
-            throw new InvalidAttributeException("La fecha de inicio debe ser anterior a la fecha de fin");
-        }
-    }
-
-    private static void validateGrade(Double approvalGrade) {
-        if (approvalGrade == null || approvalGrade < 0.0 || approvalGrade > 1.0) {
-            throw new InvalidAttributeException("La nota mínima debe estar entre 0.0 y 1.0");
-        }
-    }
-
     public Course findById(int courseId) {
         return courseRepository.findById(courseId)
                 .orElseThrow(() -> new InvalidAttributeException("Curso con id " + courseId + " no encontrado"));
@@ -207,4 +189,23 @@ public class CourseService {
         courseContent.getSections().getData().forEach(section -> section.getSectionResources().forEach(sectionResource
                 -> sectionResource.setUrl(s3FileStorageService.generatePresignedUrl(sectionResource.getUrl(), Duration.ofHours(urlDuration)))));
     }
+
+    private void validateTeachers(List<String> teacherEmails, List<Teacher> teachers) {
+        if (teachers.size() != teacherEmails.size()) {
+            throw new InvalidAttributeException("Uno o más docentes no existen o no tienen rol Teacher");
+        }
+    }
+
+    private void validateDates(LocalDate startDate, LocalDate endDate) {
+        if (!startDate.isBefore(endDate)) {
+            throw new InvalidAttributeException("La fecha de inicio debe ser anterior a la fecha de fin");
+        }
+    }
+
+    private static void validateGrade(Double approvalGrade) {
+        if (approvalGrade == null || approvalGrade < 0.0 || approvalGrade > 1.0) {
+            throw new InvalidAttributeException("La nota mínima debe estar entre 0.0 y 1.0");
+        }
+    }
+
 }

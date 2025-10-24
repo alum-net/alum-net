@@ -24,4 +24,13 @@ public interface CourseRepository extends JpaRepository<Course, Integer>, JpaSpe
 
     @EntityGraph(attributePaths = {"teachers"})
     Page<Course> findAll(Specification<Course> spec, Pageable pageable);
+
+    @Query("""
+        select count(t) from Course c
+        join c.teachers t 
+        where c.id = :courseId
+          and c.enabled = true  
+          and t.enabled = true  
+    """)
+    int countTeachersByCourseId(@Param("courseId") int courseId);
 }

@@ -4,6 +4,7 @@ import org.alumnet.application.dtos.CourseContentDTO;
 import org.alumnet.application.dtos.responses.PageableResultResponse;
 import org.alumnet.application.dtos.SectionDTO;
 import org.alumnet.application.mapper.SectionMapper;
+import org.alumnet.domain.repositories.CourseRepository;
 import org.alumnet.domain.repositories.ParticipationRepository;
 import org.alumnet.domain.repositories.SectionRepository;
 import org.springframework.data.domain.Page;
@@ -15,15 +16,18 @@ public abstract class CourseContentStrategy {
     protected final SectionRepository sectionRepository;
     protected final SectionMapper sectionMapper;
     protected final ParticipationRepository participationRepository;
+    protected final CourseRepository courseRepository;
 
     protected CourseContentStrategy(
             SectionRepository sectionRepository,
             SectionMapper sectionMapper,
-            ParticipationRepository participationRepository) {
+            ParticipationRepository participationRepository,
+            CourseRepository courseRepository) {
 
         this.sectionRepository = sectionRepository;
         this.sectionMapper = sectionMapper;
         this.participationRepository = participationRepository;
+        this.courseRepository = courseRepository;
     }
 
     public CourseContentDTO getCourseContent(String userId, Integer courseId, Pageable page) {
@@ -48,9 +52,12 @@ public abstract class CourseContentStrategy {
 
     protected abstract void validate(String userId, Integer courseId);
 
-    protected Integer getTotalEnrollments(Integer courseId) {
-        return participationRepository.countStudentsByCourseId(courseId);
+    protected Integer getTotalMembers(Integer courseId) {
+        int totalMembers = participationRepository.countStudentsByCourseId(courseId);
+        totalMembers += courseRepository.countTeachersByCourseId(courseId);
+        return totalMembers;
     }
+
     protected abstract CourseContentDTO buildCourseContentDTO(Integer courseId, String userId, PageableResultResponse<SectionDTO> sectionDTOS);
 
 }
