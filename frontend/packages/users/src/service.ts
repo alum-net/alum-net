@@ -1,8 +1,7 @@
-import api from '@alum-net/api';
+import api, { PageableResponse } from '@alum-net/api';
 import { AxiosResponse } from 'axios';
 import { getKeyclaokUserInfo } from '@alum-net/auth';
 import type {
-  PageableResultResponse,
   UserFilterDTO,
   UserInfo,
   UserRole,
@@ -39,7 +38,7 @@ export async function fetchUsers(opts: {
   page: number;
   size: number;
   filter?: UserFilterDTO;
-}): Promise<PageableResultResponse<UserInfo>> {
+}): Promise<PageableResponse<UserInfo>> {
   const { page, size, filter } = opts;
 
   const normalizedRole = (filter?.role && String(filter.role).toUpperCase()) as
@@ -56,6 +55,6 @@ export async function fetchUsers(opts: {
     role: normalizedRole || undefined,
   });
 
-  const res = await api.get<PageableResultResponse<UserInfo>>(`users/?${queryString}`);
+  const res = await api.get<PageableResponse<UserInfo>>(`users/?${queryString}`);
   return res.data;
 }
