@@ -1,6 +1,6 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Button, Card, DataTable, Dialog, Portal, Text } from 'react-native-paper';
+import { Button, Card, DataTable, Dialog, Portal, Text, IconButton } from 'react-native-paper';
 import { useUserInfo } from '@alum-net/users';
 import { UserRole, type UserInfo } from '@alum-net/users/src/types';
 import { THEME, FormTextInput, Toast } from '@alum-net/ui';
@@ -28,6 +28,9 @@ export default function CourseMembersCard({ courseId, totalEnrollments }: Props)
 
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(10);
+
+  const [expanded, setExpanded] = useState(false);
+  const toggleExpand = () => setExpanded(prev => !prev);
 
   const { data, isLoading, isFetching, error } = useCourseMembers(courseId, page, size);
   if (error) console.error('[members] COMPONENT ERROR =>', error);
@@ -114,19 +117,35 @@ export default function CourseMembersCard({ courseId, totalEnrollments }: Props)
     focusTrigger();
   };
 
+  if (!canManage) return null;
+
   return (
     <Card style={{ marginTop: 16 }}>
       <Card.Title
-        title={`Miembros (${totalEnrollments ?? 0})`}
-        right={() =>
-          canManage ? (
-            <Button ref={enrollBtnRef} mode="contained" onPress={() => setOpen(true)}>
-              Matricular estudiante
-            </Button>
-          ) : null
-        }
+        title={`Estudiantes (${totalEnrollments ?? 0})`}
+        right={props => (
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            {canManage && (
+              <Button
+                ref={enrollBtnRef}
+                mode="contained"
+                onPress={() => setOpen(true)}
+                style={{ marginRight: 4 }}
+              >
+                Matricular estudiante
+              </Button>
+            )}
+            <IconButton
+              {...props}
+              icon={expanded ? 'chevron-up' : 'chevron-down'}
+              onPress={toggleExpand}
+            />
+          </View>
+        )}
       />
-      <Card.Content>
+
+      {expanded && (
+       <Card.Content>
         <View style={styles.tableCard}>
           {(isLoading || isFetching) && (
             <View style={styles.loading}>
@@ -196,8 +215,8 @@ export default function CourseMembersCard({ courseId, totalEnrollments }: Props)
             />
           </DataTable>
         </View>
-      </Card.Content>
-
+       </Card.Content>
+      )}
       {/* Modal Matricular*/}
       {open && (
         <Portal>
