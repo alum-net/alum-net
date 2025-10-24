@@ -117,7 +117,7 @@ export default function CourseMembersCard({ courseId, totalEnrollments }: Props)
     focusTrigger();
   };
 
-  if (!canManage) return null;
+  if (user?.role === UserRole.student) return null
 
   return (
     <Card style={{ marginTop: 16 }}>
