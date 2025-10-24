@@ -1,15 +1,20 @@
 import React, { useState } from 'react';
-import { FlatList, View } from 'react-native';
+import { FlatList, Modal, View } from 'react-native';
 import { Button, Card, Text, IconButton } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams } from 'expo-router';
 import { THEME } from '@alum-net/ui';
 import { useCourse } from '@alum-net/courses';
+import { useUserInfo } from '@alum-net/users';
+import { UserRole } from '@alum-net/users/src/types';
+import { CreateSectionForm } from '../../features/courses/components/section-creation';
 
 export default function Course() {
   const { id, name } = useLocalSearchParams();
+  const { data: userInfo } = useUserInfo();
   const { data, isLoading } = useCourse(id.toString());
-
+  const [isCreateSectionModalVisible, setIsCreateSectionModalVisible] =
+    useState(false);
   const [expandedSections, setExpandedSections] = useState<
     Record<string, boolean>
   >({});
@@ -42,26 +47,29 @@ export default function Course() {
           <Card style={{ marginBottom: 8 }}>
             <Card.Title
               title={item.title}
-              right={props => (
-                <View style={{ flexDirection: 'row' }}>
-                  <IconButton {...props} icon="pencil" onPress={() => {}} />
-                  <IconButton {...props} icon="delete" iconColor="red" />
-                  <IconButton
-                    {...props}
-                    icon={
-                      expandedSections[item.title]
-                        ? 'chevron-up'
-                        : 'chevron-down'
-                    }
-                    onPress={() =>
-                      setExpandedSections(prev => ({
-                        ...prev,
-                        [item.title]: !prev[item.title],
-                      }))
-                    }
-                  />
-                </View>
-              )}
+              right={props => {
+                if (userInfo?.role === UserRole.teacher)
+                  return (
+                    <View style={{ flexDirection: 'row' }}>
+                      <IconButton {...props} icon="pencil" onPress={() => {}} />
+                      <IconButton {...props} icon="delete" iconColor="red" />
+                      <IconButton
+                        {...props}
+                        icon={
+                          expandedSections[item.title]
+                            ? 'chevron-up'
+                            : 'chevron-down'
+                        }
+                        onPress={() =>
+                          setExpandedSections(prev => ({
+                            ...prev,
+                            [item.title]: !prev[item.title],
+                          }))
+                        }
+                      />
+                    </View>
+                  );
+              }}
             />
             {expandedSections[item.title] && (
               <Card.Content>
@@ -85,7 +93,9 @@ export default function Course() {
                 borderWidth: 1,
                 borderColor: '#90caf9',
               }}
-              onPress={() => {}}
+              onPress={() => {
+                setIsCreateSectionModalVisible(true);
+              }}
             >
               <Card.Content style={{ alignItems: 'center' }}>
                 <Ionicons name="add-circle-outline" size={20} color="#1976d2" />
@@ -103,6 +113,11 @@ export default function Course() {
           </>
         }
       />
+      <Modal visible={isCreateSectionModalVisible}>
+        <CreateSectionForm
+          onFinish={() => setIsCreateSectionModalVisible(false)}
+        />
+      </Modal>
     </View>
   );
 }
