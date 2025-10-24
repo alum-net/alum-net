@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CourseSpecification {
-    public static Specification<Course> byFilters(CourseFilterDTO filter) {
+    public static Specification<Course> byFilters(CourseFilterDTO filter, UserRole userRole) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
@@ -56,16 +56,16 @@ public class CourseSpecification {
                 ));
             }
 
-            if (filter.getUserEmail() != null && filter.getRole() != null) {
+            if (filter.getUserEmail() != null) {
 
-                if (filter.getRole() == UserRole.TEACHER) {
+                if (userRole == UserRole.TEACHER) {
                     Join<Course, Teacher> teacherJoin = root.join("teachers");
                     predicates.add(criteriaBuilder.equal(
                             teacherJoin.get("email"),
                             filter.getUserEmail()
                     ));
 
-                } else if (filter.getRole() == UserRole.STUDENT) {
+                } else if (userRole == UserRole.STUDENT) {
                     Join participationJoin = root.join("participations");
                     Join studentJoin = participationJoin.join("student");
 
@@ -75,6 +75,9 @@ public class CourseSpecification {
                     ));
                 }
             }
+
+
+            predicates.add(criteriaBuilder.isTrue(root.get("enabled")));
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

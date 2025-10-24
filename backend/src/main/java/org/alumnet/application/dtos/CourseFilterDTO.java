@@ -13,5 +13,4 @@ public class CourseFilterDTO {
     private String teacherEmail;
     private ShiftType shiftType;
     private String userEmail;
-    private UserRole role;
 }

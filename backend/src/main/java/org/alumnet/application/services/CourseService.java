@@ -15,6 +15,7 @@ import org.alumnet.domain.repositories.CourseRepository;
 import org.alumnet.domain.repositories.ParticipationRepository;
 import org.alumnet.domain.repositories.UserRepository;
 import org.alumnet.domain.strategies.CourseContentStrategyFactory;
+import org.alumnet.domain.users.Administrator;
 import org.alumnet.domain.users.Student;
 import org.alumnet.domain.users.Teacher;
 import org.alumnet.domain.users.User;
@@ -172,7 +173,18 @@ public class CourseService {
         if (!hasFilter) {
             coursePage = courseRepository.findAll(page);
         } else {
-            Specification<Course> courseSpec = CourseSpecification.byFilters(filter);
+            UserRole userRole = null;
+            if(filter.getUserEmail() != null){
+                User user = userRepository.findById(filter.getUserEmail()).orElseThrow(UserNotFoundException::new);
+                switch (user) {
+                    case Administrator _ -> userRole = UserRole.ADMIN;
+                    case Teacher _ -> userRole = UserRole.TEACHER;
+                    case Student _ -> userRole = UserRole.STUDENT;
+                    default -> throw new IllegalArgumentException("Unknown User subclass: " + user.getClass().getName());
+                };
+            }
+
+            Specification<Course> courseSpec = CourseSpecification.byFilters(filter, userRole);
             coursePage = courseRepository.findAll(courseSpec, page);
         }
 
