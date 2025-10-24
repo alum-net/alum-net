@@ -14,7 +14,7 @@ type Pageable = {
 
 export type PageableContent<T> = {
   pageable: Pageable;
-  content: T[];
+  data: T[];
 };
 
 export type PageableResponse<T> = Response<T[]> & Pageable;

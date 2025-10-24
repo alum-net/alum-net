@@ -12,15 +12,19 @@ import {
   SectionCreationFormSchema,
   schema,
 } from '../validations/section-creation';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { createSection } from '../service';
+import { QUERY_KEYS } from '@alum-net/api';
 
 interface CreateSectionFormProps {
   onFinish: () => void;
+  courseId: string;
 }
 
 export const CreateSectionForm: React.FC<CreateSectionFormProps> = ({
   onFinish,
+  courseId,
 }) => {
-  const [uploading, setUploading] = useState(false);
   const [linkInput, setLinkInput] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<
     { uri: string; name: string; type: string }[]
@@ -41,6 +45,18 @@ export const CreateSectionForm: React.FC<CreateSectionFormProps> = ({
       fileUrls: [],
     },
   });
+  const queryClient = useQueryClient();
+
+  const { mutate } = useMutation({
+    mutationFn: (data: {
+      sectionData: { title: string; description?: string };
+      selectedFiles?: { uri: string; name: string; type: string }[];
+    }) => createSection({ courseId, ...data }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.getCourse] });
+    },
+  });
+
   const editor = useEditorBridge({
     autofocus: false,
     avoidIosKeyboard: true,
@@ -49,13 +65,10 @@ export const CreateSectionForm: React.FC<CreateSectionFormProps> = ({
   const addLink = () => {
     if (linkInput.trim()) {
       try {
-        // validate manually using zod to ensure it's a proper URL
-        z.string().url().parse(linkInput);
+        z.url().parse(linkInput);
         setValue('links', [...(getValues('links') || []), linkInput]);
         setLinkInput('');
-      } catch {
-        // invalid link format handled by UI or toast
-      }
+      } catch {}
     }
   };
 
@@ -69,7 +82,21 @@ export const CreateSectionForm: React.FC<CreateSectionFormProps> = ({
 
   const handleFileSelect = async () => {
     try {
-      const res = await DocumentPicker.getDocumentAsync({ multiple: true });
+      const res = await DocumentPicker.getDocumentAsync({
+        multiple: true,
+        type: [
+          'application/pdf',
+          'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          'video/mp4',
+          'image/jpeg',
+          'image/png',
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          'application/zip',
+        ],
+        copyToCacheDirectory: true,
+      });
+
       if (res.assets && res.assets.length > 0) {
         const newFiles = res.assets.map(f => ({
           uri: f.uri,
@@ -83,17 +110,13 @@ export const CreateSectionForm: React.FC<CreateSectionFormProps> = ({
     }
   };
 
-  const removeFile = (index: number) => {
-    const currentFiles = getValues('fileUrls') || [];
-    setValue(
-      'fileUrls',
-      currentFiles.filter((_, i) => i !== index),
-    );
-  };
+  const onSubmit = async (data: SectionCreationFormSchema) => {
+    const sectionData = {
+      title: data.title,
+      description: (await editor.getHTML()) || '',
+    };
 
-  const onSubmit = (data: SectionCreationFormSchema) => {
-    console.log(data);
-    onFinish();
+    mutate({ sectionData, selectedFiles }, { onSuccess: onFinish });
   };
 
   return (

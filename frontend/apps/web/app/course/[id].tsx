@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { FlatList, Modal, View } from 'react-native';
-import { Button, Card, Text, IconButton } from 'react-native-paper';
+import { Button, Card, Text } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams } from 'expo-router';
 import { THEME } from '@alum-net/ui';
 import { useCourse } from '@alum-net/courses';
 import { useUserInfo } from '@alum-net/users';
-import { UserRole } from '@alum-net/users/src/types';
 import { CreateSectionForm } from '../../features/courses/components/section-creation';
+import SectionCard from '../../features/courses/components/section-card';
 
 export default function Course() {
   const { id, name } = useLocalSearchParams();
@@ -15,9 +15,6 @@ export default function Course() {
   const { data, isLoading } = useCourse(id.toString());
   const [isCreateSectionModalVisible, setIsCreateSectionModalVisible] =
     useState(false);
-  const [expandedSections, setExpandedSections] = useState<
-    Record<string, boolean>
-  >({});
 
   if (isLoading || !data) return <Text>Cargando...</Text>;
 
@@ -26,7 +23,7 @@ export default function Course() {
       style={{ flex: 1, padding: 24, backgroundColor: THEME.colors.background }}
     >
       <FlatList
-        data={data.data?.sections.content}
+        data={data.data?.sections.data}
         keyExtractor={item => item.title}
         style={{ width: '90%', alignSelf: 'center', padding: 10 }}
         ListHeaderComponent={
@@ -44,44 +41,7 @@ export default function Course() {
           </View>
         }
         renderItem={({ item }) => (
-          <Card style={{ marginBottom: 8 }}>
-            <Card.Title
-              title={item.title}
-              right={props => {
-                if (userInfo?.role === UserRole.teacher)
-                  return (
-                    <View style={{ flexDirection: 'row' }}>
-                      <IconButton {...props} icon="pencil" onPress={() => {}} />
-                      <IconButton {...props} icon="delete" iconColor="red" />
-                      <IconButton
-                        {...props}
-                        icon={
-                          expandedSections[item.title]
-                            ? 'chevron-up'
-                            : 'chevron-down'
-                        }
-                        onPress={() =>
-                          setExpandedSections(prev => ({
-                            ...prev,
-                            [item.title]: !prev[item.title],
-                          }))
-                        }
-                      />
-                    </View>
-                  );
-              }}
-            />
-            {expandedSections[item.title] && (
-              <Card.Content>
-                <Text>{item.description}</Text>
-                {item.sectionResources.map((r, i) => (
-                  <Text key={i} style={{ marginTop: 4 }}>
-                    📄 {r.title} ({r.extension})
-                  </Text>
-                ))}
-              </Card.Content>
-            )}
-          </Card>
+          <SectionCard item={item} userRole={userInfo?.role} />
         )}
         ListFooterComponent={
           <>
@@ -113,9 +73,14 @@ export default function Course() {
           </>
         }
       />
-      <Modal visible={isCreateSectionModalVisible}>
+      <Modal
+        backdropColor={THEME.colors.backdrop}
+        animationType="fade"
+        visible={isCreateSectionModalVisible}
+      >
         <CreateSectionForm
           onFinish={() => setIsCreateSectionModalVisible(false)}
+          courseId={id.toString()}
         />
       </Modal>
     </View>

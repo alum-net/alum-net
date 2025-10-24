@@ -9,7 +9,7 @@ import { useEffect } from 'react';
 export const useCourse = (id: string) => {
   const { data: userInfo } = useUserInfo();
   const { data, isLoading } = useQuery({
-    queryKey: [QUERY_KEYS.getCourse, id],
+    queryKey: [QUERY_KEYS.getCourse],
     queryFn: () => fetchCourse(id, userInfo?.email || ''),
     enabled: !!userInfo?.email,
   });
