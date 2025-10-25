@@ -1,9 +1,9 @@
 package org.alumnet.infrastructure.controllers;
 
 import jakarta.validation.Valid;
-import org.alumnet.application.dtos.UserCreationRequestDTO;
+import org.alumnet.application.dtos.requests.UserCreationRequestDTO;
 import org.alumnet.application.dtos.UserDTO;
-import org.alumnet.application.dtos.UserFilterDTO;
+import org.alumnet.application.dtos.requests.UserFilterDTO;
 import org.alumnet.application.dtos.responses.PageableResultResponse;
 import org.alumnet.application.dtos.responses.ResultResponse;
 import org.alumnet.application.services.UserService;

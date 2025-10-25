@@ -1,6 +1,6 @@
 package org.alumnet.application.mapper;
 
-import org.alumnet.application.dtos.UserCreationRequestDTO;
+import org.alumnet.application.dtos.requests.UserCreationRequestDTO;
 import org.alumnet.application.dtos.UserDTO;
 import org.alumnet.domain.users.Administrator;
 import org.alumnet.domain.users.Student;

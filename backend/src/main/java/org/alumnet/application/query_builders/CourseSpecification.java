@@ -1,9 +1,9 @@
-package org.alumnet.application.specifications;
+package org.alumnet.application.query_builders;
 
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Expression;
-import org.alumnet.application.dtos.CourseFilterDTO;
+import org.alumnet.application.dtos.requests.CourseFilterDTO;
 import org.alumnet.application.enums.UserRole;
 import org.alumnet.domain.Course;
 import org.alumnet.domain.users.Teacher;
