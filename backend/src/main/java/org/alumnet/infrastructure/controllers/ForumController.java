@@ -41,7 +41,7 @@ public class ForumController {
     }
 
     @PostMapping(path = "/posts", produces = "application/json")
-    @PreAuthorize("hasAnyRole('teacher', 'student','admin')")
+    @PreAuthorize("hasAnyRole('teacher', 'student')")
     public ResponseEntity<ResultResponse<Object>> createPost(
             @Valid @RequestBody PostCreationRequestDTO post){
 
@@ -49,5 +49,16 @@ public class ForumController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ResultResponse.success(null, "Se creó el post correctamente"));
+    }
+
+    @DeleteMapping(path = "/posts/{postId}", produces = "application/json")
+    @PreAuthorize("hasAnyRole('teacher', 'student')")
+    public ResponseEntity<ResultResponse<Object>> deletePost(
+            @PathVariable String postId){
+
+        forumService.deletePost(postId);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .body(ResultResponse.success(null, "Se eliminó el post correctamente"));
     }
 }

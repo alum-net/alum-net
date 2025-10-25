@@ -72,6 +72,20 @@ public class ForumService {
         }
     }
 
+    public void deletePost(String postId) {
+        Post post = forumRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+
+        if(post.getParentPost() != null){
+            Post parentPost = forumRepository.findById(post.getParentPost()).orElseThrow(PostNotFoundException::new);
+            parentPost.setTotalResponses(parentPost.getTotalResponses() -1);
+
+            forumRepository.save(parentPost);
+        }
+
+        post.setEnabled(false);
+        forumRepository.save(post);
+    }
+
     private void validateTitle(PostCreationRequestDTO post) {
         if(post.getTitle() != null && post.getParentPost() != null){
             throw new InvalidPostTitleException();
