@@ -71,4 +71,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ResultResponse<Object>> handlePostNotFoundException(PostNotFoundException ex) {
         return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultResponse.error(ex.getMessage(), "No se encontró el post"));
     }
+
+    @ExceptionHandler(PostHasRepliesException.class)
+    public ResponseEntity<ResultResponse<Object>> handlePostHasRepliesException(PostHasRepliesException ex) {
+        return  ResponseEntity.status(HttpStatus.CONFLICT).body(ResultResponse.error(ex.getMessage(), "No se puede modificar el post"));
+    }
 }
