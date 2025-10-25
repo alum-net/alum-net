@@ -20,5 +20,5 @@ public class CourseDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy", timezone = "UTC")
     private Date year;
     private List<UserDTO> teachers;
-    private ShiftType shiftType;
+    private ShiftType shift;
 }

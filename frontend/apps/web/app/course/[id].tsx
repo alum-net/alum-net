@@ -6,7 +6,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { THEME } from '@alum-net/ui';
 import { useCourse } from '@alum-net/courses';
 import { useUserInfo } from '@alum-net/users';
-import { CreateSectionForm } from '../../features/courses/components/section-creation';
+import { SectionCreationForm } from '../../features/courses/components/section-creation-form';
 import SectionCard from '../../features/courses/components/section-card';
 import CourseMembersCard from './course-members-card';
 
@@ -78,7 +78,7 @@ export default function Course() {
         animationType="fade"
         visible={isCreateSectionModalVisible}
       >
-        <CreateSectionForm
+        <SectionCreationForm
           onFinish={() => setIsCreateSectionModalVisible(false)}
           courseId={id.toString()}
         />

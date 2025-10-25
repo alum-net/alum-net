@@ -6,46 +6,75 @@ import { Button, Checkbox, Menu } from 'react-native-paper';
 import { CourseShift, FiltersDirectory } from '../types';
 import { useUserInfo } from '@alum-net/users';
 import { THEME, FormTextInput } from '@alum-net/ui';
-import { useCoursesFilters } from '../hooks/useCoursesFilters';
 import { UserRole } from '@alum-net/users/src/types';
+import { z } from 'zod';
+import { useCoursesContext } from '../course-context';
 
-interface FilterFormData {
-  name: string;
-  teacherName: string;
-  year: string;
-}
+const currentYear = new Date().getFullYear();
+const maxYear = currentYear + 2;
+
+export const filterBarSchema = z.object({
+  name: z.string().optional().or(z.literal('')),
+  teacherEmail: z
+    .email('Debe ser un email válido')
+    .optional()
+    .or(z.literal('')),
+  year: z
+    .string()
+    .optional()
+    .or(z.literal(''))
+    .refine(
+      val => {
+        if (!val) return true;
+        const num = parseInt(val, 10);
+        return !isNaN(num);
+      },
+      { message: 'Debe ser un número' },
+    )
+    .refine(
+      val => {
+        if (!val) return true;
+        const num = parseInt(val, 10);
+        return num >= 0 && num <= maxYear;
+      },
+      { message: `Debe estar entre 0 y ${maxYear}` },
+    ),
+  shift: z
+    .enum(
+      SHIFTS.map(s => s.value).filter(Boolean) as [
+        CourseShift,
+        ...CourseShift[],
+      ],
+    )
+    .optional(),
+  myCourses: z.boolean().optional(),
+});
+
+type FilterBarSchema = z.infer<typeof filterBarSchema>;
 
 interface FilterBarProps {
-  currentPage: number;
-  onApplyFilters?: (filters: FiltersDirectory) => void;
-  initialFilters?: FiltersDirectory;
+  onApplyFilters?: () => void;
 }
 
-export const FilterBar = ({
-  currentPage,
-  onApplyFilters,
-  initialFilters,
-}: FilterBarProps) => {
+export const FilterBar = ({ onApplyFilters }: FilterBarProps) => {
   const { data } = useUserInfo();
   const [shiftMenuVisible, setShiftMenuVisible] = useState(false);
-  const maxYear = useMemo(() => new Date().getFullYear() + 2, []);
-
-  const { control, handleSubmit } = useForm<FilterFormData>({
-    defaultValues: {
-      name: initialFilters?.name || '',
-      teacherName: initialFilters?.teacherName || '',
-      year: initialFilters?.year || '',
-    },
-    mode: 'onChange',
-  });
-
+  const { setFilters, appliedFilters: initialFilters } = useCoursesContext();
   const [shiftType, setShift] = useState<CourseShift | undefined>(
-    initialFilters?.shiftType || undefined,
+    initialFilters?.shift || undefined,
   );
   const [myCourses, setMyCourses] = useState(
     initialFilters?.myCourses || false,
   );
-  const { setAppliedFilters } = useCoursesFilters(currentPage, !onApplyFilters);
+
+  const { control, handleSubmit, reset } = useForm<FilterBarSchema>({
+    defaultValues: {
+      name: initialFilters?.name || '',
+      teacherEmail: initialFilters?.teacherEmail || '',
+      year: initialFilters?.year || '',
+    },
+    mode: 'onChange',
+  });
 
   const handleYearChange = useCallback(
     (value: string, fieldOnChange: (...event: any[]) => void) => {
@@ -54,7 +83,7 @@ export const FilterBar = ({
         fieldOnChange(value);
       }
     },
-    [maxYear],
+    [],
   );
 
   const selectedShiftLabel = useMemo(
@@ -64,10 +93,19 @@ export const FilterBar = ({
 
   const changeFilters = useCallback(
     (values: FiltersDirectory) => {
-      setAppliedFilters(values);
+      setFilters(values);
+      onApplyFilters?.();
     },
-    [setAppliedFilters],
+    [setFilters, onApplyFilters],
   );
+
+  const clearFilters = () => {
+    reset();
+    setFilters({});
+    setMyCourses(false);
+    setShift(undefined);
+    onApplyFilters?.();
+  };
 
   return (
     <View style={styles.filterBar}>
@@ -81,9 +119,9 @@ export const FilterBar = ({
         activeOutlineColor={THEME.colors.secondary}
       />
       <FormTextInput
-        name="teacherName"
+        name="teacherEmail"
         control={control}
-        label="Nombre del profesor"
+        label="Email del profesor"
         mode="outlined"
         style={styles.filterInput}
         outlineColor="#333333"
@@ -100,23 +138,6 @@ export const FilterBar = ({
         activeOutlineColor={THEME.colors.secondary}
         placeholder={`0-${maxYear}`}
         customOnChange={handleYearChange}
-        rules={{
-          validate: {
-            isNumber: (value: string) => {
-              if (value === '') return true;
-              const num = parseInt(value);
-              return !isNaN(num) || 'Debe ser un número';
-            },
-            inRange: (value: string) => {
-              if (value === '') return true;
-              const num = parseInt(value);
-              return (
-                (num >= 0 && num <= maxYear) ||
-                `Debe estar entre 0 y ${maxYear}`
-              );
-            },
-          },
-        }}
       />
 
       <Menu
@@ -162,20 +183,17 @@ export const FilterBar = ({
       <Button
         mode="contained"
         onPress={handleSubmit(data =>
-          onApplyFilters
-            ? onApplyFilters({
-                ...data,
-                shiftType: shiftType,
-                myCourses: myCourses,
-              })
-            : changeFilters({
-                ...data,
-                shiftType: shiftType,
-                myCourses: myCourses,
-              }),
+          changeFilters({
+            ...data,
+            shift: shiftType,
+            myCourses: myCourses,
+          }),
         )}
       >
         Aplicar Filtros
+      </Button>
+      <Button mode="outlined" onPress={clearFilters}>
+        Limpiar
       </Button>
     </View>
   );

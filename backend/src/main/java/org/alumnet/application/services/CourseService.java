@@ -87,11 +87,10 @@ public class CourseService {
     public void addMemberToCourse(int courseId, String studentEmail) {
 
         Student student = userRepository.findOne(UserSpecification.byFilters(UserFilterDTO.builder()
-                        .email(studentEmail)
-                        .role(UserRole.STUDENT).build()))
-                .map(user -> (Student)user)
+                .email(studentEmail)
+                .role(UserRole.STUDENT).build()))
+                .map(user -> (Student) user)
                 .orElseThrow(UserNotFoundException::new);
-
 
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(CourseNotFoundException::new);
@@ -147,23 +146,26 @@ public class CourseService {
         boolean hasFilter = filter != null && (filter.getName() != null ||
                 filter.getYear() != null ||
                 filter.getTeacherEmail() != null ||
-                filter.getShiftType() != null||
+                filter.getShift() != null ||
                 filter.getUserEmail() != null);
 
         Page<Course> coursePage;
 
         if (!hasFilter) {
-            coursePage = courseRepository.findAll(page);
+            Specification<Course> courseSpec = CourseSpecification.basic();
+            coursePage = courseRepository.findAll(courseSpec, page);
         } else {
             UserRole userRole = null;
-            if(filter.getUserEmail() != null){
+            if (filter != null && filter.getUserEmail() != null) {
                 User user = userRepository.findById(filter.getUserEmail()).orElseThrow(UserNotFoundException::new);
                 switch (user) {
                     case Administrator _ -> userRole = UserRole.ADMIN;
                     case Teacher _ -> userRole = UserRole.TEACHER;
                     case Student _ -> userRole = UserRole.STUDENT;
-                    default -> throw new IllegalArgumentException("Unknown User subclass: " + user.getClass().getName());
-                };
+                    default ->
+                        throw new IllegalArgumentException("Unknown User subclass: " + user.getClass().getName());
+                }
+                ;
             }
 
             Specification<Course> courseSpec = CourseSpecification.byFilters(filter, userRole);
@@ -174,20 +176,23 @@ public class CourseService {
     }
 
     public Page<UserDTO> getCourseMembers(int courseId, Pageable page) {
-         Page<User> members = userRepository.findAll(UserSpecification.byCourse(courseId), page);
-         return members.map(userMapper::userToUserDTO);
+        Page<User> members = userRepository.findAll(UserSpecification.byCourse(courseId), page);
+        return members.map(userMapper::userToUserDTO);
     }
 
     public CourseContentDTO getCourseContent(Pageable page, int courseId, String userId) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        CourseContentDTO courseContent = courseContentStrategyFactory.getStrategy(user.getRole()).getCourseContent(userId, courseId, page);
+        CourseContentDTO courseContent = courseContentStrategyFactory.getStrategy(user.getRole())
+                .getCourseContent(userId, courseId, page);
         updateResourceUrls(courseContent);
         return courseContent;
     }
 
     private void updateResourceUrls(CourseContentDTO courseContent) {
-        courseContent.getSections().getData().forEach(section -> section.getSectionResources().forEach(sectionResource
-                -> sectionResource.setUrl(s3FileStorageService.generatePresignedUrl(sectionResource.getUrl(), Duration.ofHours(urlDuration)))));
+        courseContent.getSections().getData()
+                .forEach(section -> section.getSectionResources()
+                        .forEach(sectionResource -> sectionResource.setUrl(s3FileStorageService
+                                .generatePresignedUrl(sectionResource.getUrl(), Duration.ofHours(urlDuration)))));
     }
 
     private void validateTeachers(List<String> teacherEmails, List<Teacher> teachers) {
