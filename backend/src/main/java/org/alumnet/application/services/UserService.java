@@ -1,11 +1,11 @@
 package org.alumnet.application.services;
 
 import jakarta.ws.rs.core.Response;
-import org.alumnet.application.dtos.UserCreationRequestDTO;
+import org.alumnet.application.dtos.requests.UserCreationRequestDTO;
 import org.alumnet.application.dtos.UserDTO;
-import org.alumnet.application.dtos.UserFilterDTO;
+import org.alumnet.application.dtos.requests.UserFilterDTO;
 import org.alumnet.application.mapper.UserMapper;
-import org.alumnet.application.specifications.UserSpecification;
+import org.alumnet.application.query_builders.UserSpecification;
 import org.alumnet.domain.repositories.UserRepository;
 import org.alumnet.domain.users.User;
 import org.alumnet.infrastructure.config.KeycloakProperties;

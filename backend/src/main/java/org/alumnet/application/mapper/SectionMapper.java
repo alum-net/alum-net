@@ -1,6 +1,6 @@
 package org.alumnet.application.mapper;
 
-import org.alumnet.application.dtos.SectionRequestDTO;
+import org.alumnet.application.dtos.requests.SectionRequestDTO;
 import org.alumnet.application.dtos.SectionDTO;
 import org.alumnet.domain.Course;
 import org.alumnet.domain.Section;

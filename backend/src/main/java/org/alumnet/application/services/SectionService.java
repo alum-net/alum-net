@@ -1,7 +1,7 @@
 package org.alumnet.application.services;
 
 import lombok.RequiredArgsConstructor;
-import org.alumnet.application.dtos.SectionRequestDTO;
+import org.alumnet.application.dtos.requests.SectionRequestDTO;
 import org.alumnet.application.mapper.SectionMapper;
 import org.alumnet.domain.Course;
 import org.alumnet.domain.Section;
