@@ -56,4 +56,19 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ResultResponse<Object>> handleCourseNotFoundException(CourseNotFoundException ex) {
         return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultResponse.error(ex.getMessage(), "Nose encontró el curso"));
     }
+
+    @ExceptionHandler(InvalidPostContentLenghtException.class)
+    public ResponseEntity<ResultResponse<Object>> handleInvalidPostContentLenghtException(InvalidPostContentLenghtException ex) {
+        return  ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Formato incorrecto"));
+    }
+
+    @ExceptionHandler(InvalidPostTitleException.class)
+    public ResponseEntity<ResultResponse<Object>> handleInvalidPostTitleException(InvalidPostTitleException ex) {
+        return  ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Formato incorrecto"));
+    }
+
+    @ExceptionHandler(PostNotFoundException.class)
+    public ResponseEntity<ResultResponse<Object>> handlePostNotFoundException(PostNotFoundException ex) {
+        return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultResponse.error(ex.getMessage(), "No se encontró el post"));
+    }
 }

@@ -14,7 +14,6 @@ public class PostDTO {
     private String content;
     private Date createdAt;
     private Date updatedAt;
-    private Boolean enabled;
     private String parentPost;
     private String rootPost;
     private Author author;

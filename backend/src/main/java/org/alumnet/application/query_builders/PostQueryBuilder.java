@@ -16,7 +16,14 @@ public class PostQueryBuilder {
         criteriaList.add(Criteria.where("enabled").is(true));
 
         if (filter.getRootPost() != null && !filter.getRootPost().isBlank()) {
-            criteriaList.add(Criteria.where("rootPost").is(filter.getRootPost()));
+            String rootId = filter.getRootPost();
+
+            Criteria orCriteria = new Criteria().orOperator(
+                    Criteria.where("rootPost").is(rootId),
+                    Criteria.where("id").is(rootId)
+            );
+
+            criteriaList.add(orCriteria);
 
         } else {
             criteriaList.add(Criteria.where("parentPost").is(null));
