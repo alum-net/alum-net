@@ -4,16 +4,16 @@ import { useUserInfo } from '@alum-net/users';
 import { memo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button } from 'react-native-paper';
-import CreateCourseModal from './create-course';
+import CreateCourseModal from './course-creation-modal';
 import { UserRole } from '@alum-net/users/src/types';
 
-function CourseFilters({ currentPage }: { currentPage: number }) {
+function CourseFilters() {
   const { data } = useUserInfo();
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   return (
     <View>
-      <FilterBar currentPage={currentPage} />
+      <FilterBar />
       {data?.role === UserRole.admin && (
         <>
           <Button

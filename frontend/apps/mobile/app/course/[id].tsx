@@ -18,7 +18,7 @@ export default function Course() {
     const array = [{ value: 'General', label: 'General' }];
     if (data?.data)
       array.concat(
-        data?.data?.sections.content?.map(section => ({
+        data?.data?.sections.data?.map(section => ({
           value: section.title,
           label: section.title,
         })),
@@ -44,7 +44,7 @@ export default function Course() {
             onValueChange={selectedSectionTitle => {
               setExpandedSectionTitle(selectedSectionTitle);
               setExpandedSection(
-                data?.data?.sections.content?.find(
+                data?.data?.sections.data?.find(
                   section => section.title === selectedSectionTitle,
                 ),
               );
