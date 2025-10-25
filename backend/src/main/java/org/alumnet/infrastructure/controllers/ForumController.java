@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.PostDTO;
 import org.alumnet.application.dtos.requests.PostCreationRequestDTO;
 import org.alumnet.application.dtos.requests.PostFilterDTO;
+import org.alumnet.application.dtos.requests.UpdatePostRequestDTO;
 import org.alumnet.application.dtos.responses.PageableResultResponse;
 import org.alumnet.application.dtos.responses.ResultResponse;
 import org.alumnet.application.services.ForumService;
@@ -60,5 +61,17 @@ public class ForumController {
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .body(ResultResponse.success(null, "Se eliminó el post correctamente"));
+    }
+
+    @PatchMapping(path = "/posts/{postId}", produces = "application/json")
+    @PreAuthorize("hasAnyRole('teacher', 'student')")
+    public ResponseEntity<ResultResponse<Object>> updatePost(
+            @RequestBody UpdatePostRequestDTO postContent,
+            @PathVariable String postId){
+
+        forumService.updatePost(postId, postContent);
+
+        return ResponseEntity.ok()
+                .body(ResultResponse.success(null, "Se modificó el post correctamente"));
     }
 }

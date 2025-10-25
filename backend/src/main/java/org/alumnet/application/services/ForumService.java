@@ -6,12 +6,14 @@ import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.PostDTO;
 import org.alumnet.application.dtos.requests.PostCreationRequestDTO;
 import org.alumnet.application.dtos.requests.PostFilterDTO;
+import org.alumnet.application.dtos.requests.UpdatePostRequestDTO;
 import org.alumnet.application.mapper.PostMapper;
 import org.alumnet.application.query_builders.PostQueryBuilder;
 import org.alumnet.domain.forums.Post;
 import org.alumnet.domain.repositories.ForumRepository;
 import org.alumnet.infrastructure.exceptions.InvalidPostContentLenghtException;
 import org.alumnet.infrastructure.exceptions.InvalidPostTitleException;
+import org.alumnet.infrastructure.exceptions.PostHasRepliesException;
 import org.alumnet.infrastructure.exceptions.PostNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -44,7 +46,7 @@ public class ForumService {
     }
 
     public void createPost(PostCreationRequestDTO post) {
-        validatePostCharacterLenght(post.getContent());
+        validatePostCharacterLength(post.getContent());
         validateTitle(post);
         
         Post newPost = Post.builder()
@@ -86,13 +88,31 @@ public class ForumService {
         forumRepository.save(post);
     }
 
+    public void updatePost(String postId, UpdatePostRequestDTO postContent) {
+        validatePostCharacterLength(postContent.getMessage());
+
+        Post post = forumRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+
+        if(post.getTotalResponses() > 0) throw new PostHasRepliesException();
+
+        if(postContent.getMessage() != null){
+            post.setContent(postContent.getMessage());
+        }
+
+        if(postContent.getTitle() != null && post.getParentPost() == null){
+            post.setTitle(postContent.getTitle());
+        }
+
+        forumRepository.save(post);
+    }
+
     private void validateTitle(PostCreationRequestDTO post) {
         if(post.getTitle() != null && post.getParentPost() != null){
             throw new InvalidPostTitleException();
         }
     }
 
-    private void validatePostCharacterLenght(String content) {
+    private void validatePostCharacterLength(String content) {
         if(content.length() > 350) throw new InvalidPostContentLenghtException();
     }
 
