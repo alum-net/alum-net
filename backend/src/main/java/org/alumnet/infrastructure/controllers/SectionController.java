@@ -2,7 +2,7 @@ package org.alumnet.infrastructure.controllers;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.alumnet.application.dtos.SectionRequestDTO;
+import org.alumnet.application.dtos.requests.SectionRequestDTO;
 import org.alumnet.application.dtos.responses.ResultResponse;
 import org.alumnet.application.services.SectionService;
 import org.springframework.http.MediaType;

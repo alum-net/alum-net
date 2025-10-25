@@ -22,6 +22,10 @@ public class ResultResponse <T>{
     @Builder.Default
     private List<String> errors = new ArrayList<>();
 
+    public void addError(String error){
+        errors.add(error);
+    }
+
     public static <T> ResultResponse<T> success(T data, String message) {
         ResultResponse<T> response = new ResultResponse<>();
         response.setMessage(message);

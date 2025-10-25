@@ -1,8 +1,8 @@
-package org.alumnet.application.specifications;
+package org.alumnet.application.query_builders;
 
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
-import org.alumnet.application.dtos.UserFilterDTO;
+import org.alumnet.application.dtos.requests.UserFilterDTO;
 import org.alumnet.domain.Course;
 import org.alumnet.domain.CourseParticipation;
 import org.alumnet.domain.users.Administrator;

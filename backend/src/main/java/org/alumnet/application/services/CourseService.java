@@ -2,11 +2,14 @@ package org.alumnet.application.services;
 
 import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.*;
+import org.alumnet.application.dtos.requests.CourseCreationRequestDTO;
+import org.alumnet.application.dtos.requests.CourseFilterDTO;
+import org.alumnet.application.dtos.requests.UserFilterDTO;
 import org.alumnet.application.enums.UserRole;
 import org.alumnet.application.mapper.CourseMapper;
 import org.alumnet.application.mapper.UserMapper;
-import org.alumnet.application.specifications.CourseSpecification;
-import org.alumnet.application.specifications.UserSpecification;
+import org.alumnet.application.query_builders.CourseSpecification;
+import org.alumnet.application.query_builders.UserSpecification;
 import org.alumnet.domain.Course;
 import org.alumnet.domain.CourseParticipation;
 import org.alumnet.domain.CourseParticipationId;
