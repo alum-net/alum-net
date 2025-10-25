@@ -25,14 +25,18 @@ export const courseCreationSchema = z
       .refine(val => {
         return isValidDecimal(val);
       }, 'La nota debe estar entre 0 y 1'),
-    teachersEmails: z.string().refine(val => {
-      const emails = val
-        .split(',')
-        .map(e => e.trim())
-        .filter(e => e.length > 0);
-      const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
-      return emails.length > 0 && emails.every(email => emailRegex.test(email));
-    }, 'Ingrese correos válidos separados por comas (ej: email1@example.com, email2@example.com)'),
+    teachersEmails: z.array(
+      z.string().refine(val => {
+        const emails = val
+          .split(',')
+          .map(e => e.trim())
+          .filter(e => e.length > 0);
+        const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+        return (
+          emails.length > 0 && emails.every(email => emailRegex.test(email))
+        );
+      }, 'Ingrese correos válidos separados por comas (ej: email1@example.com, email2@example.com)'),
+    ),
   })
   .refine(
     data => {

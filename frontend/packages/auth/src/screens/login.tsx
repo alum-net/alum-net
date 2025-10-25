@@ -21,7 +21,7 @@ const redirectUri = makeRedirectUri({
 });
 
 export const LoginScreen = () => {
-  const [refreshToken, setRefreshToken] = useMMKVString(
+  const [, setRefreshToken] = useMMKVString(
     STORAGE_KEYS.REFRESH_TOKEN,
     storage,
   );
@@ -70,27 +70,23 @@ export const LoginScreen = () => {
 
   return (
     <View style={styles.container}>
-      {!refreshToken && (
-        <>
-          <Image
-            source={require('../assets/alumnet_logo.jpeg')}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-          <Text style={styles.title}>Bienvenido de Nuevo</Text>
-          <Text style={styles.subtitle}>
-            Inicia sesión para continuar tu camino de aprendizaje.
-          </Text>
-          <Button
-            onPress={() => {
-              promptAsync();
-            }}
-            mode="contained"
-          >
-            Iniciar sesión
-          </Button>
-        </>
-      )}
+      <Image
+        source={require('../assets/alumnet_logo.jpeg')}
+        style={styles.logo}
+        resizeMode="contain"
+      />
+      <Text style={styles.title}>Bienvenido de Nuevo</Text>
+      <Text style={styles.subtitle}>
+        Inicia sesión para continuar tu camino de aprendizaje.
+      </Text>
+      <Button
+        onPress={() => {
+          promptAsync();
+        }}
+        mode="contained"
+      >
+        Iniciar sesión
+      </Button>
     </View>
   );
 };
