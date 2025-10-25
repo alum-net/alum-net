@@ -1,4 +1,4 @@
-package org.alumnet.application.dtos;
+package org.alumnet.application.dtos.requests;
 
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;

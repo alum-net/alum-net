@@ -1,19 +1,13 @@
-import { FiltersDirectory, useCoursesFilters } from '@alum-net/courses';
 import { FilterBar } from '@alum-net/courses/src/components/filter-bar';
 import { THEME } from '@alum-net/ui';
 import { memo, useState } from 'react';
 import { Modal, StyleSheet, Text, View } from 'react-native';
 import { Button, Divider, IconButton, Portal } from 'react-native-paper';
 
-function CourseFilters({ currentPage }: { currentPage: number }) {
+function CourseFilters() {
   const [displayFilters, setDisplayFilters] = useState(false);
-  const { setAppliedFilters, appliedFilters } = useCoursesFilters(
-    currentPage,
-    true,
-  );
 
-  const dismissFilters = (newFilters: FiltersDirectory) => {
-    setAppliedFilters(newFilters);
+  const dismissFilters = () => {
     setDisplayFilters(false);
   };
 
@@ -44,11 +38,7 @@ function CourseFilters({ currentPage }: { currentPage: number }) {
               />
             </View>
             <Divider style={styles.modalDivider} />
-            <FilterBar
-              currentPage={currentPage}
-              onApplyFilters={dismissFilters}
-              initialFilters={appliedFilters}
-            />
+            <FilterBar onApplyFilters={dismissFilters} />
           </View>
         </Portal.Host>
       </Modal>

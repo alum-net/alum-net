@@ -66,7 +66,7 @@ export const updatePassword = async () => {
 };
 
 export const getKeyclaokUserInfo = async () => {
-  const accessToken = storage.getString(STORAGE_KEYS.ACCESS_TOKEN);
+  let accessToken = storage.getString(STORAGE_KEYS.ACCESS_TOKEN);
   if (!accessToken) {
     await logout();
     throw Error('User unauthorized');
@@ -74,16 +74,31 @@ export const getKeyclaokUserInfo = async () => {
   const discoveryDocument = await fetchDiscoveryAsync(
     `${process.env.EXPO_PUBLIC_KEYCLOAK_URI}/realms/${keycloakRealm}`,
   );
-
-  return (await fetchUserInfoAsync(
-    { accessToken },
-    discoveryDocument,
-  )) as Promise<{
-    email: string;
-    email_verified: boolean;
-    family_name: string;
-    given_name: string;
-    name: string;
-    sub: string;
-  }>;
+  try {
+    return (await fetchUserInfoAsync(
+      { accessToken },
+      discoveryDocument,
+    )) as Promise<{
+      email: string;
+      email_verified: boolean;
+      family_name: string;
+      given_name: string;
+      name: string;
+      sub: string;
+    }>;
+  } catch (error) {
+    console.log(error);
+    accessToken = await refresh();
+    return (await fetchUserInfoAsync(
+      { accessToken },
+      discoveryDocument,
+    )) as Promise<{
+      email: string;
+      email_verified: boolean;
+      family_name: string;
+      given_name: string;
+      name: string;
+      sub: string;
+    }>;
+  }
 };

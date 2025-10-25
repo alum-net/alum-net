@@ -4,13 +4,16 @@ import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.ResourceMetadataDTO;
 import org.alumnet.application.dtos.SectionCreationRequestDTO;
 import org.alumnet.application.dtos.UpdateRequestDTO;
+import org.alumnet.application.dtos.requests.SectionRequestDTO;
 import org.alumnet.application.mapper.SectionMapper;
 import org.alumnet.domain.Course;
 import org.alumnet.domain.Section;
+import org.alumnet.domain.SectionId;
 import org.alumnet.domain.repositories.SectionRepository;
 import org.alumnet.domain.resources.Resource;
 import org.alumnet.domain.resources.SectionResource;
 import org.alumnet.infrastructure.exceptions.InvalidAttributeException;
+import org.alumnet.infrastructure.exceptions.SectionNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,7 +34,7 @@ public class SectionService {
     private final S3FileStorageService s3FileStorageService;
     private final SectionMapper sectionMapper;
 
-    public void createSection(SectionCreationRequestDTO sectionDTO, List<MultipartFile> files, Integer courseId) {
+    public void createSection(SectionRequestDTO sectionDTO, List<MultipartFile> files, Integer courseId) {
 
         if (sectionDTO.getTitle() == null || sectionDTO.getTitle().isEmpty())
             throw new InvalidAttributeException("El título de la sección no puede estar vacío o no puede ser nulo");
@@ -117,5 +120,14 @@ public class SectionService {
 
         section.getSectionResources().removeIf(sectionResource -> sectionDTO.contains(sectionResource.getId()));
 
+    }
+    public void deleteSection(Integer courseId, String title) {
+        Section section = sectionRepository.findById(SectionId.builder()
+                .courseId(courseId)
+                .title(title).build())
+                .orElseThrow(SectionNotFoundException::new);
+
+        s3FileStorageService.deleteFolder("courses/" + courseId + "/sections/" + title + "/resources/");
+        sectionRepository.delete(section);
     }
 }

@@ -1,12 +1,11 @@
-package org.alumnet.application.dtos;
+package org.alumnet.application.dtos.requests;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.alumnet.application.dtos.ResourceMetadataDTO;
 import org.hibernate.validator.constraints.Length;
 
 import java.util.List;
@@ -15,7 +14,7 @@ import java.util.List;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SectionCreationRequestDTO {
+public class SectionRequestDTO {
     @NotBlank(message = "El título es obligatorio")
     private String title;
     @Length(max = 500, message = "La descripción no puede superar los 500 caracteres")

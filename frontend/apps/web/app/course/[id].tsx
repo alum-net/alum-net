@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
-import { FlatList, View } from 'react-native';
-import { Button, Card, Text, IconButton } from 'react-native-paper';
+import { FlatList, Modal, View } from 'react-native';
+import { Button, Card, Text } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams } from 'expo-router';
 import { THEME } from '@alum-net/ui';
 import { useCourse } from '@alum-net/courses';
+import { useUserInfo } from '@alum-net/users';
+import { SectionCreationForm } from '../../features/courses/components/section-creation-form';
+import SectionCard from '../../features/courses/components/section-card';
+import CourseMembersCard from './course-members-card';
 
 export default function Course() {
   const { id, name } = useLocalSearchParams();
+  const { data: userInfo } = useUserInfo();
   const { data, isLoading } = useCourse(id.toString());
-
-  const [expandedSections, setExpandedSections] = useState<
-    Record<string, boolean>
-  >({});
+  const [isCreateSectionModalVisible, setIsCreateSectionModalVisible] =
+    useState(false);
 
   if (isLoading || !data) return <Text>Cargando...</Text>;
 
@@ -21,7 +24,7 @@ export default function Course() {
       style={{ flex: 1, padding: 24, backgroundColor: THEME.colors.background }}
     >
       <FlatList
-        data={data.data?.sections.content}
+        data={data.data?.sections.data}
         keyExtractor={item => item.title}
         style={{ width: '90%', alignSelf: 'center', padding: 10 }}
         ListHeaderComponent={
@@ -39,41 +42,7 @@ export default function Course() {
           </View>
         }
         renderItem={({ item }) => (
-          <Card style={{ marginBottom: 8 }}>
-            <Card.Title
-              title={item.title}
-              right={props => (
-                <View style={{ flexDirection: 'row' }}>
-                  <IconButton {...props} icon="pencil" onPress={() => {}} />
-                  <IconButton {...props} icon="delete" iconColor="red" />
-                  <IconButton
-                    {...props}
-                    icon={
-                      expandedSections[item.title]
-                        ? 'chevron-up'
-                        : 'chevron-down'
-                    }
-                    onPress={() =>
-                      setExpandedSections(prev => ({
-                        ...prev,
-                        [item.title]: !prev[item.title],
-                      }))
-                    }
-                  />
-                </View>
-              )}
-            />
-            {expandedSections[item.title] && (
-              <Card.Content>
-                <Text>{item.description}</Text>
-                {item.sectionResources.map((r, i) => (
-                  <Text key={i} style={{ marginTop: 4 }}>
-                    📄 {r.title} ({r.extension})
-                  </Text>
-                ))}
-              </Card.Content>
-            )}
-          </Card>
+          <SectionCard item={item} userRole={userInfo?.role} />
         )}
         ListFooterComponent={
           <>
@@ -85,7 +54,9 @@ export default function Course() {
                 borderWidth: 1,
                 borderColor: '#90caf9',
               }}
-              onPress={() => {}}
+              onPress={() => {
+                setIsCreateSectionModalVisible(true);
+              }}
             >
               <Card.Content style={{ alignItems: 'center' }}>
                 <Ionicons name="add-circle-outline" size={20} color="#1976d2" />
@@ -95,14 +66,23 @@ export default function Course() {
               </Card.Content>
             </Card>
 
-            <Card style={{ marginTop: 16 }}>
-              <Card.Title
-                title={`Miembros (${data.data?.totalEnrollments ?? 0})`}
-              />
-            </Card>
+            <CourseMembersCard
+              courseId={id.toString()}
+              totalEnrollments={data.data?.totalEnrollments ?? 0}
+            />
           </>
         }
       />
+      <Modal
+        backdropColor={THEME.colors.backdrop}
+        animationType="fade"
+        visible={isCreateSectionModalVisible}
+      >
+        <SectionCreationForm
+          onFinish={() => setIsCreateSectionModalVisible(false)}
+          courseId={id.toString()}
+        />
+      </Modal>
     </View>
   );
 }

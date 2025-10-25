@@ -3,6 +3,9 @@ package org.alumnet.infrastructure.controllers;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.*;
+import org.alumnet.application.dtos.requests.CourseCreationRequestDTO;
+import org.alumnet.application.dtos.requests.CourseFilterDTO;
+import org.alumnet.application.dtos.requests.EnrollmentRequestDTO;
 import org.alumnet.application.dtos.responses.PageableResultResponse;
 import org.alumnet.application.dtos.responses.ResultResponse;
 import org.alumnet.application.services.CourseService;
@@ -77,7 +80,7 @@ public class CourseController {
         }
 
         @GetMapping(path = "/{courseId}/members", produces = "application/json")
-        @PreAuthorize("hasRole('admin', 'teacher')")
+        @PreAuthorize("hasAnyRole('admin','teacher')")
         public ResponseEntity<PageableResultResponse<UserDTO>> getCourseMembers(
                         @PageableDefault(page = 0, size = 15) Pageable page,
                         @PathVariable int courseId) {

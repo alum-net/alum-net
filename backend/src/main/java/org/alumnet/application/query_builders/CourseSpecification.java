@@ -1,9 +1,9 @@
-package org.alumnet.application.specifications;
+package org.alumnet.application.query_builders;
 
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Expression;
-import org.alumnet.application.dtos.CourseFilterDTO;
+import org.alumnet.application.dtos.requests.CourseFilterDTO;
 import org.alumnet.application.enums.UserRole;
 import org.alumnet.domain.Course;
 import org.alumnet.domain.users.Teacher;
@@ -13,15 +13,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CourseSpecification {
-    public static Specification<Course> byFilters(CourseFilterDTO filter) {
+
+    public static Specification<Course> basic() {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.isTrue(root.get("enabled"));
+    }
+
+    public static Specification<Course> byFilters(CourseFilterDTO filter, UserRole userRole) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
             if (filter.getName() != null) {
                 predicates.add(criteriaBuilder.like(
                         criteriaBuilder.lower(root.get("name")),
-                        "%" + filter.getName().toLowerCase() + "%"
-                ));
+                        "%" + filter.getName().toLowerCase() + "%"));
             }
 
             if (filter.getYear() != null) {
@@ -29,22 +33,19 @@ public class CourseSpecification {
                         "DATE_PART",
                         Double.class,
                         criteriaBuilder.literal("year"),
-                        root.get("startDate")
-                );
+                        root.get("startDate"));
 
                 Expression<Integer> yearAsInteger = datePartResult.as(Integer.class);
 
                 predicates.add(criteriaBuilder.equal(
                         yearAsInteger,
-                        filter.getYear()
-                ));
+                        filter.getYear()));
             }
 
-            if (filter.getShiftType() != null) {
+            if (filter.getShift() != null) {
                 predicates.add(criteriaBuilder.equal(
                         root.get("shift").as(String.class),
-                        filter.getShiftType().name()
-                ));
+                        filter.getShift().name()));
             }
 
             if (filter.getTeacherEmail() != null) {
@@ -52,29 +53,28 @@ public class CourseSpecification {
 
                 predicates.add(criteriaBuilder.like(
                         criteriaBuilder.lower(teacherJoin.get("email")),
-                        "%" + filter.getTeacherEmail().toLowerCase() + "%"
-                ));
+                        "%" + filter.getTeacherEmail().toLowerCase() + "%"));
             }
 
-            if (filter.getUserEmail() != null && filter.getRole() != null) {
+            if (filter.getUserEmail() != null) {
 
-                if (filter.getRole() == UserRole.TEACHER) {
+                if (userRole == UserRole.TEACHER) {
                     Join<Course, Teacher> teacherJoin = root.join("teachers");
                     predicates.add(criteriaBuilder.equal(
                             teacherJoin.get("email"),
-                            filter.getUserEmail()
-                    ));
+                            filter.getUserEmail()));
 
-                } else if (filter.getRole() == UserRole.STUDENT) {
+                } else if (userRole == UserRole.STUDENT) {
                     Join participationJoin = root.join("participations");
                     Join studentJoin = participationJoin.join("student");
 
                     predicates.add(criteriaBuilder.equal(
                             studentJoin.get("email"),
-                            filter.getUserEmail()
-                    ));
+                            filter.getUserEmail()));
                 }
             }
+
+            predicates.add(criteriaBuilder.isTrue(root.get("enabled")));
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

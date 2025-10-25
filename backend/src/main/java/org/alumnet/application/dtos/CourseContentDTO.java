@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.alumnet.application.dtos.responses.PageableResultResponse;
-import org.alumnet.application.dtos.responses.SectionDTO;
 
 import java.util.List;
 
@@ -20,5 +19,5 @@ public class CourseContentDTO {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     List<String> enrolledStudents;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    Integer totalEnrollments;
+    Integer totalMembers;
 }

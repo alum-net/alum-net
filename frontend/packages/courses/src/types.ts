@@ -7,7 +7,7 @@ export type CourseDisplay = {
   teachers: UserInfo[];
   startDate: string;
   endDate: string;
-  shiftType: CourseShift;
+  shift: CourseShift;
 };
 
 export type CourseCreationPayload = Omit<CourseDisplay, 'id' | 'teachers'> & {
@@ -24,9 +24,9 @@ export enum CourseShift {
 
 export interface FiltersDirectory {
   name?: string;
-  teacherName?: string;
+  teacherEmail?: string;
   year?: string;
-  shiftType?: CourseShift;
+  shift?: CourseShift;
   myCourses?: boolean;
 }
 

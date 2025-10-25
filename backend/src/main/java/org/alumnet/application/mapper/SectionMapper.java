@@ -1,10 +1,11 @@
 package org.alumnet.application.mapper;
 
-import org.alumnet.application.dtos.SectionCreationRequestDTO;
-import org.alumnet.application.dtos.responses.SectionDTO;
+import org.alumnet.application.dtos.SectionDTO;
+import org.alumnet.application.dtos.requests.SectionRequestDTO;
 import org.alumnet.domain.Course;
 import org.alumnet.domain.Section;
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface SectionMapper {
@@ -15,7 +16,7 @@ public interface SectionMapper {
     @Mapping(target = "sectionResources", ignore = true)
     @Mapping(target = "title", source = "dto.title")
     @Mapping(target = "description", source = "dto.description")
-    Section toSectionWithCourse(SectionCreationRequestDTO dto, Course course);
+    Section toSectionWithCourse(SectionRequestDTO dto, Course course);
 
     SectionDTO sectionToSectionDTO(Section section);
 }

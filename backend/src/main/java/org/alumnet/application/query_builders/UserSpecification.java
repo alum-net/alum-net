@@ -1,8 +1,8 @@
-package org.alumnet.application.specifications;
+package org.alumnet.application.query_builders;
 
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
-import org.alumnet.application.dtos.UserFilterDTO;
+import org.alumnet.application.dtos.requests.UserFilterDTO;
 import org.alumnet.domain.Course;
 import org.alumnet.domain.CourseParticipation;
 import org.alumnet.domain.users.Administrator;
@@ -52,6 +52,8 @@ public class UserSpecification {
                 predicates.add(criteriaBuilder.equal(root.type(), targetClass));
             }
 
+            predicates.add(criteriaBuilder.isTrue(root.get("enabled")));
+
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }
@@ -75,7 +77,7 @@ public class UserSpecification {
                     courseId
             );
 
-            return criteriaBuilder.or(isTeacher, isStudent);
+            return criteriaBuilder.and(criteriaBuilder.or(isTeacher, isStudent), criteriaBuilder.isTrue(root.get("enabled")));
         };
     }
 }

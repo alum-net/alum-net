@@ -1,15 +1,14 @@
 package org.alumnet.application.dtos.responses;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
 
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Setter
+@Getter
 public class PageableResultResponse<T> extends ResultResponse <List<T>>{
     private int pageNumber;
     private int pageSize;
@@ -28,7 +27,6 @@ public class PageableResultResponse<T> extends ResultResponse <List<T>>{
         response.setTotalElements(page.getTotalElements());
         response.setTotalPages(page.getTotalPages());
 
-        response.setSuccess(true);
         response.setMessage(message);
         response.setData(content);
 

@@ -1,4 +1,4 @@
-package org.alumnet.application.dtos.responses;
+package org.alumnet.application.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
