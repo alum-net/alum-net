@@ -1,7 +1,5 @@
 package org.alumnet.application.services;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.PostDTO;
 import org.alumnet.application.dtos.requests.PostCreationRequestDTO;
@@ -15,7 +13,6 @@ import org.alumnet.infrastructure.exceptions.InvalidPostContentLenghtException;
 import org.alumnet.infrastructure.exceptions.InvalidPostTitleException;
 import org.alumnet.infrastructure.exceptions.PostHasRepliesException;
 import org.alumnet.infrastructure.exceptions.PostNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -46,7 +43,7 @@ public class ForumService {
     }
 
     public void createPost(PostCreationRequestDTO post) {
-        validatePostCharacterLenght(post.getContent());
+        validatePostCharacterLength(post.getContent());
         validateTitle(post);
         
         Post newPost = Post.builder()
@@ -89,7 +86,7 @@ public class ForumService {
     }
 
     public void updatePost(String postId, UpdatePostRequestDTO postContent) {
-        validatePostCharacterLenght(postContent.getMessage());
+        validatePostCharacterLength(postContent.getMessage());
 
         Post post = forumRepository.findById(postId).orElseThrow(PostNotFoundException::new);
 
@@ -112,7 +109,7 @@ public class ForumService {
         }
     }
 
-    private void validatePostCharacterLenght(String content) {
+    private void validatePostCharacterLength(String content) {
         if(content.length() > 350) throw new InvalidPostContentLenghtException();
     }
 
