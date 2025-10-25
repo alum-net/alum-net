@@ -6,10 +6,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.validator.constraints.Length;
 
+import java.util.List;
+
 @Data
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class SectionCreationRequestDTO {
@@ -17,4 +20,5 @@ public class SectionCreationRequestDTO {
     private String title;
     @Length(max = 500, message = "La descripción no puede superar los 500 caracteres")
     private String description;
+    private List<ResourceMetadataDTO> resourcesMetadata;
 }

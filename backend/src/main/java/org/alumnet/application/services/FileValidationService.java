@@ -1,5 +1,6 @@
 package org.alumnet.application.services;
 
+import org.alumnet.application.dtos.ResourceMetadataDTO;
 import org.alumnet.infrastructure.exceptions.FileException;
 import org.alumnet.infrastructure.exceptions.FileSizeExceededException;
 import org.alumnet.infrastructure.exceptions.InvalidExtensionException;
@@ -7,9 +8,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.InvalidMimeTypeException;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class FileValidationService {
@@ -28,10 +28,84 @@ public class FileValidationService {
 
     private static final long MAX_FILE_SIZE = 10 * 1024 * 1024;
 
-    public void validateFiles(List<MultipartFile> files) throws FileException {
+    private void validateFiles(List<MultipartFile> files) throws FileException {
         for (MultipartFile file : files) {
             validateFile(file);
         }
+    }
+
+    public void validateResourcesMetadataAndFiles(List<ResourceMetadataDTO> resourcesMetadata,
+                                                  List<MultipartFile> files) throws FileException {
+
+        if (resourcesMetadata == null && files == null) return;
+
+
+        if (resourcesMetadata == null || files == null)
+            throw new FileException("Si envías recursos, debes enviar tanto metadata como archivos");
+
+
+        if (resourcesMetadata.size() != files.size())
+            throw new FileException(String.format("La cantidad de metadata (%d) no coincide con archivos (%d)",
+                            resourcesMetadata.size(), files.size()));
+
+        validateFiles(files);
+
+        Set<String> metadataFileNames = metadataFileNames(resourcesMetadata);
+        Set<String> uploadedFileNames = uploadedFileNames(files);
+
+        if (!metadataFileNames.equals(uploadedFileNames))
+            compareMetadataFilesNamesAgainstFilesFileNames(uploadedFileNames, metadataFileNames);
+
+
+    }
+
+    private void compareMetadataFilesNamesAgainstFilesFileNames(Set<String> uploadedFileNames, Set<String> metadataFileNames) {
+        Set<String> missingInMetadata = new HashSet<>(uploadedFileNames);
+        missingInMetadata.removeAll(metadataFileNames);
+
+        Set<String> missingFiles = new HashSet<>(metadataFileNames);
+        missingFiles.removeAll(uploadedFileNames);
+
+        StringBuilder errorMessage = new StringBuilder("Los nombres de archivos no coinciden con la metadata.");
+
+        if (!missingInMetadata.isEmpty()) {
+            errorMessage.append(" Archivos sin metadata: ")
+                    .append(String.join(", ", missingInMetadata))
+                    .append(".");
+        }
+
+        if (!missingFiles.isEmpty()) {
+            errorMessage.append(" Metadata sin archivo: ")
+                    .append(String.join(", ", missingFiles))
+                    .append(".");
+        }
+        throw new FileException(errorMessage.toString());
+    }
+
+    private Set<String> metadataFileNames(List<ResourceMetadataDTO> resourcesMetadata) {
+        return resourcesMetadata.stream()
+                .map(ResourceMetadataDTO::getFilename)
+                .map(this::getFileNameWithoutExtension)
+                .collect(Collectors.toSet());
+    }
+
+    private Set<String> uploadedFileNames(List<MultipartFile> files) {
+        return files.stream()
+                .map(MultipartFile::getOriginalFilename)
+                .map(this::getFileNameWithoutExtension)
+                .collect(Collectors.toSet());
+    }
+
+    private String getFileNameWithoutExtension(String filename) {
+        if (filename == null) {
+            return null;
+        }
+
+        int lastDotIndex = filename.lastIndexOf('.');
+        if (lastDotIndex > 0) {
+            return filename.substring(0, lastDotIndex);
+        }
+        return filename;
     }
 
     private void validateFile(MultipartFile file) throws FileException {

@@ -14,13 +14,18 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Section {
-    @EmbeddedId
-    private SectionId id;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "section_id")
+    private Integer sectionId;
+    private String title;
+    @Column(name = "course_id")
+    private Integer courseId;
     @Column(length = 500)
     private String description;
     @ManyToOne
-    @MapsId("courseId")
-    @JoinColumn(name = "course_id", referencedColumnName = "id")
+    @JoinColumn(name = "course_id", insertable = false, updatable = false)
     private Course course;
 
     @OneToMany(mappedBy = "section", cascade = CascadeType.ALL, orphanRemoval = true)

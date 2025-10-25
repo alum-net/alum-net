@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.alumnet.application.dtos.SectionResourceDTO;
 
 import java.util.List;
 
@@ -15,6 +14,6 @@ import java.util.List;
 public class SectionDTO {
     private String title;
     private String description;
-    private List<SectionResourceDTO> sectionResources;
+    private List<SectionResourceResponseDTO> sectionResources;
 
 }

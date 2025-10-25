@@ -3,6 +3,7 @@ package org.alumnet.infrastructure.controllers;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.SectionCreationRequestDTO;
+import org.alumnet.application.dtos.UpdateRequestDTO;
 import org.alumnet.application.dtos.responses.ResultResponse;
 import org.alumnet.application.services.SectionService;
 import org.springframework.http.MediaType;
@@ -29,4 +30,18 @@ public class SectionController {
         sectionService.createSection(sectionDTO, files, courseId);
         return ResponseEntity.ok().body(ResultResponse.success(null, "Sección creada exitosamente"));
     }
+
+
+    @PutMapping("/{courseId}/{sectionId}")
+    @PreAuthorize("hasRole('teacher')")
+    public ResponseEntity<ResultResponse<Object>> updateSection(@PathVariable Integer courseId,
+                                        @PathVariable Integer sectionId,
+                                        @RequestPart("section") @Valid UpdateRequestDTO sectionDTO,
+                                        @RequestPart (value = "resources", required = false) List<MultipartFile> files) {
+        sectionService.updateSection(courseId, sectionId, sectionDTO, files);
+        return ResponseEntity.ok(ResultResponse.success(null, "Sección actualizada exitosamente"));
+    }
+
+
+
 }

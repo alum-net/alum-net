@@ -8,17 +8,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectResponse;
-import software.amazon.awssdk.services.s3.model.ServerSideEncryption;
+import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -56,8 +55,7 @@ public class S3FileStorageService {
 
     private static RequestBody createAWSrequestBody(MultipartFile file) throws IOException {
         return RequestBody.fromInputStream(
-                file.getInputStream(), file.getSize()
-        );
+                file.getInputStream(), file.getSize());
     }
 
     private PutObjectRequest createPutObjectRequest(MultipartFile file, String key, Map<String, String> metadata) {
@@ -90,5 +88,27 @@ public class S3FileStorageService {
                         .getObjectRequest(getObjectRequest));
 
         return presignedRequest.url().toString();
+    }
+
+    public void deleteMultipleFiles(List<String> fileKeys) {
+        try {
+            List<ObjectIdentifier> keys = fileKeys.stream()
+                    .map(key -> ObjectIdentifier.builder().key(key).build())
+                    .collect(Collectors.toList());
+
+            Delete delete = Delete.builder()
+                    .objects(keys)
+                    .build();
+
+            DeleteObjectsRequest deleteObjectsRequest = DeleteObjectsRequest.builder()
+                    .bucket(s3Properties.getBucketName())
+                    .delete(delete)
+                    .build();
+
+            s3Client.deleteObjects(deleteObjectsRequest);
+            log.info("Archivos eliminados exitosamente de S3: {}", fileKeys);
+        } catch (S3Exception e) {
+            throw new RuntimeException("Error al eliminar archivos: " + e.getMessage());
+        }
     }
 }
