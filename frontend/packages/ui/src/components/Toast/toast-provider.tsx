@@ -50,7 +50,7 @@ export function ToastProvider({ children }: ToastProviderProps) {
   const [toastConfig, setToastConfig] = useState<ToastConfig | null>(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(20)).current;
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout | number>();
   const insets = useSafeAreaInsets();
 
   const showToast = useCallback(

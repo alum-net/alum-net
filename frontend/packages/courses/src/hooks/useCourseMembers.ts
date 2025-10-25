@@ -4,9 +4,9 @@ import { getCourseMembers } from '../service';
 
 export const useCourseMembers = (courseId: string, page = 0, size = 10) => {
   const q = useQuery({
-    queryKey: [QUERY_KEYS.getCourseMembers, courseId, page, size],
+    queryKey: [QUERY_KEYS.getCourseMembers, courseId],
     queryFn: () => getCourseMembers(courseId, page, size),
-    staleTime: 30_000
+    // staleTime: 30_000,
   });
 
   return {

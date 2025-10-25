@@ -13,6 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CourseSpecification {
+
+    public static Specification<Course> basic() {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.isTrue(root.get("enabled"));
+    }
+
     public static Specification<Course> byFilters(CourseFilterDTO filter, UserRole userRole) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -20,8 +25,7 @@ public class CourseSpecification {
             if (filter.getName() != null) {
                 predicates.add(criteriaBuilder.like(
                         criteriaBuilder.lower(root.get("name")),
-                        "%" + filter.getName().toLowerCase() + "%"
-                ));
+                        "%" + filter.getName().toLowerCase() + "%"));
             }
 
             if (filter.getYear() != null) {
@@ -29,22 +33,19 @@ public class CourseSpecification {
                         "DATE_PART",
                         Double.class,
                         criteriaBuilder.literal("year"),
-                        root.get("startDate")
-                );
+                        root.get("startDate"));
 
                 Expression<Integer> yearAsInteger = datePartResult.as(Integer.class);
 
                 predicates.add(criteriaBuilder.equal(
                         yearAsInteger,
-                        filter.getYear()
-                ));
+                        filter.getYear()));
             }
 
-            if (filter.getShiftType() != null) {
+            if (filter.getShift() != null) {
                 predicates.add(criteriaBuilder.equal(
                         root.get("shift").as(String.class),
-                        filter.getShiftType().name()
-                ));
+                        filter.getShift().name()));
             }
 
             if (filter.getTeacherEmail() != null) {
@@ -52,8 +53,7 @@ public class CourseSpecification {
 
                 predicates.add(criteriaBuilder.like(
                         criteriaBuilder.lower(teacherJoin.get("email")),
-                        "%" + filter.getTeacherEmail().toLowerCase() + "%"
-                ));
+                        "%" + filter.getTeacherEmail().toLowerCase() + "%"));
             }
 
             if (filter.getUserEmail() != null) {
@@ -62,8 +62,7 @@ public class CourseSpecification {
                     Join<Course, Teacher> teacherJoin = root.join("teachers");
                     predicates.add(criteriaBuilder.equal(
                             teacherJoin.get("email"),
-                            filter.getUserEmail()
-                    ));
+                            filter.getUserEmail()));
 
                 } else if (userRole == UserRole.STUDENT) {
                     Join participationJoin = root.join("participations");
@@ -71,11 +70,9 @@ public class CourseSpecification {
 
                     predicates.add(criteriaBuilder.equal(
                             studentJoin.get("email"),
-                            filter.getUserEmail()
-                    ));
+                            filter.getUserEmail()));
                 }
             }
-
 
             predicates.add(criteriaBuilder.isTrue(root.get("enabled")));
 

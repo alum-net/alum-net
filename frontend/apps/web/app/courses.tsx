@@ -1,6 +1,10 @@
 import CourseFilters from '../features/courses/components/courses-filters';
-import { CoursesDashboard } from '@alum-net/courses';
+import { CoursesDashboard, CourseContextProvider } from '@alum-net/courses';
 
 export default function CoursesList() {
-  return <CoursesDashboard FilterComponent={CourseFilters} />;
+  return (
+    <CourseContextProvider>
+      <CoursesDashboard FilterComponent={CourseFilters} />
+    </CourseContextProvider>
+  );
 }

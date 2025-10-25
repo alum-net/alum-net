@@ -27,25 +27,21 @@ const SectionCard: React.FC<SectionCardProps> = ({ item, userRole }) => {
     >
       <Card.Title
         title={item.title}
-        right={props =>
-          isTeacher ? (
-            <View style={{ flexDirection: 'row' }}>
-              <IconButton {...props} icon="pencil" onPress={() => {}} />
-              <IconButton {...props} icon="delete" iconColor="red" />
-              <IconButton
-                {...props}
-                icon={expanded ? 'chevron-up' : 'chevron-down'}
-                onPress={toggleExpand}
-              />
-            </View>
-          ) : (
+        right={props => (
+          <View style={{ flexDirection: 'row' }}>
+            {isTeacher && (
+              <>
+                <IconButton {...props} icon="pencil" onPress={() => {}} />
+                <IconButton {...props} icon="delete" iconColor="red" />
+              </>
+            )}
             <IconButton
               {...props}
               icon={expanded ? 'chevron-up' : 'chevron-down'}
               onPress={toggleExpand}
             />
-          )
-        }
+          </View>
+        )}
       />
       {expanded && (
         <Card.Content>

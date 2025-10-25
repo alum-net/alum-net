@@ -2,14 +2,15 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useRouter, usePathname } from 'expo-router';
 import { THEME } from '@alum-net/ui';
-import { useUserInfo } from '@alum-net/users/src/hooks/useUserInfo'
+import { useUserInfo } from '@alum-net/users/src/hooks/useUserInfo';
+import { UserRole } from '@alum-net/users/src/types';
 
 export default function WebHeader() {
   const router = useRouter();
   const pathname = usePathname();
 
   const { data: userInfo } = useUserInfo();
-  const isAdmin = (userInfo?.role as unknown as string) === 'ADMIN';
+  const isAdmin = userInfo?.role === UserRole.admin;
 
   const navItems: {
     label: string;
