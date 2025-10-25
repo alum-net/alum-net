@@ -26,7 +26,7 @@ export const CourseCard = ({ course }: { course: CourseDisplay }) => {
           </Text>
         ))}
         <Text style={styles.instructor}>
-          Turno: {mapShiftToString(course.shiftType)}
+          Turno: {mapShiftToString(course.shift)}
         </Text>
         <Text style={styles.instructor}>
           Fecha de inicio: {new Date(course.startDate).toDateString()}

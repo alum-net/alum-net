@@ -10,6 +10,6 @@ public class CourseFilterDTO {
     private String name;
     private Integer year;
     private String teacherEmail;
-    private ShiftType shiftType;
+    private ShiftType shift;
     private String userEmail;
 }

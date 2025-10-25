@@ -1,29 +1,41 @@
 import api, { PageableResponse } from '@alum-net/api';
 import { AxiosResponse } from 'axios';
-import { getKeyclaokUserInfo } from '@alum-net/auth';
-import type {
-  UserFilterDTO,
-  UserInfo,
-  UserRole,
-} from './types';
+import { getKeyclaokUserInfo, logout } from '@alum-net/auth';
+import { UserFilterDTO, UserInfo, UserRole } from './types';
+import { storage, STORAGE_KEYS } from '@alum-net/storage';
 
 export const getUserInfo = async () => {
-  const userInfo = await getKeyclaokUserInfo();
-  const { data }: AxiosResponse<PageableResponse<UserInfo>> = await api.get(
-    '/users/',
-    {
-      params: {
-        size: 1,
-        email: userInfo.email,
-      },
-    },
-  );
+  try {
+    let jsonUser = storage.getString(STORAGE_KEYS.USER_INFO);
+    const userObject = JSON.parse(jsonUser ?? '{}');
+    if (Object.hasOwn(userObject, 'role')) return userObject as UserInfo;
 
-  return data?.data?.[0];
+    const userInfo = await getKeyclaokUserInfo();
+    const { data }: AxiosResponse<PageableResponse<UserInfo>> = await api.get(
+      '/users/',
+      {
+        params: {
+          size: 1,
+          email: userInfo.email,
+        },
+      },
+    );
+    if (data?.data?.[0] === undefined) throw new Error('El usuario no existe');
+
+    jsonUser = JSON.stringify(data.data[0]);
+    storage.set(STORAGE_KEYS.USER_INFO, jsonUser);
+
+    return data?.data?.[0];
+  } catch (error: any) {
+    console.log(error);
+    logout();
+    throw new Error('Error interno, intente mas tarde');
+  }
 };
 
-
-function buildQueryString(queryParams: Record<string, string | number | undefined | null>): string {
+function buildQueryString(
+  queryParams: Record<string, string | number | undefined | null>,
+): string {
   const searchParams = new URLSearchParams();
 
   Object.entries(queryParams).forEach(([key, value]) => {
@@ -55,6 +67,8 @@ export async function fetchUsers(opts: {
     role: normalizedRole || undefined,
   });
 
-  const res = await api.get<PageableResponse<UserInfo>>(`users/?${queryString}`);
+  const res = await api.get<PageableResponse<UserInfo>>(
+    `users/?${queryString}`,
+  );
   return res.data;
 }

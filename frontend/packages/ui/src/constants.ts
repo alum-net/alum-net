@@ -1,4 +1,5 @@
 import { Images, ToolbarItem } from '@10play/tentap-editor';
+import { Platform } from 'react-native';
 import { DefaultTheme } from 'react-native-paper';
 
 export const THEME = {
@@ -84,6 +85,26 @@ export const MARKDOWN_TOOLBAR_ITEMS: ToolbarItem[] = [
     active: ({ editorState }) => editorState.isBlockquoteActive,
     disabled: ({ editorState }) => !editorState.canToggleBlockquote,
     image: () => Images.quote,
+  },
+  {
+    onPress:
+      ({ setToolbarContext, editorState, editor }) =>
+      () => {
+        if (Platform.OS === 'android') {
+          // On android focus outside the editor will lose the tiptap selection so we wait for the next tick and set it with the last selection value we had
+          setTimeout(() => {
+            editor.setSelection(
+              editorState.selection.from,
+              editorState.selection.to,
+            );
+          });
+        }
+        setToolbarContext(ToolbarContext.Link);
+      },
+    active: ({ editorState }) => editorState.isLinkActive,
+    disabled: ({ editorState }) =>
+      !editorState.isLinkActive && !editorState.canSetLink,
+    image: () => Images.link,
   },
   {
     onPress:

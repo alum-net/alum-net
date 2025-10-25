@@ -21,7 +21,7 @@ interface CreateSectionFormProps {
   courseId: string;
 }
 
-export const CreateSectionForm: React.FC<CreateSectionFormProps> = ({
+export const SectionCreationForm: React.FC<CreateSectionFormProps> = ({
   onFinish,
   courseId,
 }) => {

@@ -1,9 +1,8 @@
-import { useState } from 'react';
 import { View, StyleSheet, Platform, FlatList } from 'react-native';
-import { Button, Text } from 'react-native-paper';
+import { ActivityIndicator, Button, Text } from 'react-native-paper';
 import { CourseCard } from '../components/course-card';
 import { THEME } from '@alum-net/ui/src/constants';
-import { useCourses } from '../hooks/useCourses';
+import { useCoursesContext } from '../course-context';
 
 export function CoursesDashboard({
   FilterComponent,
@@ -14,9 +13,7 @@ export function CoursesDashboard({
     }>
   >;
 }) {
-  const [currentPage, setCurrentPage] = useState<number>(1);
-
-  const { data } = useCourses({});
+  const { currentPage, setPage, data, isLoading } = useCoursesContext();
 
   return (
     <View style={styles.container}>
@@ -24,13 +21,17 @@ export function CoursesDashboard({
         style={styles.flatList}
         ListHeaderComponent={<FilterComponent currentPage={currentPage} />}
         data={data?.data}
-        keyExtractor={item => item.id.toString()}
+        keyExtractor={item => item.id}
         renderItem={({ item }) => <CourseCard course={item} />}
         numColumns={Platform.OS === 'web' ? 4 : 2}
         columnWrapperStyle={styles.coursesGrid}
         key={Platform.OS === 'web' ? 'web' : 'mobile'}
         ListEmptyComponent={
-          <Text style={styles.noResults}>No se encontraron cursos</Text>
+          isLoading ? (
+            <ActivityIndicator />
+          ) : (
+            <Text style={styles.noResults}>No se encontraron cursos</Text>
+          )
         }
         ListFooterComponent={
           data && data.totalPages > 0 ? (
@@ -38,7 +39,7 @@ export function CoursesDashboard({
               {data.pageNumber > 0 && (
                 <Button
                   mode="contained-tonal"
-                  onPress={() => setCurrentPage(currentPage - 1)}
+                  onPress={() => setPage(currentPage - 1)}
                   buttonColor={THEME.colors.black}
                   labelStyle={styles.paginationButtonLabel}
                 >
@@ -48,7 +49,7 @@ export function CoursesDashboard({
               {data.pageNumber < data.totalPages - 1 && (
                 <Button
                   mode="contained-tonal"
-                  onPress={() => setCurrentPage(currentPage + 1)}
+                  onPress={() => setPage(currentPage + 1)}
                   buttonColor={THEME.colors.black}
                   labelStyle={styles.paginationButtonLabel}
                 >
