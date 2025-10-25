@@ -5,6 +5,7 @@ import org.alumnet.application.dtos.responses.ResultResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.InvalidMimeTypeException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -17,8 +18,23 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler (ConstraintViolationException.class)
     public ResponseEntity<ResultResponse<Object>> handleValidationException(ConstraintViolationException ex) {
-        return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Error de validación"));
+        ResultResponse result = ResultResponse.builder().message("Error de validación").build();
+
+        ex.getConstraintViolations()
+                .forEach(error -> result.addError(error.getMessage()));
+
+        return ResponseEntity.badRequest().body(result);
     }
+    @ExceptionHandler (MethodArgumentNotValidException.class)
+    public ResponseEntity<ResultResponse<Object>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        ResultResponse result = ResultResponse.builder().message("Error de validación").build();
+
+        ex.getBindingResult().getFieldErrors()
+                .forEach(error -> result.addError(error.getDefaultMessage()));
+
+        return ResponseEntity.badRequest().body(result);
+    }
+
     @ExceptionHandler(FileException.class)
     public ResponseEntity<ResultResponse<Object>> handleInvalidExtensionException(FileException ex) {
         return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Error validando el archivo"));
@@ -39,5 +55,20 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CourseNotFoundException.class)
     public ResponseEntity<ResultResponse<Object>> handleCourseNotFoundException(CourseNotFoundException ex) {
         return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultResponse.error(ex.getMessage(), "Nose encontró el curso"));
+    }
+
+    @ExceptionHandler(InvalidPostContentLenghtException.class)
+    public ResponseEntity<ResultResponse<Object>> handleInvalidPostContentLenghtException(InvalidPostContentLenghtException ex) {
+        return  ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Formato incorrecto"));
+    }
+
+    @ExceptionHandler(InvalidPostTitleException.class)
+    public ResponseEntity<ResultResponse<Object>> handleInvalidPostTitleException(InvalidPostTitleException ex) {
+        return  ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Formato incorrecto"));
+    }
+
+    @ExceptionHandler(PostNotFoundException.class)
+    public ResponseEntity<ResultResponse<Object>> handlePostNotFoundException(PostNotFoundException ex) {
+        return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultResponse.error(ex.getMessage(), "No se encontró el post"));
     }
 }

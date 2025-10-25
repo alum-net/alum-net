@@ -8,7 +8,6 @@ spring:
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
-
   security:
     oauth2:
       resourceserver:
@@ -37,6 +36,13 @@ keycloak:
 
 logging:
   config: classpath:logback-spring.xml
+  level:
+    org:
+      springFramework:
+        data:
+          mongodb: DEBUG
+      mongodb:
+        driver: DEBUG
 server:
   port: ${SERVER_PORT:8200}
 
