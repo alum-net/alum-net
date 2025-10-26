@@ -18,5 +18,6 @@ public interface SectionMapper {
     @Mapping(target = "description", source = "dto.description")
     Section toSectionWithCourse(SectionRequestDTO dto, Course course);
 
+    @Mapping(target = "id", source = "section.sectionId")
     SectionDTO sectionToSectionDTO(Section section);
 }

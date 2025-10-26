@@ -20,4 +20,5 @@ public class CourseContentDTO {
     List<String> enrolledStudents;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     Integer totalMembers;
+    String description;
 }

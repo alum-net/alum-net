@@ -1,12 +1,24 @@
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  arrayMove,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+
 import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Button, HelperText, Text, TextInput } from 'react-native-paper';
+import { View, StyleSheet, ScrollView } from 'react-native';
+import { Button, HelperText, Text } from 'react-native-paper';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as DocumentPicker from 'expo-document-picker';
 import { RichText, Toolbar, useEditorBridge } from '@10play/tentap-editor';
-import { FormTextInput, MARKDOWN_TOOLBAR_ITEMS } from '@alum-net/ui';
+import { FormTextInput, MARKDOWN_TOOLBAR_ITEMS, Toast } from '@alum-net/ui';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   SectionCreationFormSchema,
@@ -15,6 +27,8 @@ import {
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createSection } from '../service';
 import { QUERY_KEYS } from '@alum-net/api';
+import { SortableFileItem } from './sortable-file-item';
+import { FileMetadata } from '../types';
 
 interface CreateSectionFormProps {
   onFinish: () => void;
@@ -25,35 +39,39 @@ export const SectionCreationForm: React.FC<CreateSectionFormProps> = ({
   onFinish,
   courseId,
 }) => {
-  const [linkInput, setLinkInput] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<
     { uri: string; name: string; type: string }[]
   >([]);
   const {
     control,
     handleSubmit,
-    setValue,
     formState: { errors },
-    watch,
-    getValues,
+    setValue,
   } = useForm<SectionCreationFormSchema>({
     resolver: zodResolver(schema),
     defaultValues: {
       title: '',
-      content: '',
-      links: [],
-      fileUrls: [],
+      description: '',
+      resourcesMetadata: [],
     },
   });
   const queryClient = useQueryClient();
 
   const { mutate } = useMutation({
     mutationFn: (data: {
-      sectionData: { title: string; description?: string };
+      sectionData: {
+        title: string;
+        description?: string;
+        resourcesMetadata: FileMetadata[];
+      };
       selectedFiles?: { uri: string; name: string; type: string }[];
     }) => createSection({ courseId, ...data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.getCourse] });
+    },
+    onError: error => {
+      Toast.error('Error creando la sección');
+      console.log(error);
     },
   });
 
@@ -62,22 +80,36 @@ export const SectionCreationForm: React.FC<CreateSectionFormProps> = ({
     avoidIosKeyboard: true,
   });
 
-  const addLink = () => {
-    if (linkInput.trim()) {
-      try {
-        z.url().parse(linkInput);
-        setValue('links', [...(getValues('links') || []), linkInput]);
-        setLinkInput('');
-      } catch {}
+  const sensors = useSensors(useSensor(PointerSensor));
+
+  const handleDragEnd = ({ active, over }: any) => {
+    if (active.id !== over?.id) {
+      setSelectedFiles(prev => {
+        const oldIndex = prev.findIndex((f, i) => active.id === f.name + i);
+        const newIndex = prev.findIndex((f, i) => over.id === f.name + i);
+        const newFiles = arrayMove(prev, oldIndex, newIndex);
+
+        const metadata = newFiles.map((file, index) => ({
+          filename: file.name,
+          order: index,
+        }));
+        setValue('resourcesMetadata', metadata);
+
+        return newFiles;
+      });
     }
   };
 
-  const removeLink = (index: number) => {
-    const currentLinks = getValues('links') || [];
-    setValue(
-      'links',
-      currentLinks.filter((_, i) => i !== index),
-    );
+  const handleRemoveFile = (index: number) => {
+    setSelectedFiles(prev => {
+      const updated = prev.filter((_, idx) => idx !== index);
+      const metadata = updated.map((file, i) => ({
+        filename: file.name,
+        order: i,
+      }));
+      setValue('resourcesMetadata', metadata);
+      return updated;
+    });
   };
 
   const handleFileSelect = async () => {
@@ -103,7 +135,17 @@ export const SectionCreationForm: React.FC<CreateSectionFormProps> = ({
           name: f.name,
           type: f.mimeType || 'application/octet-stream',
         }));
-        setSelectedFiles(prev => [...prev, ...newFiles]);
+
+        setSelectedFiles(prev => {
+          const combined = [...prev, ...newFiles];
+          // Update form value for metadata based on order
+          const metadata = combined.map((file, index) => ({
+            filename: file.name,
+            order: index,
+          }));
+          setValue('resourcesMetadata', metadata);
+          return combined;
+        });
       }
     } catch (e) {
       console.error('File selection error:', e);
@@ -111,9 +153,15 @@ export const SectionCreationForm: React.FC<CreateSectionFormProps> = ({
   };
 
   const onSubmit = async (data: SectionCreationFormSchema) => {
+    const htmlDescription = await editor.getHTML();
+
     const sectionData = {
       title: data.title,
-      description: (await editor.getHTML()) || '',
+      description: htmlDescription || '',
+      resourcesMetadata: selectedFiles.map((file, index) => ({
+        filename: file.name,
+        order: index,
+      })),
     };
 
     mutate({ sectionData, selectedFiles }, { onSuccess: onFinish });
@@ -121,76 +169,77 @@ export const SectionCreationForm: React.FC<CreateSectionFormProps> = ({
 
   return (
     <SafeAreaView style={styles.container}>
-      <FormTextInput
-        name="title"
-        label="Título de la sección *"
-        control={control}
-        mode="outlined"
-        style={styles.input}
-      />
-      {errors.title && (
-        <HelperText type="error">{errors.title.message}</HelperText>
-      )}
+      <ScrollView>
+        <FormTextInput
+          name="title"
+          label="Título de la sección *"
+          control={control}
+          mode="outlined"
+          style={styles.input}
+        />
+        {errors.title && (
+          <HelperText type="error">{errors.title.message}</HelperText>
+        )}
 
-      <Text style={styles.label}>Contenido</Text>
-      <View style={styles.editorContainer}>
-        <Toolbar editor={editor} items={[...MARKDOWN_TOOLBAR_ITEMS]} />
-        <RichText editor={editor} />
-      </View>
+        <Text style={styles.label}>Contenido</Text>
+        <View style={styles.editorContainer}>
+          <Toolbar editor={editor} items={[...MARKDOWN_TOOLBAR_ITEMS]} />
+          <RichText editor={editor} />
+        </View>
+        {errors.description && (
+          <HelperText type="error">{errors.description.message}</HelperText>
+        )}
 
-      <Text style={styles.label}>Recursos multimedia</Text>
-      <TextInput
-        label="Añadir un enlace..."
-        mode="outlined"
-        value={linkInput}
-        onChangeText={setLinkInput}
-        right={<TextInput.Icon icon="plus" onPress={addLink} />}
-      />
-      <View style={{ marginTop: 8 }}>
-        {(watch('links') || []).map((link, index) => (
-          <View key={index} style={styles.linkItem}>
-            <Text style={{ flex: 1 }}>{link}</Text>
-            <Button compact onPress={() => removeLink(index)}>
-              Eliminar
-            </Button>
-          </View>
-        ))}
-      </View>
-      {errors.links && (
-        <HelperText type="error">{errors.links.message}</HelperText>
-      )}
+        <Text style={styles.label}>Recursos multimedia</Text>
 
-      <View style={styles.uploadBox}>
-        <Button icon="cloud-upload" mode="outlined" onPress={handleFileSelect}>
-          Seleccionar archivos
-        </Button>
-        <Text style={styles.fileHint}>
-          PDF, PPTX, XLSX, MP4, JPG, PNG, DOCX, ZIP
-        </Text>
+        <View style={styles.uploadBox}>
+          <Button
+            icon="cloud-upload"
+            mode="outlined"
+            onPress={handleFileSelect}
+          >
+            Seleccionar archivos
+          </Button>
+          <Text style={styles.fileHint}>
+            PDF, PPTX, XLSX, MP4, JPG, PNG, DOCX, ZIP
+          </Text>
 
-        {selectedFiles.map((f, i) => (
-          <View key={i} style={styles.fileItem}>
-            <Text style={{ flex: 1 }}>{f.name}</Text>
-            <Button
-              compact
-              onPress={() =>
-                setSelectedFiles(prev => prev.filter((_, idx) => idx !== i))
-              }
+          {/* Sortable file list */}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={selectedFiles.map((f, i) => f.name + i)}
+              strategy={verticalListSortingStrategy}
             >
-              Eliminar
-            </Button>
-          </View>
-        ))}
-      </View>
+              {selectedFiles.map((file, index) => (
+                <SortableFileItem
+                  key={file.name + index}
+                  file={file}
+                  index={index}
+                  onRemove={handleRemoveFile}
+                />
+              ))}
+            </SortableContext>
+          </DndContext>
+        </View>
+        {errors.resourcesMetadata && (
+          <HelperText type="error">
+            {errors.resourcesMetadata.message}
+          </HelperText>
+        )}
 
-      <View style={styles.actions}>
-        <Button mode="text" onPress={onFinish}>
-          Cancelar
-        </Button>
-        <Button mode="contained" onPress={handleSubmit(onSubmit)}>
-          Guardar
-        </Button>
-      </View>
+        <View style={styles.actions}>
+          <Button mode="text" onPress={onFinish}>
+            Cancelar
+          </Button>
+          <Button mode="contained" onPress={handleSubmit(onSubmit)}>
+            Guardar
+          </Button>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -225,25 +274,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     gap: 8,
-  },
-  linkItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    marginBottom: 4,
-  },
-  fileItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    marginTop: 6,
   },
 });

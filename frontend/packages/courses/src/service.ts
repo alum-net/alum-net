@@ -7,12 +7,7 @@ import {
 } from './types';
 import { AxiosResponse } from 'axios';
 import { UserInfo } from '@alum-net/users/src/types';
-
-function deleteFalsyKeys<T extends Record<string, any>>(obj: T): Partial<T> {
-  return Object.fromEntries(
-    Object.entries(obj).filter(([_, value]) => Boolean(value)),
-  ) as Partial<T>;
-}
+import { deleteFalsyKeys } from './helpers';
 
 function mapFilterKeys(filters: FiltersDirectory, userEmail: string) {
   return {

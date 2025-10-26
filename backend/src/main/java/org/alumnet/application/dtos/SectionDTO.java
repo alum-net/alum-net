@@ -13,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class SectionDTO {
+    private Integer id;
     private String title;
     private String description;
     private List<SectionResourceResponseDTO> sectionResources;

@@ -14,12 +14,11 @@ import org.springframework.stereotype.Component;
 public class TeacherCourseContentStrategy extends CourseContentStrategy {
 
     protected TeacherCourseContentStrategy(SectionRepository sectionRepository,
-                                           SectionMapper sectionMapper,
-                                           ParticipationRepository participationRepository,
-                                           CourseRepository courseRepository) {
+            SectionMapper sectionMapper,
+            ParticipationRepository participationRepository,
+            CourseRepository courseRepository) {
         super(sectionRepository, sectionMapper, participationRepository, courseRepository);
     }
-
 
     @Override
     protected void validate(String userId, Integer courseId) {
@@ -30,10 +29,12 @@ public class TeacherCourseContentStrategy extends CourseContentStrategy {
     }
 
     @Override
-    protected CourseContentDTO buildCourseContentDTO(Integer courseId, String userId, PageableResultResponse<SectionDTO> sectionDTOS) {
+    protected CourseContentDTO buildCourseContentDTO(Integer courseId, String userId,
+            PageableResultResponse<SectionDTO> sectionDTOS) {
         return CourseContentDTO.builder()
                 .sections(sectionDTOS)
                 .totalMembers(getTotalMembers(courseId))
+                .description(getDescription(courseId))
                 .build();
     }
 }
