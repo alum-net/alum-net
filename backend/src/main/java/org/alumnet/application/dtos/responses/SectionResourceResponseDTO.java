@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SectionResourceResponseDTO {
-    private String title;
     private Integer order;
     private String name;
     private String extension;

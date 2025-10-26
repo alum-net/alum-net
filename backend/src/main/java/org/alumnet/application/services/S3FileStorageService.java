@@ -29,9 +29,9 @@ public class S3FileStorageService {
     private final AmazonS3Config.S3Properties s3Properties;
     private final S3Presigner s3Presigner;
 
-    public String store(MultipartFile file, String fileExtension, String filePath) throws FileStorageException {
+    public String store(MultipartFile file,String folderPath) throws FileStorageException {
         try {
-            String key = generateS3Key(fileExtension,filePath);
+            String key = String.format("%s/%s", folderPath, file.getOriginalFilename());
 
             Map<String, String> metadata = Map.of(
                     "original-filename", file.getOriginalFilename(),
@@ -70,14 +70,6 @@ public class S3FileStorageService {
                 .build();
     }
 
-    private String generateS3Key(String originalFilename, String folderPath) {
-        String uniqueId = UUID.randomUUID().toString();
-
-        return String.format("%s/%s_%s",
-                folderPath,
-                uniqueId,
-                originalFilename);
-    }
     public String generatePresignedUrl(String key, Duration expiration) {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(s3Properties.getBucketName())

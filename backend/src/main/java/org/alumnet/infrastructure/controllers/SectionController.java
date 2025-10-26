@@ -2,7 +2,6 @@ package org.alumnet.infrastructure.controllers;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.alumnet.application.dtos.SectionCreationRequestDTO;
 import org.alumnet.application.dtos.UpdateRequestDTO;
 import org.alumnet.application.dtos.requests.SectionRequestDTO;
 import org.alumnet.application.dtos.responses.ResultResponse;
@@ -32,11 +31,11 @@ public class SectionController {
         return ResponseEntity.ok().body(ResultResponse.success(null, "Sección creada exitosamente"));
     }
 
-    @DeleteMapping("/{courseId}/{title}")
+    @DeleteMapping("/{courseId}/{sectionId}")
     @PreAuthorize("hasRole('teacher')")
     public ResponseEntity<ResultResponse<Object>> deleteSection(@PathVariable int courseId,
-                                                                @PathVariable String title) {
-        sectionService.deleteSection(courseId, title);
+                                                                @PathVariable int sectionId) {
+        sectionService.deleteSection(courseId, sectionId);
         return ResponseEntity.ok().body(ResultResponse.success(null, "Sección eliminada exitosamente"));
     }
 

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.alumnet.application.dtos.requests.SectionRequestDTO;
 
 import java.util.List;
 
@@ -11,6 +12,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class UpdateRequestDTO extends SectionCreationRequestDTO {
+public class UpdateRequestDTO extends SectionRequestDTO {
     List<Integer> eliminatedResourcesIds;
 }

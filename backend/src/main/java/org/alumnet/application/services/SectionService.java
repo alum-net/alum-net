@@ -2,13 +2,11 @@ package org.alumnet.application.services;
 
 import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.ResourceMetadataDTO;
-import org.alumnet.application.dtos.SectionCreationRequestDTO;
 import org.alumnet.application.dtos.UpdateRequestDTO;
 import org.alumnet.application.dtos.requests.SectionRequestDTO;
 import org.alumnet.application.mapper.SectionMapper;
 import org.alumnet.domain.Course;
 import org.alumnet.domain.Section;
-import org.alumnet.domain.SectionId;
 import org.alumnet.domain.repositories.SectionRepository;
 import org.alumnet.domain.resources.Resource;
 import org.alumnet.domain.resources.SectionResource;
@@ -53,7 +51,7 @@ public class SectionService {
 
 
     private void uploadAndLinkFilesToSection(List<MultipartFile> files, Section section, List<ResourceMetadataDTO> resourcesMetadata) {
-        String folderPath = "courses/" + section.getCourseId() + "/sections/" + section.getTitle() + "/resources/";
+        String folderPath = "courses/" + section.getCourseId() + "/sections/" + section.getTitle() + "/resources";
 
         Map<String, Integer> fileNameToOrder = resourcesMetadata.stream()
                 .collect(Collectors.toMap(
@@ -64,7 +62,7 @@ public class SectionService {
 
             String originalFilename = file.getOriginalFilename();
             String fileExtension = getFileExtension(originalFilename);
-            String s3Key = s3FileStorageService.store(file, fileExtension,folderPath);
+            String s3Key = s3FileStorageService.store(file,folderPath);
 
             Integer order = fileNameToOrder.get(Objects.requireNonNull(originalFilename));
             SectionResource sectionResource = createSectionResource(file, s3Key, fileExtension,order);
@@ -121,13 +119,11 @@ public class SectionService {
         section.getSectionResources().removeIf(sectionResource -> sectionDTO.contains(sectionResource.getId()));
 
     }
-    public void deleteSection(Integer courseId, String title) {
-        Section section = sectionRepository.findById(SectionId.builder()
-                .courseId(courseId)
-                .title(title).build())
+    public void deleteSection(Integer courseId, Integer sectionId) {
+        Section section = sectionRepository.findById(sectionId)
                 .orElseThrow(SectionNotFoundException::new);
 
-        s3FileStorageService.deleteFolder("courses/" + courseId + "/sections/" + title + "/resources/");
+        s3FileStorageService.deleteFolder("courses/" + courseId + "/sections/" + sectionId + "/resources/");
         sectionRepository.delete(section);
     }
 }
