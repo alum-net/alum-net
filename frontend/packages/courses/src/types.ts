@@ -46,6 +46,7 @@ export interface SectionResource {
   extension: string;
   url: string;
   order: number;
+  id: number;
 }
 
 export interface Section {

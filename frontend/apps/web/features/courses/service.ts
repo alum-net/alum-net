@@ -1,21 +1,12 @@
 import api from '@alum-net/api';
 import { Platform } from 'react-native';
-import { FileMetadata } from './types';
+import { FilesToUpload, SectionData } from './types';
 import { deleteFalsyKeys } from '@alum-net/courses/src/helpers';
 
-export const createSection = async ({
-  courseId,
-  sectionData,
-  selectedFiles,
-}: {
-  courseId: string;
-  sectionData: {
-    title: string;
-    description?: string;
-    resourcesMetadata?: FileMetadata[];
-  };
-  selectedFiles?: { uri: string; name: string; type: string }[];
-}) => {
+async function buildFormData(
+  sectionData: SectionData,
+  selectedFiles?: FilesToUpload[],
+) {
   const formData = new FormData();
   formData.append(
     'section',
@@ -32,15 +23,51 @@ export const createSection = async ({
         formData.append('resources', blob, file.name);
       }
     }
-  const { data } = await api.post(`/sections/${courseId}`, formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
+  return formData;
+}
+
+export const createSection = async ({
+  courseId,
+  sectionData,
+  selectedFiles,
+}: {
+  courseId: string;
+  sectionData: SectionData;
+  selectedFiles?: FilesToUpload[];
+}) => {
+  const { data } = await api.post(
+    `/sections/${courseId}`,
+    await buildFormData(sectionData, selectedFiles),
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
     },
-  });
+  );
 
   return data;
 };
 
 export const deleteCourse = async (courseId: string, sectionId: number) => {
   return await api.delete(`/sections/${courseId}/${sectionId}`);
+};
+
+export const updateSection = async ({
+  courseId,
+  sectionId,
+  sectionData,
+  selectedFiles,
+}: {
+  courseId: string;
+  sectionId: number;
+  sectionData: SectionData;
+  selectedFiles?: FilesToUpload[];
+}) => {
+  const { data } = await api.put(
+    `/sections/${courseId}/${sectionId}`,
+    await buildFormData(sectionData, selectedFiles),
+    { headers: { 'Content-Type': 'multipart/form-data' } },
+  );
+
+  return data;
 };

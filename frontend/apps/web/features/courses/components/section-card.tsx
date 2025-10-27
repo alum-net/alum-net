@@ -1,4 +1,4 @@
-import { Section } from '@alum-net/courses';
+import { Section, SectionContent } from '@alum-net/courses';
 import { THEME } from '@alum-net/ui';
 import { UserRole } from '@alum-net/users/src/types';
 import React, { useState } from 'react';
@@ -10,12 +10,14 @@ interface SectionCardProps {
   item: Section;
   userRole?: UserRole;
   deleteSection: (sectionId: number) => void;
+  modifySection: (sectionId: number) => void;
 }
 
 const SectionCard: React.FC<SectionCardProps> = ({
   item,
   userRole,
   deleteSection,
+  modifySection,
 }) => {
   const [expanded, setExpanded] = useState(false);
   const isTeacher = userRole === UserRole.teacher;
@@ -34,7 +36,13 @@ const SectionCard: React.FC<SectionCardProps> = ({
           <View style={{ flexDirection: 'row' }}>
             {isTeacher && (
               <>
-                <IconButton {...props} icon="pencil" onPress={() => {}} />
+                <IconButton
+                  {...props}
+                  icon="pencil"
+                  onPress={() => {
+                    modifySection(item.id);
+                  }}
+                />
                 <IconButton
                   {...props}
                   icon="delete"
@@ -53,32 +61,7 @@ const SectionCard: React.FC<SectionCardProps> = ({
       />
       {expanded && (
         <Card.Content>
-          <RenderHtml
-            contentWidth={htmlWidth}
-            source={{ html: item.description }}
-          />
-          <Text variant="titleMedium">Recursos multimedia</Text>
-          {item.sectionResources
-            .sort((a, b) => a.order - b.order)
-            .map((r, i) => (
-              <Button
-                elevation={5}
-                contentStyle={{
-                  justifyContent: 'flex-start',
-                }}
-                buttonColor={THEME.colors.background}
-                style={{
-                  marginVertical: 5,
-                  borderColor: THEME.colors.secondary,
-                  borderWidth: 1,
-                }}
-                mode="elevated"
-                key={r.name + r.order}
-                onPress={() => Linking.openURL(r.url)}
-              >
-                📄 {r.name}.{r.extension}
-              </Button>
-            ))}
+          <SectionContent item={item} htmlWidth={htmlWidth} />
         </Card.Content>
       )}
     </Card>

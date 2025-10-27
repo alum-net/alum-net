@@ -20,11 +20,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
 public class SectionService {
-
 
     private final FileValidationService fileValidationService;
     private final SectionRepository sectionRepository;
@@ -37,7 +37,7 @@ public class SectionService {
         if (sectionDTO.getTitle() == null || sectionDTO.getTitle().isEmpty())
             throw new InvalidAttributeException("El título de la sección no puede estar vacío o no puede ser nulo");
 
-        fileValidationService.validateResourcesMetadataAndFiles(sectionDTO.getResourcesMetadata(), files);
+        fileValidationService.validateCreationResourcesMetadataAndFiles(sectionDTO.getResourcesMetadata(), files);
 
         Course course = courseService.findById(courseId);
         Section section = sectionMapper.toSectionWithCourse(sectionDTO, course);
@@ -49,33 +49,37 @@ public class SectionService {
         sectionRepository.save(section);
     }
 
-
-    private void uploadAndLinkFilesToSection(List<MultipartFile> files, Section section, List<ResourceMetadataDTO> resourcesMetadata) {
-        String folderPath = "courses/" + section.getCourseId() + "/sections/" + section.getTitle() + "/resources";
-
-        Map<String, Integer> fileNameToOrder = resourcesMetadata.stream()
+    private Map<String, Integer> getFilenameAndOrderFromMetadata(List<ResourceMetadataDTO> resourcesMetadata) {
+        return resourcesMetadata.stream()
                 .collect(Collectors.toMap(
                         ResourceMetadataDTO::getFilename,
-                        ResourceMetadataDTO::getOrder
-                ));
+                        ResourceMetadataDTO::getOrder));
+    }
+
+    private void uploadAndLinkFilesToSection(List<MultipartFile> files, Section section,
+            List<ResourceMetadataDTO> resourcesMetadata) {
+        String folderPath = "courses/" + section.getCourseId() + "/sections/" + section.getTitle() + "/resources";
+
+        Map<String, Integer> fileNameToOrder = getFilenameAndOrderFromMetadata(resourcesMetadata);
+
         files.forEach(file -> {
 
             String originalFilename = file.getOriginalFilename();
             String fileExtension = getFileExtension(originalFilename);
-            String s3Key = s3FileStorageService.store(file,folderPath);
+            String s3Key = s3FileStorageService.store(file, folderPath);
 
             Integer order = fileNameToOrder.get(Objects.requireNonNull(originalFilename));
-            SectionResource sectionResource = createSectionResource(file, s3Key, fileExtension,order);
+            SectionResource sectionResource = createSectionResource(file, s3Key, fileExtension, order);
             section.addResource(sectionResource);
         });
 
     }
 
-
-    private SectionResource createSectionResource(MultipartFile file, String s3Key, String fileExtension, Integer order) {
+    private SectionResource createSectionResource(MultipartFile file, String s3Key, String fileExtension,
+            Integer order) {
         return SectionResource.builder()
                 .name(Objects.requireNonNull(file.getOriginalFilename())
-                        .substring(0,file.getOriginalFilename()
+                        .substring(0, file.getOriginalFilename()
                                 .lastIndexOf('.')))
                 .order(order)
                 .url(s3Key)
@@ -91,34 +95,54 @@ public class SectionService {
                 .orElse("");
     }
 
-
-    public void updateSection(Integer courseId, Integer sectionId, UpdateRequestDTO sectionDTO, List<MultipartFile> files) {
-        fileValidationService.validateResourcesMetadataAndFiles(sectionDTO.getResourcesMetadata(), files);
+    public void updateSection(Integer courseId, Integer sectionId, UpdateRequestDTO sectionDTO,
+            List<MultipartFile> files) {
         Course course = courseService.findById(courseId);
         course.getSections().stream().filter(section -> section.getSectionId().equals(sectionId))
                 .findFirst()
                 .ifPresent(section -> {
+                    List<Integer> resourcesToDelete = sectionDTO.getEliminatedResourcesIds();
+                    fileValidationService.validateUpdateResourcesMetadataAndFiles(sectionDTO.getResourcesMetadata(),
+                            files, filterSectionResourcesToBeDeleted(section, resourcesToDelete).toList());
+
                     section.setTitle(sectionDTO.getTitle());
                     section.setDescription(sectionDTO.getDescription());
-                    resourcesToEliminate(sectionDTO.getEliminatedResourcesIds(),section);
-                    if (files != null && !files.isEmpty()) {
-                        uploadAndLinkFilesToSection(files, section, sectionDTO.getResourcesMetadata());
+                    resourcesToEliminate(resourcesToDelete, section);
+                    List<ResourceMetadataDTO> metadata = sectionDTO.getResourcesMetadata();
+                    if (metadata != null && metadata.size() > 0) {
+                        Map<String, Integer> fileNameToOrder = getFilenameAndOrderFromMetadata(metadata);
+                        filterSectionResourcesToBeDeleted(section, resourcesToDelete)
+                                .forEach(resource -> {
+                                    resource.setOrder(fileNameToOrder.get(resource.getOriginalFilename()));
+                                });
                     }
-
+                    if (files != null && !files.isEmpty()) {
+                        uploadAndLinkFilesToSection(files, section, metadata);
+                    }
                     sectionRepository.save(section);
                 });
 
     }
 
-    private void resourcesToEliminate(List<Integer> sectionDTO, Section section) {
+    private Stream<SectionResource> filterSectionResourcesToBeDeleted(Section section,
+            List<Integer> resourcesToBeDeleted) {
+        return section.getSectionResources().stream()
+                .filter(resource -> resourcesToBeDeleted == null
+                        || !resourcesToBeDeleted.contains(resource.getId()));
+    }
+
+    private void resourcesToEliminate(List<Integer> resourceIds, Section section) {
+        if (resourceIds == null || resourceIds.isEmpty())
+            return;
         s3FileStorageService.deleteMultipleFiles(section.getSectionResources()
                 .stream()
-                .filter(sectionResource ->sectionDTO.contains(sectionResource.getId()))
+                .filter(sectionResource -> resourceIds.contains(sectionResource.getId()))
                 .map(Resource::getUrl).toList());
 
-        section.getSectionResources().removeIf(sectionResource -> sectionDTO.contains(sectionResource.getId()));
+        section.getSectionResources().removeIf(sectionResource -> resourceIds.contains(sectionResource.getId()));
 
     }
+
     public void deleteSection(Integer courseId, Integer sectionId) {
         Section section = sectionRepository.findById(sectionId)
                 .orElseThrow(SectionNotFoundException::new);

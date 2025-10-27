@@ -12,5 +12,5 @@ public class SectionResourceResponseDTO {
     private String name;
     private String extension;
     private String url;
-
+    private Integer id;
 }

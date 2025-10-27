@@ -1,6 +1,8 @@
 package org.alumnet.application.services;
 
 import org.alumnet.application.dtos.ResourceMetadataDTO;
+import org.alumnet.domain.resources.Resource;
+import org.alumnet.domain.resources.SectionResource;
 import org.alumnet.infrastructure.exceptions.FileException;
 import org.alumnet.infrastructure.exceptions.FileSizeExceededException;
 import org.alumnet.infrastructure.exceptions.InvalidExtensionException;
@@ -23,8 +25,7 @@ public class FileValidationService {
             "png", List.of("image/png"),
             "docx", List.of("application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
             "doc", List.of("application/msword"),
-            "zip", List.of("application/zip", "application/x-zip-compressed")
-    );
+            "zip", List.of("application/zip", "application/x-zip-compressed"));
 
     private static final long MAX_FILE_SIZE = 10 * 1024 * 1024;
 
@@ -34,19 +35,18 @@ public class FileValidationService {
         }
     }
 
-    public void validateResourcesMetadataAndFiles(List<ResourceMetadataDTO> resourcesMetadata,
-                                                  List<MultipartFile> files) throws FileException {
+    public void validateCreationResourcesMetadataAndFiles(List<ResourceMetadataDTO> resourcesMetadata,
+            List<MultipartFile> files) throws FileException {
 
-        if (resourcesMetadata == null && files == null) return;
-
+        if (resourcesMetadata == null && files == null)
+            return;
 
         if (resourcesMetadata == null || files == null)
             throw new FileException("Si envías recursos, debes enviar tanto metadata como archivos");
 
-
         if (resourcesMetadata.size() != files.size())
             throw new FileException(String.format("La cantidad de metadata (%d) no coincide con archivos (%d)",
-                            resourcesMetadata.size(), files.size()));
+                    resourcesMetadata.size(), files.size()));
 
         validateFiles(files);
 
@@ -55,11 +55,26 @@ public class FileValidationService {
 
         if (!metadataFileNames.equals(uploadedFileNames))
             compareMetadataFilesNamesAgainstFilesFileNames(uploadedFileNames, metadataFileNames);
-
-
     }
 
-    private void compareMetadataFilesNamesAgainstFilesFileNames(Set<String> uploadedFileNames, Set<String> metadataFileNames) {
+    public void validateUpdateResourcesMetadataAndFiles(List<ResourceMetadataDTO> resourcesMetadata,
+            List<MultipartFile> files, List<SectionResource> sectionResources) throws FileException {
+        if (files != null)
+            validateFiles(files);
+        if (resourcesMetadata != null) {
+            Set<String> allFilesResourcesSet = new HashSet<String>();
+            if (files != null)
+                allFilesResourcesSet.addAll(uploadedFileNames(files));
+            if (sectionResources != null)
+                allFilesResourcesSet.addAll(savedFileNames(sectionResources));
+            Set<String> metadataFilenames = metadataFileNames(resourcesMetadata);
+            if (!metadataFilenames.equals(allFilesResourcesSet))
+                compareMetadataFilesNamesAgainstFilesFileNames(allFilesResourcesSet, metadataFilenames);
+        }
+    }
+
+    private void compareMetadataFilesNamesAgainstFilesFileNames(Set<String> uploadedFileNames,
+            Set<String> metadataFileNames) {
         Set<String> missingInMetadata = new HashSet<>(uploadedFileNames);
         missingInMetadata.removeAll(metadataFileNames);
 
@@ -96,6 +111,13 @@ public class FileValidationService {
                 .collect(Collectors.toSet());
     }
 
+    private Set<String> savedFileNames(List<SectionResource> resources) {
+        return resources.stream()
+                .map(SectionResource::getOriginalFilename)
+                .map(this::getFileNameWithoutExtension)
+                .collect(Collectors.toSet());
+    }
+
     private String getFileNameWithoutExtension(String filename) {
         if (filename == null) {
             return null;
@@ -115,21 +137,18 @@ public class FileValidationService {
         if (!ALLOWED_EXTENSIONS.containsKey(extension.toLowerCase())) {
             throw new InvalidExtensionException(
                     String.format("Extensión '%s' no permitida. Extensiones válidas: %s",
-                            extension, ALLOWED_EXTENSIONS.keySet())
-            );
+                            extension, ALLOWED_EXTENSIONS.keySet()));
         }
 
         if (contentType != null && !ALLOWED_EXTENSIONS.get(extension.toLowerCase()).contains(contentType)) {
             throw new InvalidMimeTypeException(contentType,
-                    String.format("Tipo MIME '%s' no coincide con la extensión '%s'", contentType, extension)
-            );
+                    String.format("Tipo MIME '%s' no coincide con la extensión '%s'", contentType, extension));
         }
 
         if (file.getSize() > MAX_FILE_SIZE) {
             throw new FileSizeExceededException(
                     String.format("El archivo '%s' excede el tamaño máximo de %d MB",
-                            file.getOriginalFilename(), MAX_FILE_SIZE / (1024 * 1024))
-            );
+                            file.getOriginalFilename(), MAX_FILE_SIZE / (1024 * 1024)));
         }
     }
 
