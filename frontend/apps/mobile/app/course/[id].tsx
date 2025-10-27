@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { Card, Text, SegmentedButtons, Appbar } from 'react-native-paper';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
-
+import { ForumLinks } from '@alum-net/forums';
 import Screen from '../../components/screen';
 import { Section, SectionContent, useCourse } from '@alum-net/courses';
 import { THEME } from '@alum-net/ui';
@@ -45,6 +45,7 @@ export default function Course() {
             <Appbar.Content title={name} />
           </Appbar>
           <ScrollView horizontal style={{ paddingVertical: 10 }}>
+            <ForumLinks courseId={id.toString()} />
             <SegmentedButtons
               value={expandedSectionTitle}
               onValueChange={selectedSectionTitle => {

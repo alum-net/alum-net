@@ -13,6 +13,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteCourse } from '../../features/courses/service';
 import { QUERY_KEYS, Response } from '@alum-net/api';
 import { SectionForm } from '../../features/sections/components/section-form';
+import { ForumLinks } from '@alum-net/forums';
+import RenderHTML from 'react-native-render-html';
 
 export default function Course() {
   const { id, name } = useLocalSearchParams();
@@ -55,6 +57,7 @@ export default function Course() {
   const [isSectionFormVisible, setIsSectionFormVisible] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingSectionId, setPendingSectionId] = useState<number>();
+  const [htmlWidth, setHtmlWidth] = useState(0);
 
   const openSectionForm = (sectionId: number) => {
     setPendingSectionId(sectionId);
@@ -85,10 +88,14 @@ export default function Course() {
         data={data.data?.sections.data}
         keyExtractor={item => item.title}
         style={{ width: '90%', alignSelf: 'center', padding: 10 }}
+        onLayout={event => setHtmlWidth(event.nativeEvent.layout.width)}
         ListHeaderComponent={
           <View style={{ gap: 20 }}>
             <Text variant="headlineLarge">{name}</Text>
-            <Text variant="titleMedium">{data.data?.description}</Text>
+            <RenderHTML
+              source={{ html: data.data?.description || '' }}
+              contentWidth={htmlWidth}
+            />
             {isTeacher && (
               <Button
                 mode="contained-tonal"
@@ -99,6 +106,7 @@ export default function Course() {
                 Añadir evento
               </Button>
             )}
+            <ForumLinks courseId={id.toString()} />
           </View>
         }
         renderItem={({ item }) => (
