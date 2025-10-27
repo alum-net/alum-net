@@ -67,8 +67,9 @@ public class CourseController {
         public ResponseEntity<PageableResultResponse<CourseDTO>> getCourses(
                         CourseFilterDTO filter,
                         @PageableDefault(page = 0, size = 15) Pageable page) {
+                                
                 Page<CourseDTO> coursePage = courseService.getCourses(filter, page);
-
+                                
                 PageableResultResponse<CourseDTO> response = PageableResultResponse.fromPage(
                                 coursePage,
                                 coursePage.getContent(),

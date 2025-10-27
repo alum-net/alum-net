@@ -6,13 +6,13 @@ import { useLocalSearchParams } from 'expo-router';
 import { THEME, Toast } from '@alum-net/ui';
 import { CourseContent, useCourse } from '@alum-net/courses';
 import { useUserInfo } from '@alum-net/users';
-import SectionCard from '../../features/courses/components/section-card';
-import CourseMembersCard from './course-members-card';
+import SectionCard from '../../features/sections/components/section-card';
+import CourseMembersCard from '../../features/courses/components/course-members-card';
 import { UserRole } from '@alum-net/users/src/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteCourse } from '../../features/courses/service';
 import { QUERY_KEYS, Response } from '@alum-net/api';
-import { SectionForm } from '../../features/courses/components/section-form';
+import { SectionForm } from '../../features/sections/components/section-form';
 
 export default function Course() {
   const { id, name } = useLocalSearchParams();

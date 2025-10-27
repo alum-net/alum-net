@@ -1,6 +1,14 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Button, Card, DataTable, Dialog, Portal, Text, IconButton } from 'react-native-paper';
+import {
+  Button,
+  Card,
+  DataTable,
+  Dialog,
+  Portal,
+  Text,
+  IconButton,
+} from 'react-native-paper';
 import { useUserInfo } from '@alum-net/users';
 import { UserRole, type UserInfo } from '@alum-net/users/src/types';
 import { THEME, FormTextInput, Toast } from '@alum-net/ui';
@@ -11,7 +19,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@alum-net/api';
-import { getAxiosErrorMessage } from '../../features/users/src/users';
+import { getAxiosErrorMessage } from '../../../features/users/src/users';
 
 const schema = z.object({
   email: z.string().email('Email inválido'),
@@ -22,7 +30,10 @@ type Props = {
   totalEnrollments?: number | null;
 };
 
-export default function CourseMembersCard({ courseId, totalEnrollments }: Props) {
+export default function CourseMembersCard({
+  courseId,
+  totalEnrollments,
+}: Props) {
   const { data: user } = useUserInfo();
   const canManage = user?.role === UserRole.teacher;
 
@@ -32,7 +43,11 @@ export default function CourseMembersCard({ courseId, totalEnrollments }: Props)
   const [expanded, setExpanded] = useState(false);
   const toggleExpand = () => setExpanded(prev => !prev);
 
-  const { data, isLoading, isFetching, error } = useCourseMembers(courseId, page, size);
+  const { data, isLoading, isFetching, error } = useCourseMembers(
+    courseId,
+    page,
+    size,
+  );
   if (error) console.error('[members] COMPONENT ERROR =>', error);
 
   const rows: UserInfo[] = data?.data ?? [];
@@ -45,9 +60,9 @@ export default function CourseMembersCard({ courseId, totalEnrollments }: Props)
     defaultValues: { email: '' },
   });
 
-  
   const enrollBtnRef = useRef<any>(null);
-  const focusTrigger = () => setTimeout(() => enrollBtnRef.current?.focus?.(), 0);
+  const focusTrigger = () =>
+    setTimeout(() => enrollBtnRef.current?.focus?.(), 0);
 
   const queryClient = useQueryClient();
 
@@ -61,7 +76,9 @@ export default function CourseMembersCard({ courseId, totalEnrollments }: Props)
         focusTrigger();
         await Promise.all([
           queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.getCourse] }),
-          queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.getCourseMembers, courseId] }),
+          queryClient.invalidateQueries({
+            queryKey: [QUERY_KEYS.getCourseMembers, courseId],
+          }),
         ]);
       } else {
         Toast.error(res.errors?.[0] || res.message || 'Error al matricular');
@@ -78,10 +95,14 @@ export default function CourseMembersCard({ courseId, totalEnrollments }: Props)
         Toast.success(res.message || 'Estudiante desmatriculado');
         await Promise.all([
           queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.getCourse] }),
-          queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.getCourseMembers, courseId] }),
+          queryClient.invalidateQueries({
+            queryKey: [QUERY_KEYS.getCourseMembers, courseId],
+          }),
         ]);
       } else {
-        Toast.error(res.errors?.[0] || res.message || 'No se pudo desmatricular');
+        Toast.error(
+          res.errors?.[0] || res.message || 'No se pudo desmatricular',
+        );
       }
     } catch (e: any) {
       Toast.error(getAxiosErrorMessage(e));
@@ -107,9 +128,11 @@ export default function CourseMembersCard({ courseId, totalEnrollments }: Props)
     await onUnenroll(pendingEmail);
     closeConfirm();
   };
-  
 
-  const pages = useMemo(() => Math.max(1, Math.ceil((total || 0) / size)), [total, size]);
+  const pages = useMemo(
+    () => Math.max(1, Math.ceil((total || 0) / size)),
+    [total, size],
+  );
 
   const handleDismiss = () => {
     setOpen(false);
@@ -117,7 +140,7 @@ export default function CourseMembersCard({ courseId, totalEnrollments }: Props)
     focusTrigger();
   };
 
-  if (user?.role === UserRole.student) return null
+  if (user?.role === UserRole.student) return null;
 
   return (
     <Card style={{ marginTop: 16 }}>
@@ -145,86 +168,96 @@ export default function CourseMembersCard({ courseId, totalEnrollments }: Props)
       />
 
       {expanded && (
-       <Card.Content>
-        <View style={styles.tableCard}>
-          {(isLoading || isFetching) && (
-            <View style={styles.loading}>
-              <Text>Cargando...</Text>
-            </View>
-          )}
-
-          <DataTable>
-            <DataTable.Header>
-              <DataTable.Title style={{ flex: 1.2 }}>Nombre</DataTable.Title>
-              <DataTable.Title style={{ flex: 1.2 }}>Apellido</DataTable.Title>
-              <DataTable.Title style={{ flex: 2 }}>Email</DataTable.Title>
-              <DataTable.Title>Rol</DataTable.Title>
-              {canManage && <DataTable.Title>Acciones</DataTable.Title>}
-            </DataTable.Header>
-
-            {rows.map(u => (
-              <DataTable.Row key={u.email}>
-                <DataTable.Cell style={{ flex: 1.2 }}>{u.name}</DataTable.Cell>
-                <DataTable.Cell style={{ flex: 1.2 }}>{u.lastname}</DataTable.Cell>
-                <DataTable.Cell style={{ flex: 2 }}>{u.email}</DataTable.Cell>
-                <DataTable.Cell>
-                  {u.role === 'ADMIN' ? 'Admin' : u.role === 'TEACHER' ? 'Profesor' : 'Estudiante'}
-                </DataTable.Cell>
-                {canManage && (
-                  <DataTable.Cell>
-                    {u.role === 'STUDENT' ? (
-                      <Button
-                        mode="contained-tonal"
-                        buttonColor={THEME.colors.error}
-                        textColor="#fff"
-                        onPress={() => openConfirm(u.email)}   // abre confirmación
-                        style={{ borderRadius: 20, paddingHorizontal: 8, paddingVertical: 2 }}
-                      >
-                        Des-matricular
-                      </Button>
-                    ) : (
-                      <Text>—</Text>
-                    )}
-                  </DataTable.Cell>
-                )}
-              </DataTable.Row>
-            ))}
-
-            {rows.length === 0 && !isLoading && (
-              <DataTable.Row>
-                <DataTable.Cell>
-                  <Text>No hay miembros en este curso.</Text>
-                </DataTable.Cell>
-              </DataTable.Row>
+        <Card.Content>
+          <View style={styles.tableCard}>
+            {(isLoading || isFetching) && (
+              <View style={styles.loading}>
+                <Text>Cargando...</Text>
+              </View>
             )}
 
-            <DataTable.Pagination
-              page={page}
-              numberOfPages={pages}
-              onPageChange={setPage}
-              label={
-                total === 0
-                  ? '0 de 0'
-                  : `${Math.min(total, page * size + 1)}-${Math.min(total, (page + 1) * size)} de ${total}`
-              }
-              numberOfItemsPerPage={size}
-              onItemsPerPageChange={setSize}
-              numberOfItemsPerPageList={[5, 10, 15, 20]}
-              selectPageDropdownLabel="Filas por página"
-              showFastPaginationControls
-            />
-          </DataTable>
-        </View>
-       </Card.Content>
+            <DataTable>
+              <DataTable.Header>
+                <DataTable.Title style={{ flex: 1.2 }}>Nombre</DataTable.Title>
+                <DataTable.Title style={{ flex: 1.2 }}>
+                  Apellido
+                </DataTable.Title>
+                <DataTable.Title style={{ flex: 2 }}>Email</DataTable.Title>
+                <DataTable.Title>Rol</DataTable.Title>
+                {canManage && <DataTable.Title>Acciones</DataTable.Title>}
+              </DataTable.Header>
+
+              {rows.map(u => (
+                <DataTable.Row key={u.email}>
+                  <DataTable.Cell style={{ flex: 1.2 }}>
+                    {u.name}
+                  </DataTable.Cell>
+                  <DataTable.Cell style={{ flex: 1.2 }}>
+                    {u.lastname}
+                  </DataTable.Cell>
+                  <DataTable.Cell style={{ flex: 2 }}>{u.email}</DataTable.Cell>
+                  <DataTable.Cell>
+                    {u.role === 'ADMIN'
+                      ? 'Admin'
+                      : u.role === 'TEACHER'
+                        ? 'Profesor'
+                        : 'Estudiante'}
+                  </DataTable.Cell>
+                  {canManage && (
+                    <DataTable.Cell>
+                      {u.role === 'STUDENT' ? (
+                        <Button
+                          mode="contained-tonal"
+                          buttonColor={THEME.colors.error}
+                          textColor="#fff"
+                          onPress={() => openConfirm(u.email)} // abre confirmación
+                          style={{
+                            borderRadius: 20,
+                            paddingHorizontal: 8,
+                            paddingVertical: 2,
+                          }}
+                        >
+                          Des-matricular
+                        </Button>
+                      ) : (
+                        <Text>—</Text>
+                      )}
+                    </DataTable.Cell>
+                  )}
+                </DataTable.Row>
+              ))}
+
+              {rows.length === 0 && !isLoading && (
+                <DataTable.Row>
+                  <DataTable.Cell>
+                    <Text>No hay miembros en este curso.</Text>
+                  </DataTable.Cell>
+                </DataTable.Row>
+              )}
+
+              <DataTable.Pagination
+                page={page}
+                numberOfPages={pages}
+                onPageChange={setPage}
+                label={
+                  total === 0
+                    ? '0 de 0'
+                    : `${Math.min(total, page * size + 1)}-${Math.min(total, (page + 1) * size)} de ${total}`
+                }
+                numberOfItemsPerPage={size}
+                onItemsPerPageChange={setSize}
+                numberOfItemsPerPageList={[5, 10, 15, 20]}
+                selectPageDropdownLabel="Filas por página"
+                showFastPaginationControls
+              />
+            </DataTable>
+          </View>
+        </Card.Content>
       )}
       {/* Modal Matricular*/}
       {open && (
         <Portal>
-          <Dialog
-            visible
-            onDismiss={handleDismiss}
-            style={styles.dialog}
-          >
+          <Dialog visible onDismiss={handleDismiss} style={styles.dialog}>
             <Dialog.Title>Matricular Estudiante</Dialog.Title>
 
             <Dialog.Content style={styles.dialogContent}>
