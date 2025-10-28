@@ -1,33 +1,23 @@
 package org.alumnet.application.mapper;
 
-import org.alumnet.application.dtos.requests.SectionRequestDTO;
 import org.alumnet.application.dtos.SectionDTO;
+import org.alumnet.application.dtos.requests.SectionRequestDTO;
 import org.alumnet.domain.Course;
 import org.alumnet.domain.Section;
-import org.alumnet.domain.SectionId;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface SectionMapper {
 
-    @Mapping(source = "title", target = "id.title")
-    @Mapping(target = "course", ignore = true)
-    @Mapping(target = "id.courseId", ignore = true)
-    Section sectionCreationRequestDTOToSection(SectionRequestDTO section);
+    @Mapping(target = "sectionId", ignore = true)
+    @Mapping(target = "courseId", source = "course.id")
+    @Mapping(target = "course", source = "course")
+    @Mapping(target = "sectionResources", ignore = true)
+    @Mapping(target = "title", source = "dto.title")
+    @Mapping(target = "description", source = "dto.description")
+    Section toSectionWithCourse(SectionRequestDTO dto, Course course);
 
-    default Section toSectionWithCourse(SectionRequestDTO dto, Course course) {
-        Section section = sectionCreationRequestDTOToSection(dto);
-
-        if (section.getId() == null) {
-            section.setId(new SectionId());
-        }
-        section.getId().setCourseId(course.getId());
-        section.setCourse(course);
-        return section;
-    }
-
-    @Mapping(source = "id.title", target = "title")
+    @Mapping(target = "id", source = "section.sectionId")
     SectionDTO sectionToSectionDTO(Section section);
-
 }

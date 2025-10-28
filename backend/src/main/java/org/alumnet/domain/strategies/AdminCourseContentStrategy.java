@@ -12,18 +12,22 @@ import org.springframework.stereotype.Component;
 @Component
 public class AdminCourseContentStrategy extends CourseContentStrategy {
 
-    protected AdminCourseContentStrategy(SectionRepository sectionRepository, SectionMapper sectionMapper, ParticipationRepository participationRepository, CourseRepository courseRepository) {
+    protected AdminCourseContentStrategy(SectionRepository sectionRepository, SectionMapper sectionMapper,
+            ParticipationRepository participationRepository, CourseRepository courseRepository) {
         super(sectionRepository, sectionMapper, participationRepository, courseRepository);
     }
 
     @Override
-    protected void validate(String userId, Integer courseId) {}
+    protected void validate(String userId, Integer courseId) {
+    }
 
     @Override
-    protected CourseContentDTO buildCourseContentDTO(Integer courseId, String userId, PageableResultResponse<SectionDTO> sectionDTOS) {
+    protected CourseContentDTO buildCourseContentDTO(Integer courseId, String userId,
+            PageableResultResponse<SectionDTO> sectionDTOS) {
         return CourseContentDTO.builder()
                 .sections(sectionDTOS)
                 .totalMembers(getTotalMembers(courseId))
+                .description(getDescription(courseId))
                 .build();
     }
 }

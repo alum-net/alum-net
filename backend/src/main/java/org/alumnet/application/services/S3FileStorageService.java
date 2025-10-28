@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,9 +29,9 @@ public class S3FileStorageService {
     private final AmazonS3Config.S3Properties s3Properties;
     private final S3Presigner s3Presigner;
 
-    public String store(MultipartFile file, String fileExtension, String filePath) throws FileStorageException {
+    public String store(MultipartFile file,String folderPath) throws FileStorageException {
         try {
-            String key = generateS3Key(fileExtension,filePath);
+            String key = String.format("%s/%s", folderPath, file.getOriginalFilename());
 
             Map<String, String> metadata = Map.of(
                     "original-filename", file.getOriginalFilename(),
@@ -55,8 +56,7 @@ public class S3FileStorageService {
 
     private static RequestBody createAWSrequestBody(MultipartFile file) throws IOException {
         return RequestBody.fromInputStream(
-                file.getInputStream(), file.getSize()
-        );
+                file.getInputStream(), file.getSize());
     }
 
     private PutObjectRequest createPutObjectRequest(MultipartFile file, String key, Map<String, String> metadata) {
@@ -70,14 +70,6 @@ public class S3FileStorageService {
                 .build();
     }
 
-    private String generateS3Key(String originalFilename, String folderPath) {
-        String uniqueId = UUID.randomUUID().toString();
-
-        return String.format("%s/%s_%s",
-                folderPath,
-                uniqueId,
-                originalFilename);
-    }
     public String generatePresignedUrl(String key, Duration expiration) {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(s3Properties.getBucketName())
@@ -146,6 +138,28 @@ public class S3FileStorageService {
                     String.format("Error eliminando carpeta en S3: %s", folderPath),
                     "delete"
             );
+        }
+    }
+
+    public void deleteMultipleFiles(List<String> fileKeys) {
+        try {
+            List<ObjectIdentifier> keys = fileKeys.stream()
+                    .map(key -> ObjectIdentifier.builder().key(key).build())
+                    .collect(Collectors.toList());
+
+            Delete delete = Delete.builder()
+                    .objects(keys)
+                    .build();
+
+            DeleteObjectsRequest deleteObjectsRequest = DeleteObjectsRequest.builder()
+                    .bucket(s3Properties.getBucketName())
+                    .delete(delete)
+                    .build();
+
+            s3Client.deleteObjects(deleteObjectsRequest);
+            log.info("Archivos eliminados exitosamente de S3: {}", fileKeys);
+        } catch (S3Exception e) {
+            throw new RuntimeException("Error al eliminar archivos: " + e.getMessage());
         }
     }
 }

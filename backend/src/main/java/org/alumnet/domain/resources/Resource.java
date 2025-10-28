@@ -26,4 +26,7 @@ public abstract class Resource {
     private String extension;
     private Long sizeInBytes;
 
+    public String getOriginalFilename() {
+        return name + '.' + extension;
+    }
 }

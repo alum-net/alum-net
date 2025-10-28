@@ -16,12 +16,13 @@ import org.alumnet.domain.Section;
 @NoArgsConstructor
 @DiscriminatorValue("section")
 public class SectionResource extends Resource {
-    private String title;
+    @Column(name = "resource_order")
+    private Integer order;
 
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "section_course_id", referencedColumnName = "course_id"),
-            @JoinColumn(name = "section_title", referencedColumnName = "title")
+            @JoinColumn(name = "section_id", referencedColumnName = "section_id")
     })
     private Section section;
 }
