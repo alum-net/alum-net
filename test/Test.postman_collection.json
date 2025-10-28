@@ -21,7 +21,7 @@
 									"    pm.response.to.have.status(201);",
 									"});",
 									"",
-									"pm.test(\"Response body matches expected structure and values\", function () {",
+									"pm.test(\"El contenido de la respuesta es esperado\", function () {",
 									"    const jsonData = pm.response.json();",
 									"    pm.expect(jsonData).to.have.all.keys('message');",
 									"    pm.expect(jsonData.message).to.eql('Curso creado correctamente');",
@@ -36,7 +36,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"eval(pm.collectionVariables.get(\"utils\"));",
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
 									"",
 									"function runInitProcess() {",
 									"  getAccessToken(function() {",
@@ -110,7 +110,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"eval(pm.collectionVariables.get(\"utils\"));",
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
 									"",
 									"function runInitProcess() {",
 									"  getAccessToken(function() {",
@@ -165,7 +165,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"eval(pm.collectionVariables.get(\"utils\"));",
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
 									"",
 									"function runInitProcess() {",
 									"  getAccessToken(function() {",
@@ -239,7 +239,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"eval(pm.collectionVariables.get(\"utils\"));",
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
 									"",
 									"function runInitProcess() {",
 									"  getAccessToken(function() {",
@@ -267,14 +267,25 @@
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
 									"});",
+									"const json = pm.response.json();",
+									"",
 									"pm.test(\"El array 'data' tiene largo 2 y contiene los emails esperados\", function () {",
-									"    const json = pm.response.json();",
 									"    pm.expect(json).to.have.property('data').that.is.an('array').with.lengthOf(2);",
 									"    const emails = json.data.map(item => item.email);",
 									"    pm.expect(emails).to.include.members([",
 									"        \"estudiante3@alumnet.com\",",
 									"        \"profesor6@alumnet.com\"",
 									"    ]);",
+									"});",
+									"",
+									"pm.test(\"Cada objeto en el array 'data' tiene las claves requeridas\", function () {",
+									"    const requiredKeys = [\"avatarUrl\", \"email\", \"enabled\", \"lastname\", \"name\", \"role\"];",
+									"    pm.expect(json).to.have.property('data').that.is.an('array');",
+									"    json.data.forEach(item => {",
+									"        requiredKeys.forEach(key => {",
+									"            pm.expect(item).to.have.property(key);",
+									"        });",
+									"    });",
 									"});"
 								],
 								"type": "text/javascript",
@@ -318,7 +329,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"eval(pm.collectionVariables.get(\"utils\"));",
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
 									"",
 									"function runInitProcess() {",
 									"  getAccessToken(function() {",
@@ -401,7 +412,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"eval(pm.collectionVariables.get(\"utils\"));",
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
 									"",
 									"function runInitProcess() {",
 									"  getAccessToken(function() {",
@@ -423,8 +434,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
+									"var jsonData = pm.response.json();",
 									"pm.test(\"Se obtuvieron los cursos correctamente\", function () {",
-									"    var jsonData = pm.response.json();",
 									"    var requiredNames = [",
 									"        'curso1-verificar-curso',",
 									"        'curso2-test-eliminar',",
@@ -434,6 +445,26 @@
 									"    var foundNames = (jsonData.data || []).map(function(course) { return course.name; });",
 									"    var missing = requiredNames.filter(function(name) { return !foundNames.includes(name); });",
 									"    pm.expect(missing, 'Missing course names: ' + missing.join(', ')).to.be.empty;",
+									"});",
+									"",
+									"pm.test(\"Cada objeto en 'data' contiene las claves requeridas de curso\", function () {",
+									"    const requiredKeys = [",
+									"        \"approvalGrade\",",
+									"        \"description\",",
+									"        \"endDate\",",
+									"        \"id\",",
+									"        \"name\",",
+									"        \"shift\",",
+									"        \"startDate\",",
+									"        \"teachers\",",
+									"        \"year\"",
+									"    ];",
+									"    pm.expect(jsonData).to.have.property('data').that.is.an('array');",
+									"    jsonData.data.forEach(item => {",
+									"        requiredKeys.forEach(key => {",
+									"            pm.expect(item).to.have.property(key);",
+									"        });",
+									"    });",
 									"});"
 								],
 								"type": "text/javascript",
@@ -504,6 +535,540 @@
 							""
 						]
 					}
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "User Creation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Usuario creado correctamente\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response body matches expected structure and values\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.all.keys('message');",
+									"    pm.expect(jsonData.message).to.eql('Usuario creado exitosamente');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"packages": {},
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"El loco\",\n    \"lastname\": \"profesor\",\n    \"group\": \"teachers\",\n    \"email\": \"profesor422@alumnet.com\",\n    \"password\": \"test1234\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{alumnetUrl}}/api/users/create-user",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"create-user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UserSearch by email",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"eval(pm.collectionVariables.get(\"utils-User\"));",
+									"",
+									"function runInitProcess() {",
+									"  getAccessToken(function() {",
+									"    initTestUsers(function() {",
+									"    });",
+									"  });",
+									"}",
+									"",
+									"runInitProcess();"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Estudiante filtrado por nombre correctamente\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('data').that.is.an('array').with.length.greaterThan(0);",
+									"    const emails = json.data.map(item => item.email);",
+									"    pm.expect(emails).to.include(\"estudiante-test-usuario1@alumnet.com\");",
+									"});",
+									"",
+									"pm.test(\"Cada elemento de 'data' contiene las claves requeridas\", function () {",
+									"    const json = pm.response.json();",
+									"    const requiredKeys = [\"avatarUrl\", \"email\", \"enabled\", \"lastname\", \"name\", \"role\"];",
+									"    json.data.forEach(item => {",
+									"        requiredKeys.forEach(key => {",
+									"            pm.expect(item).to.have.property(key);",
+									"        });",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{alumnetUrl}}/api/users/?name=estudiante-test-usuario1",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								""
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0",
+									"disabled": true
+								},
+								{
+									"key": "size",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "name",
+									"value": "estudiante-test-usuario1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UserSearch by role",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"eval(pm.collectionVariables.get(\"utils-User\"));",
+									"",
+									"function runInitProcess() {",
+									"  getAccessToken(function() {",
+									"    initTestUsers(function() {",
+									"    });",
+									"  });",
+									"}",
+									"",
+									"runInitProcess();"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Estudiante filtrado por nombre correctamente\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('data').that.is.an('array').with.length.greaterThan(0);",
+									"    const emails = json.data.map(item => item.email);",
+									"    pm.expect(emails).to.include(\"profesor7@alumnet.com\", \"profesor8@alumnet.com\");",
+									"});",
+									"",
+									"pm.test(\"Cada elemento de 'data' contiene las claves requeridas\", function () {",
+									"    const json = pm.response.json();",
+									"    const requiredKeys = [\"avatarUrl\", \"email\", \"enabled\", \"lastname\", \"name\", \"role\"];",
+									"    json.data.forEach(item => {",
+									"        requiredKeys.forEach(key => {",
+									"            pm.expect(item).to.have.property(key);",
+									"        });",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{alumnetUrl}}/api/users/?role=TEACHER",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								""
+							],
+							"query": [
+								{
+									"key": "role",
+									"value": "TEACHER"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Section",
+			"item": [
+				{
+					"name": "CreateSection",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"",
+									"function runInitProcess() {",
+									"  getAccessToken(function() {",
+									"    initTestUsers(function() {",
+									"      initTestCourses(function() {",
+									"        getCursoId(\"Test-section-create-section\", \"curso4-verificar-enroll-student\", function(){})",
+									"      });",
+									"    });",
+									"  });",
+									"}",
+									"",
+									"runInitProcess();",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Curso creado correctamente\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"El contendio de la respuesta es esperado\", function () { ",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.all.keys('message');",
+									"    pm.expect(jsonData.message).to.eql('Sección creada exitosamente');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "section",
+									"type": "file",
+									"src": "postman-cloud:///1f0b3a0a-c5c8-4850-bbff-815eb6134099"
+								},
+								{
+									"key": "resources",
+									"type": "file",
+									"src": "postman-cloud:///1f0b3a0a-e2a1-4c60-ad28-a06ba754ebd2"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{alumnetUrl}}/api/sections/{{id_curso}}",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"sections",
+								"{{id_curso}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Modify Section",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "resources",
+									"type": "file",
+									"src": "postman-cloud:///1f0b3a0a-e2a1-4c60-ad28-a06ba754ebd2"
+								},
+								{
+									"key": "section",
+									"type": "file",
+									"src": "postman-cloud:///1f0b3b30-95a8-4310-847f-3fd8452e4c54"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{alumnetUrl}}/api/sections/{{id_curso}}",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"sections",
+								"{{id_curso}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Course Content Access",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"",
+									"function runInitProcess() {",
+									"  getAccessToken(function() {",
+									"    initTestUsers(function() {",
+									"      initTestCourses(function() {",
+									"        getCursoId(\"Test-curso-create-section\", \"curso6-verificar-create-section\", function(){",
+									"            enrollStudent(\"estudiante4@alumnet.com\", function (){})",
+									"        })",
+									"      });",
+									"    });",
+									"  });",
+									"}",
+									"",
+									"runInitProcess();",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Se obtuvieron las secciones correctamente\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"La respuesta contiene todas las claves requeridas según la estructura JSON\", function () {",
+									"    var jsonData;",
+									"    try {",
+									"        jsonData = pm.response.json();",
+									"    } catch (e) {",
+									"        pm.expect.fail(\"La respuesta no es un JSON válido\");",
+									"        return;",
+									"    }",
+									"    // data",
+									"    pm.expect(jsonData).to.have.property(\"data\");",
+									"    // data.sections",
+									"    pm.expect(jsonData.data).to.have.property(\"sections\");",
+									"    // data.sections.data (array)",
+									"    pm.expect(jsonData.data.sections).to.have.property(\"data\");",
+									"    pm.expect(jsonData.data.sections.data).to.be.an(\"array\");",
+									"    // data.sections.data[0].description, data.sections.data[0].sectionResources (array), data.sections.data[0].title",
+									"    if (jsonData.data.sections.data.length > 0) {",
+									"        var section0 = jsonData.data.sections.data[0];",
+									"        pm.expect(section0).to.have.property(\"description\");",
+									"        pm.expect(section0).to.have.property(\"sectionResources\");",
+									"        pm.expect(section0.sectionResources).to.be.an(\"array\");",
+									"        pm.expect(section0).to.have.property(\"title\");",
+									"        // data.sections.data[0].sectionResources[0].extension, name, title, url",
+									"        if (section0.sectionResources.length > 0) {",
+									"            var resource0 = section0.sectionResources[0];",
+									"            pm.expect(resource0).to.have.property(\"extension\");",
+									"            pm.expect(resource0).to.have.property(\"name\");",
+									"            pm.expect(resource0).to.have.property(\"title\");",
+									"            pm.expect(resource0).to.have.property(\"url\");",
+									"        } else {",
+									"            pm.expect.fail(\"sectionResources está vacío, no se puede verificar el primer recurso\");",
+									"        }",
+									"    } else {",
+									"        pm.expect.fail(\"sections.data está vacío, no se puede verificar la primera sección\");",
+									"    }",
+									"    // data.sections.errors (array)",
+									"    pm.expect(jsonData.data.sections).to.have.property(\"errors\");",
+									"    pm.expect(jsonData.data.sections.errors).to.be.an(\"array\");",
+									"    // data.sections.message",
+									"    pm.expect(jsonData.data.sections).to.have.property(\"message\");",
+									"    // data.sections.pageNumber",
+									"    pm.expect(jsonData.data.sections).to.have.property(\"pageNumber\");",
+									"    // data.sections.pageSize",
+									"    pm.expect(jsonData.data.sections).to.have.property(\"pageSize\");",
+									"    // data.sections.totalElements",
+									"    pm.expect(jsonData.data.sections).to.have.property(\"totalElements\");",
+									"    // data.sections.totalPages",
+									"    pm.expect(jsonData.data.sections).to.have.property(\"totalPages\");",
+									"    // message (raíz)",
+									"    pm.expect(jsonData).to.have.property(\"message\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{alumnetUrl}}/api/courses/{{id_curso}}/content/?userId=estudiante4@alumnet.com",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"courses",
+								"{{id_curso}}",
+								"content",
+								""
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "estudiante4@alumnet.com"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete section",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{alumnetUrl}}/api/sections/",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"sections",
+								""
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -609,7 +1174,7 @@
 				"packages": {},
 				"requests": {},
 				"exec": [
-					"pm.collectionVariables.set(\"utils\", `",
+					"pm.collectionVariables.set(\"utils-Course\", `",
 					"const arr_users_test = [",
 					"  {",
 					"    \"name\": \"Profesor\",",
@@ -673,7 +1238,28 @@
 					"    \"group\": \"students\",",
 					"    \"email\": \"estudiante3@alumnet.com\",",
 					"    \"password\": \"test1234\"",
-					"  }",
+					"  },",
+					"      {",
+					"    \"name\": \"Profesor\",",
+					"    \"lastname\": \"7\",",
+					"    \"group\": \"teachers\",",
+					"    \"email\": \"profesor7@alumnet.com\",",
+					"    \"password\": \"test1234\"",
+					"  },",
+					"    {",
+					"    \"name\": \"Profesor\",",
+					"    \"lastname\": \"8\",",
+					"    \"group\": \"teachers\",",
+					"    \"email\": \"profesor8@alumnet.com\",",
+					"    \"password\": \"test1234\"",
+					"  },",
+					"      {",
+					"    \"name\": \"Estudiante\",",
+					"    \"lastname\": \"4\",",
+					"    \"group\": \"students\",",
+					"    \"email\": \"estudiante4@alumnet.com\",",
+					"    \"password\": \"test1234\"",
+					"  },",
 					"]",
 					"",
 					"const arr_course_test = [",
@@ -730,6 +1316,28 @@
 					"    \"endDate\": \"2025-12-15\",",
 					"    \"teachersEmails\": [",
 					"      \"profesor6@alumnet.com\"",
+					"    ]",
+					"  },",
+					"    {",
+					"    \"name\": \"curso6-verificar-create-section\",",
+					"    \"description\": \"Test-curso-create-section\",",
+					"    \"shift\": \"MORNING\",",
+					"    \"approvalGrade\": 0.7,",
+					"    \"startDate\": \"2025-09-01\",",
+					"    \"endDate\": \"2025-12-15\",",
+					"    \"teachersEmails\": [",
+					"      \"profesor7@alumnet.com\"",
+					"    ]",
+					"  },",
+					"      {",
+					"    \"name\": \"Curso7-verificar-get-section-content\",",
+					"    \"description\": \"curso-section-get-content\",",
+					"    \"shift\": \"MORNING\",",
+					"    \"approvalGrade\": 0.7,",
+					"    \"startDate\": \"2025-09-01\",",
+					"    \"endDate\": \"2025-12-15\",",
+					"    \"teachersEmails\": [",
+					"      \"profesor8@alumnet.com\"",
 					"    ]",
 					"  }",
 					"]",
@@ -868,6 +1476,95 @@
 					"`",
 					");",
 					"",
+					"pm.collectionVariables.set(\"utils-User\",",
+					"`",
+					"const arr_users_test = [",
+					"    {",
+					"    \"name\": \"Estudiante-test-usuario1\",",
+					"    \"lastname\": \"3\",",
+					"    \"group\": \"students\",",
+					"    \"email\": \"estudiante-test-usuario1@alumnet.com\",",
+					"    \"password\": \"test1234\"",
+					"  },",
+					"      {",
+					"    \"name\": \"Estudiante-test-usuario2\",",
+					"    \"lastname\": \"3\",",
+					"    \"group\": \"students\",",
+					"    \"email\": \"estudiante-test-usuario2@alumnet.com\",",
+					"    \"password\": \"test1234\"",
+					"  },",
+					"    {",
+					"    \"name\": \"Profesor\",",
+					"    \"lastname\": \"7\",",
+					"    \"group\": \"teachers\",",
+					"    \"email\": \"profesor7@alumnet.com\",",
+					"    \"password\": \"test1234\"",
+					"  },",
+					"  {",
+					"    \"name\": \"Profesor\",",
+					"    \"lastname\": \"2\",",
+					"    \"group\": \"teachers\",",
+					"    \"email\": \"profesor7@alumnet.com\",",
+					"    \"password\": \"test1234\"",
+					"  }",
+					"",
+					"]",
+					"function getAccessToken(next) {",
+					"  pm.sendRequest({",
+					"    url: pm.collectionVariables.get(\"keycloak\") + \"/realms/alumnet-realm/protocol/openid-connect/token\",",
+					"    method: 'POST',",
+					"    header: { 'Content-Type': 'application/x-www-form-urlencoded' },",
+					"    body: {",
+					"      mode: 'urlencoded',",
+					"      urlencoded: [",
+					"        { key: \"grant_type\", value: \"password\" },",
+					"        { key: \"client_id\", value: \"alumnet\" },",
+					"        { key: \"username\", value: \"develop@alumnet.com\" },",
+					"        { key: \"password\", value: \"develop\" }",
+					"      ]",
+					"    }",
+					"  }, function (err, res) {",
+					"    if (err) {",
+					"      console.error(\"Error al obtener token:\", err);",
+					"      return;",
+					"    }",
+					"    const jsonData = res.json();",
+					"    const accessToken = jsonData.access_token;",
+					"    pm.collectionVariables.set(\"access_token\", accessToken);",
+					"    console.log(\"Nuevo token obtenido y guardado.\");",
+					"",
+					"    if (next) next();",
+					"  });",
+					"}",
+					"function initTestUsers(next) {",
+					"  const arr = arr_users_test.slice(); // copia simple",
+					"  let pending = arr.length;",
+					"",
+					"  arr.forEach(teacher => {",
+					"    pm.sendRequest({",
+					"      url: pm.collectionVariables.get(\"alumnetUrl\") + \"/api/users/create-user\",",
+					"      method: \"POST\",",
+					"      header: { ",
+					"        \"Content-Type\": \"application/json\",",
+					"        \"Authorization\": \"Bearer \" + pm.collectionVariables.get(\"access_token\")",
+					"      },",
+					"      body: { mode: \"raw\", raw: JSON.stringify(teacher) }",
+					"    }, (err, res) => {",
+					"      if (err) {",
+					"        console.error(\"❌ Error al crear \" + teacher.email, err);",
+					"      } else if (res.code >= 200 && res.code < 300) {",
+					"        console.log(\"✅ Usuario creado: \" + teacher.email);",
+					"      } else {",
+					"        console.error(\"⚠️ Error al crear \" + teacher.email + \": \" + res.code);",
+					"      }",
+					"",
+					"      pending--;",
+					"      if (pending === 0 && next) next();",
+					"    });",
+					"  });",
+					"}",
+					"`);",
+					"",
 					"",
 					""
 				]
@@ -904,6 +1601,14 @@
 		},
 		{
 			"key": "utils",
+			"value": ""
+		},
+		{
+			"key": "utils-Course",
+			"value": ""
+		},
+		{
+			"key": "utils-User",
 			"value": ""
 		}
 	]
