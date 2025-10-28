@@ -83,4 +83,12 @@ public class LibraryController {
         libraryService.createResource(file, metadata);
         return ResponseEntity.status(HttpStatus.CREATED).body(ResultResponse.success(null, "Se creó el recurso correctamente"));
     }
+
+    @DeleteMapping(path= "/resources/{resourceId}", produces = "application/json")
+    @PreAuthorize("hasAnyRole('admin', 'teacher')")
+    public ResponseEntity<ResultResponse<Object>> deleteResource(
+            @PathVariable Integer resourceId){
+        libraryService.deleteResource(resourceId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ResultResponse.success(null, "Se eliminó el recurso correctamente"));
+    }
 }
