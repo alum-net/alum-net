@@ -1,6 +1,6 @@
 export enum ForumType {
-  ANNOUNCE = 'announce',
-  GENERAL = 'general',
+  ANNOUNCE = 'ANNOUNCE',
+  GENERAL = 'GENERAL',
 }
 
 export type Post = {

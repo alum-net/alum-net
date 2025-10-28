@@ -6,13 +6,13 @@ import { useLocalSearchParams } from 'expo-router';
 import { THEME, Toast } from '@alum-net/ui';
 import { CourseContent, useCourse } from '@alum-net/courses';
 import { useUserInfo } from '@alum-net/users';
-import SectionCard from '../../features/sections/components/section-card';
-import CourseMembersCard from '../../features/courses/components/course-members-card';
+import SectionCard from '../../../features/sections/components/section-card';
+import CourseMembersCard from '../../../features/courses/components/course-members-card';
 import { UserRole } from '@alum-net/users/src/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { deleteCourse } from '../../features/courses/service';
+import { deleteCourse } from '../../../features/courses/service';
 import { QUERY_KEYS, Response } from '@alum-net/api';
-import { SectionForm } from '../../features/sections/components/section-form';
+import { SectionForm } from '../../../features/sections/components/section-form';
 import { ForumLinks } from '@alum-net/forums';
 import RenderHTML from 'react-native-render-html';
 
@@ -35,7 +35,6 @@ export default function Course() {
     }) => deleteCourse(courseId, sectionId),
     onSuccess: (_, variables) => {
       Toast.success('Sección eliminada correctamente');
-      console.log(variables);
       queryClient.setQueryData(
         [QUERY_KEYS.getCourse],
         (oldData: Response<CourseContent>) => ({

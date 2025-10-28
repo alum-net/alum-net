@@ -9,10 +9,10 @@ export function ForumLinks({ courseId }: { courseId: string }) {
       <Button mode="text">
         <Link
           href={{
-            pathname: `/forum/[type]`,
+            pathname: `/course/[id]/forum/[type]`,
             params: {
               type: ForumType.ANNOUNCE,
-              courseId: courseId,
+              id: courseId,
             },
           }}
         >
@@ -22,10 +22,10 @@ export function ForumLinks({ courseId }: { courseId: string }) {
       <Button mode="text">
         <Link
           href={{
-            pathname: `/forum/[type]`,
+            pathname: `/course/[id]/forum/[type]`,
             params: {
               type: ForumType.GENERAL,
-              courseId: courseId,
+              id: courseId,
             },
           }}
         >

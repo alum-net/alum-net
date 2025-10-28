@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
-import { getForumPosts } from './service';
+import { getForumPosts } from '../service';
 import { QUERY_KEYS } from '@alum-net/api';
-import { ForumType } from './types';
+import { ForumType } from '../types';
 
 export const useForumPosts = (
   courseId: string,
