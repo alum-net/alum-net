@@ -76,4 +76,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ResultResponse<Object>> handlePostHasRepliesException(PostHasRepliesException ex) {
         return  ResponseEntity.status(HttpStatus.CONFLICT).body(ResultResponse.error(ex.getMessage(), "No se puede modificar el post"));
     }
+
+    @ExceptionHandler(NoPendingChangesException.class)
+    public ResponseEntity<ResultResponse<Object>> handleNoPendingChangesException(NoPendingChangesException ex) {
+        return  ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).body(ResultResponse.error(ex.getMessage(), "No hay cambios pendientes"));
+    }
 }

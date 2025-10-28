@@ -162,4 +162,24 @@ public class S3FileStorageService {
             throw new RuntimeException("Error al eliminar archivos: " + e.getMessage());
         }
     }
+
+    public void deleteMultipleFile(String fileKey) {
+        try {
+            ObjectIdentifier key = ObjectIdentifier.builder().key(fileKey).build();
+
+            Delete delete = Delete.builder()
+                    .objects(key)
+                    .build();
+
+            DeleteObjectsRequest deleteObjectsRequest = DeleteObjectsRequest.builder()
+                    .bucket(s3Properties.getBucketName())
+                    .delete(delete)
+                    .build();
+
+            s3Client.deleteObjects(deleteObjectsRequest);
+            log.info("Archivo eliminado exitosamente de S3: {}", fileKey);
+        } catch (S3Exception e) {
+            throw new RuntimeException("Error al eliminar archivos: " + e.getMessage());
+        }
+    }
 }
