@@ -9,6 +9,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.xml.transform.Result;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -85,5 +87,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ResultResponse<Object>> handleIllegalArgumentException(IllegalArgumentException ex) {
         return  ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Error en el procesamiento"));
+    }
+
+    @ExceptionHandler(LabelAlreadyExistsException.class)
+    public ResponseEntity<ResultResponse<Object>> handleLabelAlreadyExistsException(LabelAlreadyExistsException ex){
+        return  ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Ya existe la etiqueta"));
     }
 }
