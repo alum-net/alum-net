@@ -1,0 +1,72 @@
+[
+  {
+    "name": "Ana",
+    "lastname": "Rodríguez",
+    "group": "teachers",
+    "email": "ana.rodriguez@alumnet.com",
+    "password": "test1234"
+  },
+  {
+    "name": "Lucas",
+    "lastname": "Martínez",
+    "group": "teachers",
+    "email": "lucas.martinez@alumnet.com",
+    "password": "test1234"
+  },
+  {
+    "name": "María",
+    "lastname": "González",
+    "group": "teachers",
+    "email": "maria.gonzalez@alumnet.com",
+    "password": "test1234"
+  },
+  {
+    "name": "Diego",
+    "lastname": "Pérez",
+    "group": "teachers",
+    "email": "diego.perez@alumnet.com",
+    "password": "test1234"
+  },
+  {
+    "name": "Sofía",
+    "lastname": "López",
+    "group": "teachers",
+    "email": "sofia.lopez@alumnet.com",
+    "password": "test1234"
+  },
+  {
+    "name": "Martín",
+    "lastname": "Fernández",
+    "group": "teachers",
+    "email": "martin.fernandez@alumnet.com",
+    "password": "test1234"
+  },
+  {
+    "name": "Lucía",
+    "lastname": "Sosa",
+    "group": "teachers",
+    "email": "lucia.sosa@alumnet.com",
+    "password": "test1234"
+  },
+  {
+    "name": "Jorge",
+    "lastname": "Ramírez",
+    "group": "teachers",
+    "email": "jorge.ramirez@alumnet.com",
+    "password": "test1234"
+  },
+  {
+    "name": "Valentina",
+    "lastname": "Gómez",
+    "group": "teachers",
+    "email": "valentina.gomez@alumnet.com",
+    "password": "test1234"
+  },
+  {
+    "name": "Federico",
+    "lastname": "Vigliarolo",
+    "group": "teachers",
+    "email": "federico.vigliarolo@alumnet.com",
+    "password": "test1234"
+  }
+]

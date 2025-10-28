@@ -1,0 +1,910 @@
+{
+	"info": {
+		"_postman_id": "d7f5b855-8cc2-40f7-981b-f9ba17623a82",
+		"name": "Test",
+		"description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "39146326"
+	},
+	"item": [
+		{
+			"name": "Course",
+			"item": [
+				{
+					"name": "Course creation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Curso creado correctamente\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response body matches expected structure and values\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.all.keys('message');",
+									"    pm.expect(jsonData.message).to.eql('Curso creado correctamente');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"eval(pm.collectionVariables.get(\"utils\"));",
+									"",
+									"function runInitProcess() {",
+									"  getAccessToken(function() {",
+									"    initTestUsers(function() {",
+									"    });",
+									"  });",
+									"}",
+									"",
+									"runInitProcess();"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Test-curso\",\r\n  \"description\": \"tupla creada para test\",\r\n  \"shift\": \"EVENING\",\r\n  \"approvalGrade\": 0.7,\r\n  \"startDate\": \"2025-09-01\",\r\n  \"endDate\": \"2025-12-15\",\r\n  \"teachersEmails\": [\"profesor1@alumnet.com\"]\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{alumnetUrl}}/api/courses",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"courses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Course delete",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Se eliminó el curso correctamente\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"eval(pm.collectionVariables.get(\"utils\"));",
+									"",
+									"function runInitProcess() {",
+									"  getAccessToken(function() {",
+									"    initTestUsers(function() {",
+									"      initTestCourses(function() {",
+									"        getCursoId(\"Test-curso-delete\", \"curso2-test-eliminar\", function(){})",
+									"      });",
+									"    });",
+									"  });",
+									"}",
+									"",
+									"runInitProcess();",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{alumnetUrl}}/api/courses/{{id_curso}}",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"courses",
+								"{{id_curso}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Unenrollment student",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"eval(pm.collectionVariables.get(\"utils\"));",
+									"",
+									"function runInitProcess() {",
+									"  getAccessToken(function() {",
+									"    initTestUsers(function() {",
+									"      initTestCourses(function() {",
+									"        getCursoId(\"Test-curso-unroll-student\", \"curso3-verificar-unroll-student\", function(){",
+									"            enrollStudent(\"estudiante1@alumnet.com\", function (){})",
+									"        })",
+									"      });",
+									"    });",
+									"  });",
+									"}",
+									"",
+									"runInitProcess();",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Se desmatriculó el estudiante con exito\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{alumnetUrl}}/api/courses/{{id_curso}}/participations/estudiante1@alumnet.com",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"courses",
+								"{{id_curso}}",
+								"participations",
+								"estudiante1@alumnet.com"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get members",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"eval(pm.collectionVariables.get(\"utils\"));",
+									"",
+									"function runInitProcess() {",
+									"  getAccessToken(function() {",
+									"    initTestUsers(function() {",
+									"      initTestCourses(function() {",
+									"        getCursoId(\"Test-curso-get-members\", \"curso5-verificar-get-members\", function(){",
+									"            enrollStudent(\"estudiante3@alumnet.com\", function (){})",
+									"        })",
+									"      });",
+									"    });",
+									"  });",
+									"}",
+									"",
+									"runInitProcess();"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"El array 'data' tiene largo 2 y contiene los emails esperados\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('data').that.is.an('array').with.lengthOf(2);",
+									"    const emails = json.data.map(item => item.email);",
+									"    pm.expect(emails).to.include.members([",
+									"        \"estudiante3@alumnet.com\",",
+									"        \"profesor6@alumnet.com\"",
+									"    ]);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{alumnetUrl}}/api/courses/{{id_curso}}/members",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"courses",
+								"{{id_curso}}",
+								"members"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Enrollment student",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"eval(pm.collectionVariables.get(\"utils\"));",
+									"",
+									"function runInitProcess() {",
+									"  getAccessToken(function() {",
+									"    initTestUsers(function() {",
+									"      initTestCourses(function() {",
+									"        getCursoId(\"Test-curso-enroll-student\", \"curso4-verificar-enroll-student\", function(){})",
+									"      });",
+									"    });",
+									"  });",
+									"}",
+									"",
+									"runInitProcess();"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response body matches expected structure and values\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.all.keys('message');",
+									"    pm.expect(jsonData.message).to.eql('Estudiante matriculado correctamente');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"studentEmail\": \"estudiante2@alumnet.com\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{alumnetUrl}}/api/courses/{{id_curso}}/participations",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"courses",
+								"{{id_curso}}",
+								"participations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get courses",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"eval(pm.collectionVariables.get(\"utils\"));",
+									"",
+									"function runInitProcess() {",
+									"  getAccessToken(function() {",
+									"    initTestUsers(function() {",
+									"      initTestCourses(function() {",
+									"      });",
+									"    });",
+									"  });",
+									"}",
+									"",
+									"runInitProcess();"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Se obtuvieron los cursos correctamente\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var requiredNames = [",
+									"        'curso1-verificar-curso',",
+									"        'curso2-test-eliminar',",
+									"        'curso3-verificar-unroll-student',",
+									"        'curso4-verificar-enroll-student'",
+									"    ];",
+									"    var foundNames = (jsonData.data || []).map(function(course) { return course.name; });",
+									"    var missing = requiredNames.filter(function(name) { return !foundNames.includes(name); });",
+									"    pm.expect(missing, 'Missing course names: ' + missing.join(', ')).to.be.empty;",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{alumnetUrl}}/api/courses/",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"courses",
+								""
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "teacherEmail",
+									"value": "803h38i@alumnet.com",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "LOGIN",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"pm.collectionVariables.set(\"access_token\", jsonData.access_token);"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "alumnet",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "develop@alumnet.com",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "develop",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{keycloak}}/realms/alumnet-realm/protocol/openid-connect/token",
+					"host": [
+						"{{keycloak}}"
+					],
+					"path": [
+						"realms",
+						"alumnet-realm",
+						"protocol",
+						"openid-connect",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "dummy",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"eval(pm.collectionVariables.get(\"utils\"));",
+							"",
+							"await getAccessToken();",
+							"await initTestUsers();",
+							"await initTestCourses();"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "www.google.com",
+					"host": [
+						"www",
+						"google",
+						"com"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					"pm.collectionVariables.set(\"utils\", `",
+					"const arr_users_test = [",
+					"  {",
+					"    \"name\": \"Profesor\",",
+					"    \"lastname\": \"1\",",
+					"    \"group\": \"teachers\",",
+					"    \"email\": \"profesor1@alumnet.com\",",
+					"    \"password\": \"test1234\"",
+					"  },",
+					"  {",
+					"    \"name\": \"Profesor\",",
+					"    \"lastname\": \"2\",",
+					"    \"group\": \"teachers\",",
+					"    \"email\": \"profesor2@alumnet.com\",",
+					"    \"password\": \"test1234\"",
+					"  },",
+					"  {",
+					"    \"name\": \"Profesor\",",
+					"    \"lastname\": \"3\",",
+					"    \"group\": \"teachers\",",
+					"    \"email\": \"profesor3@alumnet.com\",",
+					"    \"password\": \"test1234\"",
+					"  },",
+					"  {",
+					"    \"name\": \"Profesor\",",
+					"    \"lastname\": \"4\",",
+					"    \"group\": \"teachers\",",
+					"    \"email\": \"profesor4@alumnet.com\",",
+					"    \"password\": \"test1234\"",
+					"  },",
+					"  {",
+					"    \"name\": \"Profesor\",",
+					"    \"lastname\": \"5\",",
+					"    \"group\": \"teachers\",",
+					"    \"email\": \"profesor5@alumnet.com\",",
+					"    \"password\": \"test1234\"",
+					"  },",
+					"    {",
+					"    \"name\": \"Profesor\",",
+					"    \"lastname\": \"6\",",
+					"    \"group\": \"teachers\",",
+					"    \"email\": \"profesor6@alumnet.com\",",
+					"    \"password\": \"test1234\"",
+					"  },",
+					"    {",
+					"    \"name\": \"Estudiante\",",
+					"    \"lastname\": \"1\",",
+					"    \"group\": \"students\",",
+					"    \"email\": \"estudiante1@alumnet.com\",",
+					"    \"password\": \"test1234\"",
+					"  },",
+					"  {",
+					"    \"name\": \"Estudiante\",",
+					"    \"lastname\": \"2\",",
+					"    \"group\": \"students\",",
+					"    \"email\": \"estudiante2@alumnet.com\",",
+					"    \"password\": \"test1234\"",
+					"  },",
+					"    {",
+					"    \"name\": \"Estudiante\",",
+					"    \"lastname\": \"3\",",
+					"    \"group\": \"students\",",
+					"    \"email\": \"estudiante3@alumnet.com\",",
+					"    \"password\": \"test1234\"",
+					"  }",
+					"]",
+					"",
+					"const arr_course_test = [",
+					"  {",
+					"    \"name\": \"curso1-verificar-curso\",",
+					"    \"description\": \"Test-curso-get\",",
+					"    \"shift\": \"MORNING\",",
+					"    \"approvalGrade\": 0.7,",
+					"    \"startDate\": \"2025-09-01\",",
+					"    \"endDate\": \"2025-12-15\",",
+					"    \"teachersEmails\": [",
+					"      \"profesor2@alumnet.com\"",
+					"    ]",
+					"  },",
+					"  {",
+					"    \"name\": \"curso2-test-eliminar\",",
+					"    \"description\": \"Test-curso-delete\",",
+					"    \"shift\": \"MORNING\",",
+					"    \"approvalGrade\": 0.7,",
+					"    \"startDate\": \"2025-09-01\",",
+					"    \"endDate\": \"2025-12-15\",",
+					"    \"teachersEmails\": [",
+					"      \"profesor3@alumnet.com\"",
+					"    ]",
+					"  },",
+					"  {",
+					"    \"name\": \"curso3-verificar-unroll-student\",",
+					"    \"description\": \"Test-curso-unroll-student\",",
+					"    \"shift\": \"MORNING\",",
+					"    \"approvalGrade\": 0.7,",
+					"    \"startDate\": \"2025-09-01\",",
+					"    \"endDate\": \"2025-12-15\",",
+					"    \"teachersEmails\": [",
+					"      \"profesor4@alumnet.com\"",
+					"    ]",
+					"  },",
+					"  {",
+					"    \"name\": \"curso4-verificar-enroll-student\",",
+					"    \"description\": \"Test-curso-enroll-student\",",
+					"    \"shift\": \"MORNING\",",
+					"    \"approvalGrade\": 0.7,",
+					"    \"startDate\": \"2025-09-01\",",
+					"    \"endDate\": \"2025-12-15\",",
+					"    \"teachersEmails\": [",
+					"      \"profesor5@alumnet.com\"",
+					"    ]",
+					"  },",
+					"    {",
+					"    \"name\": \"curso5-verificar-get-members\",",
+					"    \"description\": \"Test-curso-get-members\",",
+					"    \"shift\": \"MORNING\",",
+					"    \"approvalGrade\": 0.7,",
+					"    \"startDate\": \"2025-09-01\",",
+					"    \"endDate\": \"2025-12-15\",",
+					"    \"teachersEmails\": [",
+					"      \"profesor6@alumnet.com\"",
+					"    ]",
+					"  }",
+					"]",
+					"",
+					"function getAccessToken(next) {",
+					"  pm.sendRequest({",
+					"    url: pm.collectionVariables.get(\"keycloak\") + \"/realms/alumnet-realm/protocol/openid-connect/token\",",
+					"    method: 'POST',",
+					"    header: { 'Content-Type': 'application/x-www-form-urlencoded' },",
+					"    body: {",
+					"      mode: 'urlencoded',",
+					"      urlencoded: [",
+					"        { key: \"grant_type\", value: \"password\" },",
+					"        { key: \"client_id\", value: \"alumnet\" },",
+					"        { key: \"username\", value: \"develop@alumnet.com\" },",
+					"        { key: \"password\", value: \"develop\" }",
+					"      ]",
+					"    }",
+					"  }, function (err, res) {",
+					"    if (err) {",
+					"      console.error(\"Error al obtener token:\", err);",
+					"      return;",
+					"    }",
+					"    const jsonData = res.json();",
+					"    const accessToken = jsonData.access_token;",
+					"    pm.collectionVariables.set(\"access_token\", accessToken);",
+					"    console.log(\"Nuevo token obtenido y guardado.\");",
+					"",
+					"    if (next) next();",
+					"  });",
+					"}",
+					"",
+					"function initTestUsers(next) {",
+					"  const arr = arr_users_test.slice(); // copia simple",
+					"  let pending = arr.length;",
+					"",
+					"  arr.forEach(teacher => {",
+					"    pm.sendRequest({",
+					"      url: pm.collectionVariables.get(\"alumnetUrl\") + \"/api/users/create-user\",",
+					"      method: \"POST\",",
+					"      header: { ",
+					"        \"Content-Type\": \"application/json\",",
+					"        \"Authorization\": \"Bearer \" + pm.collectionVariables.get(\"access_token\")",
+					"      },",
+					"      body: { mode: \"raw\", raw: JSON.stringify(teacher) }",
+					"    }, (err, res) => {",
+					"      if (err) {",
+					"        console.error(\"❌ Error al crear \" + teacher.email, err);",
+					"      } else if (res.code >= 200 && res.code < 300) {",
+					"        console.log(\"✅ Usuario creado: \" + teacher.email);",
+					"      } else {",
+					"        console.error(\"⚠️ Error al crear \" + teacher.email + \": \" + res.code);",
+					"      }",
+					"",
+					"      pending--;",
+					"      if (pending === 0 && next) next();",
+					"    });",
+					"  });",
+					"}",
+					"",
+					"function initTestCourses(next) {",
+					"  const arr = arr_course_test.slice();",
+					"  let pending = arr.length;",
+					"",
+					"  arr.forEach(course => {",
+					"    pm.sendRequest({",
+					"      url: pm.collectionVariables.get(\"alumnetUrl\") + \"/api/courses\",",
+					"      method: \"POST\",",
+					"      header: { ",
+					"        \"Content-Type\": \"application/json\",",
+					"        \"Authorization\": \"Bearer \" + pm.collectionVariables.get(\"access_token\")",
+					"      },",
+					"      body: { mode: \"raw\", raw: JSON.stringify(course) }",
+					"    }, (err, res) => {",
+					"      if (err) {",
+					"        console.error(\"❌ Error al crear \" + course.name, err);",
+					"      } else if (res.code >= 200 && res.code < 300) {",
+					"        console.log(\"✅ Curso creado: \" + course.name);",
+					"      } else {",
+					"        console.error(\"⚠️ Error al crear \" + course.name + \": \" + res.code);",
+					"      }",
+					"",
+					"      pending--;",
+					"      if (pending === 0 && next) next();",
+					"    });",
+					"  });",
+					"}",
+					"function getCursoId(description, name, next){",
+					"    pm.sendRequest({",
+					"    url: pm.collectionVariables.get(\"alumnetUrl\") + '/api/courses/?description=' + description +'&name=' + name,",
+					"    method: 'GET',",
+					"    header: {",
+					"        'Authorization': 'Bearer ' + pm.variables.get('access_token')",
+					"    }",
+					"}, function (err, res) {",
+					"    if (err) {",
+					"        console.error('Error en la petición GET:', err);",
+					"        return;",
+					"    }",
+					"    var json = res.json();",
+					"    if (json.data && json.data.length > 0) {",
+					"        var id = json.data[0].id;",
+					"        pm.collectionVariables.set('id_curso', parseInt(id));",
+					"    } else {",
+					"        console.warn('No se encontró ningún curso con esa descripción');",
+					"        pm.collectionVariables.set('id_curso', parseInt(\"\"));",
+					"    }",
+					"",
+					"    next();",
+					"});",
+					"}",
+					"function enrollStudent(email, curso_id, next) {",
+					"    pm.sendRequest({",
+					"        url: pm.collectionVariables.get(\"alumnetUrl\") + \"/api/courses/\" + pm.collectionVariables.get(\"id_curso\") + \"/participations\",",
+					"        method: 'POST',",
+					"        header: {",
+					"            'Content-Type': 'application/json',",
+					"            \"Authorization\": \"Bearer \" + pm.collectionVariables.get(\"access_token\")",
+					"        },",
+					"        body: {",
+					"            mode: 'raw',",
+					"            raw: JSON.stringify({ studentEmail: email })",
+					"        }",
+					"    }, function (err, res2) {",
+					"        if (err) {",
+					"            console.error('Error en la petición de matrícula:', err);",
+					"            pm.environment.set('enroll_status', 'error');",
+					"            return;",
+					"        }",
+					"        const json2 = res2.json();",
+					"        pm.environment.set('enroll_status', json2.success ? 'ok' : 'fail');",
+					"        pm.environment.set('enroll_message', json2.message);",
+					"    });",
+					"    next();",
+					"}",
+					"`",
+					");",
+					"",
+					"",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "alumnetUrl",
+			"value": "https://localhost:8080"
+		},
+		{
+			"key": "keycloak",
+			"value": "https://localhost:8000"
+		},
+		{
+			"key": "access_token",
+			"value": ""
+		},
+		{
+			"key": "id_curso",
+			"value": ""
+		},
+		{
+			"key": "utils",
+			"value": ""
+		}
+	]
+}

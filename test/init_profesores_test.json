@@ -1,0 +1,37 @@
+[
+  {
+    "name": "Profesor",
+    "lastname": "1",
+    "group": "teachers",
+    "email": "profesor1@alumnet.com",
+    "password": "test1234"
+  },
+  {
+    "name": "Profesor",
+    "lastname": "2",
+    "group": "teachers",
+    "email": "profesor2@alumnet.com",
+    "password": "test1234"
+  },
+  {
+    "name": "Profesor",
+    "lastname": "3",
+    "group": "teachers",
+    "email": "profesor3@alumnet.com",
+    "password": "test1234"
+  },
+  {
+    "name": "Profesor",
+    "lastname": "4",
+    "group": "teachers",
+    "email": "profesor4@alumnet.com",
+    "password": "test1234"
+  },
+  {
+    "name": "Profesor",
+    "lastname": "5",
+    "group": "teachers",
+    "email": "profesor5@alumnet.com",
+    "password": "test1234"
+  }
+]
