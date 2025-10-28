@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.alumnet.application.enums.UserRole;
+import org.alumnet.domain.resources.LibraryResource;
+
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -23,6 +26,9 @@ public abstract class User {
     @Column(name = "avatar_url")
     private String avatarUrl;
     private boolean enabled;
+
+    @OneToMany(mappedBy = "creator", fetch = FetchType.LAZY)
+    private Set<LibraryResource> libraryResources;
 
     public abstract UserRole getRole();
 
