@@ -42,13 +42,15 @@ export interface FilterBarRef {
 }
 
 export interface SectionResource {
-  title: string;
   name: string;
   extension: string;
   url: string;
+  order: number;
+  id: number;
 }
 
 export interface Section {
+  id: number;
   title: string;
   description: string;
   sectionResources: SectionResource[];
@@ -58,4 +60,5 @@ export interface CourseContent {
   sections: PageableContent<Section>;
   enrolledStudents?: string[];
   totalEnrollments?: number;
+  description: string;
 }

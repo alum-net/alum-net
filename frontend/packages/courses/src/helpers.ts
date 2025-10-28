@@ -21,3 +21,13 @@ export function isValidDecimal(value: string): boolean {
   const decimalRegex = /^(0(\.\d)?|1(\.0)?|\.\d)$/;
   return decimalRegex.test(value);
 }
+
+export function deleteFalsyKeys<T extends Record<string, any>>(
+  obj: T,
+): Partial<T> {
+  return Object.fromEntries(
+    Object.entries(obj).filter(([_, value]) =>
+      Array.isArray(value) ? value.length > 0 : Boolean(value),
+    ),
+  ) as Partial<T>;
+}

@@ -2,6 +2,7 @@ package org.alumnet.infrastructure.controllers;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.alumnet.application.dtos.UpdateRequestDTO;
 import org.alumnet.application.dtos.requests.SectionRequestDTO;
 import org.alumnet.application.dtos.responses.ResultResponse;
 import org.alumnet.application.services.SectionService;
@@ -30,11 +31,25 @@ public class SectionController {
         return ResponseEntity.ok().body(ResultResponse.success(null, "Sección creada exitosamente"));
     }
 
-    @DeleteMapping("/{courseId}/{title}")
+    @DeleteMapping("/{courseId}/{sectionId}")
     @PreAuthorize("hasRole('teacher')")
     public ResponseEntity<ResultResponse<Object>> deleteSection(@PathVariable int courseId,
-                                                                @PathVariable String title) {
-        sectionService.deleteSection(courseId, title);
+                                                                @PathVariable int sectionId) {
+        sectionService.deleteSection(courseId, sectionId);
         return ResponseEntity.ok().body(ResultResponse.success(null, "Sección eliminada exitosamente"));
     }
+
+
+    @PutMapping("/{courseId}/{sectionId}")
+    @PreAuthorize("hasRole('teacher')")
+    public ResponseEntity<ResultResponse<Object>> updateSection(@PathVariable Integer courseId,
+                                        @PathVariable Integer sectionId,
+                                        @RequestPart("section") @Valid UpdateRequestDTO sectionDTO,
+                                        @RequestPart (value = "resources", required = false) List<MultipartFile> files) {
+        sectionService.updateSection(courseId, sectionId, sectionDTO, files);
+        return ResponseEntity.ok(ResultResponse.success(null, "Sección actualizada exitosamente"));
+    }
+
+
+
 }

@@ -8,7 +8,7 @@ import { useEffect } from 'react';
 
 export const useCourse = (id: string) => {
   const { data: userInfo } = useUserInfo();
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: [QUERY_KEYS.getCourse],
     queryFn: () => fetchCourse(id, userInfo?.email || ''),
     enabled: !!userInfo?.email,
@@ -16,8 +16,8 @@ export const useCourse = (id: string) => {
   const nav = useNavigation();
 
   useEffect(() => {
-    if (data?.errors && data?.errors.length > 0) {
-      Toast.error(data.errors[0]);
+    if (error || (data?.errors && data?.errors.length > 0)) {
+      Toast.error('No estas inscripto al curso');
       if (nav.canGoBack()) nav.goBack();
       else
         nav.reset({
@@ -25,7 +25,7 @@ export const useCourse = (id: string) => {
           routes: [{ name: 'courses' as never }],
         });
     }
-  }, [data?.errors, nav]);
+  }, [data?.errors, nav, error]);
 
   return {
     data,
