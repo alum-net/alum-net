@@ -6,6 +6,7 @@ import java.util.List;
 
 @Data
 public class LibraryResourceDTO {
+    private Integer id;
     private String title;
     private List<LabelDTO> labels;
 
