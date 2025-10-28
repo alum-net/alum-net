@@ -93,4 +93,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ResultResponse<Object>> handleLabelAlreadyExistsException(LabelAlreadyExistsException ex){
         return  ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Ya existe la etiqueta"));
     }
+
+    @ExceptionHandler(LabelNotFoundException.class)
+    public ResponseEntity<ResultResponse<Object>> handleLabelNotFoundException(LabelNotFoundException ex){
+        return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultResponse.error(ex.getMessage(), "No se encontró la etiqueta"));
+    }
 }

@@ -7,6 +7,7 @@ import org.alumnet.application.query_builders.LabelSpecification;
 import org.alumnet.domain.repositories.LabelRepository;
 import org.alumnet.domain.resources.Label;
 import org.alumnet.infrastructure.exceptions.LabelAlreadyExistsException;
+import org.alumnet.infrastructure.exceptions.LabelNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -41,5 +42,11 @@ public class LibraryService {
         labelRepository.save(newLabel);
 
         return libraryMapper.labelToLabelDTO(newLabel);
+    }
+
+    public void deleteLabel(int labelId) {
+        Label label = labelRepository.findById(labelId).orElseThrow(LabelNotFoundException::new);
+
+        labelRepository.delete(label);
     }
 }
