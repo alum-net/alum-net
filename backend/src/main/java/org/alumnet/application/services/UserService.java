@@ -4,12 +4,14 @@ import com.opencsv.bean.CsvToBeanBuilder;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.requests.UserBulkCreationDTO;
+import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.requests.UserCreationRequestDTO;
 import org.alumnet.application.dtos.UserDTO;
 import org.alumnet.application.dtos.requests.UserFilterDTO;
 import org.alumnet.application.dtos.requests.UserModifyRequestDTO;
 import org.alumnet.application.dtos.responses.BulkCreationErrorDetailDTO;
 import org.alumnet.application.dtos.responses.BulkCreationResponseDTO;
+import org.alumnet.application.dtos.requests.UserModifyRequestDTO;
 import org.alumnet.application.mapper.UserMapper;
 import org.alumnet.application.query_builders.UserSpecification;
 import org.alumnet.domain.repositories.UserRepository;
@@ -237,4 +239,5 @@ public class UserService {
         user.setCredentials(Collections.singletonList(credential));
         return user;
     }
+
 }
