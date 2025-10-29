@@ -13,11 +13,14 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteCourse } from '../../features/courses/service';
 import { QUERY_KEYS, Response } from '@alum-net/api';
 import { SectionForm } from '../../features/courses/components/section-form';
+import EventCreationModal from '../../features/events/components/event-creation-modal';
+
 
 export default function Course() {
   const { id, name } = useLocalSearchParams();
   const queryClient = useQueryClient();
   const { data: userInfo } = useUserInfo();
+  const [isEventModalVisible, setIsEventModalVisible] = useState(false);
   const isTeacher = useMemo(
     () => userInfo?.role === UserRole.teacher,
     [userInfo?.role],
@@ -93,7 +96,7 @@ export default function Course() {
               <Button
                 mode="contained-tonal"
                 icon="plus"
-                onPress={() => {}}
+                onPress={() => setIsEventModalVisible(true)}
                 style={{ alignSelf: 'flex-start', marginBottom: 20 }}
               >
                 Añadir evento
@@ -185,6 +188,12 @@ export default function Course() {
           }
         />
       </Modal>
+      <EventCreationModal
+        visible={isEventModalVisible}
+        onClose={() => setIsEventModalVisible(false)}
+        courseId={id.toString()}
+        sections={data.data?.sections.data ?? []}
+      />
     </>
   );
 }
