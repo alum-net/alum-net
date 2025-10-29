@@ -1,7 +1,5 @@
 package org.alumnet.application.services;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.PostDTO;
 import org.alumnet.application.dtos.requests.PostCreationRequestDTO;
@@ -15,7 +13,6 @@ import org.alumnet.infrastructure.exceptions.InvalidPostContentLenghtException;
 import org.alumnet.infrastructure.exceptions.InvalidPostTitleException;
 import org.alumnet.infrastructure.exceptions.PostHasRepliesException;
 import org.alumnet.infrastructure.exceptions.PostNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -36,7 +33,7 @@ public class ForumService {
     private final PostMapper postMapper;
     private final MongoTemplate mongoTemplate;
 
-    public Page<PostDTO> getPosts(PostFilterDTO postFilter, Pageable page){
+    public Page<PostDTO> getPosts(PostFilterDTO postFilter, Pageable page) {
         Query query = PostQueryBuilder.byFilters(postFilter).with(page);
 
         List<Post> posts = mongoTemplate.find(query, Post.class);
@@ -48,7 +45,7 @@ public class ForumService {
     public void createPost(PostCreationRequestDTO post) {
         validatePostCharacterLength(post.getContent());
         validateTitle(post);
-        
+
         Post newPost = Post.builder()
                 .title(post.getTitle())
                 .author(post.getAuthor())
@@ -65,10 +62,10 @@ public class ForumService {
 
         forumRepository.save(newPost);
 
-        if(post.getParentPost() != null){
+        if (post.getParentPost() != null) {
             Post parentPost = forumRepository.findById(post.getParentPost()).orElseThrow(PostNotFoundException::new);
 
-            parentPost.setTotalResponses(parentPost.getTotalResponses()+1);
+            parentPost.setTotalResponses(parentPost.getTotalResponses() + 1);
 
             forumRepository.save(parentPost);
         }
@@ -77,9 +74,9 @@ public class ForumService {
     public void deletePost(String postId) {
         Post post = forumRepository.findById(postId).orElseThrow(PostNotFoundException::new);
 
-        if(post.getParentPost() != null){
+        if (post.getParentPost() != null) {
             Post parentPost = forumRepository.findById(post.getParentPost()).orElseThrow(PostNotFoundException::new);
-            parentPost.setTotalResponses(parentPost.getTotalResponses() -1);
+            parentPost.setTotalResponses(parentPost.getTotalResponses() - 1);
 
             forumRepository.save(parentPost);
         }
@@ -89,17 +86,18 @@ public class ForumService {
     }
 
     public void updatePost(String postId, UpdatePostRequestDTO postContent) {
-        validatePostCharacterLength(postContent.getMessage());
+        validatePostCharacterLength(postContent.getContent());
 
         Post post = forumRepository.findById(postId).orElseThrow(PostNotFoundException::new);
 
-        if(post.getTotalResponses() > 0) throw new PostHasRepliesException();
+        if (post.getTotalResponses() > 0)
+            throw new PostHasRepliesException();
 
-        if(postContent.getMessage() != null){
-            post.setContent(postContent.getMessage());
+        if (postContent.getContent() != null) {
+            post.setContent(postContent.getContent());
         }
 
-        if(postContent.getTitle() != null && post.getParentPost() == null){
+        if (postContent.getTitle() != null && post.getParentPost() == null) {
             post.setTitle(postContent.getTitle());
         }
 
@@ -107,13 +105,14 @@ public class ForumService {
     }
 
     private void validateTitle(PostCreationRequestDTO post) {
-        if(post.getTitle() != null && post.getParentPost() != null){
+        if (post.getTitle() != null && post.getParentPost() != null) {
             throw new InvalidPostTitleException();
         }
     }
 
     private void validatePostCharacterLength(String content) {
-        if(content.length() > 350) throw new InvalidPostContentLenghtException();
+        if (content.length() > 350)
+            throw new InvalidPostContentLenghtException();
     }
 
     private List<PostDTO> buildHierarchy(List<Post> posts) {

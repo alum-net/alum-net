@@ -10,8 +10,9 @@ export const useForumPosts = (
   parentPostId?: string,
 ) => {
   const { data, isLoading } = useQuery({
-    queryKey: [QUERY_KEYS.getForumPosts],
-    queryFn: () => getForumPosts({ courseId, forumType, page, parentPostId }),
+    queryKey: [QUERY_KEYS.getForumPosts, parentPostId],
+    queryFn: () =>
+      getForumPosts({ courseId, forumType, page, rootPost: parentPostId }),
   });
 
   return {

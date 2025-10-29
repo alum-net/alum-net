@@ -10,7 +10,7 @@ import {
 export const getForumPosts = async (params: {
   courseId: string;
   forumType: ForumType;
-  parentPostId?: string;
+  rootPost?: string;
   page: number;
 }) => {
   const { data }: AxiosResponse<PageableResponse<Post>> = await api.get(

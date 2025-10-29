@@ -5,7 +5,7 @@ import { FlatList, StyleSheet, View } from 'react-native';
 import { Button, Divider, Text } from 'react-native-paper';
 import { ForumPost } from '../components/forum-post';
 import { THEME } from '@alum-net/ui';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { PostCreationForm } from '../components/forum-post-creation';
 
 export function ForumPostList() {
@@ -15,9 +15,17 @@ export function ForumPostList() {
   }>();
   const [page, setPage] = useState(0);
   const { data } = useForumPosts(id, type, page);
+  const nav = useRouter();
 
   const selectPost = (postId: string) => {
-    console.log('Ver detalles de publicación:', postId);
+    nav.navigate({
+      pathname: '/course/[id]/forum/[type]/[postId]',
+      params: {
+        id,
+        type,
+        postId,
+      },
+    });
   };
 
   const headerTitle =

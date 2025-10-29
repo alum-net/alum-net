@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class UpdatePostRequestDTO {
-    private String message;
+    private String content;
     private String title;
 }

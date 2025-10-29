@@ -33,6 +33,6 @@ export interface PostCreationRequest {
 }
 
 export interface UpdatePostRequest {
-  message?: string;
+  content: string;
   title?: string;
 }

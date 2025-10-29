@@ -1,6 +1,6 @@
 import { QUERY_KEYS } from '@alum-net/api';
 import { createPost } from '../service';
-import { ForumType } from '../types';
+import { ForumType, Post } from '../types';
 import {
   FormTextInput,
   RichTextEditor,
@@ -27,9 +27,17 @@ export type PostCreationSchema = z.infer<typeof schema>;
 export const PostCreationForm = ({
   forumType,
   courseId,
+  updateInitialData,
+  onUpdate,
+  creationParentPost,
+  creationRootPost,
 }: {
   forumType: ForumType;
   courseId: number;
+  updateInitialData?: Post;
+  onUpdate?: (data: Post) => void;
+  creationParentPost?: string;
+  creationRootPost?: string;
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const {
