@@ -1,5 +1,6 @@
 package org.alumnet.application.services;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.LabelDTO;
 import org.alumnet.application.dtos.LibraryResourceDTO;
@@ -26,9 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -65,8 +64,16 @@ public class LibraryService {
         return libraryMapper.labelToLabelDTO(newLabel);
     }
 
+    @Transactional
     public void deleteLabel(int labelId) {
-        Label label = labelRepository.findById(labelId).orElseThrow(LabelNotFoundException::new);
+        Label label = labelRepository.findById(labelId)
+                .orElseThrow(LabelNotFoundException::new);
+
+        for (LibraryResource resource : label.getResources()) {
+            resource.getLabels().remove(label);
+        }
+
+        label.getResources().clear();
 
         labelRepository.delete(label);
     }
