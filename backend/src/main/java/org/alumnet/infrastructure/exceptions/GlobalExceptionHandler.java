@@ -81,4 +81,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ResultResponse<Object>> handleNoPendingChangesException(NoPendingChangesException ex) {
         return  ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).body(ResultResponse.error(ex.getMessage(), "No hay cambios pendientes"));
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ResultResponse<Object>> handleIllegalArgumentException(IllegalArgumentException ex) {
+        return  ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Error en el procesamiento"));
+    }
 }
