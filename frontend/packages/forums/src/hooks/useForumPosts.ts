@@ -16,7 +16,7 @@ export const useForumPosts = (
   });
 
   return {
-    data,
+    data: data,
     isLoading,
   };
 };

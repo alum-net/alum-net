@@ -6,15 +6,15 @@ export enum ForumType {
 export type Post = {
   id: string;
   courseId: number;
-  title: string;
+  title: string | null;
   content: string;
   createdAt: Date;
-  updatedAt: Date;
-  parentPost: string;
-  rootPost: string;
+  updatedAt: Date | null;
+  parentPost: string | null;
+  rootPost: string | null;
   author: Author;
   totalResponses: number;
-  responses: Post[];
+  responses: Post[] | null;
 };
 
 type Author = {

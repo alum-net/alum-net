@@ -1,5 +1,5 @@
 import { ForumPostList } from '@alum-net/forums';
-import Screen from '../../../../components/screen';
+import Screen from '../../../../../components/screen';
 import { FAB } from 'react-native-paper';
 import { StyleSheet } from 'react-native';
 import { THEME } from '@alum-net/ui';
