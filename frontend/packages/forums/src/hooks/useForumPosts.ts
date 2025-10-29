@@ -7,12 +7,12 @@ export const useForumPosts = (
   courseId: string,
   forumType: ForumType,
   page = 0,
-  parentPostId?: string,
+  rootPostId?: string,
 ) => {
   const { data, isLoading } = useQuery({
-    queryKey: [QUERY_KEYS.getForumPosts, parentPostId],
+    queryKey: [QUERY_KEYS.getForumPosts, rootPostId],
     queryFn: () =>
-      getForumPosts({ courseId, forumType, page, rootPost: parentPostId }),
+      getForumPosts({ courseId, forumType, page, rootPost: rootPostId }),
   });
 
   return {

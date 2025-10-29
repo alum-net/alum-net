@@ -1,5 +1,5 @@
 import { QUERY_KEYS } from '@alum-net/api';
-import { createPost } from '../service';
+import { createPost, updatePost } from '../service';
 import { ForumType, Post } from '../types';
 import {
   FormTextInput,
@@ -8,127 +8,154 @@ import {
   useRichTextEditor,
 } from '@alum-net/ui';
 import { useUserInfo } from '@alum-net/users';
-import { UserRole } from '@alum-net/users/src/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { StyleSheet } from 'react-native';
-import { Button, Dialog, FAB, HelperText, Portal } from 'react-native-paper';
+import { Button, Dialog, HelperText, Portal } from 'react-native-paper';
 
 import { z } from 'zod';
-const schema = z.object({
-  title: z.string().min(1, 'El titulo es requerido'),
+
+const basePostSchema = z.object({
+  title: z.string().optional(),
   content: z.string().min(8, 'El contenido es requerido'),
 });
 
-export type PostCreationSchema = z.infer<typeof schema>;
+const postCreationSchema = basePostSchema.extend({
+  title: z.string().min(1, 'El titulo es requerido'),
+});
+
+const postUpdateSchema = basePostSchema;
+
+export type PostCreationSchema = z.infer<typeof postCreationSchema>;
+export type PostUpdateSchema = z.infer<typeof postUpdateSchema>;
+
+interface PostCreationFormProps {
+  forumType: ForumType;
+  courseId: number;
+  updateInitialData?: Post;
+  creationParentPost?: string;
+  creationRootPost?: string;
+  onDismiss: () => void;
+  isVisible: boolean;
+}
 
 export const PostCreationForm = ({
   forumType,
   courseId,
   updateInitialData,
-  onUpdate,
   creationParentPost,
   creationRootPost,
-}: {
-  forumType: ForumType;
-  courseId: number;
-  updateInitialData?: Post;
-  onUpdate?: (data: Post) => void;
-  creationParentPost?: string;
-  creationRootPost?: string;
-}) => {
-  const [isVisible, setIsVisible] = useState(false);
+  onDismiss,
+  isVisible,
+}: PostCreationFormProps) => {
   const {
     control,
     handleSubmit,
     formState: { errors },
     setValue,
-  } = useForm<PostCreationSchema>({
-    resolver: zodResolver(schema),
+  } = useForm<PostCreationSchema | PostUpdateSchema>({
+    resolver: zodResolver(
+      updateInitialData || creationParentPost
+        ? postUpdateSchema
+        : postCreationSchema,
+    ),
     defaultValues: {
-      title: '',
-      content: '',
+      title: updateInitialData?.title || undefined,
+      content: updateInitialData?.content || '',
     },
   });
-  const { editor, content } = useRichTextEditor('');
+
+  console.log(updateInitialData, creationParentPost, creationRootPost);
+  const { editor, content } = useRichTextEditor(
+    updateInitialData?.content || '',
+  );
   const { data: userInfo } = useUserInfo();
   const queryClient = useQueryClient();
-  const { mutate } = useMutation({
-    mutationFn: ({ title, content }: PostCreationSchema) =>
+  const { mutate: createMutate } = useMutation({
+    mutationFn: (data: PostCreationSchema) =>
       createPost({
         forumType,
         courseId,
         author: { email: userInfo!.email, name: userInfo!.name },
-        title: title,
-        content: content,
+        title: creationParentPost ? undefined : data.title,
+        content: data.content,
+        parentPost: creationParentPost,
+        rootPost: creationRootPost,
       }),
-    onSuccess: () => {
+    onSuccess: async () => {
       Toast.success('Posteo creado correctamente');
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.getForumPosts] });
-      setIsVisible(false);
+      await queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.getForumPosts],
+      });
+      onDismiss();
     },
     onError: () => {
       Toast.error('Error creando posteo');
     },
   });
 
-  if (
-    userInfo?.role === UserRole.admin ||
-    (userInfo?.role === UserRole.student && forumType === ForumType.ANNOUNCE)
-  )
-    return null;
+  const { mutate: updateMutate } = useMutation({
+    mutationFn: (data: PostUpdateSchema) =>
+      updatePost(updateInitialData!.id, {
+        title: data.title,
+        content: data.content,
+      }),
+    onSuccess: async () => {
+      Toast.success('Posteo actualizado correctamente');
+      console.log(updateInitialData);
+      await queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.getForumPosts],
+      });
+      onDismiss();
+    },
+    onError: () => {
+      Toast.error('Error actualizando posteo');
+    },
+  });
 
   const onSubmit = () => {
     setValue('content', content || '');
-    handleSubmit((data: PostCreationSchema) => mutate(data))();
+    handleSubmit(data => {
+      if (updateInitialData) {
+        updateMutate(data as PostUpdateSchema);
+      } else {
+        createMutate(data as PostCreationSchema);
+      }
+    })();
   };
 
   return (
-    <>
-      <FAB
-        icon="plus"
-        label="Nueva publicación"
-        style={styles.fab}
-        onPress={() => setIsVisible(true)}
-      />
-      <Portal>
-        <Dialog visible={isVisible} onDismiss={() => setIsVisible(false)}>
-          <Dialog.Title>Nueva publicación</Dialog.Title>
-          <Dialog.Content style={{ gap: 20 }}>
+    <Portal>
+      <Dialog visible={isVisible} onDismiss={onDismiss}>
+        <Dialog.Title>
+          {updateInitialData ? 'Editar publicación' : 'Nueva publicación'}
+        </Dialog.Title>
+        <Dialog.Content style={{ gap: 20 }}>
+          {!creationParentPost && !updateInitialData?.parentPost && (
             <FormTextInput
               control={control}
               name="title"
               label="Titulo"
               mode="outlined"
             />
-            {errors.title && (
-              <HelperText type="error">{errors.title.message}</HelperText>
-            )}
-            <RichTextEditor editor={editor} />
-            {errors.content && (
-              <HelperText type="error">{errors.content.message}</HelperText>
-            )}
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button mode="outlined" onPress={() => setIsVisible(false)}>
-              Cancelar
-            </Button>
-            <Button mode="contained" onPress={onSubmit}>
-              Crear
-            </Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
-    </>
+          )}
+          {errors.title && (
+            <HelperText type="error">{errors.title.message}</HelperText>
+          )}
+          <RichTextEditor editor={editor} />
+          {errors.content && (
+            <HelperText type="error">{errors.content.message}</HelperText>
+          )}
+        </Dialog.Content>
+        <Dialog.Actions>
+          <Button mode="outlined" onPress={onDismiss}>
+            Cancelar
+          </Button>
+          <Button mode="contained" onPress={onSubmit}>
+            {updateInitialData ? 'Actualizar' : 'Crear'}
+          </Button>
+        </Dialog.Actions>
+      </Dialog>
+    </Portal>
   );
 };
-
-const styles = StyleSheet.create({
-  fab: {
-    position: 'absolute',
-    right: 16,
-    bottom: 24,
-  },
-});

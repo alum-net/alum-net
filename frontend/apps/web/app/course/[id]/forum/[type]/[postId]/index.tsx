@@ -1,6 +1,12 @@
 import React, { useMemo, useState } from 'react';
-import { View, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
-import { Card, Text, Button, useTheme, Portal } from 'react-native-paper';
+import {
+  View,
+  StyleSheet,
+  ActivityIndicator,
+  ScrollView,
+  Platform,
+} from 'react-native';
+import { Card, Text, Button, useTheme } from 'react-native-paper';
 import {
   deletePost,
   ForumType,
@@ -20,7 +26,7 @@ import { UserRole } from '@alum-net/users/src/types';
 type UserAction = {
   action: 'update' | 'answer' | undefined;
   showForm: boolean;
-  data: Post | undefined;
+  data?: Post;
 };
 
 export default function ForumThread() {
@@ -34,17 +40,6 @@ export default function ForumThread() {
   const { data: userInfo } = useUserInfo();
   const queryClient = useQueryClient();
   const router = useRouter();
-
-  const { mutate: updatePostMutation } = useMutation({
-    mutationFn: (data: Post) =>
-      updatePost(data.id, { content: data.content, title: data.title }),
-    onSuccess: () => {
-      Toast.success('Posteo editado correctamente');
-    },
-    onError: () => {
-      Toast.error('Error al intentar editar posteo');
-    },
-  });
 
   const { mutate: deletePostMutation } = useMutation({
     mutationFn: (data: { postId: string; isRoot: boolean }) =>
@@ -66,9 +61,8 @@ export default function ForumThread() {
     [data?.data],
   );
   const [userAction, setUserAction] = useState<UserAction>({
-    action: undefined,
+    action: 'answer',
     showForm: false,
-    data: undefined,
   });
 
   if (data?.totalElements === 0) return router.back();
@@ -86,12 +80,15 @@ export default function ForumThread() {
   };
 
   const onCreate = (postToAnswerTo: Post) => {
-    setUserAction({ action: 'update', data: postToAnswerTo, showForm: true });
+    setUserAction({ action: 'answer', data: postToAnswerTo, showForm: true });
   };
+
+  const dismissAction = () =>
+    setUserAction({ action: undefined, data: undefined, showForm: false });
 
   return (
     <>
-      <ScrollView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.container}>
         <PostCard
           key={parentPost.id}
           post={parentPost}
@@ -100,7 +97,8 @@ export default function ForumThread() {
           marginMultiplier={0}
           deleteFn={deletePostMutation}
           updateFn={
-            type === ForumType.GENERAL && userInfo?.role !== UserRole.admin
+            userInfo?.role === UserRole.teacher ||
+            (type === ForumType.GENERAL && userInfo?.role !== UserRole.admin)
               ? onUpdate
               : undefined
           }
@@ -112,16 +110,25 @@ export default function ForumThread() {
           }
         />
       </ScrollView>
-      <PostCreationForm
-        forumType={type}
-        courseId={Number(id)}
-        updateInitialData={userAction.data}
-        onUpdate={
-          userAction.action === 'answer' ? updatePostMutation : undefined
-        }
-        creationParentPost={userAction.data?.parentPost}
-        creationRootPost={userAction.data?.rootPost}
-      />
+      {userAction.showForm && (
+        <PostCreationForm
+          forumType={type}
+          courseId={Number(id)}
+          updateInitialData={
+            userAction.action === 'update' ? userAction.data : undefined
+          }
+          creationParentPost={
+            userAction.action === 'answer' ? userAction.data?.id : undefined
+          }
+          creationRootPost={
+            userAction.action === 'answer'
+              ? userAction.data?.rootPost || userAction.data?.id
+              : undefined
+          }
+          onDismiss={dismissAction}
+          isVisible={userAction.showForm}
+        />
+      )}
     </>
   );
 }
@@ -147,27 +154,26 @@ const PostCard = ({
   const [contentWidth, setContentWidth] = useState(0);
 
   return (
-    <View
-      style={[
-        styles.commentContainer,
-        isReply && {
-          marginLeft: 24 * marginMultiplier,
-          position: 'relative',
-        },
-      ]}
-    >
-      {isReply && (
-        <View
-          style={[
-            styles.verticalLine,
-            { backgroundColor: theme.colors.outline },
-          ]}
-        />
-      )}
-
-      <Card style={styles.card}>
+    <>
+      <Card
+        style={[
+          styles.card,
+          isReply && {
+            marginLeft: 10 * marginMultiplier,
+          },
+        ]}
+      >
+        {isReply && (
+          <View
+            style={[
+              styles.verticalLine,
+              { backgroundColor: theme.colors.outline },
+            ]}
+          />
+        )}
         <Card.Content
           onLayout={event => setContentWidth(event.nativeEvent.layout.width)}
+          style={{ padding: 15 }}
         >
           <View style={styles.headerRow}>
             <Text style={styles.author}>{post.author.name}</Text>
@@ -209,9 +215,11 @@ const PostCard = ({
                 >
                   Eliminar
                 </Button>
-                <Button compact mode="text" onPress={() => updateFn?.(post)}>
-                  Editar
-                </Button>
+                {post.totalResponses <= 0 && updateFn && (
+                  <Button compact mode="text" onPress={() => updateFn(post)}>
+                    Editar
+                  </Button>
+                )}
               </>
             )}
           </View>
@@ -226,7 +234,9 @@ const PostCard = ({
               post={reply}
               isReply
               userEmail={userEmail}
-              marginMultiplier={marginMultiplier + 1}
+              marginMultiplier={
+                marginMultiplier + Platform.OS === 'web' ? 1 : 0.5
+              }
               deleteFn={deleteFn}
               updateFn={updateFn}
               createFn={createFn}
@@ -234,7 +244,7 @@ const PostCard = ({
           ))}
         </View>
       )}
-    </View>
+    </>
   );
 };
 
@@ -247,9 +257,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  commentContainer: {
-    marginBottom: 12,
-  },
   verticalLine: {
     position: 'absolute',
     left: -12,
@@ -261,6 +268,7 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: 8,
     elevation: 1,
+    marginBottom: 12,
   },
   headerRow: {
     flexDirection: 'row',
@@ -284,5 +292,10 @@ const styles = StyleSheet.create({
   actionsRow: {
     flexDirection: 'row',
     gap: 8,
+  },
+  fab: {
+    position: 'absolute',
+    right: 16,
+    bottom: 24,
   },
 });

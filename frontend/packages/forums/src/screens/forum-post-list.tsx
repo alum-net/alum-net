@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { useForumPosts } from '../hooks/useForumPosts';
 import { ForumType } from '../types';
 import { FlatList, StyleSheet, View } from 'react-native';
-import { Button, Divider, Text } from 'react-native-paper';
+import { Button, Divider, FAB, Text } from 'react-native-paper';
 import { ForumPost } from '../components/forum-post';
 import { THEME } from '@alum-net/ui';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { PostCreationForm } from '../components/forum-post-creation';
+import { UserRole } from '@alum-net/users/src/types';
+import { useUserInfo } from '@alum-net/users';
 
 export function ForumPostList() {
   const { id, type } = useLocalSearchParams<{
@@ -16,6 +18,8 @@ export function ForumPostList() {
   const [page, setPage] = useState(0);
   const { data } = useForumPosts(id, type, page);
   const nav = useRouter();
+  const { data: userInfo } = useUserInfo();
+  const [createPost, setCreatePost] = useState(false);
 
   const selectPost = (postId: string) => {
     nav.navigate({
@@ -87,7 +91,25 @@ export function ForumPostList() {
             ) : null
           }
         />
-        <PostCreationForm courseId={Number(id)} forumType={type} />
+
+        {(userInfo?.role === UserRole.student && type === ForumType.ANNOUNCE) ||
+          (userInfo?.role !== UserRole.admin && (
+            <>
+              <FAB
+                icon="plus"
+                label="Nueva publicación"
+                style={styles.fab}
+                onPress={() => setCreatePost(true)}
+              />
+
+              <PostCreationForm
+                courseId={Number(id)}
+                forumType={type}
+                onDismiss={() => setCreatePost(false)}
+                isVisible={createPost}
+              />
+            </>
+          ))}
       </View>
     </>
   );
@@ -127,5 +149,10 @@ const styles = StyleSheet.create({
   },
   paginationButtonLabel: {
     color: 'white',
+  },
+  fab: {
+    position: 'absolute',
+    right: 16,
+    bottom: 24,
   },
 });

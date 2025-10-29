@@ -25,7 +25,7 @@ type Author = {
 export interface PostCreationRequest {
   forumType: ForumType;
   courseId: number;
-  title: string;
+  title?: string;
   content: string;
   parentPost?: string | null;
   rootPost?: string | null;
