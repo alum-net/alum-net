@@ -27,11 +27,16 @@ public class FileValidationService {
             "doc", List.of("application/msword"),
             "zip", List.of("application/zip", "application/x-zip-compressed"));
 
+    private static final Map<String, String> ALLOWED_AVATAR_EXTENSIONS = Map.of(
+            "jpg", "image/jpeg",
+            "jpeg", "image/jpeg",
+            "png", "image/png");
+
     private static final long MAX_FILE_SIZE = 10 * 1024 * 1024;
 
     private void validateFiles(List<MultipartFile> files) throws FileException {
         for (MultipartFile file : files) {
-            validateFile(file);
+            validateFile(file, false);
         }
     }
 
@@ -73,8 +78,46 @@ public class FileValidationService {
         }
     }
 
+    public void validateFile(MultipartFile file, boolean avatar) throws FileException {
+        String extension = getFileExtension(file.getOriginalFilename());
+        String contentType = file.getContentType();
+
+        if(!avatar){
+            if (!ALLOWED_EXTENSIONS.containsKey(extension.toLowerCase())) {
+                throw new InvalidExtensionException(
+                        String.format("Extensión '%s' no permitida. Extensiones válidas: %s",
+                                extension, ALLOWED_EXTENSIONS.keySet()));
+            }
+
+            if (contentType != null && !ALLOWED_EXTENSIONS.get(extension.toLowerCase()).contains(contentType)) {
+                throw new InvalidMimeTypeException(contentType,
+                        String.format("Tipo MIME '%s' no coincide con la extensión '%s'", contentType, extension));
+            }
+        }
+        else{
+            if (!ALLOWED_AVATAR_EXTENSIONS.containsKey(extension.toLowerCase())) {
+                throw new InvalidExtensionException(
+                        String.format("Extensión '%s' no permitida. Extensiones válidas: %s",
+                                extension, ALLOWED_AVATAR_EXTENSIONS.keySet()));
+            }
+
+            if (contentType != null && !ALLOWED_AVATAR_EXTENSIONS.get(extension.toLowerCase()).contains(contentType)) {
+                throw new InvalidMimeTypeException(contentType,
+                        String.format("Tipo MIME '%s' no coincide con la extensión '%s'", contentType, extension));
+            }
+        }
+
+        if (file.getSize() > MAX_FILE_SIZE) {
+            throw new FileSizeExceededException(
+                    String.format("El archivo '%s' excede el tamaño máximo de %d MB",
+                            file.getOriginalFilename(), MAX_FILE_SIZE / (1024 * 1024)));
+        }
+    }
+
+
+
     private void compareMetadataFilesNamesAgainstFilesFileNames(Set<String> uploadedFileNames,
-            Set<String> metadataFileNames) {
+                                                                Set<String> metadataFileNames) {
         Set<String> missingInMetadata = new HashSet<>(uploadedFileNames);
         missingInMetadata.removeAll(metadataFileNames);
 
@@ -128,28 +171,6 @@ public class FileValidationService {
             return filename.substring(0, lastDotIndex);
         }
         return filename;
-    }
-
-    private void validateFile(MultipartFile file) throws FileException {
-        String extension = getFileExtension(file.getOriginalFilename());
-        String contentType = file.getContentType();
-
-        if (!ALLOWED_EXTENSIONS.containsKey(extension.toLowerCase())) {
-            throw new InvalidExtensionException(
-                    String.format("Extensión '%s' no permitida. Extensiones válidas: %s",
-                            extension, ALLOWED_EXTENSIONS.keySet()));
-        }
-
-        if (contentType != null && !ALLOWED_EXTENSIONS.get(extension.toLowerCase()).contains(contentType)) {
-            throw new InvalidMimeTypeException(contentType,
-                    String.format("Tipo MIME '%s' no coincide con la extensión '%s'", contentType, extension));
-        }
-
-        if (file.getSize() > MAX_FILE_SIZE) {
-            throw new FileSizeExceededException(
-                    String.format("El archivo '%s' excede el tamaño máximo de %d MB",
-                            file.getOriginalFilename(), MAX_FILE_SIZE / (1024 * 1024)));
-        }
     }
 
     private String getFileExtension(String filename) {
