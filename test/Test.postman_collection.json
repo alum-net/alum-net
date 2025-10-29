@@ -801,7 +801,7 @@
 									"  getAccessToken(function() {",
 									"    initTestUsers(function() {",
 									"      initTestCourses(function() {",
-									"        getCursoId(\"Test-section-create-section\", \"curso4-verificar-enroll-student\", function(){})",
+									"        getCursoId(\"Test-curso-create-section\", \"curso6-verificar-create-section\", function(){})",
 									"      });",
 									"    });",
 									"  });",
@@ -854,56 +854,12 @@
 								{
 									"key": "section",
 									"type": "file",
-									"src": "postman-cloud:///1f0b3a0a-c5c8-4850-bbff-815eb6134099"
+									"src": "postman-cloud:///1f0b45b8-d825-4d40-96da-b08516f6c2a3"
 								},
 								{
 									"key": "resources",
 									"type": "file",
 									"src": "postman-cloud:///1f0b3a0a-e2a1-4c60-ad28-a06ba754ebd2"
-								}
-							]
-						},
-						"url": {
-							"raw": "{{alumnetUrl}}/api/sections/{{id_curso}}",
-							"host": [
-								"{{alumnetUrl}}"
-							],
-							"path": [
-								"api",
-								"sections",
-								"{{id_curso}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Modify Section",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{access_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "PUT",
-						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "resources",
-									"type": "file",
-									"src": "postman-cloud:///1f0b3a0a-e2a1-4c60-ad28-a06ba754ebd2"
-								},
-								{
-									"key": "section",
-									"type": "file",
-									"src": "postman-cloud:///1f0b3b30-95a8-4310-847f-3fd8452e4c54"
 								}
 							]
 						},
@@ -928,21 +884,21 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"// eval(pm.collectionVariables.get(\"utils-Course\"));",
 									"",
-									"function runInitProcess() {",
-									"  getAccessToken(function() {",
-									"    initTestUsers(function() {",
-									"      initTestCourses(function() {",
-									"        getCursoId(\"Test-curso-create-section\", \"curso6-verificar-create-section\", function(){",
-									"            enrollStudent(\"estudiante4@alumnet.com\", function (){})",
-									"        })",
-									"      });",
-									"    });",
-									"  });",
-									"}",
+									"// function runInitProcess() {",
+									"//   getAccessToken(function() {",
+									"//     initTestUsers(function() {",
+									"//       initTestCourses(function() {",
+									"//         getCursoId(\"Test-curso-create-section\", \"curso6-verificar-create-section\", function(){",
+									"//             enrollStudent(\"estudiante4@alumnet.com\", function (){})",
+									"//         })",
+									"//       });",
+									"//     });",
+									"//   });",
+									"// }",
 									"",
-									"runInitProcess();",
+									"// runInitProcess();",
 									""
 								],
 								"type": "text/javascript",
@@ -954,61 +910,61 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Se obtuvieron las secciones correctamente\", function () {",
+									"pm.test(\"Status code correcto\", function () {",
 									"    pm.response.to.have.status(200);",
 									"});",
 									"",
-									"pm.test(\"La respuesta contiene todas las claves requeridas según la estructura JSON\", function () {",
-									"    var jsonData;",
+									"pm.test(\"La respuesta contiene todas las claves requeridas según el ejemplo proporcionado\", function () {",
+									"    let jsonData;",
 									"    try {",
 									"        jsonData = pm.response.json();",
 									"    } catch (e) {",
 									"        pm.expect.fail(\"La respuesta no es un JSON válido\");",
 									"        return;",
 									"    }",
+									"",
 									"    // data",
 									"    pm.expect(jsonData).to.have.property(\"data\");",
-									"    // data.sections",
+									"    pm.expect(jsonData.data).to.have.property(\"description\");",
 									"    pm.expect(jsonData.data).to.have.property(\"sections\");",
-									"    // data.sections.data (array)",
 									"    pm.expect(jsonData.data.sections).to.have.property(\"data\");",
-									"    pm.expect(jsonData.data.sections.data).to.be.an(\"array\");",
-									"    // data.sections.data[0].description, data.sections.data[0].sectionResources (array), data.sections.data[0].title",
-									"    if (jsonData.data.sections.data.length > 0) {",
-									"        var section0 = jsonData.data.sections.data[0];",
-									"        pm.expect(section0).to.have.property(\"description\");",
-									"        pm.expect(section0).to.have.property(\"sectionResources\");",
-									"        pm.expect(section0.sectionResources).to.be.an(\"array\");",
-									"        pm.expect(section0).to.have.property(\"title\");",
-									"        // data.sections.data[0].sectionResources[0].extension, name, title, url",
-									"        if (section0.sectionResources.length > 0) {",
-									"            var resource0 = section0.sectionResources[0];",
-									"            pm.expect(resource0).to.have.property(\"extension\");",
-									"            pm.expect(resource0).to.have.property(\"name\");",
-									"            pm.expect(resource0).to.have.property(\"title\");",
-									"            pm.expect(resource0).to.have.property(\"url\");",
-									"        } else {",
-									"            pm.expect.fail(\"sectionResources está vacío, no se puede verificar el primer recurso\");",
-									"        }",
-									"    } else {",
-									"        pm.expect.fail(\"sections.data está vacío, no se puede verificar la primera sección\");",
-									"    }",
-									"    // data.sections.errors (array)",
 									"    pm.expect(jsonData.data.sections).to.have.property(\"errors\");",
-									"    pm.expect(jsonData.data.sections.errors).to.be.an(\"array\");",
-									"    // data.sections.message",
 									"    pm.expect(jsonData.data.sections).to.have.property(\"message\");",
-									"    // data.sections.pageNumber",
 									"    pm.expect(jsonData.data.sections).to.have.property(\"pageNumber\");",
-									"    // data.sections.pageSize",
 									"    pm.expect(jsonData.data.sections).to.have.property(\"pageSize\");",
-									"    // data.sections.totalElements",
 									"    pm.expect(jsonData.data.sections).to.have.property(\"totalElements\");",
-									"    // data.sections.totalPages",
 									"    pm.expect(jsonData.data.sections).to.have.property(\"totalPages\");",
-									"    // message (raíz)",
 									"    pm.expect(jsonData).to.have.property(\"message\");",
-									"});"
+									"",
+									"    // data.sections.data (array)",
+									"    pm.expect(jsonData.data.sections.data).to.be.an(\"array\");",
+									"    // data.sections.errors (array)",
+									"    pm.expect(jsonData.data.sections.errors).to.be.an(\"array\");",
+									"",
+									"    // Si hay al menos una sección, validar claves del primer elemento",
+									"    if (jsonData.data.sections.data.length > 0) {",
+									"        const section0 = jsonData.data.sections.data[0];",
+									"        pm.expect(section0).to.have.property(\"description\");",
+									"        pm.expect(section0).to.have.property(\"id\");",
+									"        pm.expect(section0).to.have.property(\"sectionResources\");",
+									"        pm.expect(section0).to.have.property(\"title\");",
+									"        pm.expect(section0.sectionResources).to.be.an(\"array\");",
+									"",
+									"        // Si hay al menos un recurso, validar claves del primer recurso",
+									"        if (section0.sectionResources.length > 0) {",
+									"            const resource0 = section0.sectionResources[0];",
+									"            pm.expect(resource0).to.have.property(\"extension\");",
+									"            pm.expect(resource0).to.have.property(\"id\");",
+									"            pm.expect(resource0).to.have.property(\"name\");",
+									"            pm.expect(resource0).to.have.property(\"order\");",
+									"            pm.expect(resource0).to.have.property(\"url\");",
+									"        }",
+									"    }",
+									"});",
+									"",
+									"",
+									"",
+									""
 								],
 								"type": "text/javascript",
 								"packages": {},
@@ -1030,14 +986,16 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{alumnetUrl}}/api/courses/{{id_curso}}/content/?userId=estudiante4@alumnet.com",
+							"raw": "http://localhost:8080/api/courses/7/content/?userId=estudiante4@alumnet.com",
+							"protocol": "http",
 							"host": [
-								"{{alumnetUrl}}"
+								"localhost"
 							],
+							"port": "8080",
 							"path": [
 								"api",
 								"courses",
-								"{{id_curso}}",
+								"7",
 								"content",
 								""
 							],
@@ -1052,19 +1010,137 @@
 					"response": []
 				},
 				{
-					"name": "Delete section",
+					"name": "Modify Section",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"eval(pm.collectionVariables.get(\"utils-User\"));",
+									"",
+									"function runInitProcess() {",
+									"  getAccessToken(function() {",
+									"        getSectionId(function(){})",
+									"  });",
+									"}",
+									"",
+									"runInitProcess();",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code correcto\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"El contendio de la respuesta es esperado\", function () { ",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.all.keys('message');",
+									"    pm.expect(jsonData.message).to.eql('Sección modificada exitosamente');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"request": {
-						"method": "DELETE",
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
 						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "resources",
+									"type": "file",
+									"src": "postman-cloud:///1f0b3a0a-e2a1-4c60-ad28-a06ba754ebd2"
+								},
+								{
+									"key": "section",
+									"type": "file",
+									"src": "postman-cloud:///1f0b45f7-74a5-4ba0-9dd9-ffef0ca25c4b"
+								}
+							]
+						},
 						"url": {
-							"raw": "{{alumnetUrl}}/api/sections/",
+							"raw": "{{alumnetUrl}}/api/sections/{{id_curso}}/{{id_section}}",
 							"host": [
 								"{{alumnetUrl}}"
 							],
 							"path": [
 								"api",
 								"sections",
-								""
+								"{{id_curso}}",
+								"{{id_section}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete section",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code correcto\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"El contendio de la respuesta es esperado\", function () { ",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.all.keys('message');",
+									"    pm.expect(jsonData.message).to.eql('Sección eliminada exitosamente');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{alumnetUrl}}/api/sections/{{id_curso}}/{{id_section}}",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"sections",
+								"{{id_curso}}",
+								"{{id_section}}"
 							]
 						}
 					},
@@ -1563,7 +1639,35 @@
 					"    });",
 					"  });",
 					"}",
+					"function getSectionId(next){",
+					"    pm.sendRequest({",
+					"    url: pm.collectionVariables.get(\"alumnetUrl\") + \"/api/courses/\" + pm.collectionVariables.get(\"id_curso\") + \"/content/?userId=estudiante4@alumnet.com\",",
+					"    method: 'GET',",
+					"    header: {",
+					"        'Authorization': 'Bearer ' + pm.collectionVariables.get('access_token')",
+					"    }",
+					"}, function (err, res) {",
+					"    if (err) {",
+					"        console.error('Error en la petición GET:', err);",
+					"        return;",
+					"    }",
+					"",
+					"    const json = res.json();",
+					"",
+					"if (json.data && json.data.sections && json.data.sections.data.length > 0) {",
+					"    const sectionResourceId = String(json.data.sections.data[0].sectionResources[0].id);",
+					"    pm.collectionVariables.set('id_section', sectionResourceId);",
+					"    console.log('id_section guardado:', sectionResourceId);",
+					"} else {",
+					"    console.warn('No se encontró ninguna sección o recurso');",
+					"    pm.collectionVariables.unset('id_section');",
+					"}",
+					"    next();",
+					"});",
+					"}",
 					"`);",
+					"",
+					"",
 					"",
 					"",
 					""
@@ -1609,6 +1713,10 @@
 		},
 		{
 			"key": "utils-User",
+			"value": ""
+		},
+		{
+			"key": "id_section",
 			"value": ""
 		}
 	]
