@@ -76,4 +76,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ResultResponse<Object>> handlePostHasRepliesException(PostHasRepliesException ex) {
         return  ResponseEntity.status(HttpStatus.CONFLICT).body(ResultResponse.error(ex.getMessage(), "No se puede modificar el post"));
     }
+
+    @ExceptionHandler(InvalidAttributeException.class)
+    public ResponseEntity<ResultResponse<Object>> handleInvalidAttributeException(InvalidAttributeException ex) {
+        return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Atributo inválido"));
+    }
+
+    @ExceptionHandler(QuestionnaireValidationException.class)
+    public ResponseEntity<ResultResponse<Object>> handleQuestionnaireValidationException(QuestionnaireValidationException ex) {
+        return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Error de validación del cuestionario"));
+    }
 }

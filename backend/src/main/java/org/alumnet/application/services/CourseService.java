@@ -216,4 +216,7 @@ public class CourseService {
         }
     }
 
+    public List<Student> findEnrolledStudentsInCourse(int id) {
+        return participationRepository.findEnrolledStudentsByCourseId(id);
+    }
 }

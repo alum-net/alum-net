@@ -150,4 +150,8 @@ public class SectionService {
         s3FileStorageService.deleteFolder("courses/" + courseId + "/sections/" + sectionId + "/resources/");
         sectionRepository.delete(section);
     }
+
+    public Section findSectionById(Integer sectionId) {
+        return sectionRepository.findById(sectionId).orElseThrow(SectionNotFoundException::new);
+    }
 }
