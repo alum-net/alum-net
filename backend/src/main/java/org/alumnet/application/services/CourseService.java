@@ -2,7 +2,9 @@ package org.alumnet.application.services;
 
 import com.opencsv.bean.CsvToBeanBuilder;
 import lombok.RequiredArgsConstructor;
-import org.alumnet.application.dtos.*;
+import org.alumnet.application.dtos.CourseContentDTO;
+import org.alumnet.application.dtos.CourseDTO;
+import org.alumnet.application.dtos.UserDTO;
 import org.alumnet.application.dtos.requests.CourseBulkCreationDTO;
 import org.alumnet.application.dtos.requests.CourseCreationRequestDTO;
 import org.alumnet.application.dtos.requests.CourseFilterDTO;
