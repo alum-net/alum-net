@@ -4,11 +4,14 @@ import { getKeyclaokUserInfo, logout } from '@alum-net/auth';
 import { UserFilterDTO, UserInfo, UserRole } from './types';
 import { storage, STORAGE_KEYS } from '@alum-net/storage';
 
-export const getUserInfo = async () => {
+export const getUserInfo = async (invalidate = false) => {
   try {
-    let jsonUser = storage.getString(STORAGE_KEYS.USER_INFO);
-    const userObject = JSON.parse(jsonUser ?? '{}');
-    if (Object.hasOwn(userObject, 'role')) return userObject as UserInfo;
+    if (!invalidate) {
+      const userObject = JSON.parse(
+        storage.getString(STORAGE_KEYS.USER_INFO) ?? '{}',
+      );
+      if (Object.hasOwn(userObject, 'role')) return userObject as UserInfo;
+    }
 
     const userInfo = await getKeyclaokUserInfo();
     const { data }: AxiosResponse<PageableResponse<UserInfo>> = await api.get(
@@ -22,8 +25,7 @@ export const getUserInfo = async () => {
     );
     if (data?.data?.[0] === undefined) throw new Error('El usuario no existe');
 
-    jsonUser = JSON.stringify(data.data[0]);
-    storage.set(STORAGE_KEYS.USER_INFO, jsonUser);
+    storage.set(STORAGE_KEYS.USER_INFO, JSON.stringify(data.data[0]));
 
     return data?.data?.[0];
   } catch (error: any) {
