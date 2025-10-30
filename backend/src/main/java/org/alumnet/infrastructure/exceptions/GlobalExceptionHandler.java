@@ -98,4 +98,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ResultResponse<Object>> handleLabelNotFoundException(LabelNotFoundException ex){
         return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultResponse.error(ex.getMessage(), "No se encontró la etiqueta"));
     }
+
+    @ExceptionHandler(LibraryResourceAlreadyExistsException.class)
+    public ResponseEntity<ResultResponse<Object>> handleLibraryResourceAlreadyExistsException(LibraryResourceAlreadyExistsException ex) {
+        return  ResponseEntity.status(HttpStatus.CONFLICT).body(ResultResponse.error(ex.getMessage(), "Ya existe el recurso en la librería"));
+    }
 }
