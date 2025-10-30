@@ -6,6 +6,7 @@ import org.alumnet.application.dtos.*;
 import org.alumnet.application.dtos.requests.CourseCreationRequestDTO;
 import org.alumnet.application.dtos.requests.CourseFilterDTO;
 import org.alumnet.application.dtos.requests.EnrollmentRequestDTO;
+import org.alumnet.application.dtos.responses.BulkCreationResponseDTO;
 import org.alumnet.application.dtos.responses.PageableResultResponse;
 import org.alumnet.application.dtos.responses.ResultResponse;
 import org.alumnet.application.services.CourseService;
@@ -13,9 +14,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/courses")
@@ -105,6 +108,33 @@ public class CourseController {
         CourseContentDTO userPage = courseService.getCourseContent(page,courseId,userId);
         return ResponseEntity.ok(ResultResponse.success(userPage,"Secciones obtenidas exitosamente"));
 
+    }
+
+    @PostMapping(path = "/bulk-creation",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('admin')")
+    public ResponseEntity<ResultResponse<BulkCreationResponseDTO>> bulkCreateCourses(
+            @RequestPart("file") MultipartFile file,
+            @RequestParam(value = "hasHeaders", required = false, defaultValue = "false") boolean hasHeaders) {
+
+        BulkCreationResponseDTO bulkCreationResponse = courseService.bulkCreateCourses(file, hasHeaders);
+
+        if (bulkCreationResponse.getTotalRecords() > 0 &&
+                bulkCreationResponse.getTotalRecords() == bulkCreationResponse.getFailedCreations()) {
+
+            return ResponseEntity.badRequest().body(ResultResponse.success(
+                    bulkCreationResponse,
+                    "La solicitud de creación masiva de cursos no se pudo procesar completamente (todos los registros fallaron)."));
+        }
+
+        String successMessage = bulkCreationResponse.getFailedCreations() == 0
+                ? "Carga masiva de cursos completada exitosamente."
+                : "Carga masiva finalizada con " + bulkCreationResponse.getFailedCreations() + " errores. Revise el reporte.";
+
+        return ResponseEntity.ok(ResultResponse.success(
+                bulkCreationResponse,
+                successMessage));
     }
 
 }
