@@ -884,21 +884,21 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"// eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
 									"",
-									"// function runInitProcess() {",
-									"//   getAccessToken(function() {",
-									"//     initTestUsers(function() {",
-									"//       initTestCourses(function() {",
-									"//         getCursoId(\"Test-curso-create-section\", \"curso6-verificar-create-section\", function(){",
-									"//             enrollStudent(\"estudiante4@alumnet.com\", function (){})",
-									"//         })",
-									"//       });",
-									"//     });",
-									"//   });",
-									"// }",
+									"function runInitProcess() {",
+									"  getAccessToken(function() {",
+									"    initTestUsers(function() {",
+									"      initTestCourses(function() {",
+									"        getCursoId(\"Test-curso-create-section\", \"curso6-verificar-create-section\", function(){",
+									"            enrollStudent(\"estudiante4@alumnet.com\", function (){})",
+									"        })",
+									"      });",
+									"    });",
+									"  });",
+									"}",
 									"",
-									"// runInitProcess();",
+									"runInitProcess();",
 									""
 								],
 								"type": "text/javascript",
@@ -986,16 +986,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/courses/7/content/?userId=estudiante4@alumnet.com",
-							"protocol": "http",
+							"raw": "{{alumnetUrl}}/api/courses/{{id_curso}}/content/?userId=estudiante4@alumnet.com",
 							"host": [
-								"localhost"
+								"{{alumnetUrl}}"
 							],
-							"port": "8080",
 							"path": [
 								"api",
 								"courses",
-								"7",
+								"{{id_curso}}",
 								"content",
 								""
 							],
@@ -1043,7 +1041,7 @@
 									"pm.test(\"El contendio de la respuesta es esperado\", function () { ",
 									"    const jsonData = pm.response.json();",
 									"    pm.expect(jsonData).to.have.all.keys('message');",
-									"    pm.expect(jsonData.message).to.eql('Sección modificada exitosamente');",
+									"    pm.expect(jsonData.message).to.eql('Sección actualizada exitosamente');",
 									"});"
 								],
 								"type": "text/javascript",
@@ -1111,6 +1109,26 @@
 									"    pm.expect(jsonData).to.have.all.keys('message');",
 									"    pm.expect(jsonData.message).to.eql('Sección eliminada exitosamente');",
 									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"eval(pm.collectionVariables.get(\"utils-User\"));",
+									"",
+									"function runInitProcess() {",
+									"  getAccessToken(function() {",
+									"        getSectionId(function(){})",
+									"  });",
+									"}",
+									"",
+									"runInitProcess();",
+									""
 								],
 								"type": "text/javascript",
 								"packages": {},
@@ -1655,7 +1673,7 @@
 					"    const json = res.json();",
 					"",
 					"if (json.data && json.data.sections && json.data.sections.data.length > 0) {",
-					"    const sectionResourceId = String(json.data.sections.data[0].sectionResources[0].id);",
+					"    const sectionResourceId = String(json.data.sections.data[0].id);",
 					"    pm.collectionVariables.set('id_section', sectionResourceId);",
 					"    console.log('id_section guardado:', sectionResourceId);",
 					"} else {",
