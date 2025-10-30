@@ -1,5 +1,5 @@
 import { Platform } from 'react-native';
-import { FilesToUpload, SectionData } from '../sections/types';
+import { FilesToUpload, SectionData } from './types';
 import { deleteFalsyKeys } from '@alum-net/courses/src/helpers';
 import api from '@alum-net/api';
 

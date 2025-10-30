@@ -1,23 +1,20 @@
 import { useMemo, useState } from 'react';
 import { View, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
-import { useTheme } from 'react-native-paper';
-import {
-  deletePost,
-  ForumType,
-  Post,
-  PostCard,
-  PostCreationForm,
-  useForumPosts,
-} from '@alum-net/forums';
+import { Button, Dialog, Portal, Text, useTheme } from 'react-native-paper';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useUserInfo } from '@alum-net/users';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@alum-net/api';
-import { Toast } from '@alum-net/ui';
+import { THEME, Toast } from '@alum-net/ui';
 import { UserRole } from '@alum-net/users/src/types';
+import { ForumType, Post } from '../types';
+import { useForumPosts } from '../hooks/useForumPosts';
+import { deletePost } from '../service';
+import { PostCard } from '../components/post-card';
+import { PostCreationForm } from '../components/forum-post-creation';
 
 type UserAction = {
-  action: 'update' | 'answer' | undefined;
+  action: 'update' | 'answer' | 'delete' | undefined;
   showForm: boolean;
   data?: Post;
 };
@@ -39,10 +36,14 @@ export const ForumThread = () => {
       deletePost(data.postId),
     onSuccess: async (_, variables) => {
       await queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.getForumPosts, postId],
+        queryKey: [
+          QUERY_KEYS.getForumPosts,
+          variables.isRoot ? undefined : postId,
+        ],
       });
       if (variables.isRoot) router.back();
       Toast.success('Posteo eliminado correctamente');
+      dismissAction();
     },
     onError: () => {
       Toast.error('No pudimos eliminar el posteo');
@@ -79,6 +80,10 @@ export const ForumThread = () => {
     setUserAction({ action: 'answer', data: postToAnswerTo, showForm: true });
   };
 
+  const onDelete = (postToDelete: Post) => {
+    setUserAction({ action: 'delete', data: postToDelete, showForm: true });
+  };
+
   const dismissAction = () =>
     setUserAction({ action: undefined, data: undefined, showForm: false });
 
@@ -91,7 +96,7 @@ export const ForumThread = () => {
           isReply={false}
           userEmail={userInfo?.email ?? ''}
           marginMultiplier={0}
-          deleteFn={deletePostMutation}
+          deleteFn={onDelete}
           updateFn={
             userInfo?.role === UserRole.teacher ||
             (type === ForumType.GENERAL && userInfo?.role !== UserRole.admin)
@@ -107,25 +112,53 @@ export const ForumThread = () => {
           userRole={userInfo!.role}
         />
       </ScrollView>
-      {userAction.showForm && (
-        <PostCreationForm
-          forumType={type}
-          courseId={Number(id)}
-          updateInitialData={
-            userAction.action === 'update' ? userAction.data : undefined
-          }
-          creationParentPost={
-            userAction.action === 'answer' ? userAction.data?.id : undefined
-          }
-          creationRootPost={
-            userAction.action === 'answer'
-              ? userAction.data?.rootPost || userAction.data?.id
-              : undefined
-          }
-          onDismiss={dismissAction}
-          isVisible={userAction.showForm}
-        />
+      {userAction.showForm && userAction.action === 'delete' && (
+        <Portal>
+          <Dialog visible onDismiss={dismissAction} style={styles.dialog}>
+            <Dialog.Title>Confirmar eliminación</Dialog.Title>
+            <Dialog.Content style={styles.dialogContent}>
+              <Text>¿Querés eliminar el posteo del foro?</Text>
+            </Dialog.Content>
+            <Dialog.Actions style={styles.dialogActions}>
+              <Button onPress={dismissAction}>Cancelar</Button>
+              <Button
+                mode="contained-tonal"
+                buttonColor={THEME.colors.error}
+                textColor="#fff"
+                onPress={() =>
+                  deletePostMutation({
+                    postId: userAction.data!.id,
+                    isRoot: !userAction.data?.parentPost,
+                  })
+                }
+              >
+                Eliminar
+              </Button>
+            </Dialog.Actions>
+          </Dialog>
+        </Portal>
       )}
+      {userAction.showForm &&
+        userAction.action &&
+        ['answer', 'update'].includes(userAction.action) && (
+          <PostCreationForm
+            forumType={type}
+            courseId={Number(id)}
+            updateInitialData={
+              userAction.action === 'update' ? userAction.data : undefined
+            }
+            creationParentPost={
+              userAction.action === 'answer' ? userAction.data?.id : undefined
+            }
+            creationRootPost={
+              userAction.action === 'answer'
+                ? userAction.data?.rootPost || userAction.data?.id
+                : undefined
+            }
+            onDismiss={dismissAction}
+            isVisible={userAction.showForm}
+          />
+        )}
     </>
   );
 };
@@ -138,5 +171,18 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  dialog: {
+    backgroundColor: 'white',
+    alignSelf: 'center',
+    width: 420,
+    maxWidth: '90%',
+    borderRadius: 12,
+  },
+  dialogContent: {
+    paddingTop: 4,
+  },
+  dialogActions: {
+    justifyContent: 'flex-end',
   },
 });

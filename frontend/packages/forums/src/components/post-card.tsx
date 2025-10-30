@@ -19,7 +19,7 @@ export const PostCard = ({
   isReply: boolean;
   userEmail: string;
   marginMultiplier: number;
-  deleteFn: (data: { postId: string; isRoot: boolean }) => void;
+  deleteFn: (data: Post) => void;
   updateFn: undefined | ((data: Post) => void);
   createFn: undefined | ((data: Post) => void);
   userRole: UserRole;
@@ -79,12 +79,7 @@ export const PostCard = ({
                 compact
                 mode="text"
                 textColor={theme.colors.error}
-                onPress={() =>
-                  deleteFn({
-                    postId: post.id,
-                    isRoot: post.parentPost === null,
-                  })
-                }
+                onPress={() => deleteFn(post)}
               >
                 Eliminar
               </Button>

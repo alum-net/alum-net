@@ -52,7 +52,7 @@ export function ForumPostList() {
           {headerSubtitle}
         </Text>
 
-        <Divider style={styles.divider} />
+        <Divider bold style={styles.divider} />
 
         <FlatList
           data={data?.data}
@@ -118,7 +118,6 @@ export function ForumPostList() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
     paddingHorizontal: 16,
     paddingTop: 24,
   },
