@@ -15,10 +15,7 @@ import org.alumnet.domain.repositories.UserRepository;
 import org.alumnet.domain.resources.Label;
 import org.alumnet.domain.resources.LibraryResource;
 import org.alumnet.domain.users.User;
-import org.alumnet.infrastructure.exceptions.LabelAlreadyExistsException;
-import org.alumnet.infrastructure.exceptions.LabelNotFoundException;
-import org.alumnet.infrastructure.exceptions.LibraryResourceAlreadyExistsException;
-import org.alumnet.infrastructure.exceptions.UserNotFoundException;
+import org.alumnet.infrastructure.exceptions.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -123,5 +120,15 @@ public class LibraryService {
                 .build();
 
         libraryResourceRepository.save(libraryResource);
+    }
+
+    public void deleteResource(Integer resourceId) {
+        LibraryResource libraryResource = libraryResourceRepository
+                .findById(resourceId)
+                .orElseThrow(LibraryResourceNotFoundException::new);
+
+        fileStorageService.deleteMultipleFile(libraryResource.getUrl());
+
+        libraryResourceRepository.delete(libraryResource);
     }
 }
