@@ -43,4 +43,12 @@ public class LibraryController {
         LabelDTO newLabel =  libraryService.createLabel(label);
         return ResponseEntity.status(HttpStatus.CREATED).body(ResultResponse.success(newLabel, "Etiqueta creada exitosamente"));
     }
+
+    @DeleteMapping(path = "/labels/{labelId}", produces = "application/json")
+    @PreAuthorize("hasAnyRole('admin')")
+    public ResponseEntity<ResultResponse<Object>> deleteLabel(
+            @PathVariable int labelId) {
+        libraryService.deleteLabel(labelId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ResultResponse.success(null, "Etiqueta eliminada exitosamente"));
+    }
 }

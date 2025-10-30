@@ -1,12 +1,15 @@
 package org.alumnet.application.services;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.LabelDTO;
 import org.alumnet.application.mapper.LibraryMapper;
 import org.alumnet.application.query_builders.LabelSpecification;
 import org.alumnet.domain.repositories.LabelRepository;
 import org.alumnet.domain.resources.Label;
+import org.alumnet.domain.resources.LibraryResource;
 import org.alumnet.infrastructure.exceptions.LabelAlreadyExistsException;
+import org.alumnet.infrastructure.exceptions.LabelNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -41,5 +44,19 @@ public class LibraryService {
         labelRepository.save(newLabel);
 
         return libraryMapper.labelToLabelDTO(newLabel);
+    }
+
+    @Transactional
+    public void deleteLabel(int labelId) {
+        Label label = labelRepository.findById(labelId)
+                .orElseThrow(LabelNotFoundException::new);
+
+        for (LibraryResource resource : label.getResources()) {
+            resource.getLabels().remove(label);
+        }
+
+        label.getResources().clear();
+
+        labelRepository.delete(label);
     }
 }
