@@ -1,15 +1,25 @@
 package org.alumnet.application.services;
 
+import com.opencsv.bean.CsvToBeanBuilder;
 import jakarta.ws.rs.core.Response;
+import lombok.RequiredArgsConstructor;
+import org.alumnet.application.dtos.requests.UserBulkCreationDTO;
+import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.requests.UserCreationRequestDTO;
 import org.alumnet.application.dtos.UserDTO;
 import org.alumnet.application.dtos.requests.UserFilterDTO;
+import org.alumnet.application.dtos.requests.UserModifyRequestDTO;
+import org.alumnet.application.dtos.responses.BulkCreationErrorDetailDTO;
+import org.alumnet.application.dtos.responses.BulkCreationResponseDTO;
+import org.alumnet.application.dtos.requests.UserModifyRequestDTO;
 import org.alumnet.application.mapper.UserMapper;
 import org.alumnet.application.query_builders.UserSpecification;
 import org.alumnet.domain.repositories.UserRepository;
 import org.alumnet.domain.users.User;
 import org.alumnet.infrastructure.config.KeycloakProperties;
 import org.alumnet.infrastructure.exceptions.ExistingUserException;
+import org.alumnet.infrastructure.exceptions.NoPendingChangesException;
+import org.alumnet.infrastructure.exceptions.UserNotFoundException;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -18,24 +28,25 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
-
-    @Autowired
-    private Keycloak keycloak;
-
-    @Autowired
-    private KeycloakProperties properties;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private UserMapper userMapper;
+    private final Keycloak keycloak;
+    private final KeycloakProperties properties;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
+    private final S3FileStorageService fileStorageService;
+    private final FileValidationService fileValidationService;
 
     public void createUser(UserCreationRequestDTO userCreationRequestDTO) throws ExistingUserException {
         try {
@@ -75,6 +86,131 @@ public class UserService {
         return userPage.map(userMapper::userToUserDTO);
     }
 
+    public UserDTO getUser(String userEmail){
+        return userRepository.findById(userEmail)
+                .map(userMapper::userToUserDTO)
+                .orElseThrow(UserNotFoundException::new);
+    }
+
+    public BulkCreationResponseDTO bulkCreateUsers(MultipartFile file, boolean hasHeaders) {
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("El archivo CSV no debe estar vacío.");
+        }
+
+        List<BulkCreationErrorDetailDTO> errors = new ArrayList<>();
+        List<UserBulkCreationDTO> bulkCreationList;
+        int successfulCreations = 0;
+
+        try (Reader reader = new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8)) {
+
+            CsvToBeanBuilder<UserBulkCreationDTO> builder = new CsvToBeanBuilder<UserBulkCreationDTO>(reader)
+                    .withType(UserBulkCreationDTO.class)
+                    .withSeparator(',');
+            if(hasHeaders){
+                builder.withSkipLines(1);
+            }
+
+            bulkCreationList = builder.build().parse();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error fatal al leer o parsear el archivo CSV.", e);
+        }
+
+        int initialLineNumber = hasHeaders ? 2 : 1;
+
+        for (UserBulkCreationDTO bulkDTO : bulkCreationList) {
+            int currentLine = initialLineNumber++; // Rastrea la línea original del archivo
+
+            try {
+                String initialPassword = getUsernamePartFromEmail(bulkDTO.getEmail());
+                String keycloakGroup = getGroupFromGroupName(bulkDTO.getGroup());
+
+                UserCreationRequestDTO creationRequestDTO = new UserCreationRequestDTO(
+                        bulkDTO.getName(),
+                        bulkDTO.getLastname(),
+                        keycloakGroup,
+                        bulkDTO.getEmail(),
+                        initialPassword
+                );
+
+                createUser(creationRequestDTO);
+                successfulCreations++;
+
+            } catch (ExistingUserException e) {
+                errors.add(BulkCreationErrorDetailDTO.builder()
+                        .lineNumber(currentLine)
+                        .identifier(bulkDTO.getEmail())
+                        .reason("El usuario ya existe en el sistema.")
+                        .build());
+            } catch (IllegalArgumentException e) {
+                errors.add(BulkCreationErrorDetailDTO.builder()
+                        .lineNumber(currentLine)
+                        .identifier(bulkDTO.getEmail())
+                        .reason(e.getMessage())
+                        .build());
+            } catch (Exception e) {
+                errors.add(BulkCreationErrorDetailDTO.builder()
+                        .lineNumber(currentLine)
+                        .identifier(bulkDTO.getEmail())
+                        .reason("Error desconocido al crear el usuario: " + e.getMessage())
+                        .build());
+            }
+        }
+
+        return BulkCreationResponseDTO.builder()
+                .totalRecords(bulkCreationList.size())
+                .successfulCreations(successfulCreations)
+                .failedCreations(errors.size())
+                .errors(errors)
+                .build();
+    }
+
+    public void modifyUser(String userEmail, UserModifyRequestDTO modifyRequest, MultipartFile userAvatar) {
+        if(modifyRequest == null && userAvatar == null) throw new NoPendingChangesException();
+
+        User user = userRepository.findById(userEmail).orElseThrow(UserNotFoundException::new);
+
+        if(modifyRequest != null)
+        {
+            if(modifyRequest.getName() != null) user.setName(modifyRequest.getName());
+            if(modifyRequest.getLastname() != null) user.setLastname(modifyRequest.getLastname());
+        }
+
+        if (userAvatar != null) {
+            fileValidationService.validateFile(userAvatar, true);
+            String userAvatarFolder = "users/" + userEmail + "/avatar/";
+
+            if(user.getAvatarUrl() != null) fileStorageService.deleteMultipleFile(user.getAvatarUrl());
+            fileStorageService.store(userAvatar, userAvatarFolder);
+
+            user.setAvatarUrl(userAvatarFolder + userAvatar.getOriginalFilename());
+        }
+
+        userRepository.save(user);
+    }
+
+    private String getUsernamePartFromEmail(String email) {
+        if (email == null || !email.contains("@")) {
+            throw new IllegalArgumentException("Email inválido o formato incorrecto para generación de contraseña.");
+        }
+
+        return email.substring(0, email.indexOf("@"));
+    }
+
+    private String getGroupFromGroupName(String groupName) {
+        if (groupName == null || groupName.trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre del grupo no puede estar vacío.");
+        }
+
+        return switch (groupName.trim().toUpperCase()) {
+            case "ADMINISTRADORES" -> "admins";
+            case "PROFESORES" -> "teachers";
+            case "ESTUDIANTES" -> "students";
+            default -> throw new IllegalArgumentException("Grupo no válido: " + groupName +
+                    ". Debe ser 'Administradores', 'Profesores' o 'Estudiantes'.");
+        };
+    }
+
     private boolean isRegisteredUser(String email) {
         return userRepository.existsById(email)
                 || !keycloak.realm(properties.getRealm()).users().searchByEmail(email, true).isEmpty();
@@ -103,4 +239,5 @@ public class UserService {
         user.setCredentials(Collections.singletonList(credential));
         return user;
     }
+
 }

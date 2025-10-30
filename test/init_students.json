@@ -1,0 +1,107 @@
+[
+  {
+    "name": "Ana",
+    "lastname": "González",
+    "group": "students",
+    "email": "ana.gonzalez@alumnet.com",
+    "password": "test1234"
+  },
+  {
+    "name": "Bruno",
+    "lastname": "Pereira",
+    "group": "students",
+    "email": "bruno.pereira@alumnet.com",
+    "password": "test1234"
+  },
+  {
+    "name": "Carla",
+    "lastname": "Rodríguez",
+    "group": "students",
+    "email": "carla.rodriguez@alumnet.com",
+    "password": "test1234"
+  },
+  {
+    "name": "Diego",
+    "lastname": "Fernández",
+    "group": "students",
+    "email": "diego.fernandez@alumnet.com",
+    "password": "test1234"
+  },
+  {
+    "name": "Elena",
+    "lastname": "Silva",
+    "group": "students",
+    "email": "elena.silva@alumnet.com",
+    "password": "test1234"
+  },
+  {
+    "name": "Federico",
+    "lastname": "Martínez",
+    "group": "students",
+    "email": "federico.martinez@alumnet.com",
+    "password": "test1234"
+  },
+  {
+    "name": "Gabriela",
+    "lastname": "López",
+    "group": "students",
+    "email": "gabriela.lopez@alumnet.com",
+    "password": "test1234"
+  },
+  {
+    "name": "Hernán",
+    "lastname": "Castro",
+    "group": "students",
+    "email": "hernan.castro@alumnet.com",
+    "password": "test1234"
+  },
+  {
+    "name": "Isabel",
+    "lastname": "Sosa",
+    "group": "students",
+    "email": "isabel.sosa@alumnet.com",
+    "password": "test1234"
+  },
+  {
+    "name": "Joaquín",
+    "lastname": "Vega",
+    "group": "students",
+    "email": "joaquin.vega@alumnet.com",
+    "password": "test1234"
+  },
+  {
+    "name": "Karen",
+    "lastname": "Acosta",
+    "group": "students",
+    "email": "karen.acosta@alumnet.com",
+    "password": "test1234"
+  },
+  {
+    "name": "Luis",
+    "lastname": "Ramos",
+    "group": "students",
+    "email": "luis.ramos@alumnet.com",
+    "password": "test1234"
+  },
+  {
+    "name": "María",
+    "lastname": "Benítez",
+    "group": "students",
+    "email": "maria.benitez@alumnet.com",
+    "password": "test1234"
+  },
+  {
+    "name": "Nicolás",
+    "lastname": "Torres",
+    "group": "students",
+    "email": "nicolas.torres@alumnet.com",
+    "password": "test1234"
+  },
+  {
+    "name": "Olivia",
+    "lastname": "Pérez",
+    "group": "students",
+    "email": "olivia.perez@alumnet.com",
+    "password": "test1234"
+  }
+]

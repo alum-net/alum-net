@@ -9,6 +9,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.xml.transform.Result;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -75,6 +77,21 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(PostHasRepliesException.class)
     public ResponseEntity<ResultResponse<Object>> handlePostHasRepliesException(PostHasRepliesException ex) {
         return  ResponseEntity.status(HttpStatus.CONFLICT).body(ResultResponse.error(ex.getMessage(), "No se puede modificar el post"));
+    }
+
+    @ExceptionHandler(NoPendingChangesException.class)
+    public ResponseEntity<ResultResponse<Object>> handleNoPendingChangesException(NoPendingChangesException ex) {
+        return  ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).body(ResultResponse.error(ex.getMessage(), "No hay cambios pendientes"));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ResultResponse<Object>> handleIllegalArgumentException(IllegalArgumentException ex) {
+        return  ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Error en el procesamiento"));
+    }
+
+    @ExceptionHandler(LabelAlreadyExistsException.class)
+    public ResponseEntity<ResultResponse<Object>> handleLabelAlreadyExistsException(LabelAlreadyExistsException ex){
+        return  ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Ya existe la etiqueta"));
     }
 
     @ExceptionHandler(InvalidAttributeException.class)

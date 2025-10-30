@@ -1,10 +1,15 @@
 package org.alumnet.application.services;
 
+import com.opencsv.bean.CsvToBeanBuilder;
 import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.*;
+import org.alumnet.application.dtos.requests.CourseBulkCreationDTO;
 import org.alumnet.application.dtos.requests.CourseCreationRequestDTO;
 import org.alumnet.application.dtos.requests.CourseFilterDTO;
 import org.alumnet.application.dtos.requests.UserFilterDTO;
+import org.alumnet.application.dtos.responses.BulkCreationErrorDetailDTO;
+import org.alumnet.application.dtos.responses.BulkCreationResponseDTO;
+import org.alumnet.application.enums.ShiftType;
 import org.alumnet.application.enums.UserRole;
 import org.alumnet.application.mapper.CourseMapper;
 import org.alumnet.application.mapper.UserMapper;
@@ -28,10 +33,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -189,6 +202,152 @@ public class CourseService {
                 .getCourseContent(userId, courseId, page);
         updateResourceUrls(courseContent);
         return courseContent;
+    }
+
+    public BulkCreationResponseDTO bulkCreateCourses(MultipartFile file, boolean hasHeaders) {
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("El archivo CSV no debe estar vacío.");
+        }
+
+        List<BulkCreationErrorDetailDTO> errors = new ArrayList<>();
+        List<CourseBulkCreationDTO> bulkCreationList;
+        int successfulCreations = 0;
+
+        try (Reader reader = new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8)) {
+            CsvToBeanBuilder<CourseBulkCreationDTO> builder = new CsvToBeanBuilder<CourseBulkCreationDTO>(reader)
+                    .withType(CourseBulkCreationDTO.class)
+                    .withSeparator(',');
+
+            if (hasHeaders) {
+                builder.withSkipLines(1);
+            }
+            bulkCreationList = builder.build().parse();
+        } catch (Exception e) {
+            throw new RuntimeException("Error fatal al leer o parsear el archivo CSV. Verifique el formato general del archivo.", e);
+        }
+
+        int initialLineNumber = hasHeaders ? 2 : 1;
+
+        for (CourseBulkCreationDTO bulkDTO : bulkCreationList) {
+            int currentLine = initialLineNumber++;
+            String identifier = bulkDTO.getName() != null ? bulkDTO.getName().trim() : "Curso sin nombre";
+
+            try {
+
+                // Se replican las validaciones que se hacen en el endpoint atómico
+                if (bulkDTO.getName() == null || bulkDTO.getName().trim().isEmpty()) {
+                    throw new InvalidAttributeException("El nombre del curso no puede estar vacío");
+                }
+                if (bulkDTO.getDescription() == null || bulkDTO.getDescription().trim().isEmpty()) {
+                    throw new InvalidAttributeException("La descripción del curso no puede estar vacía");
+                }
+
+                ShiftType validatedShift = getValidShift(bulkDTO.getShift());
+
+                LocalDate startDate = parseDate(bulkDTO.getStartDate(), "Fecha de inicio");
+                LocalDate endDate = parseDate(bulkDTO.getEndDate(), "Fecha de fin");
+
+                List<String> teacherEmails = parseTeacherEmails(bulkDTO.getTeacherEmails());
+
+                List<Teacher> teachers = userRepository
+                        .findAllById(teacherEmails)
+                        .stream()
+                        .filter(user -> user instanceof Teacher)
+                        .map(user -> (Teacher) user)
+                        .collect(Collectors.toList());
+                validateTeachers(teacherEmails, teachers);
+
+                CourseCreationRequestDTO creationRequestDTO = new CourseCreationRequestDTO(
+                        bulkDTO.getName(),
+                        bulkDTO.getDescription(),
+                        validatedShift,
+                        bulkDTO.getApprovalGrade(),
+                        startDate,
+                        endDate,
+                        teacherEmails
+                );
+
+                create(creationRequestDTO);
+                successfulCreations++;
+
+            } catch (InvalidAttributeException e) {
+                errors.add(BulkCreationErrorDetailDTO.builder()
+                        .lineNumber(currentLine)
+                        .identifier(identifier)
+                        .reason("Error de validación: " + e.getMessage())
+                        .build());
+            } catch (DateTimeParseException e) {
+                errors.add(BulkCreationErrorDetailDTO.builder()
+                        .lineNumber(currentLine)
+                        .identifier(identifier)
+                        .reason("Error de formato de fecha. Use YYYY-MM-DD.")
+                        .build());
+            } catch (Exception e) {
+                errors.add(BulkCreationErrorDetailDTO.builder()
+                        .lineNumber(currentLine)
+                        .identifier(identifier)
+                        .reason("Error desconocido al crear curso: " + e.getMessage())
+                        .build());
+            }
+        }
+
+        return BulkCreationResponseDTO.builder()
+                .totalRecords(bulkCreationList.size())
+                .successfulCreations(successfulCreations)
+                .failedCreations(errors.size())
+                .errors(errors)
+                .build();
+    }
+
+    private List<String> parseTeacherEmails(String emailsString) {
+        if (emailsString == null || emailsString.trim().isEmpty()) {
+            throw new InvalidAttributeException("Debe asignarse al menos un docente");
+        }
+
+        List<String> emails = Arrays.stream(emailsString.split("\\|"))
+                .map(String::trim)
+                .filter(email -> !email.isEmpty())
+                .collect(Collectors.toList());
+
+        if (emails.isEmpty()) {
+            throw new InvalidAttributeException("Debe asignarse al menos un docente");
+        }
+
+        for (String email : emails) {
+            if (!isValidEmailFormat(email)) {
+                throw new InvalidAttributeException("El email del docente '" + email + "' tiene un formato incorrecto.");
+            }
+        }
+
+        return emails;
+    }
+
+    private LocalDate parseDate(String dateString, String fieldName) {
+        if (dateString == null || dateString.trim().isEmpty()) {
+            throw new InvalidAttributeException(fieldName + " no puede ser nula");
+        }
+        try {
+            return LocalDate.parse(dateString.trim(), DateTimeFormatter.ISO_LOCAL_DATE);
+        } catch (DateTimeParseException e) {
+            throw new DateTimeParseException("El campo '" + fieldName + "' tiene un formato inválido. Use YYYY-MM-DD.", dateString, e.getErrorIndex());
+        }
+    }
+
+    private ShiftType getValidShift(String shift) {
+        if (shift == null || shift.trim().isEmpty()) {
+            throw new InvalidAttributeException("Debe seleccionarse un turno (Matutino, Vespertino o Nocturno)");
+        }
+        return switch (shift.trim().toUpperCase()) {
+            case "NOCTURNO" -> ShiftType.EVENING;
+            case "VESPERTINO" -> ShiftType.AFTERNOON;
+            case "MATUTINO" -> ShiftType.MORNING;
+            default -> throw new InvalidAttributeException("Turno inválido: " + shift +
+                    ". Debe ser Matutino, Vespertino o Nocturno.");
+        };
+    }
+
+    private boolean isValidEmailFormat(String email) {
+        return email != null && email.matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$");
     }
 
     private void updateResourceUrls(CourseContentDTO courseContent) {
