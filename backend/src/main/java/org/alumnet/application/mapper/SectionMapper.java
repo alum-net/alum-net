@@ -7,7 +7,7 @@ import org.alumnet.domain.Section;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {EventMapper.class})
 public interface SectionMapper {
 
     @Mapping(target = "sectionId", ignore = true)

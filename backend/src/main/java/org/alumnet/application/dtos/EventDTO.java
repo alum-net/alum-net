@@ -1,6 +1,8 @@
 package org.alumnet.application.dtos;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,6 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 public class EventDTO {
     @NotBlank(message = "El tipo no puede ser nulo o vacio")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String type;
     @NotNull(message = "El ID de la seccion no puede ser nulo")
     private Integer sectionId;

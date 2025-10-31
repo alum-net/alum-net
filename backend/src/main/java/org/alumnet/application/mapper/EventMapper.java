@@ -9,10 +9,7 @@ import org.alumnet.domain.events.Event;
 import org.alumnet.domain.events.OnSite;
 import org.alumnet.domain.events.Questionnaire;
 import org.alumnet.domain.events.Task;
-import org.mapstruct.AfterMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
+import org.mapstruct.*;
 
 @Mapper(componentModel = "spring")
 public interface EventMapper {
@@ -43,4 +40,17 @@ public interface EventMapper {
             });
         }
     }
+
+    @Mapping(target = "sectionId" , source = "event.section.sectionId")
+    EventDTO eventToEventDTO(Event event);
+
+    @Mapping(target = "sectionId", source = "questionnaire.section.sectionId")
+    @Mapping(target = "questions", source = "questionnaire.questions")
+    @Mapping(target = "durationInMinutes", source = "questionnaire.durationInMinutes")
+    EventDTO questionnaireToEventDTO(Questionnaire questionnaire);
+
+    QuestionDTO questionToQuestionDTO(Question question);
+
+    AnswerDTO answerToAnswerDTO(Answer answer);
+
 }

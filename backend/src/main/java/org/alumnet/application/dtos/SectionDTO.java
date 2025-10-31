@@ -16,6 +16,7 @@ public class SectionDTO {
     private Integer id;
     private String title;
     private String description;
+    private List<EventDTO> events;
     private List<SectionResourceResponseDTO> sectionResources;
 
 }
