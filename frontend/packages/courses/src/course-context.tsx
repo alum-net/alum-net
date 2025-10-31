@@ -1,12 +1,12 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { QUERY_KEYS } from '@alum-net/api';
+import { PageableResponse, QUERY_KEYS } from '@alum-net/api';
 import { getCourses } from './service';
-import { FiltersDirectory } from './types';
+import { CourseDisplay, FiltersDirectory } from './types';
 import { useUserInfo } from '@alum-net/users';
 
 type CoursesContextValue = {
-  data: any;
+  data: PageableResponse<CourseDisplay> | undefined;
   isLoading: boolean;
   error: unknown;
   refetch: () => void;

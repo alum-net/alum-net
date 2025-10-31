@@ -5,8 +5,17 @@ import { StyleSheet, Text } from 'react-native';
 import { Button } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { THEME } from '@alum-net/ui';
+import { FilesToUpload } from '../types';
 
-export const SortableFileItem = ({ file, index, onRemove }: any) => {
+export const SortableFileItem = ({
+  file,
+  index,
+  onRemove,
+}: {
+  file: FilesToUpload;
+  index: number;
+  onRemove: (index: number) => void;
+}) => {
   const {
     attributes,
     listeners,

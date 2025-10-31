@@ -24,12 +24,11 @@ import * as DocumentPicker from 'expo-document-picker';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
-  useEditorBridge,
-  RichText,
-  Toolbar,
-  useEditorContent,
-} from '@10play/tentap-editor';
-import { FormTextInput, MARKDOWN_TOOLBAR_ITEMS, Toast } from '@alum-net/ui';
+  FormTextInput,
+  RichTextEditor,
+  Toast,
+  useRichTextEditor,
+} from '@alum-net/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@alum-net/api';
 import { SortableFileItem } from './sortable-file-item';
@@ -73,7 +72,6 @@ export const SectionForm: React.FC<SectionFormProps> = ({
     handleSubmit,
     formState: { errors },
     setValue,
-    getValues,
   } = useForm<SectionCreationFormSchema>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -126,17 +124,9 @@ export const SectionForm: React.FC<SectionFormProps> = ({
     },
   });
 
-  const editor = useEditorBridge({
-    autofocus: false,
-    avoidIosKeyboard: true,
-    initialContent: initialData?.description || '',
-  });
-  const editorContent = useEditorContent(editor, {
-    type: 'html',
-  });
   const sensors = useSensors(useSensor(PointerSensor));
 
-  console.log(getValues('resourcesMetadata'));
+  const { editor, content } = useRichTextEditor(initialData?.description || '');
 
   const handleDragEnd = ({ active, over }: DragEndEvent) => {
     if (over !== null && active.id !== over.id) {
@@ -213,7 +203,7 @@ export const SectionForm: React.FC<SectionFormProps> = ({
     try {
       const sectionData = {
         title: data.title,
-        description: editorContent || '',
+        description: content || '',
         resourcesMetadata: selectedFiles.map((file, index) => ({
           filename: file.name,
           order: index,
@@ -251,11 +241,7 @@ export const SectionForm: React.FC<SectionFormProps> = ({
           )}
 
           <Text style={styles.label}>Contenido</Text>
-          <View style={styles.editorContainer}>
-            <Toolbar editor={editor} items={[...MARKDOWN_TOOLBAR_ITEMS]} />
-            <RichText editor={editor} />
-          </View>
-
+          <RichTextEditor editor={editor} />
           <Text style={styles.label}>Recursos multimedia</Text>
 
           <View style={styles.uploadBox}>
@@ -309,13 +295,6 @@ const styles = StyleSheet.create({
   container: { padding: 16 },
   input: { marginBottom: 8 },
   label: { marginTop: 16, marginBottom: 4, fontWeight: '500' },
-  editorContainer: {
-    height: 200,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 4,
-    overflow: 'hidden',
-  },
   uploadBox: {
     marginTop: 8,
     padding: 16,
