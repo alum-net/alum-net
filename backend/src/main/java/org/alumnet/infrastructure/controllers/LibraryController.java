@@ -5,6 +5,7 @@ import org.alumnet.application.dtos.LabelDTO;
 import org.alumnet.application.dtos.LibraryResourceDTO;
 import org.alumnet.application.dtos.requests.LibraryResourceCreationRequestDTO;
 import org.alumnet.application.dtos.requests.LibraryResourceFilterDTO;
+import org.alumnet.application.dtos.requests.UpdateLabelRequestDTO;
 import org.alumnet.application.dtos.responses.PageableResultResponse;
 import org.alumnet.application.dtos.responses.ResultResponse;
 import org.alumnet.application.services.LibraryService;
@@ -90,5 +91,14 @@ public class LibraryController {
             @PathVariable Integer resourceId){
         libraryService.deleteResource(resourceId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ResultResponse.success(null, "Se eliminó el recurso correctamente"));
+    }
+
+    @PutMapping(path = "/labels/{labelId}", produces = "application/json")
+    @PreAuthorize("hasRole('admin')")
+    public ResponseEntity<ResultResponse<Object>> deleteLabel(
+            @PathVariable int labelId,
+            @RequestBody UpdateLabelRequestDTO label) {
+        libraryService.modifyLabel(labelId, label.getName());
+        return ResponseEntity.ok(ResultResponse.success(null, "Etiqueta modificada exitosamente"));
     }
 }
