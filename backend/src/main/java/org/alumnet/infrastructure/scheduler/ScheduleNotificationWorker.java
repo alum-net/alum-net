@@ -23,7 +23,7 @@ public class ScheduleNotificationWorker {
 
     @Scheduled(cron = "0 */15 * * * *")
     public void sendNotification() {
-        /*log.info("Running scheduled task to process pending notifications");
+        log.info("Running scheduled task to process pending notifications");
         List<ScheduledNotification> scheduledNotifications = notificationService.processPendingNotifications();
         scheduledNotifications.forEach(scheduledNotification -> {
             log.info("Sending email for notification id: {}", scheduledNotification.getId());
@@ -34,6 +34,6 @@ public class ScheduleNotificationWorker {
             mailgunMessagesApi.sendMessage(DOMAIN,message);
             notificationService.markNotificationAsSent(scheduledNotification);
 
-        });*/
+        });
     }
 }
