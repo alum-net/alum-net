@@ -17,7 +17,6 @@ import { ForumLinks } from '@alum-net/forums';
 import RenderHTML from 'react-native-render-html';
 import EventCreationModal from '../../../features/events/components/event-creation-modal';
 
-
 export default function Course() {
   const { id, name } = useLocalSearchParams();
   const queryClient = useQueryClient();
