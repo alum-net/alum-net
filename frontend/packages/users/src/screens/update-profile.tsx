@@ -1,22 +1,15 @@
 import { StyleSheet, View, TouchableOpacity, Platform } from 'react-native';
-import {
-  Text,
-  Avatar,
-  Button,
-  Surface,
-  HelperText,
-  ActivityIndicator,
-} from 'react-native-paper';
+import { Text, Avatar, Button, Surface, HelperText } from 'react-native-paper';
 import { FormTextInput, THEME, Toast } from '@alum-net/ui';
 import { logout, updatePassword } from '@alum-net/auth';
 import { useUserInfo } from '../hooks/useUserInfo';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as ImagePicker from 'expo-image-picker';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AvatarFile, UpdatePayload } from '../types';
 import { updateUser } from '../service';
-import { isAxiosError } from 'axios';
+import { QUERY_KEYS } from '@alum-net/api';
 
 type ProfileFormData = {
   name: string;
@@ -26,9 +19,9 @@ type ProfileFormData = {
 export const MAX_FILE_SIZE = 10;
 
 export function UpdateProfile() {
-  const [refetchUserData, setRefetchUserData] = useState(false);
+  const queryClient = useQueryClient();
   const [status, requestPermission] = ImagePicker.useMediaLibraryPermissions();
-  const { data: userInfo } = useUserInfo(refetchUserData);
+  const { data: userInfo } = useUserInfo();
   const [avatar, setAvatar] = useState<AvatarFile>({
     uri: userInfo?.avatarUrl,
     filename: userInfo?.name + '_avatar',
@@ -49,16 +42,14 @@ export function UpdateProfile() {
   useEffect(() => {
     if (userInfo?.lastname) setValue('lastname', userInfo.lastname);
     if (userInfo?.name) setValue('name', userInfo.name);
+    if (userInfo?.avatarUrl) setAvatar({ uri: userInfo.avatarUrl });
   }, [userInfo, setValue]);
 
   const mutation = useMutation({
     mutationFn: (data: UpdatePayload) => updateUser(userInfo!.email, data),
-    onSuccess: () => {
+    onSuccess: async data => {
       Toast.success('Perfil actualizado satisfactoriamente');
-      setRefetchUserData(true);
-      setTimeout(() => {
-        setRefetchUserData(false);
-      }, 5000);
+      await queryClient.setQueryData([QUERY_KEYS.getUserInfo], () => data);
     },
     onError: () => {
       Toast.error('Ocurrio un error actualizando tu perfil');
@@ -81,8 +72,11 @@ export function UpdateProfile() {
           )
         ) {
           setAvatar({
-            type: result.assets[0].type,
-            filename: result.assets[0].file?.name,
+            type: 'image/jpeg',
+            filename:
+              result.assets[0].fileName ||
+              result.assets[0].file?.name ||
+              'avatar.jpg',
             uri: result.assets[0].uri,
           });
           return;

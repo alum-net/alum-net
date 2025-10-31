@@ -1,34 +1,27 @@
-import api, { PageableResponse } from '@alum-net/api';
+import api, { PageableResponse, Response } from '@alum-net/api';
 import { AxiosResponse } from 'axios';
 import { getKeyclaokUserInfo, logout } from '@alum-net/auth';
 import { UpdatePayload, UserFilterDTO, UserInfo, UserRole } from './types';
 import { storage, STORAGE_KEYS } from '@alum-net/storage';
 import { deleteFalsyKeys } from '@alum-net/courses/src/helpers';
+import { Platform } from 'react-native';
 
-export const getUserInfo = async (invalidate = false) => {
+export const getUserInfo = async () => {
   try {
-    if (!invalidate) {
-      const userObject = JSON.parse(
-        storage.getString(STORAGE_KEYS.USER_INFO) ?? '{}',
-      );
-      if (Object.hasOwn(userObject, 'role')) return userObject as UserInfo;
-    }
+    const userObject = JSON.parse(
+      storage.getString(STORAGE_KEYS.USER_INFO) ?? '{}',
+    );
+    if (Object.hasOwn(userObject, 'role')) return userObject as UserInfo;
 
     const userInfo = await getKeyclaokUserInfo();
-    const { data }: AxiosResponse<PageableResponse<UserInfo>> = await api.get(
-      '/users/',
-      {
-        params: {
-          size: 1,
-          email: userInfo.email,
-        },
-      },
+    const { data }: AxiosResponse<Response<UserInfo>> = await api.get(
+      `/users/${userInfo.email}`,
     );
-    if (data?.data?.[0] === undefined) throw new Error('El usuario no existe');
+    if (data.data === undefined) throw new Error('El usuario no existe');
 
-    storage.set(STORAGE_KEYS.USER_INFO, JSON.stringify(data.data[0]));
+    storage.set(STORAGE_KEYS.USER_INFO, JSON.stringify(data));
 
-    return data?.data?.[0];
+    return data.data;
   } catch (error: unknown) {
     console.log(error);
     logout();
@@ -80,25 +73,51 @@ async function buildFormData(data: UpdatePayload) {
   const formData = new FormData();
   formData.append(
     'modifyRequest',
-    new Blob(
-      [
-        JSON.stringify(
-          deleteFalsyKeys({ name: data.name, lastname: data.lastname }),
-        ),
-      ],
-      {
-        type: 'application/json',
-      },
-    ),
+    Platform.OS === 'web'
+      ? new Blob(
+          [
+            JSON.stringify(
+              deleteFalsyKeys({ name: data.name, lastname: data.lastname }),
+            ),
+          ],
+          { type: 'application/json' },
+        )
+      : ({
+          string: JSON.stringify(
+            deleteFalsyKeys({
+              name: data.name,
+              lastname: data.lastname,
+            }),
+          ),
+          type: 'application/json',
+        } as any),
   );
   if (data.avatar.uri && data.avatar.type && data.avatar.filename) {
     const response = await fetch(data.avatar.uri || '');
-    const blob = await response.blob();
-    formData.append('userAvatar', blob, data.avatar.filename);
+    formData.append(
+      'userAvatar',
+      Platform.OS === 'web'
+        ? await response.blob()
+        : ({
+            name: data.avatar.filename,
+            uri: data.avatar.uri,
+            type: data.avatar.type,
+          } as any),
+      data.avatar.filename,
+    );
   }
   return formData;
 }
 
 export const updateUser = async (userEmail: string, data: UpdatePayload) => {
-  return await api.patch(`users/${userEmail}/`, await buildFormData(data));
+  const { data: updatedUser } = await api.patch<Response<UserInfo>>(
+    `users/${userEmail}`,
+    await buildFormData(data),
+    {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    },
+  );
+
+  storage.set(STORAGE_KEYS.USER_INFO, JSON.stringify(updatedUser.data));
+  return updatedUser.data;
 };

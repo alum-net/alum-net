@@ -29,7 +29,7 @@ RUN ./gradlew clean build --no-daemon -x test
 # Usamos el JRE 24 para asegurar la compatibilidad total en runtime.
 # -----------------------------------------------------------
 FROM eclipse-temurin:24-jre
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+# RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
 # Puerto de la aplicación
 EXPOSE 8080 8787

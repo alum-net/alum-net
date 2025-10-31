@@ -90,15 +90,24 @@ public class UserService {
 
         return userPage.map(user -> {
             UserDTO dto = userMapper.userToUserDTO(user);
-            dto.setAvatarUrl(fileStorageService.generatePresignedUrl(
-                    dto.getAvatarUrl(), Duration.ofDays(urlDuration)));
+            if (user.getAvatarUrl() != null) {
+                dto.setAvatarUrl(fileStorageService.generatePresignedUrl(
+                        dto.getAvatarUrl(), Duration.ofDays(urlDuration)));
+            }
             return dto;
         });
     }
 
     public UserDTO getUser(String userEmail) {
         return userRepository.findById(userEmail)
-                .map(userMapper::userToUserDTO)
+                .map(user -> {
+                    UserDTO dto = userMapper.userToUserDTO(user);
+                    if (user.getAvatarUrl() != null) {
+                        dto.setAvatarUrl(fileStorageService.generatePresignedUrl(
+                                dto.getAvatarUrl(), Duration.ofDays(urlDuration)));
+                    }
+                    return dto;
+                })
                 .orElseThrow(UserNotFoundException::new);
     }
 
