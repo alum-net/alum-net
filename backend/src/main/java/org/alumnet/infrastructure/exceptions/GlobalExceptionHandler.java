@@ -9,8 +9,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import javax.xml.transform.Result;
-
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -92,5 +90,30 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(LabelAlreadyExistsException.class)
     public ResponseEntity<ResultResponse<Object>> handleLabelAlreadyExistsException(LabelAlreadyExistsException ex){
         return  ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Ya existe la etiqueta"));
+    }
+
+    @ExceptionHandler(LabelNotFoundException.class)
+    public ResponseEntity<ResultResponse<Object>> handleLabelNotFoundException(LabelNotFoundException ex){
+        return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultResponse.error(ex.getMessage(), "No se encontró la etiqueta"));
+    }
+
+    @ExceptionHandler(LibraryResourceAlreadyExistsException.class)
+    public ResponseEntity<ResultResponse<Object>> handleLibraryResourceAlreadyExistsException(LibraryResourceAlreadyExistsException ex) {
+        return  ResponseEntity.status(HttpStatus.CONFLICT).body(ResultResponse.error(ex.getMessage(), "Ya existe el recurso en la librería"));
+    }
+
+    @ExceptionHandler(LibraryResourceNotFoundException.class)
+    public ResponseEntity<ResultResponse<Object>> handleLibraryResourceNotFoundException(LibraryResourceNotFoundException ex) {
+        return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultResponse.error(ex.getMessage(), "No existe el recurso en la librería"));
+    }
+
+    @ExceptionHandler(InvalidAttributeException.class)
+    public ResponseEntity<ResultResponse<Object>> handleInvalidAttributeException(InvalidAttributeException ex) {
+        return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Atributo inválido"));
+    }
+
+    @ExceptionHandler(QuestionnaireValidationException.class)
+    public ResponseEntity<ResultResponse<Object>> handleQuestionnaireValidationException(QuestionnaireValidationException ex) {
+        return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Error de validación del cuestionario"));
     }
 }

@@ -20,9 +20,6 @@ public class SectionResource extends Resource {
     private Integer order;
 
     @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "section_course_id", referencedColumnName = "course_id"),
-            @JoinColumn(name = "section_id", referencedColumnName = "section_id")
-    })
+    @JoinColumn(name = "section_id", referencedColumnName = "section_id")
     private Section section;
 }

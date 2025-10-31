@@ -1,6 +1,5 @@
 {
   "java.compile.nullAnalysis.mode": "automatic",
-  "java.jdt.ls.java.home": "/Users/FedeMaciel/Library/Java/JavaVirtualMachines/azul-24.0.2/Contents/Home",
   "sqltools.connections": [
     {
       "ssh": "Disabled",

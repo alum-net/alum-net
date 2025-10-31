@@ -2,7 +2,9 @@ package org.alumnet.application.services;
 
 import com.opencsv.bean.CsvToBeanBuilder;
 import lombok.RequiredArgsConstructor;
-import org.alumnet.application.dtos.*;
+import org.alumnet.application.dtos.CourseContentDTO;
+import org.alumnet.application.dtos.CourseDTO;
+import org.alumnet.application.dtos.UserDTO;
 import org.alumnet.application.dtos.requests.CourseBulkCreationDTO;
 import org.alumnet.application.dtos.requests.CourseCreationRequestDTO;
 import org.alumnet.application.dtos.requests.CourseFilterDTO;
@@ -373,5 +375,9 @@ public class CourseService {
         if (approvalGrade == null || approvalGrade < 0.0 || approvalGrade > 1.0) {
             throw new InvalidAttributeException("La nota mínima debe estar entre 0.0 y 1.0");
         }
+    }
+
+    public List<Student> findEnrolledStudentsInCourse(int id) {
+        return participationRepository.findEnrolledStudentsByCourseId(id);
     }
 }
