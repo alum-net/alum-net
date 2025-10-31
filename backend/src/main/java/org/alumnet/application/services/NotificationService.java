@@ -8,9 +8,12 @@ import com.onesignal.client.model.Notification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.alumnet.application.enums.NotificationStatus;
+import org.alumnet.application.query_builders.NotificationQueryBuilder;
 import org.alumnet.domain.ScheduledNotification;
 import org.alumnet.domain.repositories.NotificationRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -23,19 +26,33 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
-
     private final DefaultApi oneSignalApi;
     @Value("${onesignal.config.id}")
     private String oneSignalAppId;
     @Value("${send.notification.now:false}")
     private boolean sendNotificationNow;
     private final NotificationRepository notificationRepository;
+    private final MongoTemplate mongoTemplate;
 
+    public void cancelScheduledNotification(int eventId, String notificationId){
+        Query query = NotificationQueryBuilder.byEventId(eventId);
+        ScheduledNotification notification = mongoTemplate.findOne(query, ScheduledNotification.class);
 
-    public String sendNotifications(String title, String message, List<String> userEmails, LocalDateTime endDate) {
+        notificationRepository.delete(notification);
+
+        try {
+            oneSignalApi.cancelNotification(oneSignalAppId, notificationId);
+        } catch (ApiException e) {
+            log.error("Error al cancelar el envío notificación: {}", e.getMessage(), e);
+            notificationRepository.deleteById(notification.getId());
+            throw new RuntimeException("Error comunicando con OneSignal", e);
+        }
+    }
+
+    public String sendNotifications(int eventId, String title, String message, List<String> userEmails, LocalDateTime endDate) {
         ScheduledNotification notification = null;
         try {
-            notification = saveScheduledEmailNotification(title, message, userEmails, endDate);
+            notification = saveScheduledEmailNotification(eventId, title, message, userEmails, endDate);
             return sendPushNotifications(title, message, userEmails, endDate);
         } catch (ApiException e) {
             log.error("Error al enviar notificación: {}", e.getMessage(), e);
@@ -58,14 +75,15 @@ public class NotificationService {
         return send(notification);
     }
 
-    private ScheduledNotification saveScheduledEmailNotification(String title, String message, List<String> userEmails, LocalDateTime endDate) {
+    private ScheduledNotification saveScheduledEmailNotification(int eventId, String title, String message, List<String> userEmails, LocalDateTime endDate) {
         //Contemplar caso borde de que pasa si el endDate es mañana y le resto 24 horas (la notificación se debería enviar inmediatamente)
         return notificationRepository.save(ScheduledNotification.builder()
-                .title(title).
-                message(message).
-                recipientIds(userEmails).
-                state(NotificationStatus.PENDING).
-                scheduledSendTime(endDate.minusHours(24)).
+                .title(title)
+                .eventId(eventId)
+                .message(message)
+                .recipientIds(userEmails)
+                .state(NotificationStatus.PENDING)
+                .scheduledSendTime(endDate.minusHours(24)).
                 build());
     }
 

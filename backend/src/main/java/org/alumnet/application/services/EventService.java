@@ -1,6 +1,7 @@
 package org.alumnet.application.services;
 
 
+import com.onesignal.client.ApiException;
 import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.AnswerDTO;
 import org.alumnet.application.dtos.EventDTO;
@@ -15,6 +16,8 @@ import org.alumnet.domain.events.EventParticipationId;
 import org.alumnet.domain.events.Questionnaire;
 import org.alumnet.domain.repositories.EventRepository;
 import org.alumnet.domain.users.Student;
+import org.alumnet.infrastructure.exceptions.EventHasParticipationException;
+import org.alumnet.infrastructure.exceptions.EventNotFoundException;
 import org.alumnet.infrastructure.exceptions.InvalidAttributeException;
 import org.alumnet.infrastructure.exceptions.QuestionnaireValidationException;
 import org.springframework.stereotype.Service;
@@ -42,7 +45,14 @@ public class EventService {
         List<Student> enrolledStudentsInCourse = courseService.
                 findEnrolledStudentsInCourse(section.getCourse().getId());
 
+        Event event = eventMapper.eventDTOToEvent(eventDTO);
+        event.setSection(section);
+        event.setParticipation(enrollStudentsInEvent(event, enrolledStudentsInCourse));
+
+        eventRepository.save(event);
+
         String notificationID = notificationService.sendNotifications(
+                event.getId(),
                 eventDTO.getTitle(),
                 eventDTO.getDescription(),
                 enrolledStudentsInCourse.stream()
@@ -51,14 +61,25 @@ public class EventService {
                 eventDTO.getEndDate()
         );
 
-        Event event = eventMapper.eventDTOToEvent(eventDTO);
-        event.setSection(section);
         event.setNotificationId(notificationID);
-        event.setParticipation(enrollStudentsInEvent(event, enrolledStudentsInCourse));
-
-
         eventRepository.save(event);
+    }
 
+    public void deleteEvent(int eventId) {
+        boolean hasParticipations = someParticipationByEventId(eventId);
+
+        if(hasParticipations) throw new EventHasParticipationException();
+
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(EventNotFoundException::new);
+
+        eventRepository.delete(event);
+
+        notificationService.cancelScheduledNotification(eventId, event.getNotificationId());
+    }
+
+    private boolean someParticipationByEventId(int eventId){
+        return eventRepository.someParticipationByEventId(eventId);
     }
 
     private List<EventParticipation> enrollStudentsInEvent(Event event, List<Student> students) {

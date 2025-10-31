@@ -23,7 +23,7 @@ public class LibraryResource extends Resource {
     private Date createdAt;
 
     @ManyToOne
-    @JoinColumn(name = "creator_email", nullable = false)
+    @JoinColumn(name = "creator_email")
     private User creator;
 
     @ManyToMany
