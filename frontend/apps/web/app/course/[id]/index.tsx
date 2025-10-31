@@ -15,7 +15,7 @@ import { QUERY_KEYS, Response } from '@alum-net/api';
 import { SectionForm } from '../../../features/sections/components/section-form';
 import { ForumLinks } from '@alum-net/forums';
 import RenderHTML from 'react-native-render-html';
-import EventCreationModal from '../../features/events/components/event-creation-modal';
+import EventCreationModal from '../../../features/events/components/event-creation-modal';
 
 
 export default function Course() {
