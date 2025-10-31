@@ -13,6 +13,7 @@
   "dependencies": {
     "@alum-net/auth": "*",
     "@alum-net/courses": "*",
+    "@alum-net/forums": "*",
     "@alum-net/storage": "*",
     "@alum-net/ui": "*",
     "@alum-net/forums": "*",
@@ -23,6 +24,7 @@
     "expo-blur": "~14.1.5",
     "expo-constants": "~17.1.7",
     "expo-device": "~7.1.4",
+    "expo-image-picker": "~16.1.4",
     "expo-linking": "~7.1.7",
     "expo-router": "~5.1.7",
     "expo-splash-screen": "~0.30.10",

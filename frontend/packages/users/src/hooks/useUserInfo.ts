@@ -10,7 +10,7 @@ export const useUserInfo = () => {
   });
 
   return {
-    data,
+    data: data,
     isLoading,
     refetch,
   };

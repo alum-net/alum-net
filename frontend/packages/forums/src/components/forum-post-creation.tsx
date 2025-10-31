@@ -65,7 +65,6 @@ export const PostCreationForm = ({
     },
   });
 
-  console.log(updateInitialData, creationParentPost, creationRootPost);
   const { editor, content } = useRichTextEditor(
     updateInitialData?.content || '',
   );
@@ -102,7 +101,6 @@ export const PostCreationForm = ({
       }),
     onSuccess: async () => {
       Toast.success('Posteo actualizado correctamente');
-      console.log(updateInitialData);
       await queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.getForumPosts],
       });

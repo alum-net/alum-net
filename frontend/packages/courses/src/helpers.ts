@@ -22,7 +22,7 @@ export function isValidDecimal(value: string): boolean {
   return decimalRegex.test(value);
 }
 
-export function deleteFalsyKeys<T extends Record<string, any>>(
+export function deleteFalsyKeys<T extends Record<string, unknown>>(
   obj: T,
 ): Partial<T> {
   return Object.fromEntries(
