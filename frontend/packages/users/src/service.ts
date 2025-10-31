@@ -1,8 +1,9 @@
 import api, { PageableResponse } from '@alum-net/api';
 import { AxiosResponse } from 'axios';
 import { getKeyclaokUserInfo, logout } from '@alum-net/auth';
-import { UserFilterDTO, UserInfo, UserRole } from './types';
+import { UpdatePayload, UserFilterDTO, UserInfo, UserRole } from './types';
 import { storage, STORAGE_KEYS } from '@alum-net/storage';
+import { deleteFalsyKeys } from '@alum-net/courses/src/helpers';
 
 export const getUserInfo = async (invalidate = false) => {
   try {
@@ -28,7 +29,7 @@ export const getUserInfo = async (invalidate = false) => {
     storage.set(STORAGE_KEYS.USER_INFO, JSON.stringify(data.data[0]));
 
     return data?.data?.[0];
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.log(error);
     logout();
     throw new Error('Error interno, intente mas tarde');
@@ -74,3 +75,30 @@ export async function fetchUsers(opts: {
   );
   return res.data;
 }
+
+async function buildFormData(data: UpdatePayload) {
+  const formData = new FormData();
+  formData.append(
+    'modifyRequest',
+    new Blob(
+      [
+        JSON.stringify(
+          deleteFalsyKeys({ name: data.name, lastname: data.lastname }),
+        ),
+      ],
+      {
+        type: 'application/json',
+      },
+    ),
+  );
+  if (data.avatar.uri && data.avatar.type && data.avatar.filename) {
+    const response = await fetch(data.avatar.uri || '');
+    const blob = await response.blob();
+    formData.append('userAvatar', blob, data.avatar.filename);
+  }
+  return formData;
+}
+
+export const updateUser = async (userEmail: string, data: UpdatePayload) => {
+  return await api.patch(`users/${userEmail}/`, await buildFormData(data));
+};

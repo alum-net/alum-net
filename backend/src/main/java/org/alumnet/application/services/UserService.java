@@ -24,6 +24,7 @@ import org.keycloak.admin.client.Keycloak;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -34,6 +35,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -47,6 +49,8 @@ public class UserService {
     private final UserMapper userMapper;
     private final S3FileStorageService fileStorageService;
     private final FileValidationService fileValidationService;
+    @Value("${aws.s3.duration-url-hours}")
+    private long urlDuration;
 
     public void createUser(UserCreationRequestDTO userCreationRequestDTO) throws ExistingUserException {
         try {
@@ -61,7 +65,8 @@ public class UserService {
         UserRepresentation userRepresentation = createUserRepresentation(userCreationRequestDTO);
         try (Response keycloakResponse = keycloak.realm(properties.getRealm()).users().create(userRepresentation)) {
             if (keycloakResponse.getStatus() != 201) {
-                throw new ExistingUserException("Failed to create user in Keycloak: " + keycloakResponse.getStatusInfo().getReasonPhrase());
+                throw new ExistingUserException(
+                        "Failed to create user in Keycloak: " + keycloakResponse.getStatusInfo().getReasonPhrase());
             }
         }
         saveUser(userCreationRequestDTO);
@@ -83,10 +88,15 @@ public class UserService {
             userPage = userRepository.findAll(userSpec, page);
         }
 
-        return userPage.map(userMapper::userToUserDTO);
+        return userPage.map(user -> {
+            UserDTO dto = userMapper.userToUserDTO(user);
+            dto.setAvatarUrl(fileStorageService.generatePresignedUrl(
+                    dto.getAvatarUrl(), Duration.ofDays(urlDuration)));
+            return dto;
+        });
     }
 
-    public UserDTO getUser(String userEmail){
+    public UserDTO getUser(String userEmail) {
         return userRepository.findById(userEmail)
                 .map(userMapper::userToUserDTO)
                 .orElseThrow(UserNotFoundException::new);
@@ -106,7 +116,7 @@ public class UserService {
             CsvToBeanBuilder<UserBulkCreationDTO> builder = new CsvToBeanBuilder<UserBulkCreationDTO>(reader)
                     .withType(UserBulkCreationDTO.class)
                     .withSeparator(',');
-            if(hasHeaders){
+            if (hasHeaders) {
                 builder.withSkipLines(1);
             }
 
@@ -130,8 +140,7 @@ public class UserService {
                         bulkDTO.getLastname(),
                         keycloakGroup,
                         bulkDTO.getEmail(),
-                        initialPassword
-                );
+                        initialPassword);
 
                 createUser(creationRequestDTO);
                 successfulCreations++;
@@ -166,21 +175,24 @@ public class UserService {
     }
 
     public void modifyUser(String userEmail, UserModifyRequestDTO modifyRequest, MultipartFile userAvatar) {
-        if(modifyRequest == null && userAvatar == null) throw new NoPendingChangesException();
+        if (modifyRequest == null && userAvatar == null)
+            throw new NoPendingChangesException();
 
         User user = userRepository.findById(userEmail).orElseThrow(UserNotFoundException::new);
 
-        if(modifyRequest != null)
-        {
-            if(modifyRequest.getName() != null) user.setName(modifyRequest.getName());
-            if(modifyRequest.getLastname() != null) user.setLastname(modifyRequest.getLastname());
+        if (modifyRequest != null) {
+            if (modifyRequest.getName() != null)
+                user.setName(modifyRequest.getName());
+            if (modifyRequest.getLastname() != null)
+                user.setLastname(modifyRequest.getLastname());
         }
 
         if (userAvatar != null) {
             fileValidationService.validateFile(userAvatar, true);
             String userAvatarFolder = "users/" + userEmail + "/avatar/";
 
-            if(user.getAvatarUrl() != null) fileStorageService.deleteMultipleFile(user.getAvatarUrl());
+            if (user.getAvatarUrl() != null)
+                fileStorageService.deleteMultipleFile(user.getAvatarUrl());
             fileStorageService.store(userAvatar, userAvatarFolder);
 
             user.setAvatarUrl(userAvatarFolder + userAvatar.getOriginalFilename());
