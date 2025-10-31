@@ -1,10 +1,8 @@
 import { Section, SectionContent } from '@alum-net/courses';
-import { THEME } from '@alum-net/ui';
 import { UserRole } from '@alum-net/users/src/types';
 import React, { useState } from 'react';
-import { Linking, View } from 'react-native';
-import { Button, Card, IconButton, Text } from 'react-native-paper';
-import RenderHtml from 'react-native-render-html';
+import { View } from 'react-native';
+import { Card, IconButton } from 'react-native-paper';
 
 interface SectionCardProps {
   item: Section;

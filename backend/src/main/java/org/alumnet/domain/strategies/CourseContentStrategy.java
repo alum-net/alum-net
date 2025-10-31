@@ -45,7 +45,7 @@ public abstract class CourseContentStrategy {
                 sectionPage.getContent(),
                 sectionPage.getTotalElements() > 0
                         ? "Usuarios obtenidos exitosamente"
-                        : "No se encontraron usuarios que coincidan con los filtros");
+                        : "No se encontraron secciones que coincidan con los filtros");
     }
 
     protected abstract void validate(String userId, Integer courseId);
