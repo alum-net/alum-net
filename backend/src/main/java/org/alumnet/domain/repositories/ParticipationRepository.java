@@ -2,6 +2,7 @@ package org.alumnet.domain.repositories;
 
 import org.alumnet.domain.CourseParticipation;
 import org.alumnet.domain.CourseParticipationId;
+import org.alumnet.domain.users.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,13 +22,13 @@ public interface ParticipationRepository extends JpaRepository<CourseParticipati
     boolean hasEnrolledStudents(@Param("courseId") int courseId);
 
     @Query("""
-    SELECT cp.student.email as student 
-    FROM CourseParticipation cp 
-    WHERE cp.course.id = :courseId
-    AND cp.course.enabled = true     
-    AND cp.student.enabled = true     
-""")
-    List<String> findStudentsEmailsByCourseId(@Param("courseId") Integer courseId);
+        SELECT cp.student 
+        FROM CourseParticipation cp 
+        WHERE cp.course.id = :courseId
+        AND cp.course.enabled = true     
+        AND cp.student.enabled = true     
+    """)
+    List<Student> findEnrolledStudentsByCourseId(@Param("courseId") Integer courseId);
 
     @Query("""
     SELECT COUNT(cp) FROM CourseParticipation cp 
