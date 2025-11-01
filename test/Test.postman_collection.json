@@ -17,15 +17,18 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Curso creado correctamente\", function () {",
+									"pm.test(\"EL status code es el esperado\", function () {",
 									"    pm.response.to.have.status(201);",
 									"});",
 									"",
-									"pm.test(\"El contenido de la respuesta es esperado\", function () {",
-									"    const jsonData = pm.response.json();",
+									"const jsonData = pm.response.json();",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () {",
 									"    pm.expect(jsonData).to.have.all.keys('message');",
+									"});",
+									"",
+									"pm.test(\"El mensaje de respuesta es el esperado\", function (){",
 									"    pm.expect(jsonData.message).to.eql('Curso creado correctamente');",
-									"});"
+									"})"
 								],
 								"type": "text/javascript",
 								"packages": {},
@@ -95,7 +98,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Se eliminó el curso correctamente\", function () {",
+									"pm.test(\"El status code es el esperado\", function () {",
 									"    pm.response.to.have.status(204);",
 									"});",
 									"",
@@ -191,7 +194,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Se desmatriculó el estudiante con exito\", function () {",
+									"pm.test(\"El status code es el esperado\", function () {",
 									"    pm.response.to.have.status(204);",
 									"});",
 									"",
@@ -246,7 +249,7 @@
 									"    initTestUsers(function() {",
 									"      initTestCourses(function() {",
 									"        getCursoId(\"Test-curso-get-members\", \"curso5-verificar-get-members\", function(){",
-									"            enrollStudent(\"estudiante3@alumnet.com\", function (){})",
+									"            enrollStudent(\"estudiante3@alumnet.com\", function () { })",
 									"        })",
 									"      });",
 									"    });",
@@ -264,12 +267,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
+									"pm.test(\"El status code es el esperado\", function () {",
 									"    pm.response.to.have.status(200);",
 									"});",
 									"const json = pm.response.json();",
 									"",
-									"pm.test(\"El array 'data' tiene largo 2 y contiene los emails esperados\", function () {",
+									"pm.test(\"La respuesta contiene los miembros esperados\", function () {",
 									"    pm.expect(json).to.have.property('data').that.is.an('array').with.lengthOf(2);",
 									"    const emails = json.data.map(item => item.email);",
 									"    pm.expect(emails).to.include.members([",
@@ -278,7 +281,7 @@
 									"    ]);",
 									"});",
 									"",
-									"pm.test(\"Cada objeto en el array 'data' tiene las claves requeridas\", function () {",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () {",
 									"    const requiredKeys = [\"avatarUrl\", \"email\", \"enabled\", \"lastname\", \"name\", \"role\"];",
 									"    pm.expect(json).to.have.property('data').that.is.an('array');",
 									"    json.data.forEach(item => {",
@@ -352,15 +355,18 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
+									"pm.test(\"El status code es el esperado\", function () {",
 									"    pm.response.to.have.status(200);",
 									"});",
 									"",
-									"pm.test(\"Response body matches expected structure and values\", function () {",
-									"    const jsonData = pm.response.json();",
+									"const jsonData = pm.response.json();",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () {",
 									"    pm.expect(jsonData).to.have.all.keys('message');",
+									"});",
+									"",
+									"pm.test(\"El mensaje de la respuesta es el esperado\", function () {",
 									"    pm.expect(jsonData.message).to.eql('Estudiante matriculado correctamente');",
-									"});"
+									"})"
 								],
 								"type": "text/javascript",
 								"packages": {},
@@ -434,8 +440,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
+									"pm.test(\"El status code es el esperado\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
 									"var jsonData = pm.response.json();",
-									"pm.test(\"Se obtuvieron los cursos correctamente\", function () {",
+									"pm.test(\"La respuesta contiene los cursos esperados\", function () {",
 									"    var requiredNames = [",
 									"        'curso1-verificar-curso',",
 									"        'curso2-test-eliminar',",
@@ -447,7 +457,7 @@
 									"    pm.expect(missing, 'Missing course names: ' + missing.join(', ')).to.be.empty;",
 									"});",
 									"",
-									"pm.test(\"Cada objeto en 'data' contiene las claves requeridas de curso\", function () {",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () {",
 									"    const requiredKeys = [",
 									"        \"approvalGrade\",",
 									"        \"description\",",
@@ -548,13 +558,16 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Usuario creado correctamente\", function () {",
+									"pm.test(\"El status code es el esperado\", function () {",
 									"    pm.response.to.have.status(200);",
 									"});",
 									"",
-									"pm.test(\"Response body matches expected structure and values\", function () {",
-									"    const jsonData = pm.response.json();",
+									"const jsonData = pm.response.json();",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () {",
 									"    pm.expect(jsonData).to.have.all.keys('message');",
+									"});",
+									"",
+									"pm.test(\"El mensaje de la respuesta es el esperado\", function () {",
 									"    pm.expect(jsonData.message).to.eql('Usuario creado exitosamente');",
 									"});"
 								],
@@ -566,8 +579,19 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"exec": [
+									"eval(pm.collectionVariables.get(\"utils-User\"));",
+									"",
+									"function runInitProcess() {",
+									"  getAccessToken(function() {",
+									"  });",
+									"}",
+									"",
+									"runInitProcess();"
+								],
+								"type": "text/javascript",
 								"packages": {},
-								"type": "text/javascript"
+								"requests": {}
 							}
 						}
 					],
@@ -634,14 +658,18 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Estudiante filtrado por nombre correctamente\", function () {",
+									"pm.test(\"EL status code es el esperado\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"La respuesta contiene los usuarios esperados\", function () {",
 									"    const json = pm.response.json();",
 									"    pm.expect(json).to.have.property('data').that.is.an('array').with.length.greaterThan(0);",
 									"    const emails = json.data.map(item => item.email);",
 									"    pm.expect(emails).to.include(\"estudiante-test-usuario1@alumnet.com\");",
 									"});",
 									"",
-									"pm.test(\"Cada elemento de 'data' contiene las claves requeridas\", function () {",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () {",
 									"    const json = pm.response.json();",
 									"    const requiredKeys = [\"avatarUrl\", \"email\", \"enabled\", \"lastname\", \"name\", \"role\"];",
 									"    json.data.forEach(item => {",
@@ -727,14 +755,18 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Estudiante filtrado por nombre correctamente\", function () {",
+									"pm.test(\"EL status code es el esperado\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"La respuesta contiene los usuarios esperados\", function () {",
 									"    const json = pm.response.json();",
 									"    pm.expect(json).to.have.property('data').that.is.an('array').with.length.greaterThan(0);",
 									"    const emails = json.data.map(item => item.email);",
 									"    pm.expect(emails).to.include(\"profesor7@alumnet.com\", \"profesor8@alumnet.com\");",
 									"});",
 									"",
-									"pm.test(\"Cada elemento de 'data' contiene las claves requeridas\", function () {",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () {",
 									"    const json = pm.response.json();",
 									"    const requiredKeys = [\"avatarUrl\", \"email\", \"enabled\", \"lastname\", \"name\", \"role\"];",
 									"    json.data.forEach(item => {",
@@ -782,6 +814,182 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "UserModify",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"eval(pm.collectionVariables.get(\"utils-User\"));",
+									"",
+									"function runInitProcess() {",
+									"  getAccessToken(function() {",
+									"    initTestUsers(function() {",
+									"    });",
+									"  });",
+									"}",
+									"",
+									"runInitProcess();"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"El status code es el esperado\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () {",
+									"    pm.expect(jsonData).to.have.all.keys('message');",
+									"});",
+									"",
+									"pm.test(\"El mensaje de la respuesta es el esperado\", function () {",
+									"    pm.expect(jsonData.message).to.eql('Usuario modificado correctamente.');",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "modifyRequest",
+									"type": "file",
+									"src": "postman-cloud:///1f0b53de-f25c-4db0-b853-6f6164df9451"
+								},
+								{
+									"key": "userAvatar",
+									"type": "file",
+									"src": "postman-cloud:///1f0b53e0-fc20-4a20-bc8e-0f55bba8df89"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{alumnetUrl}}/api/users/estudiante3@alumnet.com",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"estudiante3@alumnet.com"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UserBulkCreation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"El status code es el esperado\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () {",
+									"    pm.expect(jsonData).to.have.all.keys('data', 'message');",
+									"    pm.expect(jsonData.data).to.have.all.keys('errors', 'failedCreations', 'successfulCreations', 'totalRecords');",
+									"});",
+									"",
+									"pm.test(\"El mensaje de respuesta es el esperado\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message).to.eql('Solicitud de creación masiva de usuarios procesada exitosamente.');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"eval(pm.collectionVariables.get(\"utils-User\"));",
+									"",
+									"function runInitProcess() {",
+									"  getAccessToken(function() {",
+									"  });",
+									"}",
+									"",
+									"runInitProcess();"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "postman-cloud:///1f0b6c1f-ce82-4120-982e-794ce5a45929"
+								},
+								{
+									"key": "hasHeaders",
+									"value": "true",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{alumnetUrl}}/api/users/bulk-creation",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"bulk-creation"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -819,15 +1027,18 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Curso creado correctamente\", function () {",
+									"pm.test(\"EL status code es el esperado\", function () {",
 									"    pm.response.to.have.status(200);",
 									"});",
 									"",
-									"pm.test(\"El contendio de la respuesta es esperado\", function () { ",
-									"    const jsonData = pm.response.json();",
+									"const jsonData = pm.response.json();",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () { ",
 									"    pm.expect(jsonData).to.have.all.keys('message');",
+									"});",
+									"",
+									"pm.test(\"El mensaje de la respuesta es el esperado\", function () { ",
 									"    pm.expect(jsonData.message).to.eql('Sección creada exitosamente');",
-									"});"
+									"})"
 								],
 								"type": "text/javascript",
 								"packages": {},
@@ -910,11 +1121,11 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code correcto\", function () {",
+									"pm.test(\"El status code es el esperado\", function () {",
 									"    pm.response.to.have.status(200);",
 									"});",
 									"",
-									"pm.test(\"La respuesta contiene todas las claves requeridas según el ejemplo proporcionado\", function () {",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () {",
 									"    let jsonData;",
 									"    try {",
 									"        jsonData = pm.response.json();",
@@ -1034,15 +1245,18 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code correcto\", function () {",
+									"pm.test(\"El status code es el esperado\", function () {",
 									"    pm.response.to.have.status(200);",
 									"});",
 									"",
-									"pm.test(\"El contendio de la respuesta es esperado\", function () { ",
-									"    const jsonData = pm.response.json();",
+									"const jsonData = pm.response.json();",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () { ",
 									"    pm.expect(jsonData).to.have.all.keys('message');",
+									"});",
+									"",
+									"pm.test(\"El mensaje de la respuesta es correcto\", function () { ",
 									"    pm.expect(jsonData.message).to.eql('Sección actualizada exitosamente');",
-									"});"
+									"})"
 								],
 								"type": "text/javascript",
 								"packages": {},
@@ -1100,15 +1314,18 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code correcto\", function () {",
+									"pm.test(\"El status code es el esperado\", function () {",
 									"    pm.response.to.have.status(200);",
 									"});",
 									"",
-									"pm.test(\"El contendio de la respuesta es esperado\", function () { ",
-									"    const jsonData = pm.response.json();",
+									"const jsonData = pm.response.json();",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () { ",
 									"    pm.expect(jsonData).to.have.all.keys('message');",
+									"});",
+									"",
+									"pm.test(\"El mensaje de la respuesta es correcto\", function () { ",
 									"    pm.expect(jsonData.message).to.eql('Sección eliminada exitosamente');",
-									"});"
+									"})"
 								],
 								"type": "text/javascript",
 								"packages": {},
@@ -1159,6 +1376,222 @@
 								"sections",
 								"{{id_curso}}",
 								"{{id_section}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Forum",
+			"item": [
+				{
+					"name": "GetPosts",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{alumnetUrl}}/api/forums/posts?forumType=GENERAL&courseId=1&rootPost=68fd3205b35858f0cbd5699b&sort=createdAt,desc",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"forums",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "forumType",
+									"value": "GENERAL"
+								},
+								{
+									"key": "courseId",
+									"value": "1"
+								},
+								{
+									"key": "rootPost",
+									"value": "68fd3205b35858f0cbd5699b"
+								},
+								{
+									"key": "page",
+									"value": "0",
+									"disabled": true
+								},
+								{
+									"key": "size",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "createdAt,desc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreatePost",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"forumType\": \"GENERAL\",\r\n    \"courseId\": 1,\r\n    \"content\": \"Esta es una preuyba de respuesta post root\",\r\n    \"author\":{\r\n        \"name\": \"Gaston\",\r\n        \"email\": \"estudiante2@alumnet.com\"\r\n    },\r\n    \"parentPost\": \"68fd3205b35858f0cbd5699b\",\r\n    \"rootPost\": \"68fd3205b35858f0cbd5699b\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{alumnetUrl}}/api/forums/posts",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"forums",
+								"posts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeletePost",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"forumType\": \"GENERAL\",\r\n    \"courseId\": 1,\r\n    \"content\": \"Esta es una respuesta al post\",\r\n    \"author\":{\r\n        \"name\": \"Gaston\",\r\n        \"email\": \"prueba@gc\"\r\n    }\r\n}"
+						},
+						"url": {
+							"raw": "{{alumnetUrl}}/api/forums/posts/68fd324cb35858f0cbd5699c",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"forums",
+								"posts",
+								"68fd324cb35858f0cbd5699c"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdatePost",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"message\": \"Nuevo mensaje\",\r\n    \"title\": \"Title nuevo\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{alumnetUrl}}/api/forums/posts/68fd3205b35858f0cbd5699b",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"forums",
+								"posts",
+								"68fd3205b35858f0cbd5699b"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Event",
+			"item": [
+				{
+					"name": "Create Task",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"type\": \"questionnaire\",\n    \"sectionId\": 1,\n    \"title\": \"Cuestionario\",\n    \"description\": \"Cuestionario de Java\",\n    \"startDate\": \"2025-10-28 17:00\",\n    \"endDate\": \"2025-10-28 19:00\",\n    \"maxGrade\": \"30\",\n    \"questions\": [\n        {\n            \"text\": \"¿Qué es JPA?\",\n            \"answers\": [\n                {\n                    \"text\": \"Java Persistence API\",\n                    \"isCorrect\": true\n                },\n                {\n                    \"text\": \"Java Programming Application\",\n                    \"isCorrect\": false\n                },\n                {\n                    \"text\": \"Java Platform Architecture\",\n                    \"isCorrect\": false\n                },\n                {\n                    \"text\": \"Java Protocol Access\",\n                    \"isCorrect\": false\n                }\n            ]\n        }\n    ],\n    \"durationInMinutes\": 120\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{alumnetUrl}}/api/events/create",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"events",
+								"create"
 							]
 						}
 					},
@@ -1575,14 +2008,14 @@
 					"const arr_users_test = [",
 					"    {",
 					"    \"name\": \"Estudiante-test-usuario1\",",
-					"    \"lastname\": \"3\",",
+					"    \"lastname\": \"1\",",
 					"    \"group\": \"students\",",
 					"    \"email\": \"estudiante-test-usuario1@alumnet.com\",",
 					"    \"password\": \"test1234\"",
 					"  },",
 					"      {",
 					"    \"name\": \"Estudiante-test-usuario2\",",
-					"    \"lastname\": \"3\",",
+					"    \"lastname\": \"2\",",
 					"    \"group\": \"students\",",
 					"    \"email\": \"estudiante-test-usuario2@alumnet.com\",",
 					"    \"password\": \"test1234\"",
@@ -1594,11 +2027,18 @@
 					"    \"email\": \"profesor7@alumnet.com\",",
 					"    \"password\": \"test1234\"",
 					"  },",
+					"      {",
+					"    \"name\": \"estudiante-test-modify\",",
+					"    \"lastname\": \"3\",",
+					"    \"group\": \"teachers\",",
+					"    \"email\": \"estudiante3@alumnet.com\",",
+					"    \"password\": \"test1234\"",
+					"  },",
 					"  {",
 					"    \"name\": \"Profesor\",",
-					"    \"lastname\": \"2\",",
+					"    \"lastname\": \"8\",",
 					"    \"group\": \"teachers\",",
-					"    \"email\": \"profesor7@alumnet.com\",",
+					"    \"email\": \"profesor8@alumnet.com\",",
 					"    \"password\": \"test1234\"",
 					"  }",
 					"",
