@@ -1,10 +1,10 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useMemo } from 'react';
 import { View, ScrollView, StyleSheet, Modal } from 'react-native';
 import { Button, Checkbox, Text, Banner } from 'react-native-paper';
 import { Toast } from '@alum-net/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { bulkCreateCourses } from '../service';
-import type { BulkCreationResponse, BulkCreationError } from '../types';
+import type { BulkCreationError } from '../types';
 import { useCoursesContext } from '@alum-net/courses';
 import { QUERY_KEYS } from '@alum-net/api';
 
@@ -26,38 +26,61 @@ export default function BulkCourseUploadModal({ visible, onDismiss }: Props) {
   const queryClient = useQueryClient();
   const { appliedFilters, currentPage } = useCoursesContext();
 
+  const clearFileInput = () => {
+    setSelectedFile(undefined);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   const { mutate, isPending } = useMutation({
     mutationFn: ({ file, hasHeaders }: { file: File; hasHeaders: boolean }) =>
-      bulkCreateCourses(file, hasHeaders).then(res => res.data as BulkCreationResponse),
+      bulkCreateCourses(file, hasHeaders),
 
     onMutate: () => {
       setErrorMessage(undefined);
       setErrorItems([]);
     },
 
-    onSuccess: (data: BulkCreationResponse & { message?: string }) => {
-        const { successfulCreations, failedCreations, errors, message } = data;
-      
+    onSuccess: (resp: any) => {
+ 
+        const { data: payload, message } = resp.data as {
+          data: { successfulCreations: number; failedCreations: number; errors: BulkCreationError[]; totalRecords: number };
+          message?: string;
+        };
+        const { successfulCreations, failedCreations, errors } = payload;
+        
         queryClient.invalidateQueries({
           queryKey: [QUERY_KEYS.getCourses, appliedFilters, currentPage],
         });
       
         if (failedCreations > 0) {
-          Toast.info(message ?? `Carga finalizada: ${successfulCreations} OK, ${failedCreations} errores.`);
-          setErrorMessage('Se encontraron errores al procesar el CSV:');
-          setErrorItems(errors ?? []);
+          let successPart = '';
+          if (successfulCreations === 1) {
+            successPart = `✓ 1 curso creado correctamente.\n`;
+          } else if (successfulCreations > 1) {
+            successPart = `✓ ${successfulCreations} cursos creados correctamente.\n`;
+          }
+
+          const header = message ?? (failedCreations === 1
+            ? '1 curso no pudo ser creado:'
+            : `${failedCreations} cursos no pudieron ser creados:`);
+          
+          setErrorMessage(`${successPart}${header}`);
+          setErrorItems(Array.isArray(errors) ? errors : []);
+          clearFileInput();
           requestAnimationFrame(() => {
             scrollRef.current?.scrollTo({ y: 0, animated: true });
           });
+
           return;
         }
       
-        const responseMessage = message ?? 'Carga masiva completada exitosamente.';
-        Toast.success(responseMessage);
+        Toast.success(message ?? 'Carga masiva de cursos completada exitosamente.');
       
         setErrorMessage(undefined);
         setErrorItems([]);
-        setSelectedFile(undefined);
+        clearFileInput();
         onDismiss();
       },
       
@@ -70,7 +93,7 @@ export default function BulkCourseUploadModal({ visible, onDismiss }: Props) {
       Toast.error(message);
       setErrorMessage(message);
       setErrorItems(Array.isArray(errors) ? errors : []);
-
+      clearFileInput();
       requestAnimationFrame(() => {
         scrollRef.current?.scrollTo({ y: 0, animated: true });
       });
@@ -78,38 +101,52 @@ export default function BulkCourseUploadModal({ visible, onDismiss }: Props) {
   });
 
   const handleCancel = () => {
-    setSelectedFile(undefined);
     setErrorMessage(undefined);
     setErrorItems([]);
+    clearFileInput();
     onDismiss();
   };
 
   const handleUploadClick = () => fileInputRef.current?.click();
 
   const handleSubmit = () => {
-    if (selectedFile) {
-      mutate({ file: selectedFile, hasHeaders });
+    if (!selectedFile) return;
+    if (!selectedFile.name.endsWith('.csv')) {
+      setErrorMessage('Solo se permiten archivos CSV');
+      return;
     }
+    mutate({ file: selectedFile, hasHeaders });
   };
 
-  if (!visible) return null;
-
-  const renderErrorBanner = () => {
+  const errorBanner = useMemo(() => {
     if (!errorMessage && errorItems.length === 0) return null;
 
     const MAX_ITEMS = 6;
     const shown = errorItems.slice(0, MAX_ITEMS);
     const remaining = errorItems.length - shown.length;
+    const parts = errorMessage?.split('\n') ?? [];
 
     return (
       <View style={{ marginBottom: 16 }}>
-        <Banner visible icon="alert-circle" style={{ backgroundColor: '#fdecea', borderRadius: 8 }}>
+        <Banner
+          visible
+          icon="alert-circle"
+          style={{ backgroundColor: '#fdecea', borderRadius: 8 }}
+        >
           <View style={styles.errContainer}>
-            <View>
-              <Text style={styles.errTitle}>
-                {errorMessage ?? 'Se detectaron errores:'}
-              </Text>
-            </View>
+            {parts.map((part, idx) =>
+              part ? (
+                <Text
+                  key={idx}
+                  style={[
+                    part.includes('✓') ? styles.successTitle : styles.errTitle,
+                    idx > 0 && { marginTop: 8 },
+                  ]}
+                >
+                  {part}
+                </Text>
+              ) : null
+            )}
 
             <View style={styles.errList}>
               {shown.map((e) => {
@@ -127,7 +164,6 @@ export default function BulkCourseUploadModal({ visible, onDismiss }: Props) {
                   </View>
                 );
               })}
-
               {remaining > 0 && (
                 <Text style={[styles.errText, { marginTop: 6 }]}>
                   +{remaining} errores adicionales. Revisá el CSV.
@@ -138,7 +174,9 @@ export default function BulkCourseUploadModal({ visible, onDismiss }: Props) {
         </Banner>
       </View>
     );
-  };
+  }, [errorMessage, errorItems]);
+
+  if (!visible) return null;
 
   return (
     <Modal
@@ -150,7 +188,7 @@ export default function BulkCourseUploadModal({ visible, onDismiss }: Props) {
           Carga masiva de cursos (CSV)
         </Text>
 
-        {renderErrorBanner()}
+        {errorBanner}
 
         <View style={styles.uploadBox}>
           <Button
@@ -269,6 +307,13 @@ const styles = StyleSheet.create({
   
     errTitle: {
       color: '#7f1d1d',
+      fontWeight: '700',
+      fontSize: 14,
+      lineHeight: 20,
+    },
+
+    successTitle: {
+      color: '#065f46',
       fontWeight: '700',
       fontSize: 14,
       lineHeight: 20,
