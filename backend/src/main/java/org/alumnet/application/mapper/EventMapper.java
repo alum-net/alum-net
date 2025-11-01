@@ -3,8 +3,8 @@ package org.alumnet.application.mapper;
 import org.alumnet.application.dtos.AnswerDTO;
 import org.alumnet.application.dtos.EventDTO;
 import org.alumnet.application.dtos.QuestionDTO;
-import org.alumnet.domain.Answer;
-import org.alumnet.domain.Question;
+import org.alumnet.domain.events.Answer;
+import org.alumnet.domain.events.Question;
 import org.alumnet.domain.events.Event;
 import org.alumnet.domain.events.OnSite;
 import org.alumnet.domain.events.Questionnaire;
@@ -24,6 +24,14 @@ public interface EventMapper {
     Question questionDTOToQuestion(QuestionDTO questionDTO);
     Answer answerDTOToAnswer(AnswerDTO answerDTO);
 
+    QuestionDTO questionDTOToQuestionDTO(Question question);
+    AnswerDTO answerDTOToAnswerDTO(Answer answer);
+
+    EventDTO eventToTaskDTO(Task task);
+    EventDTO eventToOnSiteDTO(OnSite onSite);
+    @Mapping(target = "sectionId", source = "section.sectionId")
+    EventDTO eventToQuestionnaireDTO(Questionnaire questionnaire);
+
     default Event eventDTOToEvent(EventDTO eventDTO) {
         return switch (eventDTO.getType()) {
             case "task" -> eventDTOToTask(eventDTO);
@@ -32,6 +40,16 @@ public interface EventMapper {
             default -> throw new IllegalArgumentException("Unknown role: " + eventDTO.getType());
         };
     }
+    default EventDTO eventToEventDTO(Event event) {
+        return switch (event) {
+            case Task task -> eventToTaskDTO(task);
+            case OnSite onSite -> eventToOnSiteDTO(onSite);
+            case Questionnaire questionnaire -> eventToQuestionnaireDTO(questionnaire);
+            case null -> throw new IllegalArgumentException("Event cannot be null");
+            default -> throw new IllegalArgumentException("Unknown event type: " + event.getClass().getName());
+        };
+    }
+
     @AfterMapping
     default void linkRelations(@MappingTarget Questionnaire questionnaire) {
         if (questionnaire.getQuestions() != null) {

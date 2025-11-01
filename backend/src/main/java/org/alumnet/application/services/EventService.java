@@ -6,21 +6,22 @@ import org.alumnet.application.dtos.AnswerDTO;
 import org.alumnet.application.dtos.EventDTO;
 import org.alumnet.application.dtos.QuestionDTO;
 import org.alumnet.application.mapper.EventMapper;
-import org.alumnet.domain.Answer;
-import org.alumnet.domain.Question;
 import org.alumnet.domain.Section;
 import org.alumnet.domain.events.Event;
 import org.alumnet.domain.events.EventParticipation;
 import org.alumnet.domain.events.EventParticipationId;
-import org.alumnet.domain.events.Questionnaire;
+import org.alumnet.domain.repositories.EventParticipationRepository;
 import org.alumnet.domain.repositories.EventRepository;
+import org.alumnet.domain.repositories.UserRepository;
+import org.alumnet.domain.resources.TaskResource;
 import org.alumnet.domain.users.Student;
-import org.alumnet.infrastructure.exceptions.InvalidAttributeException;
-import org.alumnet.infrastructure.exceptions.QuestionnaireValidationException;
+import org.alumnet.infrastructure.exceptions.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +32,11 @@ public class EventService {
     private final NotificationService notificationService;
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
-
+    private final FileValidationService fileValidationService;
+    private final EventParticipationRepository eventParticipationRepository;
+    private final UserRepository userRepository;
+    private final S3FileStorageService s3FileStorageService;
+    
     public void createEvent(EventDTO eventDTO) {
         validateDates(eventDTO.getStartDate(),eventDTO.getEndDate());
 
@@ -103,6 +108,50 @@ public class EventService {
             throw new InvalidAttributeException("La fecha de fin debe ser posterior a la fecha actual");
         if (endDate.isBefore(startDate))
             throw new InvalidAttributeException("La fecha de inicio debe ser anterior a la fecha de fin");
+
+    }
+
+    public EventDTO getEventById(Integer eventId) {
+        return eventMapper.eventToEventDTO(eventRepository.findById(eventId).orElseThrow(EventNotFoundException::new));
+    }
+
+    public void submitHomework(Integer eventId, MultipartFile homeworkFile, String studentEmail) {
+        Event event = eventRepository.findById(eventId).orElseThrow(EventNotFoundException::new);
+        if (LocalDateTime.now().isAfter(event.getEndDate()))
+            throw new AssignmentDueDateExpiredException("No se puede enviar la tarea despues de la fecha de fin del evento");
+
+        fileValidationService.validateFile(homeworkFile, false);
+
+        Student student = userRepository.findById(studentEmail)
+                .filter(user -> user instanceof Student)
+                .map(user -> (Student) user).orElseThrow(UserNotFoundException::new);
+
+        String s3Key = s3FileStorageService.store(homeworkFile, "courses/" + event.getSection().getCourseId() +
+                "/sections/" + event.getSection().getTitle() +
+                "/events/" + event.getId() +
+                "/homeworks/" + student.getEmail());
+
+        TaskResource submissionResource = TaskResource.builder()
+                .url(s3Key)
+                .extension(fileValidationService.getFileExtension(homeworkFile.getOriginalFilename()))
+                .sizeInBytes(homeworkFile.getSize())
+                .name(Objects.requireNonNull(homeworkFile.getOriginalFilename())
+                        .substring(0, homeworkFile.getOriginalFilename().lastIndexOf('.')))
+                .build();
+
+        EventParticipation eventParticipation = EventParticipation.builder()
+                .id(EventParticipationId.builder()
+                        .eventId(event.getId())
+                        .studentEmail(studentEmail)
+                        .build())
+                .event(event)
+                .student(student)
+                .resource(submissionResource)
+                .build();
+
+        submissionResource.setParticipation(eventParticipation);
+
+        eventParticipationRepository.save(eventParticipation);
 
     }
 }
