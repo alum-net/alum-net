@@ -21,6 +21,9 @@
         "backgroundColor": "#ffffff"
       }
     },
+    "ios": {
+      "bundleIdentifier": "alumnet.mobile"
+    },
     "plugins": [
       [
         "onesignal-expo-plugin",

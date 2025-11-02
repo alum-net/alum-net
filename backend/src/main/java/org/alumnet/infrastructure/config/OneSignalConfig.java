@@ -21,9 +21,12 @@ public class OneSignalConfig {
         apiClient.setConnectTimeout(30000);
 
         apiClient.setReadTimeout(30000);
-        HttpBearerAuth restApiAuth = (HttpBearerAuth) apiClient
-                .getAuthentication("rest_api_key");
-        restApiAuth.setBearerToken(restApiKey);
+
+        // HttpBearerAuth restApiAuth = (HttpBearerAuth) apiClient
+        // .getAuthentication("rest_api_key");
+        // restApiAuth.setBearerToken(restApiKey);
+        apiClient.addDefaultHeader("Authorization", restApiKey);
+        apiClient.addDefaultHeader("Content-Type", "application/json");
 
         return apiClient;
     }

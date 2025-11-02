@@ -71,7 +71,7 @@ export const LoginScreen = () => {
   return (
     <View style={styles.container}>
       <Image
-        source={require('@alum-net/ui/assets/alumnet_logo.jpeg')}
+        source={require('@alum-net/ui/src/assets/alumnet_logo.jpeg')}
         style={styles.logo}
         resizeMode="contain"
       />

@@ -19,7 +19,7 @@ export const getUserInfo = async () => {
     );
     if (data.data === undefined) throw new Error('El usuario no existe');
 
-    storage.set(STORAGE_KEYS.USER_INFO, JSON.stringify(data));
+    storage.set(STORAGE_KEYS.USER_INFO, JSON.stringify(data.data));
 
     return data.data;
   } catch (error: unknown) {

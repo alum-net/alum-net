@@ -1,6 +1,13 @@
 import React, { useMemo } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
-import { Button, Dialog, Portal, Text, TextInput, Divider } from 'react-native-paper';
+import {
+  Button,
+  Dialog,
+  Portal,
+  Text,
+  TextInput,
+  Divider,
+} from 'react-native-paper';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -8,7 +15,7 @@ import { THEME, Toast } from '@alum-net/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@alum-net/api';
 import { createEvent } from '../service';
-import { SectionOption } from '../types';
+import { EventType, SectionOption } from '../types';
 import FormDateInput from '../../../components/date-input';
 import SelectField from './select-field';
 
@@ -17,43 +24,61 @@ const answerSchema = z.object({
   correct: z.boolean(),
 });
 
-const questionSchema = z.object({
-  text: z.string().trim().min(5, 'Mínimo 5 caracteres').max(500),
-  answers: z.array(answerSchema).min(2, 'Al menos dos opciones'),
-}).refine(
-  (question) => question.answers.some((answer) => answer.correct),
-  { message: 'Debe haber al menos una respuesta correcta', path: ['answers'] }
-);
+const questionSchema = z
+  .object({
+    text: z.string().trim().min(5, 'Mínimo 5 caracteres').max(500),
+    answers: z.array(answerSchema).min(2, 'Al menos dos opciones'),
+  })
+  .refine(question => question.answers.some(answer => answer.correct), {
+    message: 'Debe haber al menos una respuesta correcta',
+    path: ['answers'],
+  });
 
 const baseEventFields = {
   sectionId: z.number().int().positive('Debe seleccionar una sección'),
   title: z.string().trim().min(3, 'Mínimo 3 caracteres').max(120, 'Máximo 120'),
-  description: z.string().trim().min(1, 'La descripción es requerida').max(2000, 'Máximo 2000'),
+  description: z
+    .string()
+    .trim()
+    .min(1, 'La descripción es requerida')
+    .max(2000, 'Máximo 2000'),
   startDateOnly: z.string().min(1, 'Requerido'),
-  startTimeOnly: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Formato HH:mm'),
+  startTimeOnly: z
+    .string()
+    .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Formato HH:mm'),
   endDateOnly: z.string().min(1, 'Requerido'),
-  endTimeOnly: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Formato HH:mm'),
+  endTimeOnly: z
+    .string()
+    .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Formato HH:mm'),
   maxGrade: z.number().int().min(0, 'Mínimo 0').max(100, 'Máximo 100'),
 };
 
 const taskSchema = z.object({
-  type: z.literal('task'),
+  type: z.literal(EventType.TASK),
   ...baseEventFields,
 });
 
 const onsiteSchema = z.object({
-  type: z.literal('on-site'),
+  type: z.literal(EventType.ONSITE),
   ...baseEventFields,
 });
 
 const questionnaireSchema = z.object({
-  type: z.literal('questionnaire'),
+  type: z.literal(EventType.QUESTIONNAIRE),
   ...baseEventFields,
-  durationInMinutes: z.number().int().min(1, 'Mínimo 1 minuto').max(600, 'Máximo 600 minutos'),
+  durationInMinutes: z
+    .number()
+    .int()
+    .min(1, 'Mínimo 1 minuto')
+    .max(600, 'Máximo 600 minutos'),
   questions: z.array(questionSchema).min(1, 'Agregá al menos una pregunta'),
 });
 
-const eventSchema = z.discriminatedUnion('type', [taskSchema, onsiteSchema, questionnaireSchema]);
+const eventSchema = z.discriminatedUnion('type', [
+  taskSchema,
+  onsiteSchema,
+  questionnaireSchema,
+]);
 export type EventFormData = z.infer<typeof eventSchema>;
 
 type Props = {
@@ -63,11 +88,16 @@ type Props = {
   sections: SectionOption[];
 };
 
-export default function EventCreationModal({ visible, onClose, courseId, sections }: Props) {
+export default function EventCreationModal({
+  visible,
+  onClose,
+  courseId,
+  sections,
+}: Props) {
   const queryClient = useQueryClient();
 
   const defaultValues: EventFormData = {
-    type: 'task',
+    type: EventType.TASK,
     sectionId: sections[0]?.id ?? 0,
     title: '',
     description: '',
@@ -78,7 +108,13 @@ export default function EventCreationModal({ visible, onClose, courseId, section
     maxGrade: 100,
   } as EventFormData;
 
-  const { control, handleSubmit, watch, reset, formState: { errors } } = useForm<EventFormData>({
+  const {
+    control,
+    handleSubmit,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm<EventFormData>({
     resolver: zodResolver(eventSchema),
     defaultValues,
   });
@@ -97,12 +133,12 @@ export default function EventCreationModal({ visible, onClose, courseId, section
         startDate: `${formData.startDateOnly} ${formData.startTimeOnly}`,
         endDate: `${formData.endDateOnly} ${formData.endTimeOnly}`,
       };
-  
+
       delete (payload as any).startDateOnly;
       delete (payload as any).startTimeOnly;
       delete (payload as any).endDateOnly;
       delete (payload as any).endTimeOnly;
-  
+
       return await createEvent(courseId, payload as any);
     },
     onSuccess: () => {
@@ -116,21 +152,23 @@ export default function EventCreationModal({ visible, onClose, courseId, section
       Toast.error(errorMessage);
     },
   });
-  
+
   const handleFormSubmit = async (data: EventFormData) => {
     try {
       await mutateAsync(data);
-    } catch (error) {
-    }
+    } catch (error) {}
   };
-  
+
   const sectionOptions = useMemo(
-    () => sections.map((section) => ({ 
-      label: section.title, 
-      value: String(section.id) 
-    })),
-    [sections]
+    () =>
+      sections.map(section => ({
+        label: section.title,
+        value: String(section.id),
+      })),
+    [sections],
   );
+
+  console.log(errors);
 
   return (
     <Portal>
@@ -140,7 +178,6 @@ export default function EventCreationModal({ visible, onClose, courseId, section
         <Dialog.Content style={styles.content}>
           <ScrollView showsVerticalScrollIndicator={false}>
             <View style={styles.formContainer}>
-
               <View style={styles.fieldWrapper}>
                 <Text style={styles.label}>Tipo de evento</Text>
                 <SelectField<EventFormData>
@@ -148,9 +185,9 @@ export default function EventCreationModal({ visible, onClose, courseId, section
                   control={control}
                   label=""
                   options={[
-                    { label: 'Tarea', value: 'task' },
-                    { label: 'Evento presencial', value: 'on-site' },
-                    { label: 'Cuestionario', value: 'questionnaire' },
+                    { label: 'Tarea', value: EventType.TASK },
+                    { label: 'Evento presencial', value: EventType.ONSITE },
+                    { label: 'Cuestionario', value: EventType.QUESTIONNAIRE },
                   ]}
                   error={!!errors.type}
                   helperText={errors.type && 'Seleccioná un tipo'}
@@ -166,7 +203,7 @@ export default function EventCreationModal({ visible, onClose, courseId, section
                   control={control}
                   label=""
                   options={sectionOptions}
-                  onChangeTransform={(value) => Number(value)}
+                  onChangeTransform={value => Number(value)}
                   error={!!(errors as any).sectionId}
                   helperText={(errors as any).sectionId?.message}
                 />
@@ -237,7 +274,10 @@ export default function EventCreationModal({ visible, onClose, courseId, section
                 </View>
 
                 <View style={styles.timeColumn}>
-                  <Text variant="labelLarge" style={{ marginBottom: 8, marginTop: 8 }}>
+                  <Text
+                    variant="labelLarge"
+                    style={{ marginBottom: 8, marginTop: 8 }}
+                  >
                     Hora inicio
                   </Text>
                   <Controller
@@ -281,7 +321,10 @@ export default function EventCreationModal({ visible, onClose, courseId, section
                 </View>
 
                 <View style={styles.timeColumn}>
-                  <Text variant="labelLarge" style={{ marginBottom: 8, marginTop: 8 }}>
+                  <Text
+                    variant="labelLarge"
+                    style={{ marginBottom: 8, marginTop: 8 }}
+                  >
                     Hora fin
                   </Text>
                   <Controller
@@ -310,11 +353,13 @@ export default function EventCreationModal({ visible, onClose, courseId, section
 
               <View style={styles.fieldWrapper}>
                 <Text style={styles.label}>
-                  Nota máxima que tendrá {
-                    selectedEventType === 'task' ? 'la tarea' : 
-                    selectedEventType === 'on-site' ? 'el evento' : 
-                    'el cuestionario'
-                  } al corregirse
+                  Nota máxima que tendrá{' '}
+                  {selectedEventType === EventType.TASK
+                    ? 'la tarea'
+                    : selectedEventType === EventType.ONSITE
+                      ? 'el evento'
+                      : 'el cuestionario'}{' '}
+                  al corregirse
                 </Text>
                 <Controller
                   name="maxGrade"
@@ -322,7 +367,7 @@ export default function EventCreationModal({ visible, onClose, courseId, section
                   render={({ field: { onChange, value } }) => (
                     <TextInput
                       value={String(value)}
-                      onChangeText={(text) => onChange(Number(text) || 0)}
+                      onChangeText={text => onChange(Number(text) || 0)}
                       mode="flat"
                       keyboardType="numeric"
                       style={styles.input}
@@ -339,7 +384,7 @@ export default function EventCreationModal({ visible, onClose, courseId, section
                 )}
               </View>
 
-              {selectedEventType === 'questionnaire' && (
+              {selectedEventType === EventType.QUESTIONNAIRE && (
                 <View style={styles.fieldWrapper}>
                   <Text style={styles.label}>Duración en minutos</Text>
                   <Controller
@@ -348,7 +393,9 @@ export default function EventCreationModal({ visible, onClose, courseId, section
                     render={({ field: { onChange, value } }) => (
                       <TextInput
                         value={value ? String(value) : ''}
-                        onChangeText={(text) => onChange(text ? Number(text) : undefined)}
+                        onChangeText={text =>
+                          onChange(text ? Number(text) : undefined)
+                        }
                         mode="flat"
                         keyboardType="numeric"
                         style={styles.input}
@@ -366,7 +413,7 @@ export default function EventCreationModal({ visible, onClose, courseId, section
                 </View>
               )}
 
-              {selectedEventType === 'questionnaire' && (
+              {selectedEventType === EventType.QUESTIONNAIRE && (
                 <View style={styles.questionsSection}>
                   <View style={styles.questionsSectionHeader}>
                     <Text style={styles.sectionTitle}>Preguntas</Text>
@@ -374,11 +421,15 @@ export default function EventCreationModal({ visible, onClose, courseId, section
 
                   {fields.map((field, questionIndex) => (
                     <View key={field.id}>
-                      {questionIndex > 0 && <Divider style={styles.questionDivider} />}
+                      {questionIndex > 0 && (
+                        <Divider style={styles.questionDivider} />
+                      )}
 
                       <View style={styles.questionContainer}>
                         <View style={styles.fieldWrapper}>
-                          <Text style={styles.label}>El texto de la pregunta</Text>
+                          <Text style={styles.label}>
+                            El texto de la pregunta
+                          </Text>
                           <Controller
                             name={`questions.${questionIndex}.text` as any}
                             control={control}
@@ -388,15 +439,22 @@ export default function EventCreationModal({ visible, onClose, courseId, section
                                 onChangeText={onChange}
                                 mode="flat"
                                 style={styles.input}
-                                error={!!(errors as any).questions?.[questionIndex]?.text}
+                                error={
+                                  !!(errors as any).questions?.[questionIndex]
+                                    ?.text
+                                }
                                 underlineColor="transparent"
                                 activeUnderlineColor="transparent"
                               />
                             )}
                           />
-                          {(errors as any).questions?.[questionIndex]?.text?.message && (
+                          {(errors as any).questions?.[questionIndex]?.text
+                            ?.message && (
                             <Text style={styles.errorText}>
-                              {(errors as any).questions[questionIndex]?.text?.message}
+                              {
+                                (errors as any).questions[questionIndex]?.text
+                                  ?.message
+                              }
                             </Text>
                           )}
                         </View>
@@ -405,11 +463,16 @@ export default function EventCreationModal({ visible, onClose, courseId, section
                           <Text style={styles.label}>
                             Opciones de respuesta (mínimo 2)
                           </Text>
-                          {[0, 1, 2, 3].map((answerIndex) => (
-                            <View key={answerIndex} style={{ marginTop: answerIndex > 0 ? 8 : 0 }}>
+                          {[0, 1, 2, 3].map(answerIndex => (
+                            <View
+                              key={answerIndex}
+                              style={{ marginTop: answerIndex > 0 ? 8 : 0 }}
+                            >
                               <Controller
                                 control={control}
-                                name={`questions.${questionIndex}.answers.${answerIndex}.text` as any}
+                                name={
+                                  `questions.${questionIndex}.answers.${answerIndex}.text` as any
+                                }
                                 render={({ field: { onChange, value } }) => (
                                   <TextInput
                                     value={value || ''}
@@ -429,7 +492,9 @@ export default function EventCreationModal({ visible, onClose, courseId, section
                         <View style={styles.fieldWrapper}>
                           <Text style={styles.label}>Respuesta correcta</Text>
                           <SelectField<any>
-                            name={`questions.${questionIndex}.correctAnswerIndex` as any}
+                            name={
+                              `questions.${questionIndex}.correctAnswerIndex` as any
+                            }
                             control={control}
                             label=""
                             options={[
@@ -438,24 +503,33 @@ export default function EventCreationModal({ visible, onClose, courseId, section
                               { label: 'Opción 3', value: '2' },
                               { label: 'Opción 4', value: '3' },
                             ]}
-                            onChangeTransform={(selectedValue) => {
+                            onChangeTransform={selectedValue => {
                               const correctIndex = Number(selectedValue);
-                              [0, 1, 2, 3].forEach((answerIndex) => {
+                              [0, 1, 2, 3].forEach(answerIndex => {
                                 const answerText = watch(
-                                  `questions.${questionIndex}.answers.${answerIndex}.text` as any
+                                  `questions.${questionIndex}.answers.${answerIndex}.text` as any,
                                 );
                                 if (answerText) {
-                                  (control as any)._formValues.questions[questionIndex].answers[answerIndex].correct = 
-                                    (answerIndex === correctIndex);
+                                  (control as any)._formValues.questions[
+                                    questionIndex
+                                  ].answers[answerIndex].correct =
+                                    answerIndex === correctIndex;
                                 }
                               });
                               return correctIndex;
                             }}
-                            error={!!(errors as any).questions?.[questionIndex]?.answers}
+                            error={
+                              !!(errors as any).questions?.[questionIndex]
+                                ?.answers
+                            }
                           />
-                          {(errors as any).questions?.[questionIndex]?.answers?.message && (
+                          {(errors as any).questions?.[questionIndex]?.answers
+                            ?.message && (
                             <Text style={styles.errorText}>
-                              {(errors as any).questions[questionIndex]?.answers?.message}
+                              {
+                                (errors as any).questions[questionIndex]
+                                  ?.answers?.message
+                              }
                             </Text>
                           )}
                         </View>
@@ -476,13 +550,15 @@ export default function EventCreationModal({ visible, onClose, courseId, section
 
                   <Button
                     mode="text"
-                    onPress={() => append({
-                      text: '',
-                      answers: [
-                        { text: '', correct: false },
-                        { text: '', correct: false }
-                      ]
-                    })}
+                    onPress={() =>
+                      append({
+                        text: '',
+                        answers: [
+                          { text: '', correct: false },
+                          { text: '', correct: false },
+                        ],
+                      })
+                    }
                     style={styles.addQuestionButton}
                     labelStyle={styles.addQuestionLabel}
                   >
@@ -509,7 +585,9 @@ export default function EventCreationModal({ visible, onClose, courseId, section
             buttonColor="#2196F3"
             style={styles.submitButton}
           >
-            {selectedEventType === 'questionnaire' ? 'Crear cuestionario' : 'Crear evento'}
+            {selectedEventType === EventType.QUESTIONNAIRE
+              ? 'Crear cuestionario'
+              : 'Crear evento'}
           </Button>
         </Dialog.Actions>
       </Dialog>

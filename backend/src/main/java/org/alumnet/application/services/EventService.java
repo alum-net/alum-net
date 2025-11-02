@@ -1,19 +1,15 @@
 package org.alumnet.application.services;
 
-
-import com.onesignal.client.ApiException;
 import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.AnswerDTO;
 import org.alumnet.application.dtos.EventDTO;
 import org.alumnet.application.dtos.QuestionDTO;
+import org.alumnet.application.enums.EventType;
 import org.alumnet.application.mapper.EventMapper;
-import org.alumnet.domain.Answer;
-import org.alumnet.domain.Question;
 import org.alumnet.domain.Section;
 import org.alumnet.domain.events.Event;
 import org.alumnet.domain.events.EventParticipation;
 import org.alumnet.domain.events.EventParticipationId;
-import org.alumnet.domain.events.Questionnaire;
 import org.alumnet.domain.repositories.EventRepository;
 import org.alumnet.domain.users.Student;
 import org.alumnet.infrastructure.exceptions.EventHasParticipationException;
@@ -36,14 +32,14 @@ public class EventService {
     private final EventMapper eventMapper;
 
     public void createEvent(EventDTO eventDTO) {
-        validateDates(eventDTO.getStartDate(),eventDTO.getEndDate());
+        validateDates(eventDTO.getStartDate(), eventDTO.getEndDate());
 
-        if ("questionnaire".equals(eventDTO.getType()))
+        if (eventDTO.getType() == EventType.QUESTIONNAIRE)
             validateQuestions(eventDTO.getQuestions());
 
         Section section = sectionService.findSectionById(eventDTO.getSectionId());
-        List<Student> enrolledStudentsInCourse = courseService.
-                findEnrolledStudentsInCourse(section.getCourse().getId());
+        List<Student> enrolledStudentsInCourse = courseService
+                .findEnrolledStudentsInCourse(section.getCourse().getId());
 
         Event event = eventMapper.eventDTOToEvent(eventDTO);
         event.setSection(section);
@@ -53,13 +49,12 @@ public class EventService {
 
         String notificationID = notificationService.sendNotifications(
                 event.getId(),
+                "Se acerca la fecha limite de un" + eventDTO.mapType(),
                 eventDTO.getTitle(),
-                eventDTO.getDescription(),
                 enrolledStudentsInCourse.stream()
                         .map(Student::getEmail)
                         .toList(),
-                eventDTO.getEndDate()
-        );
+                eventDTO.getEndDate().minusDays(1));
 
         event.setNotificationId(notificationID);
         eventRepository.save(event);
@@ -68,7 +63,8 @@ public class EventService {
     public void deleteEvent(int eventId) {
         boolean hasParticipations = someParticipationByEventId(eventId);
 
-        if(hasParticipations) throw new EventHasParticipationException();
+        if (hasParticipations)
+            throw new EventHasParticipationException();
 
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(EventNotFoundException::new);
@@ -78,7 +74,7 @@ public class EventService {
         notificationService.cancelScheduledNotification(eventId, event.getNotificationId());
     }
 
-    private boolean someParticipationByEventId(int eventId){
+    private boolean someParticipationByEventId(int eventId) {
         return eventRepository.someParticipationByEventId(eventId);
     }
 
@@ -96,7 +92,7 @@ public class EventService {
                         .build())
                 .toList();
     }
-    
+
     private void validateQuestions(List<QuestionDTO> questions) {
         if (questions == null || questions.isEmpty())
             throw new QuestionnaireValidationException("Un cuestionario debe tener al menos una pregunta");

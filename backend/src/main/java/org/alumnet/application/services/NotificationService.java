@@ -29,12 +29,12 @@ public class NotificationService {
     private final DefaultApi oneSignalApi;
     @Value("${onesignal.config.id}")
     private String oneSignalAppId;
-    @Value("${send.notification.now:false}")
+    @Value("${send.notification.now:true}")
     private boolean sendNotificationNow;
     private final NotificationRepository notificationRepository;
     private final MongoTemplate mongoTemplate;
 
-    public void cancelScheduledNotification(int eventId, String notificationId){
+    public void cancelScheduledNotification(int eventId, String notificationId) {
         Query query = NotificationQueryBuilder.byEventId(eventId);
         ScheduledNotification notification = mongoTemplate.findOne(query, ScheduledNotification.class);
 
@@ -49,19 +49,21 @@ public class NotificationService {
         }
     }
 
-    public String sendNotifications(int eventId, String title, String message, List<String> userEmails, LocalDateTime endDate) {
+    public String sendNotifications(int eventId, String title, String message, List<String> userEmails,
+            LocalDateTime endDate) {
         ScheduledNotification notification = null;
         try {
             notification = saveScheduledEmailNotification(eventId, title, message, userEmails, endDate);
             return sendPushNotifications(title, message, userEmails, endDate);
-        } catch (ApiException e) {
+        } catch (Exception e) {
             log.error("Error al enviar notificación: {}", e.getMessage(), e);
             notificationRepository.deleteById(notification.getId());
             throw new RuntimeException("Error comunicando con OneSignal", e);
         }
     }
 
-    private String sendPushNotifications(String title, String message, List<String> userEmails, LocalDateTime endDate) throws ApiException {
+    private String sendPushNotifications(String title, String message, List<String> userEmails, LocalDateTime endDate)
+            throws ApiException, Exception {
         log.info("Enviando notificación a {} usuarios: {} - {}", userEmails.size(), title, message);
         log.info("sendNotificationNow: {}", sendNotificationNow);
         Notification notification = createNotification();
@@ -75,18 +77,18 @@ public class NotificationService {
         return send(notification);
     }
 
-    private ScheduledNotification saveScheduledEmailNotification(int eventId, String title, String message, List<String> userEmails, LocalDateTime endDate) {
-        //Contemplar caso borde de que pasa si el endDate es mañana y le resto 24 horas (la notificación se debería enviar inmediatamente)
+    private ScheduledNotification saveScheduledEmailNotification(int eventId, String title, String message,
+            List<String> userEmails, LocalDateTime endDate) {
+        // Contemplar caso borde de que pasa si el endDate es mañana y le resto 24 horas
+        // (la notificación se debería enviar inmediatamente)
         return notificationRepository.save(ScheduledNotification.builder()
                 .title(title)
                 .eventId(eventId)
                 .message(message)
                 .recipientIds(userEmails)
                 .state(NotificationStatus.PENDING)
-                .scheduledSendTime(endDate.minusHours(24)).
-                build());
+                .scheduledSendTime(endDate.minusHours(24)).build());
     }
-
 
     private Notification createNotification() {
         Notification notification = new Notification();
@@ -105,14 +107,16 @@ public class NotificationService {
         return map;
     }
 
-    private String send(Notification notification) throws ApiException {
+    private String send(Notification notification) throws ApiException, Exception {
         if (log.isDebugEnabled()) {
             Map<String, Object> payload = createPayloadMap(notification);
             log.debug("Payload: {}", payload);
         }
 
         CreateNotificationSuccessResponse response = oneSignalApi.createNotification(notification);
-
+        if (response.getErrors() != null) {
+            throw new Exception(response.getErrors().toString());
+        }
         log.info("Notificación enviada con ID: {}", response.getId());
         return response.getId();
     }
@@ -145,7 +149,6 @@ public class NotificationService {
             payload.put("headings", headings);
         }
 
-
         if (notification.getIncludedSegments() != null) {
             payload.put("included_segments", notification.getIncludedSegments());
         }
@@ -157,13 +160,16 @@ public class NotificationService {
             payload.put("data", notification.getData());
         }
 
+        if (notification.getIncludeAliases() != null) {
+            payload.put("include_aliases", notification.getIncludeAliases());
+        }
+
         return payload;
     }
 
     public List<ScheduledNotification> processPendingNotifications() {
         return notificationRepository.findByStateAndScheduledSendTimeBefore(NotificationStatus.PENDING,
-                LocalDateTime.now()
-        );
+                LocalDateTime.now());
     }
 
     public void markNotificationAsSent(ScheduledNotification notification) {
