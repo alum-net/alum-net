@@ -521,6 +521,103 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "CoursesBulkCreation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"",
+									"pm.test(\"El status code es el esperado\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () {",
+									"    // Validar claves principales",
+									"    pm.expect(jsonData).to.have.property('data');",
+									"    pm.expect(jsonData).to.have.property('message');",
+									"    // Validar claves dentro de 'data'",
+									"    pm.expect(jsonData.data).to.have.property('errors');",
+									"    pm.expect(jsonData.data).to.have.property('failedCreations');",
+									"    pm.expect(jsonData.data).to.have.property('successfulCreations');",
+									"    pm.expect(jsonData.data).to.have.property('totalRecords');",
+									"});",
+									"",
+									"pm.test(\"El número de errores coincide con el esperado\", function () {",
+									"    pm.expect(jsonData.data[\"failedCreations\"]).to.equal(2);",
+									"    pm.expect(jsonData.data[\"successfulCreations\"]).to.equal(6);",
+									"    pm.expect(jsonData.data[\"totalRecords\"]).to.equal(8);",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"",
+									"function runInitProcess() {",
+									"  getAccessToken(function() {",
+									"  });",
+									"}",
+									"",
+									"runInitProcess();",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/Users/fede/Downloads/courses-bulk-fixed.csv"
+								},
+								{
+									"key": "hasHeaders",
+									"value": "true",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{alumnetUrl}}/api/courses/bulk-creation",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"courses",
+								"bulk-creation"
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"event": [
@@ -1388,13 +1485,105 @@
 			"item": [
 				{
 					"name": "GetPosts",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"",
+									"// function runInitProcess() {",
+									"//   getAccessToken(function() {",
+									"//     initTestUsers(function() {",
+									"//       initTestCourses(function() {",
+									"//         getCursoId(\"post-get-post\", \"Curso9-verificar-get-post\", function(){",
+									"//             enrollStudent(\"estudiante6@alumnet.com\", function(){",
+									"//                 createPost(\"Obtener un post\", \"estudiante6@alumnet.com\", function (){});",
+									"//             });",
+									"//         });",
+									"//       });",
+									"//     });",
+									"//   });",
+									"// }",
+									"",
+									"// runInitProcess();",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Helpers",
+									"function hasAllKeys(obj, keys) {",
+									"    return keys.every(k => Object.prototype.hasOwnProperty.call(obj, k));",
+									"}",
+									"",
+									"pm.test(\"EL status code es el esperado\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const json = pm.response.json();",
+									"",
+									"// Validar claves top-level",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () {",
+									"    const topLevelKeys = [",
+									"        \"data\",",
+									"        \"errors\",",
+									"        \"message\",",
+									"        \"pageNumber\",",
+									"        \"pageSize\",",
+									"        \"totalElements\",",
+									"        \"totalPages\"",
+									"    ];",
+									"    const itemKeys = [",
+									"        \"author\",",
+									"        \"content\",",
+									"        \"courseId\",",
+									"        \"createdAt\",",
+									"        \"id\",",
+									"        \"parentPost\",",
+									"        \"responses\",",
+									"        \"rootPost\",",
+									"        \"title\",",
+									"        \"totalResponses\",",
+									"        \"updatedAt\"",
+									"    ];",
+									"",
+									"    pm.expect(hasAllKeys(json, topLevelKeys)).to.be.true;",
+									"    json.data.forEach((item, idx) => {",
+									"        pm.expect(hasAllKeys(item, itemKeys), `Faltan claves en data[${idx}]`).to.be.true;",
+									"    });",
+									"",
+									"});",
+									"",
+									"",
+									"// Validación opcional de valores específicos del ejemplo (si quieres forzar exactitud)",
+									"pm.test(\"El mensaje de respuesta es el esperado\", function () {",
+									"    pm.expect(json.message).to.eql(\"Posts obtenidos exitosamente\");",
+									"    if (json.totalElements > 0) {",
+									"        pm.expect(json.data.length).to.be.at.least(1);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{token}}",
+									"value": "{{access_token}}",
 									"type": "string"
 								}
 							]
@@ -1402,7 +1591,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{alumnetUrl}}/api/forums/posts?forumType=GENERAL&courseId=1&rootPost=68fd3205b35858f0cbd5699b&sort=createdAt,desc",
+							"raw": "{{alumnetUrl}}/api/forums/posts?forumType=GENERAL&courseId={{id_curso}}",
 							"host": [
 								"{{alumnetUrl}}"
 							],
@@ -1417,12 +1606,145 @@
 									"value": "GENERAL"
 								},
 								{
-									"key": "courseId",
-									"value": "1"
+									"key": "page",
+									"value": "0",
+									"disabled": true
 								},
 								{
-									"key": "rootPost",
-									"value": "68fd3205b35858f0cbd5699b"
+									"key": "size",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "courseId",
+									"value": "{{id_curso}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get parent post",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"",
+									"// function runInitProcess() {",
+									"//   getAccessToken(function() {",
+									"//     initTestUsers(function() {",
+									"//       initTestCourses(function() {",
+									"//         getCursoId(\"post-get-post\", \"Curso9-verificar-get-post\", function(){",
+									"//             enrollStudent(\"estudiante6@alumnet.com\", function(){",
+									"//                 createPost(\"Obtener un post\", \"estudiante6@alumnet.com\", function (){});",
+									"//             });",
+									"//         });",
+									"//       });",
+									"//     });",
+									"//   });",
+									"// }",
+									"",
+									"// runInitProcess();",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Helpers",
+									"function hasAllKeys(obj, keys) {",
+									"    return keys.every(k => Object.prototype.hasOwnProperty.call(obj, k));",
+									"}",
+									"",
+									"pm.test(\"EL status code es el esperado\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const json = pm.response.json();",
+									"",
+									"// Validar claves top-level",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () {",
+									"    const topLevelKeys = [",
+									"        \"data\",",
+									"        \"errors\",",
+									"        \"message\",",
+									"        \"pageNumber\",",
+									"        \"pageSize\",",
+									"        \"totalElements\",",
+									"        \"totalPages\"",
+									"    ];",
+									"    const itemKeys = [",
+									"        \"author\",",
+									"        \"content\",",
+									"        \"courseId\",",
+									"        \"createdAt\",",
+									"        \"id\",",
+									"        \"parentPost\",",
+									"        \"responses\",",
+									"        \"rootPost\",",
+									"        \"title\",",
+									"        \"totalResponses\",",
+									"        \"updatedAt\"",
+									"    ];",
+									"",
+									"    pm.expect(hasAllKeys(json, topLevelKeys)).to.be.true;",
+									"    json.data.forEach((item, idx) => {",
+									"        pm.expect(hasAllKeys(item, itemKeys), `Faltan claves en data[${idx}]`).to.be.true;",
+									"    });",
+									"",
+									"});",
+									"",
+									"",
+									"// Validación opcional de valores específicos del ejemplo (si quieres forzar exactitud)",
+									"pm.test(\"El mensaje de respuesta es el esperado\", function () {",
+									"    pm.expect(json.message).to.eql(\"Posts obtenidos exitosamente\");",
+									"    if (json.totalElements > 0) {",
+									"        pm.expect(json.data.length).to.be.at.least(1);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{alumnetUrl}}/api/forums/posts?forumType=GENERAL&courseId={{id_curso}}&rootPost=6907b4ff791b2759c2c8d13d",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"forums",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "forumType",
+									"value": "GENERAL"
 								},
 								{
 									"key": "page",
@@ -1435,8 +1757,12 @@
 									"disabled": true
 								},
 								{
-									"key": "sort",
-									"value": "createdAt,desc"
+									"key": "courseId",
+									"value": "{{id_curso}}"
+								},
+								{
+									"key": "rootPost",
+									"value": "6907b4ff791b2759c2c8d13d"
 								}
 							]
 						}
@@ -1445,6 +1771,56 @@
 				},
 				{
 					"name": "CreatePost",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"",
+									"// function runInitProcess() {",
+									"//   getAccessToken(function() {",
+									"//     initTestUsers(function() {",
+									"//       initTestCourses(function() {",
+									"//         getCursoId(\"post-create-post\", \"Curso8-verificar-create-post\", function(){",
+									"//             enrollStudent(\"estudiante5@alumnet.com\", function (){})",
+									"//         })",
+									"//       });",
+									"//     });",
+									"//   });",
+									"// }",
+									"",
+									"// runInitProcess();",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"EL status code es el esperado\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () { ",
+									"    pm.expect(jsonData).to.have.all.keys('message');",
+									"});",
+									"",
+									"pm.test(\"El mensaje de la respuesta es el esperado\", function () { ",
+									"    pm.expect(jsonData.message).to.eql('Se creó el post correctamente');",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -1460,7 +1836,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"forumType\": \"GENERAL\",\r\n    \"courseId\": 1,\r\n    \"content\": \"Esta es una preuyba de respuesta post root\",\r\n    \"author\":{\r\n        \"name\": \"Gaston\",\r\n        \"email\": \"estudiante2@alumnet.com\"\r\n    },\r\n    \"parentPost\": \"68fd3205b35858f0cbd5699b\",\r\n    \"rootPost\": \"68fd3205b35858f0cbd5699b\"\r\n}",
+							"raw": "{\r\n    \"forumType\": \"GENERAL\",\r\n    \"courseId\": {{id_curso}},\r\n    \"content\": \"Creacion de post de prueba\",\r\n    \"author\":{\r\n        \"name\": \"Estudiante 5\",\r\n        \"email\": \"estudiante5@alumnet.com\"\r\n    },\r\n        // \"rootPost\": \"6907b4ff791b2759c2c8d13d\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1483,13 +1859,60 @@
 				},
 				{
 					"name": "DeletePost",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"",
+									"function runInitProcess() {",
+									"  getAccessToken(function() {",
+									"    initTestUsers(function() {",
+									"      initTestCourses(function() {",
+									"        getCursoId(\"post-delete-post\", \"Curso10-delete-post\", function(){",
+									"            enrollStudent(\"estudiante7@alumnet.com\", function(){",
+									"                createPost(\"Eliminar este post\", \"estudiante7@alumnet.com\", function (){",
+									"                    getPostId(function(){});",
+									"                });",
+									"",
+									"            });",
+									"        });",
+									"      });",
+									"    });",
+									"  });",
+									"}",
+									"",
+									"runInitProcess();",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"EL status code es el esperado\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{token}}",
+									"value": "{{access_token}}",
 									"type": "string"
 								}
 							]
@@ -1501,7 +1924,7 @@
 							"raw": "{\r\n    \"forumType\": \"GENERAL\",\r\n    \"courseId\": 1,\r\n    \"content\": \"Esta es una respuesta al post\",\r\n    \"author\":{\r\n        \"name\": \"Gaston\",\r\n        \"email\": \"prueba@gc\"\r\n    }\r\n}"
 						},
 						"url": {
-							"raw": "{{alumnetUrl}}/api/forums/posts/68fd324cb35858f0cbd5699c",
+							"raw": "{{alumnetUrl}}/api/forums/posts/{{id_post}}",
 							"host": [
 								"{{alumnetUrl}}"
 							],
@@ -1509,7 +1932,7 @@
 								"api",
 								"forums",
 								"posts",
-								"68fd324cb35858f0cbd5699c"
+								"{{id_post}}"
 							]
 						}
 					},
@@ -1517,13 +1940,69 @@
 				},
 				{
 					"name": "UpdatePost",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"",
+									"function runInitProcess() {",
+									"  getAccessToken(function() {",
+									"    // initTestUsers(function() {",
+									"    //   initTestCourses(function() {",
+									"        getCursoId(\"post-modify-post\", \"Curso11-modify-post\", function(){",
+									"            enrollStudent(\"estudiante8@alumnet.com\", function(){",
+									"                createPost(\"Eliminar este post\", \"estudiante8@alumnet.com\", function (){",
+									"                    getPostId(function(){});",
+									"                });",
+									"",
+									"            });",
+									"        // });",
+									"    //   });",
+									"    });",
+									"  });",
+									"}",
+									"",
+									"runInitProcess();",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"El status code es el esperado\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () { ",
+									"    pm.expect(jsonData).to.have.all.keys('message');",
+									"});",
+									"",
+									"pm.test(\"El mensaje de la respuesta es correcto\", function () { ",
+									"    pm.expect(jsonData.message).to.eql('Se modificó el post correctamente');",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{token}}",
+									"value": "{{access_token}}",
 									"type": "string"
 								}
 							]
@@ -1532,7 +2011,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"message\": \"Nuevo mensaje\",\r\n    \"title\": \"Title nuevo\"\r\n}",
+							"raw": "{\r\n    \"message\": \"Mensaje de post modificado\",\r\n    \"title\": \"Title modificado\",\r\n    \"content\": \"Modificando el post de prueba\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1540,7 +2019,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{alumnetUrl}}/api/forums/posts/68fd3205b35858f0cbd5699b",
+							"raw": "{{alumnetUrl}}/api/forums/posts/{{id_post}}",
 							"host": [
 								"{{alumnetUrl}}"
 							],
@@ -1548,7 +2027,7 @@
 								"api",
 								"forums",
 								"posts",
-								"68fd3205b35858f0cbd5699b"
+								"{{id_post}}"
 							]
 						}
 					},
@@ -1666,11 +2145,16 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"eval(pm.collectionVariables.get(\"utils\"));",
+							"eval(pm.collectionVariables.get(\"utils-Course\"));",
 							"",
-							"await getAccessToken();",
-							"await initTestUsers();",
-							"await initTestCourses();"
+							"function runInitProcess() {",
+							"      getAccessToken(function() {",
+							"        getPostId(function(){});",
+							"      })",
+							"};",
+							"",
+							"runInitProcess();",
+							""
 						],
 						"type": "text/javascript",
 						"packages": {},
@@ -1738,14 +2222,14 @@
 					"    \"email\": \"profesor5@alumnet.com\",",
 					"    \"password\": \"test1234\"",
 					"  },",
-					"    {",
+					"  {",
 					"    \"name\": \"Profesor\",",
 					"    \"lastname\": \"6\",",
 					"    \"group\": \"teachers\",",
 					"    \"email\": \"profesor6@alumnet.com\",",
 					"    \"password\": \"test1234\"",
 					"  },",
-					"    {",
+					"  {",
 					"    \"name\": \"Estudiante\",",
 					"    \"lastname\": \"1\",",
 					"    \"group\": \"students\",",
@@ -1759,35 +2243,92 @@
 					"    \"email\": \"estudiante2@alumnet.com\",",
 					"    \"password\": \"test1234\"",
 					"  },",
-					"    {",
+					"  {",
 					"    \"name\": \"Estudiante\",",
 					"    \"lastname\": \"3\",",
 					"    \"group\": \"students\",",
 					"    \"email\": \"estudiante3@alumnet.com\",",
 					"    \"password\": \"test1234\"",
 					"  },",
-					"      {",
+					"  {",
 					"    \"name\": \"Profesor\",",
 					"    \"lastname\": \"7\",",
 					"    \"group\": \"teachers\",",
 					"    \"email\": \"profesor7@alumnet.com\",",
 					"    \"password\": \"test1234\"",
 					"  },",
-					"    {",
+					"  {",
 					"    \"name\": \"Profesor\",",
 					"    \"lastname\": \"8\",",
 					"    \"group\": \"teachers\",",
 					"    \"email\": \"profesor8@alumnet.com\",",
 					"    \"password\": \"test1234\"",
 					"  },",
-					"      {",
+					"  {",
 					"    \"name\": \"Estudiante\",",
 					"    \"lastname\": \"4\",",
 					"    \"group\": \"students\",",
 					"    \"email\": \"estudiante4@alumnet.com\",",
 					"    \"password\": \"test1234\"",
 					"  },",
-					"]",
+					"  {",
+					"    \"name\": \"Profesor\",",
+					"    \"lastname\": \"9\",",
+					"    \"group\": \"teachers\",",
+					"    \"email\": \"profesor9@alumnet.com\",",
+					"    \"password\": \"test1234\"",
+					"  },",
+					"  {",
+					"    \"name\": \"Estudiante\",",
+					"    \"lastname\": \"5\",",
+					"    \"group\": \"students\",",
+					"    \"email\": \"estudiante5@alumnet.com\",",
+					"    \"password\": \"test1234\"",
+					"  },",
+					"    {",
+					"    \"name\": \"Estudiante\",",
+					"    \"lastname\": \"6\",",
+					"    \"group\": \"students\",",
+					"    \"email\": \"estudiante6@alumnet.com\",",
+					"    \"password\": \"test1234\"",
+					"  },",
+					"    {",
+					"    \"name\": \"Profesor\",",
+					"    \"lastname\": \"10\",",
+					"    \"group\": \"teachers\",",
+					"    \"email\": \"profesor10@alumnet.com\",",
+					"    \"password\": \"test1234\"",
+					"  },",
+					"    {",
+					"    \"name\": \"Estudiante\",",
+					"    \"lastname\": \"7\",",
+					"    \"group\": \"students\",",
+					"    \"email\": \"estudiante7@alumnet.com\",",
+					"    \"password\": \"test1234\"",
+					"  },",
+					"    {",
+					"    \"name\": \"Profesor\",",
+					"    \"lastname\": \"11\",",
+					"    \"group\": \"teachers\",",
+					"    \"email\": \"profesor11@alumnet.com\",",
+					"    \"password\": \"test1234\"",
+					"  },",
+					"      {",
+					"    \"name\": \"Estudiante\",",
+					"    \"lastname\": \"8\",",
+					"    \"group\": \"students\",",
+					"    \"email\": \"estudiante7@alumnet.com\",",
+					"    \"password\": \"test1234\"",
+					"  },",
+					"    {",
+					"    \"name\": \"Profesor\",",
+					"    \"lastname\": \"12\",",
+					"    \"group\": \"teachers\",",
+					"    \"email\": \"profesor12@alumnet.com\",",
+					"    \"password\": \"test1234\"",
+					"  },",
+					"];",
+					"",
 					"",
 					"const arr_course_test = [",
 					"  {",
@@ -1856,7 +2397,7 @@
 					"      \"profesor7@alumnet.com\"",
 					"    ]",
 					"  },",
-					"      {",
+					"    {",
 					"    \"name\": \"Curso7-verificar-get-section-content\",",
 					"    \"description\": \"curso-section-get-content\",",
 					"    \"shift\": \"MORNING\",",
@@ -1865,6 +2406,50 @@
 					"    \"endDate\": \"2025-12-15\",",
 					"    \"teachersEmails\": [",
 					"      \"profesor8@alumnet.com\"",
+					"    ]",
+					"  },",
+					"      {",
+					"    \"name\": \"Curso8-verificar-create-post\",",
+					"    \"description\": \"post-create-post\",",
+					"    \"shift\": \"MORNING\",",
+					"    \"approvalGrade\": 0.7,",
+					"    \"startDate\": \"2025-09-01\",",
+					"    \"endDate\": \"2025-12-15\",",
+					"    \"teachersEmails\": [",
+					"      \"profesor9@alumnet.com\"",
+					"    ]",
+					"  },",
+					"    {",
+					"    \"name\": \"Curso9-verificar-get-post\",",
+					"    \"description\": \"post-get-post\",",
+					"    \"shift\": \"MORNING\",",
+					"    \"approvalGrade\": 0.7,",
+					"    \"startDate\": \"2025-09-01\",",
+					"    \"endDate\": \"2025-12-15\",",
+					"    \"teachersEmails\": [",
+					"      \"profesor10@alumnet.com\"",
+					"    ]",
+					"  },",
+					"    {",
+					"    \"name\": \"Curso10-delete-post\",",
+					"    \"description\": \"post-delete-post\",",
+					"    \"shift\": \"MORNING\",",
+					"    \"approvalGrade\": 0.7,",
+					"    \"startDate\": \"2025-09-01\",",
+					"    \"endDate\": \"2025-12-15\",",
+					"    \"teachersEmails\": [",
+					"      \"profesor11@alumnet.com\"",
+					"    ]",
+					"  },",
+					"      {",
+					"    \"name\": \"Curso11-modify-post\",",
+					"    \"description\": \"post-modify-post\",",
+					"    \"shift\": \"MORNING\",",
+					"    \"approvalGrade\": 0.7,",
+					"    \"startDate\": \"2025-09-01\",",
+					"    \"endDate\": \"2025-12-15\",",
+					"    \"teachersEmails\": [",
+					"      \"profesor12@alumnet.com\"",
 					"    ]",
 					"  }",
 					"]",
@@ -1976,9 +2561,11 @@
 					"    next();",
 					"});",
 					"}",
-					"function enrollStudent(email, curso_id, next) {",
+					"function enrollStudent(email, next) {",
 					"    pm.sendRequest({",
-					"        url: pm.collectionVariables.get(\"alumnetUrl\") + \"/api/courses/\" + pm.collectionVariables.get(\"id_curso\") + \"/participations\",",
+					"        url: pm.collectionVariables.get(\"alumnetUrl\") + \"/api/courses/\" ",
+					"             + pm.collectionVariables.get(\"id_curso\") ",
+					"             + \"/participations\",",
 					"        method: 'POST',",
 					"        header: {",
 					"            'Content-Type': 'application/json',",
@@ -1990,15 +2577,76 @@
 					"        }",
 					"    }, function (err, res2) {",
 					"        if (err) {",
-					"            console.error('Error en la petición de matrícula:', err);",
+					"            console.error('❌ Error en la petición de matrícula:', err);",
 					"            pm.environment.set('enroll_status', 'error');",
 					"            return;",
 					"        }",
+					"",
 					"        const json2 = res2.json();",
+					"",
 					"        pm.environment.set('enroll_status', json2.success ? 'ok' : 'fail');",
 					"        pm.environment.set('enroll_message', json2.message);",
+					"",
+					"        // ✅ Llamar next() solo cuando terminó correctamente",
+					"        if (typeof next === \"function\") next();",
 					"    });",
-					"    next();",
+					"}",
+					"",
+					"",
+					"function createPost(contenido, email, next) {",
+					"    pm.sendRequest({",
+					"        url: pm.collectionVariables.get(\"alumnetUrl\") + \"/api/forums/posts\",",
+					"        method: 'POST',",
+					"        header: {",
+					"            'Content-Type': 'application/json',",
+					"            \"Authorization\": \"Bearer \" + pm.collectionVariables.get(\"access_token\")",
+					"        },",
+					"        body: {",
+					"            mode: 'raw',",
+					"            raw: JSON.stringify({ ",
+					"                forumType: \"GENERAL\",",
+					"                courseId: pm.collectionVariables.get(\"id_curso\"),",
+					"                content: contenido,",
+					"                name: email",
+					"            })",
+					"        }",
+					"    }, function (err, res2) {",
+					"        if (err) {",
+					"            console.error('Error en creación de post', err);",
+					"            return;",
+					"        }",
+					"",
+					"        const json2 = res2.json();",
+					"        console.log(\"Post creado correctamente:\", json2);",
+					"",
+					"        // ✅ Llamar next() cuando la solicitud terminó",
+					"    });",
+					"        next();",
+					"}",
+					"",
+					"function getPostId(next){",
+					"    pm.sendRequest({",
+					"    url: pm.collectionVariables.get(\"alumnetUrl\") + \"/api/forums/posts?forumType=GENERAL&courseId=\" + pm.collectionVariables.get(\"id_curso\"),",
+					"    method: 'GET',",
+					"    header: {",
+					"        'Authorization': 'Bearer ' + pm.collectionVariables.get('access_token')",
+					"    }",
+					"}, function (err, res) {",
+					"    if (err) {",
+					"        console.error('Error en la petición GET:', err);",
+					"        return;",
+					"    }",
+					"const jsonData = res.json();",
+					"",
+					"if (jsonData.data && jsonData.data.length > 0) {",
+					"    const id = jsonData.data[0].id;",
+					"    pm.collectionVariables.set(\"id_post\", id);",
+					"    console.log(\"Post ID guardado:\", id);",
+					"} else {",
+					"    console.warn(\"⚠️ No se encontró ningún elemento en data\");",
+					"}",
+					"});",
+					"next();",
 					"}",
 					"`",
 					");",
@@ -2127,7 +2775,6 @@
 					"",
 					"",
 					"",
-					"",
 					""
 				]
 			}
@@ -2175,6 +2822,10 @@
 		},
 		{
 			"key": "id_section",
+			"value": ""
+		},
+		{
+			"key": "id_post",
 			"value": ""
 		}
 	]
