@@ -5,6 +5,7 @@
   "private": true,
   "dependencies": {
     "@alum-net/storage": "*",
+    "@alum-net/ui": "*",
     "expo-auth-session": "^7.0.8",
     "expo-random": "^14.0.1"
   },
