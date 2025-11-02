@@ -1,9 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { FlatList, Linking, Platform, View } from 'react-native';
-import { Button, Chip, Divider, Text } from 'react-native-paper';
-import { getLabels, getResources } from '../service';
+import { Button, Card, Chip, Divider, Text } from 'react-native-paper';
+import { getResources } from '../service';
 import { QUERY_KEYS } from '@alum-net/api';
 import { THEME } from '@alum-net/ui';
+import { useLabels } from '../hooks/useLables';
 export const LibraryDashboard = ({
   deleteLabel,
   deleteResource,
@@ -11,11 +12,7 @@ export const LibraryDashboard = ({
   deleteLabel?: ({ id }: { id: number }) => void;
   deleteResource?: ({ id }: { id: number }) => void;
 }) => {
-  const { data: labels } = useQuery({
-    queryFn: getLabels,
-    queryKey: [QUERY_KEYS.getLibraryLabels],
-    retry: 0,
-  });
+  const { data: labels } = useLabels();
 
   const { data: resources } = useQuery({
     queryFn: () => getResources(),
@@ -28,32 +25,44 @@ export const LibraryDashboard = ({
       numColumns={Platform.OS === 'web' ? 4 : 1}
       data={resources?.data}
       renderItem={({ item }) => (
-        <Button
-          elevation={5}
-          contentStyle={{
-            justifyContent: 'flex-start',
-          }}
-          buttonColor={THEME.colors.background}
-          style={{
-            marginVertical: 5,
-            borderColor: THEME.colors.secondary,
-            borderWidth: 1,
-          }}
-          mode="elevated"
-          key={item.id}
-          onPress={() => Linking.openURL(item.url)}
-        >
-          <Text variant="labelLarge">
-            📄 {item.name}.{item.extension}
-          </Text>
+        <Card mode="elevated" style={{ margin: 10, padding: 10 }}>
+          <Button
+            elevation={5}
+            contentStyle={{
+              justifyContent: 'flex-start',
+            }}
+            buttonColor={THEME.colors.background}
+            style={{
+              marginVertical: 5,
+              borderColor: THEME.colors.secondary,
+              borderWidth: 1,
+            }}
+            mode="elevated"
+            key={item.id}
+            onPress={() => Linking.openURL(item.url)}
+          >
+            📄 {item.title} - {item.extension}
+          </Button>
           <Divider />
-          <Text variant="labelMedium">Etiquetas</Text>
-          {item.labels.map(label => (
-            <Text variant="labelMedium" key={label.id + '-' + item.id}>
-              {label.name}
-            </Text>
-          ))}
-        </Button>
+          <Text variant="labelMedium">Etiquetas: </Text>
+          <View style={{ flexDirection: 'row', gap: 4, flexWrap: 'wrap' }}>
+            {item.labels.map(label => (
+              <Text variant="labelMedium" key={label.id + '-' + item.id}>
+                {label.name} -
+              </Text>
+            ))}
+          </View>
+          <Divider />
+          {deleteResource && (
+            <Button
+              mode="text"
+              textColor={THEME.colors.error}
+              onPress={() => deleteResource({ id: item.id })}
+            >
+              Eliminar
+            </Button>
+          )}
+        </Card>
       )}
       keyExtractor={resource => resource.id.toString()}
       ListHeaderComponent={

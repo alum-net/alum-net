@@ -4,9 +4,10 @@ import { Label, LibraryDashboard, LibraryResource } from '@alum-net/library';
 import { UserRole, useUserInfo } from '@alum-net/users';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { View } from 'react-native';
-import { Button, Text } from 'react-native-paper';
-import { QUERY_KEYS } from '@alum-net/api';
-import { CreateLabelForm } from '@/features/library/components/create-label-form';
+import { Text } from 'react-native-paper';
+import { PageableResponse, QUERY_KEYS } from '@alum-net/api';
+import { CreateLabelForm } from '../features/library/components/create-label-form';
+import { CreateResourceForm } from '../features/library/components/file-upload-form';
 
 export default function Library() {
   const { data: userInfo } = useUserInfo();
@@ -31,12 +32,17 @@ export default function Library() {
     onSuccess: async (_, variables) => {
       await queryClient.setQueryData(
         [QUERY_KEYS.getLibraryResources],
-        (oldResources: LibraryResource[]) =>
-          oldResources?.filter(label => label.id !== variables.id),
+        (oldResources: PageableResponse<LibraryResource>) => ({
+          ...oldResources,
+          data: oldResources?.data?.filter(
+            resource => resource.id !== variables.id,
+          ),
+        }),
       );
       Toast.success('Recurso eliminado correctamente.');
     },
-    onError: () => {
+    onError: error => {
+      console.log(error);
       Toast.error('Error inesperado eliminando el recurso.');
     },
   });
@@ -46,9 +52,7 @@ export default function Library() {
       <Text variant="headlineLarge">Bienvenido a la libreria!</Text>
       <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
         {userInfo?.role === UserRole.admin && <CreateLabelForm />}
-        {userInfo?.role !== UserRole.student && (
-          <Button mode="outlined">Subir nuevo recurso a la libreria</Button>
-        )}
+        {userInfo?.role !== UserRole.student && <CreateResourceForm />}
       </View>
       <Text variant="headlineSmall">
         Utiliza los filtros para obtener los recursos que buscas:
