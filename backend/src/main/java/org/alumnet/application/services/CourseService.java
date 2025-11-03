@@ -27,6 +27,7 @@ import org.alumnet.domain.users.Student;
 import org.alumnet.domain.users.Teacher;
 import org.alumnet.domain.users.User;
 import org.alumnet.infrastructure.exceptions.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -36,6 +37,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -56,6 +58,8 @@ public class CourseService {
     private final ParticipationRepository participationRepository;
     private final CourseContentStrategyFactory courseContentStrategyFactory;
     private final S3FileStorageService s3FileStorageService;
+    @Value("${aws.s3.duration-url-hours}")
+    private long urlDuration;
 
     private final CourseMapper courseMapper;
 
