@@ -161,7 +161,11 @@ public class LibraryService {
             LibraryResource libraryResource = libraryResourceRepository.findById(resourceId)
                     .orElseThrow(LibraryResourceNotFoundException::new);
 
-            if(libraryResource.getCreator().getRole() != UserRole.ADMIN){
+            User user = userRepository
+                    .findById(modifyRequest.getCurrentUserEmail())
+                    .orElseThrow(UserNotFoundException::new);
+
+            if(user.getRole() != UserRole.ADMIN){
                 if(!Objects.equals(libraryResource.getCreator().getEmail(), modifyRequest.getCurrentUserEmail())){
                     throw new AuthorizationException("Solo el administrador o el creador puede modificar el recurso");
                 }
