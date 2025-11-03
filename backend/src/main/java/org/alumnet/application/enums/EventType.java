@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum EventType {
-  QUESTIONNAIRE("querstionnaire"),
+  QUESTIONNAIRE("questionnaire"),
   TASK("task"),
   ONSITE("on-site");
 
