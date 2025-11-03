@@ -1,153 +1,123 @@
 package org.alumnet.application.services;
 
-import com.onesignal.client.ApiException;
-import com.onesignal.client.api.DefaultApi;
-import com.onesignal.client.model.CreateNotificationSuccessResponse;
-import com.onesignal.client.model.LanguageStringMap;
-import com.onesignal.client.model.Notification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.alumnet.application.enums.NotificationStatus;
+import org.alumnet.application.query_builders.NotificationQueryBuilder;
 import org.alumnet.domain.ScheduledNotification;
 import org.alumnet.domain.repositories.NotificationRepository;
+import org.alumnet.infrastructure.config.OneSignalClient;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
 
-    private final DefaultApi oneSignalApi;
-    @Value("${onesignal.config.id}")
-    private String oneSignalAppId;
+    private final OneSignalClient oneSignalClient;
+    private final NotificationRepository notificationRepository;
+    private final MongoTemplate mongoTemplate;
+
     @Value("${send.notification.now:false}")
     private boolean sendNotificationNow;
-    private final NotificationRepository notificationRepository;
 
+    /**
+     * Cancels a scheduled notification in both the local database and OneSignal.
+     */
+    public void cancelScheduledNotification(int eventId, String notificationId) {
+        Query query = NotificationQueryBuilder.byEventId(eventId);
+        ScheduledNotification notification = mongoTemplate.findOne(query, ScheduledNotification.class);
 
-    public String sendNotifications(String title, String message, List<String> userEmails, LocalDateTime endDate) {
-        ScheduledNotification notification = null;
+        if (notification == null) {
+            log.warn("No scheduled notification found for event {}", eventId);
+            return;
+        }
+
+        notificationRepository.delete(notification);
+
         try {
-            notification = saveScheduledEmailNotification(title, message, userEmails, endDate);
+            oneSignalClient.cancelNotification(notificationId);
+            log.info("Notification {} canceled successfully in OneSignal", notificationId);
+        } catch (Exception e) {
+            log.error("Error canceling OneSignal notification: {}", e.getMessage(), e);
+            throw new RuntimeException("Error communicating with OneSignal", e);
+        }
+    }
+
+    /**
+     * Creates and sends a notification (immediate or scheduled).
+     */
+    public String sendNotifications(int eventId, String title, String message, List<String> userEmails,
+            LocalDateTime endDate) {
+        ScheduledNotification scheduledNotification = null;
+        try {
+            scheduledNotification = saveScheduledEmailNotification(eventId, title, message, userEmails, endDate);
             return sendPushNotifications(title, message, userEmails, endDate);
-        } catch (ApiException e) {
-            log.error("Error al enviar notificación: {}", e.getMessage(), e);
-            notificationRepository.deleteById(notification.getId());
-            throw new RuntimeException("Error comunicando con OneSignal", e);
-        }
-    }
-
-    private String sendPushNotifications(String title, String message, List<String> userEmails, LocalDateTime endDate) throws ApiException {
-        log.info("Enviando notificación a {} usuarios: {} - {}", userEmails.size(), title, message);
-        log.info("sendNotificationNow: {}", sendNotificationNow);
-        Notification notification = createNotification();
-        notification.setHeadings(createLanguageStringMap(title));
-        notification.setContents(createLanguageStringMap(message));
-        notification.setIncludeAliases(Map.of("external_id", userEmails));
-        notification.setTargetChannel(Notification.TargetChannelEnum.PUSH);
-        if (!sendNotificationNow && endDate.minusHours(24).isAfter(LocalDateTime.now()))
-            notification.setSendAfter(endDate.minusHours(24).atZone(ZoneId.systemDefault()).toOffsetDateTime());
-
-        return send(notification);
-    }
-
-    private ScheduledNotification saveScheduledEmailNotification(String title, String message, List<String> userEmails, LocalDateTime endDate) {
-        //Contemplar caso borde de que pasa si el endDate es mañana y le resto 24 horas (la notificación se debería enviar inmediatamente)
-        return notificationRepository.save(ScheduledNotification.builder()
-                .title(title).
-                message(message).
-                recipientIds(userEmails).
-                state(NotificationStatus.PENDING).
-                scheduledSendTime(endDate.minusHours(24)).
-                build());
-    }
-
-
-    private Notification createNotification() {
-        Notification notification = new Notification();
-        notification.setAppId(oneSignalAppId);
-        notification.setIsChrome(true);
-        notification.setIsAnyWeb(true);
-        notification.setIsFirefox(true);
-        notification.setIsSafari(true);
-        return notification;
-    }
-
-    private LanguageStringMap createLanguageStringMap(String text) {
-        LanguageStringMap map = new LanguageStringMap();
-        map.en(text);
-        map.es(text);
-        return map;
-    }
-
-    private String send(Notification notification) throws ApiException {
-        if (log.isDebugEnabled()) {
-            Map<String, Object> payload = createPayloadMap(notification);
-            log.debug("Payload: {}", payload);
-        }
-
-        CreateNotificationSuccessResponse response = oneSignalApi.createNotification(notification);
-
-        log.info("Notificación enviada con ID: {}", response.getId());
-        return response.getId();
-    }
-
-    private Map<String, Object> createPayloadMap(Notification notification) {
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("app_id", oneSignalAppId);
-
-        if (notification.getContents() != null) {
-            Map<String, String> contents = new HashMap<>();
-            LanguageStringMap contentsMap = notification.getContents();
-            if (contentsMap.getEn() != null) {
-                contents.put("en", contentsMap.getEn());
+        } catch (Exception e) {
+            log.error("Error sending notification: {}", e.getMessage(), e);
+            if (scheduledNotification != null) {
+                notificationRepository.deleteById(scheduledNotification.getId());
             }
-            if (contentsMap.getEs() != null) {
-                contents.put("es", contentsMap.getEs());
-            }
-            payload.put("contents", contents);
+            throw new RuntimeException("Error communicating with OneSignal", e);
         }
-
-        if (notification.getHeadings() != null) {
-            Map<String, String> headings = new HashMap<>();
-            LanguageStringMap headingsMap = notification.getHeadings();
-            if (headingsMap.getEn() != null) {
-                headings.put("en", headingsMap.getEn());
-            }
-            if (headingsMap.getEs() != null) {
-                headings.put("es", headingsMap.getEs());
-            }
-            payload.put("headings", headings);
-        }
-
-
-        if (notification.getIncludedSegments() != null) {
-            payload.put("included_segments", notification.getIncludedSegments());
-        }
-        if (notification.getIncludeEmailTokens() != null) {
-            payload.put("include_external_user_ids", notification.getIncludeEmailTokens());
-        }
-
-        if (notification.getData() != null) {
-            payload.put("data", notification.getData());
-        }
-
-        return payload;
     }
 
+    /**
+     * Builds the OneSignal payload and sends it through the client.
+     */
+    private String sendPushNotifications(String title, String message, List<String> userEmails, LocalDateTime endDate) {
+        log.info("Preparing to send notification to {} users: {} - {}", userEmails.size(), title, message);
+        log.debug("sendNotificationNow: {}", sendNotificationNow);
+
+        LocalDateTime scheduledSend = null;
+
+        // Only schedule if "send now" is false and event is >24h away
+        if (!sendNotificationNow && endDate.minusHours(24).isAfter(LocalDateTime.now())) {
+            scheduledSend = endDate.minusHours(24);
+        }
+
+        return oneSignalClient.sendNotification(title, message, userEmails, scheduledSend);
+    }
+
+    /**
+     * Saves a notification record in DB before it's sent or scheduled.
+     */
+    private ScheduledNotification saveScheduledEmailNotification(int eventId, String title, String message,
+            List<String> userEmails, LocalDateTime endDate) {
+        LocalDateTime scheduledTime = endDate.minusHours(24);
+        if (scheduledTime.isBefore(LocalDateTime.now())) {
+            scheduledTime = LocalDateTime.now(); // send immediately if <24h left
+        }
+
+        ScheduledNotification notification = ScheduledNotification.builder()
+                .title(title)
+                .eventId(eventId)
+                .message(message)
+                .recipientIds(userEmails)
+                .state(NotificationStatus.PENDING)
+                .scheduledSendTime(scheduledTime)
+                .build();
+
+        return notificationRepository.save(notification);
+    }
+
+    /**
+     * Returns pending notifications that should be processed.
+     */
     public List<ScheduledNotification> processPendingNotifications() {
-        return notificationRepository.findByStateAndScheduledSendTimeBefore(NotificationStatus.PENDING,
-                LocalDateTime.now()
-        );
+        return notificationRepository.findByStateAndScheduledSendTimeBefore(
+                NotificationStatus.PENDING, LocalDateTime.now());
     }
 
+    /**
+     * Marks a notification as sent after successful delivery.
+     */
     public void markNotificationAsSent(ScheduledNotification notification) {
         notification.markAsSent();
         notificationRepository.save(notification);

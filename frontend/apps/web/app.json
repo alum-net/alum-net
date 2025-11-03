@@ -4,13 +4,13 @@
     "slug": "web",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "../../packages/ui/src/assets/alumnet_logo.png",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "web": {
       "bundler": "metro",
       "output": "single",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "../../packages/ui/src/assets/alumnet_logo.png"
     },
     "plugins": [
       "expo-router",

@@ -11,27 +11,31 @@ import org.alumnet.domain.events.Questionnaire;
 import org.alumnet.domain.events.Task;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.alumnet.application.enums.EventType;
 
 @Mapper(componentModel = "spring")
 public interface EventMapper {
 
     Task eventDTOToTask(EventDTO task);
+
     OnSite eventDTOToOnSite(EventDTO onSite);
+
     Questionnaire eventDTOToQuestionnaire(EventDTO eventDTO);
 
     Question questionDTOToQuestion(QuestionDTO questionDTO);
+
     Answer answerDTOToAnswer(AnswerDTO answerDTO);
 
     default Event eventDTOToEvent(EventDTO eventDTO) {
         return switch (eventDTO.getType()) {
-            case "task" -> eventDTOToTask(eventDTO);
-            case "on-site" -> eventDTOToOnSite(eventDTO);
-            case "questionnaire" -> eventDTOToQuestionnaire(eventDTO);
+            case EventType.TASK -> eventDTOToTask(eventDTO);
+            case EventType.ONSITE -> eventDTOToOnSite(eventDTO);
+            case EventType.QUESTIONNAIRE -> eventDTOToQuestionnaire(eventDTO);
             default -> throw new IllegalArgumentException("Unknown role: " + eventDTO.getType());
         };
     }
+
     @AfterMapping
     default void linkRelations(@MappingTarget Questionnaire questionnaire) {
         if (questionnaire.getQuestions() != null) {

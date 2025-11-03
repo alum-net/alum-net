@@ -116,4 +116,19 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ResultResponse<Object>> handleQuestionnaireValidationException(QuestionnaireValidationException ex) {
         return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Error de validación del cuestionario"));
     }
+
+    @ExceptionHandler(EventHasParticipationException.class)
+    public ResponseEntity<ResultResponse<Object>> handleEventHasParticipationException(EventHasParticipationException ex) {
+        return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "El evento tiene participaciones activas"));
+    }
+
+    @ExceptionHandler(EventNotFoundException.class)
+    public ResponseEntity<ResultResponse<Object>> handleEventNotFoundException(EventNotFoundException ex) {
+        return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "No existe el evento"));
+    }
+
+    @ExceptionHandler(SectionNotFoundException.class)
+    public ResponseEntity<ResultResponse<Object>> handleSectionNotFoundException(SectionNotFoundException ex){
+        return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "No existe la sección"));
+    }
 }

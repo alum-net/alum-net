@@ -49,7 +49,4 @@ public class SectionController {
         sectionService.updateSection(courseId, sectionId, sectionDTO, files);
         return ResponseEntity.ok(ResultResponse.success(null, "Sección actualizada exitosamente"));
     }
-
-
-
 }

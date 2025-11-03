@@ -29,6 +29,9 @@ public class ScheduledNotification {
     @Field("state")
     @Indexed
     private NotificationStatus state;
+    @Field("eventId")
+    @Indexed
+    private Integer eventId;
     @Field("recipient_ids")
     private List<String> recipientIds;
     @Field("sent_at")
