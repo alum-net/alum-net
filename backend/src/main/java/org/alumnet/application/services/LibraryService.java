@@ -2,6 +2,8 @@ package org.alumnet.application.services;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+
+import org.alumnet.application.dtos.CourseContentDTO;
 import org.alumnet.application.dtos.LabelDTO;
 import org.alumnet.application.dtos.LibraryResourceDTO;
 import org.alumnet.application.dtos.requests.LibraryResourceCreationRequestDTO;
@@ -159,7 +161,11 @@ public class LibraryService {
             LibraryResource libraryResource = libraryResourceRepository.findById(resourceId)
                     .orElseThrow(LibraryResourceNotFoundException::new);
 
-            if(libraryResource.getCreator().getRole() != UserRole.ADMIN){
+            User user = userRepository
+                    .findById(modifyRequest.getCurrentUserEmail())
+                    .orElseThrow(UserNotFoundException::new);
+
+            if(user.getRole() != UserRole.ADMIN){
                 if(!Objects.equals(libraryResource.getCreator().getEmail(), modifyRequest.getCurrentUserEmail())){
                     throw new AuthorizationException("Solo el administrador o el creador puede modificar el recurso");
                 }

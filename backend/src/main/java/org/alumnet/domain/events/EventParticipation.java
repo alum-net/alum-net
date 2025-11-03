@@ -2,6 +2,7 @@ package org.alumnet.domain.events;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.alumnet.domain.resources.TaskResource;
 import org.alumnet.domain.users.Student;
 
 @Entity
@@ -25,4 +26,8 @@ public class EventParticipation {
     private Student student;
 
     private Double grade;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "resource_id", referencedColumnName = "id")
+    private TaskResource resource;
 }

@@ -136,4 +136,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ResultResponse<Object>> handleAuthorizationException(AuthorizationException ex){
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResultResponse.error(ex.getMessage(), "Problema en la autorización"));
     }
+
+    @ExceptionHandler(AssignmentDueDateExpiredException.class)
+    public ResponseEntity<ResultResponse<Object>> handleAssignmentDueDateExpiredException(AssignmentDueDateExpiredException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ResultResponse.error(ex.getMessage(), "La fecha de entrega de la tarea ha expirado"));
+    }
+
+    @ExceptionHandler(HomeworkAlreadySubmittedException.class)
+    public ResponseEntity<ResultResponse<Object>> handleHomeworkAlreadySubmittedException(HomeworkAlreadySubmittedException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ResultResponse.error(ex.getMessage(), "La tarea ya ha sido enviada"));
+    }
 }

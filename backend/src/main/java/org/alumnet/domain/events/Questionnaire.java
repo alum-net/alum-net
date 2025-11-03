@@ -6,7 +6,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
-import org.alumnet.domain.Question;
 
 import java.util.ArrayList;
 import java.util.List;
