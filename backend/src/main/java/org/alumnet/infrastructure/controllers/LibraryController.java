@@ -1,10 +1,14 @@
 package org.alumnet.infrastructure.controllers;
 
+import jakarta.ws.rs.Path;
 import lombok.RequiredArgsConstructor;
+
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
 import org.alumnet.application.dtos.LabelDTO;
 import org.alumnet.application.dtos.LibraryResourceDTO;
-import org.alumnet.application.dtos.requests.LibraryResourceCreationRequestDTO;
-import org.alumnet.application.dtos.requests.LibraryResourceFilterDTO;
+import org.alumnet.application.dtos.requests.*;
 import org.alumnet.application.dtos.responses.PageableResultResponse;
 import org.alumnet.application.dtos.responses.ResultResponse;
 import org.alumnet.application.services.LibraryService;
@@ -43,9 +47,11 @@ public class LibraryController {
     @PostMapping(path = "/labels", produces = "application/json")
     @PreAuthorize("hasAnyRole('admin', 'teacher')")
     public ResponseEntity<ResultResponse<LabelDTO>> createLabel(
-           @RequestBody String label) {
-        LabelDTO newLabel =  libraryService.createLabel(label);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ResultResponse.success(newLabel, "Etiqueta creada exitosamente"));
+            @RequestBody LabelCreationDTO label) {
+        LabelDTO newLabel = libraryService
+                .createLabel(label.getName());
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ResultResponse.success(newLabel, "Etiqueta creada exitosamente"));
     }
 
     @DeleteMapping(path = "/labels/{labelId}", produces = "application/json")
@@ -53,7 +59,8 @@ public class LibraryController {
     public ResponseEntity<ResultResponse<Object>> deleteLabel(
             @PathVariable int labelId) {
         libraryService.deleteLabel(labelId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ResultResponse.success(null, "Etiqueta eliminada exitosamente"));
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .body(ResultResponse.success(null, "Etiqueta eliminada exitosamente"));
     }
 
     @GetMapping(path = "/resources", produces = "application/json")
@@ -71,7 +78,6 @@ public class LibraryController {
                         ? "Recursos obtenidos exitosamente"
                         : "No se encontraron recursos que coincidan con los filtros");
 
-
         return ResponseEntity.ok(response);
     }
 
@@ -79,16 +85,37 @@ public class LibraryController {
     @PreAuthorize("hasAnyRole('admin', 'teacher')")
     public ResponseEntity<ResultResponse<Object>> createResource(
             @RequestPart(value = "file", required = true) MultipartFile file,
-            @RequestPart(value = "metadata", required = true) LibraryResourceCreationRequestDTO metadata){
+            @RequestPart(value = "metadata", required = true) LibraryResourceCreationRequestDTO metadata) {
         libraryService.createResource(file, metadata);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ResultResponse.success(null, "Se creó el recurso correctamente"));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ResultResponse.success(null, "Se creó el recurso correctamente"));
     }
 
-    @DeleteMapping(path= "/resources/{resourceId}", produces = "application/json")
+    @DeleteMapping(path = "/resources/{resourceId}", produces = "application/json")
     @PreAuthorize("hasAnyRole('admin', 'teacher')")
     public ResponseEntity<ResultResponse<Object>> deleteResource(
-            @PathVariable Integer resourceId){
+            @PathVariable Integer resourceId) {
         libraryService.deleteResource(resourceId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ResultResponse.success(null, "Se eliminó el recurso correctamente"));
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .body(ResultResponse.success(null, "Se eliminó el recurso correctamente"));
     }
+
+    @PutMapping(path = "/labels/{labelId}", produces = "application/json")
+    @PreAuthorize("hasRole('admin')")
+    public ResponseEntity<ResultResponse<Object>> deleteLabel(
+            @PathVariable int labelId,
+            @RequestBody UpdateLabelRequestDTO label) {
+        libraryService.modifyLabel(labelId, label.getName());
+        return ResponseEntity.ok(ResultResponse.success(null, "Etiqueta modificada exitosamente"));
+    }
+
+    @PatchMapping(path = "/resources/{resourceId}", produces = "application/json")
+    @PreAuthorize("hasAnyRole('admin', 'teacher')")
+    public ResponseEntity<ResultResponse<Object>> modifyResource(
+            @PathVariable int resourceId,
+            @RequestBody(required = true) LibraryResourceUpdateRequestDTO modifyRequest){
+        libraryService.modifyResource(resourceId, modifyRequest);
+        return ResponseEntity.ok(ResultResponse.success(null, "Recurso modificado exitosamente"));
+    }
+
 }

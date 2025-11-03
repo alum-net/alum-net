@@ -5,4 +5,6 @@ export const QUERY_KEYS = {
   getUsers: 'get-users',
   getCourseMembers: 'get-course-members',
   getForumPosts: 'get-forum-posts',
+  getLibraryLabels: 'get-library-labels',
+  getLibraryResources: 'get-library-resources',
 };

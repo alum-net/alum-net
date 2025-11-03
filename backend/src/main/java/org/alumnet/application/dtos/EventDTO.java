@@ -11,14 +11,16 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.alumnet.application.enums.EventType;
+
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class EventDTO {
-    @NotBlank(message = "El tipo no puede ser nulo o vacio")
-    private String type;
+    @NotNull(message = "El tipo no puede ser nulo o vacio")
+    private EventType type;
     @NotNull(message = "El ID de la seccion no puede ser nulo")
     private Integer sectionId;
     @NotBlank(message = "El titulo no puede ser nulo o vacio")
@@ -36,4 +38,15 @@ public class EventDTO {
     @Min(value = 1, message = "La duracion debe ser al menos 1 minuto")
     private Integer durationInMinutes;
 
+    public String mapType() {
+        switch (type) {
+            case EventType.QUESTIONNAIRE:
+                return " questionario";
+            case EventType.ONSITE:
+                return " evento presencial";
+            case EventType.TASK:
+            default:
+                return "a tarea";
+        }
+    }
 }

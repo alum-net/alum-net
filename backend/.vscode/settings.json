@@ -1,6 +1,5 @@
 {
   "java.compile.nullAnalysis.mode": "automatic",
-  "java.jdt.ls.java.home": "/Library/Java/JavaVirtualMachines/jdk-24.jdk/Contents/Home",
   "sqltools.connections": [
     {
       "ssh": "Disabled",

@@ -117,9 +117,24 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Error de validación del cuestionario"));
     }
 
+    @ExceptionHandler(EventHasParticipationException.class)
+    public ResponseEntity<ResultResponse<Object>> handleEventHasParticipationException(EventHasParticipationException ex) {
+        return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "El evento tiene participaciones activas"));
+    }
+
     @ExceptionHandler(EventNotFoundException.class)
     public ResponseEntity<ResultResponse<Object>> handleEventNotFoundException(EventNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultResponse.error(ex.getMessage(), "Evento no encontrado"));
+        return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "No existe el evento"));
+    }
+
+    @ExceptionHandler(SectionNotFoundException.class)
+    public ResponseEntity<ResultResponse<Object>> handleSectionNotFoundException(SectionNotFoundException ex){
+        return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "No existe la sección"));
+    }
+
+    @ExceptionHandler(AuthorizationException.class)
+    public ResponseEntity<ResultResponse<Object>> handleAuthorizationException(AuthorizationException ex){
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResultResponse.error(ex.getMessage(), "Problema en la autorización"));
     }
 
     @ExceptionHandler(AssignmentDueDateExpiredException.class)

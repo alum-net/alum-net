@@ -6,6 +6,8 @@ import org.alumnet.application.dtos.LabelDTO;
 import org.alumnet.application.dtos.LibraryResourceDTO;
 import org.alumnet.application.dtos.requests.LibraryResourceCreationRequestDTO;
 import org.alumnet.application.dtos.requests.LibraryResourceFilterDTO;
+import org.alumnet.application.dtos.requests.LibraryResourceUpdateRequestDTO;
+import org.alumnet.application.enums.UserRole;
 import org.alumnet.application.mapper.LibraryMapper;
 import org.alumnet.application.query_builders.LabelSpecification;
 import org.alumnet.application.query_builders.LibraryResourceSpecification;
@@ -16,14 +18,17 @@ import org.alumnet.domain.resources.Label;
 import org.alumnet.domain.resources.LibraryResource;
 import org.alumnet.domain.users.User;
 import org.alumnet.infrastructure.exceptions.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Duration;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -35,13 +40,16 @@ public class LibraryService {
     private final S3FileStorageService fileStorageService;
     private final FileValidationService fileValidationService;
     private final LibraryMapper libraryMapper;
+    private final S3FileStorageService s3FileStorageService;
+    @Value("${aws.s3.duration-url-hours}")
+    private long urlDuration;
 
     public Page<LabelDTO> getLabel(String textToSearch, Pageable page) {
         Page<Label> labelPage;
 
-        if(textToSearch == null){
+        if (textToSearch == null) {
             labelPage = labelRepository.findAll(page);
-        }else{
+        } else {
             Specification<Label> labelSpec = LabelSpecification.byName(textToSearch, false);
             labelPage = labelRepository.findAll(labelSpec, page);
         }
@@ -52,7 +60,8 @@ public class LibraryService {
     public LabelDTO createLabel(String label) {
         Specification<Label> labelSpec = LabelSpecification.byName(label, true);
 
-        if(labelRepository.exists(labelSpec)) throw new LabelAlreadyExistsException();
+        if (labelRepository.exists(labelSpec))
+            throw new LabelAlreadyExistsException();
 
         Label newLabel = Label.builder().name(label).build();
 
@@ -78,28 +87,33 @@ public class LibraryService {
     public Page<LibraryResourceDTO> getResources(LibraryResourceFilterDTO filter, Pageable page) {
         boolean hasFilter = filter != null
                 && (filter.getName() != null
-                    || (filter.getLabelIds() != null && !filter.getLabelIds().isEmpty()));
+                        || (filter.getLabelIds() != null && !filter.getLabelIds().isEmpty()));
 
         Page<LibraryResource> resources;
 
-        if(!hasFilter){
+        if (!hasFilter) {
             resources = libraryResourceRepository.findAll(page);
-        }
-        else{
+        } else {
             Specification<LibraryResource> resourceSpec = LibraryResourceSpecification.byFilters(filter);
             resources = libraryResourceRepository.findAll(resourceSpec, page);
         }
 
-        return resources.map(libraryMapper::libraryToLibraryResourceDTO);
+        return resources.map(resource -> {
+            LibraryResourceDTO dto = libraryMapper.libraryToLibraryResourceDTO(resource);
+            dto.setUrl(s3FileStorageService
+                    .generatePresignedUrl(dto.getUrl(), Duration.ofHours(urlDuration)));
+            return dto;
+        });
     }
 
     public void createResource(MultipartFile file, LibraryResourceCreationRequestDTO metadata) {
-        String fileName =  file.getOriginalFilename();
+        String fileName = file.getOriginalFilename();
 
         fileValidationService.validateFile(file, false);
 
         Specification<LibraryResource> resourceSpec = LibraryResourceSpecification.byName(fileName, true);
-        if(libraryResourceRepository.exists(resourceSpec)) throw new LibraryResourceAlreadyExistsException();
+        if (libraryResourceRepository.exists(resourceSpec))
+            throw new LibraryResourceAlreadyExistsException();
 
         String url = fileStorageService.store(file, "library/resources");
 
@@ -130,5 +144,46 @@ public class LibraryService {
         fileStorageService.deleteMultipleFile(libraryResource.getUrl());
 
         libraryResourceRepository.delete(libraryResource);
+    }
+
+    public void modifyLabel(int labelId, String name) {
+        Label label = labelRepository.findById(labelId).orElseThrow(LabelNotFoundException::new);
+        if(!Objects.equals(name, label.getName())){
+            label.setName(name);
+            labelRepository.save(label);
+        }
+    }
+
+    public void modifyResource(int resourceId, LibraryResourceUpdateRequestDTO modifyRequest) {
+        if(modifyRequest == null) throw new NoPendingChangesException();
+
+        if(modifyRequest.getTitle() != null || (modifyRequest.getLabelIds() != null && !modifyRequest.getLabelIds().isEmpty())){
+            LibraryResource libraryResource = libraryResourceRepository.findById(resourceId)
+                    .orElseThrow(LibraryResourceNotFoundException::new);
+
+            User user = userRepository
+                    .findById(modifyRequest.getCurrentUserEmail())
+                    .orElseThrow(UserNotFoundException::new);
+
+            if(user.getRole() != UserRole.ADMIN){
+                if(!Objects.equals(libraryResource.getCreator().getEmail(), modifyRequest.getCurrentUserEmail())){
+                    throw new AuthorizationException("Solo el administrador o el creador puede modificar el recurso");
+                }
+            }
+
+            if(modifyRequest.getTitle() != null) libraryResource.setTitle(modifyRequest.getTitle());
+
+            if(modifyRequest.getLabelIds() != null && !modifyRequest.getLabelIds().isEmpty()){
+                Set<Label> newLabelSet = new HashSet<>(labelRepository.findAllById(modifyRequest.getLabelIds()));
+
+                if(newLabelSet.size() != modifyRequest.getLabelIds().size()){
+                    throw new InvalidAttributeException("Una o más etiquetas no son válidas");
+                }
+
+                libraryResource.setLabels(newLabelSet);
+            }
+
+            libraryResourceRepository.save(libraryResource);
+        }
     }
 }

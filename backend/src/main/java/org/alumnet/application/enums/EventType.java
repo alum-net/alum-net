@@ -11,7 +11,6 @@ public enum EventType {
 
     private final String value;
 
-
      EventType(String value) {
         this.value = value;
     }

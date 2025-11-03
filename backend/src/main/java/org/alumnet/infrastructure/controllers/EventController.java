@@ -40,4 +40,11 @@ public class EventController {
         eventService.submitHomework(eventId, homeworkFile,studentEmail);
         return ResponseEntity.ok(ResultResponse.success(null, "Tarea enviada exitosamente"));
     }
+
+    @DeleteMapping(value = "/{eventId}", produces = "application/json")
+    @PreAuthorize("hasRole('teacher')")
+    public ResponseEntity<ResultResponse<Object>> deleteEvent(@PathVariable(required = true) int eventId) {
+        eventService.deleteEvent(eventId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ResultResponse.success(null, "Tarea eliminada exitosamente"));
+    }
 }
