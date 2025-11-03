@@ -6,9 +6,9 @@ import java.util.List;
 
 @Data
 @Builder
-public class BulkCreationResponseDTO {
+public class BulkTaskResponseDTO {
     private int totalRecords;
-    private int successfulCreations;
-    private int failedCreations;
-    private List<BulkCreationErrorDetailDTO> errors;
+    private int successfulRecords;
+    private int failedRecords;
+    private List<BulkTaskErrorDetailDTO> errors;
 }

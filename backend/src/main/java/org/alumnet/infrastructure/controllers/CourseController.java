@@ -6,7 +6,7 @@ import org.alumnet.application.dtos.*;
 import org.alumnet.application.dtos.requests.CourseCreationRequestDTO;
 import org.alumnet.application.dtos.requests.CourseFilterDTO;
 import org.alumnet.application.dtos.requests.EnrollmentRequestDTO;
-import org.alumnet.application.dtos.responses.BulkCreationResponseDTO;
+import org.alumnet.application.dtos.responses.BulkTaskResponseDTO;
 import org.alumnet.application.dtos.responses.PageableResultResponse;
 import org.alumnet.application.dtos.responses.ResultResponse;
 import org.alumnet.application.services.CourseService;
@@ -19,6 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/courses")
@@ -114,27 +116,55 @@ public class CourseController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<ResultResponse<BulkCreationResponseDTO>> bulkCreateCourses(
+    public ResponseEntity<ResultResponse<BulkTaskResponseDTO>> bulkCreateCourses(
             @RequestPart("file") MultipartFile file,
             @RequestParam(value = "hasHeaders", required = false, defaultValue = "false") boolean hasHeaders) {
 
-        BulkCreationResponseDTO bulkCreationResponse = courseService.bulkCreateCourses(file, hasHeaders);
+        BulkTaskResponseDTO bulkCreationResponse = courseService.bulkCreateCourses(file, hasHeaders);
 
         if (bulkCreationResponse.getTotalRecords() > 0 &&
-                bulkCreationResponse.getTotalRecords() == bulkCreationResponse.getFailedCreations()) {
+                bulkCreationResponse.getTotalRecords() == bulkCreationResponse.getFailedRecords()) {
 
             return ResponseEntity.badRequest().body(ResultResponse.success(
                     bulkCreationResponse,
                     "La solicitud de creación masiva de cursos no se pudo procesar completamente (todos los registros fallaron)."));
         }
 
-        String successMessage = bulkCreationResponse.getFailedCreations() == 0
+        String successMessage = bulkCreationResponse.getFailedRecords() == 0
                 ? "Carga masiva de cursos completada exitosamente."
-                : "Carga masiva finalizada con " + bulkCreationResponse.getFailedCreations() + " errores. Revise el reporte.";
+                : "Carga masiva finalizada con " + bulkCreationResponse.getFailedRecords() + " errores. Revise el reporte.";
 
         return ResponseEntity.ok(ResultResponse.success(
                 bulkCreationResponse,
                 successMessage));
     }
+
+    @DeleteMapping(path = "/bulk-deletion",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('admin')")
+    public ResponseEntity<ResultResponse<Object>> bulkDeletion(
+            @RequestPart(value = "file", required = true) MultipartFile file,
+            @RequestParam(value = "hasHeaders", required = false, defaultValue = "false") boolean hasHeaders){
+
+        BulkTaskResponseDTO bulkDeletionResponse = courseService.bulkDeleteCourses(file, hasHeaders);
+
+        if(bulkDeletionResponse.getFailedRecords() == bulkDeletionResponse.getTotalRecords()){
+            return ResponseEntity.badRequest().body(ResultResponse
+                    .error(bulkDeletionResponse
+                            .getErrors().stream()
+                                    .map(error ->
+                                            "Linea " + error.getLineNumber() + ": " + error.getReason())
+                                    .collect(Collectors.toList()),
+                            "La solicitud de baja masiva de cursos no se pudo completar"));
+        }
+
+        String successMessage = bulkDeletionResponse.getFailedRecords() == 0
+                ? "Eliminación masiva de cursos completada exitosamente."
+                : "Eliminación masiva finalizada con " + bulkDeletionResponse.getFailedRecords() + " errores. Revise el reporte.";
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ResultResponse.success(bulkDeletionResponse, successMessage));
+    }
+
 
 }

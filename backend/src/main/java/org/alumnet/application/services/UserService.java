@@ -4,14 +4,12 @@ import com.opencsv.bean.CsvToBeanBuilder;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.requests.UserBulkCreationDTO;
-import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.requests.UserCreationRequestDTO;
 import org.alumnet.application.dtos.UserDTO;
 import org.alumnet.application.dtos.requests.UserFilterDTO;
 import org.alumnet.application.dtos.requests.UserModifyRequestDTO;
-import org.alumnet.application.dtos.responses.BulkCreationErrorDetailDTO;
-import org.alumnet.application.dtos.responses.BulkCreationResponseDTO;
-import org.alumnet.application.dtos.requests.UserModifyRequestDTO;
+import org.alumnet.application.dtos.responses.BulkTaskErrorDetailDTO;
+import org.alumnet.application.dtos.responses.BulkTaskResponseDTO;
 import org.alumnet.application.mapper.UserMapper;
 import org.alumnet.application.query_builders.UserSpecification;
 import org.alumnet.domain.repositories.UserRepository;
@@ -23,7 +21,6 @@ import org.alumnet.infrastructure.exceptions.UserNotFoundException;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,7 +28,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
@@ -111,12 +107,12 @@ public class UserService {
                 .orElseThrow(UserNotFoundException::new);
     }
 
-    public BulkCreationResponseDTO bulkCreateUsers(MultipartFile file, boolean hasHeaders) {
+    public BulkTaskResponseDTO bulkCreateUsers(MultipartFile file, boolean hasHeaders) {
         if (file.isEmpty()) {
             throw new IllegalArgumentException("El archivo CSV no debe estar vacío.");
         }
 
-        List<BulkCreationErrorDetailDTO> errors = new ArrayList<>();
+        List<BulkTaskErrorDetailDTO> errors = new ArrayList<>();
         List<UserBulkCreationDTO> bulkCreationList;
         int successfulCreations = 0;
 
@@ -155,19 +151,19 @@ public class UserService {
                 successfulCreations++;
 
             } catch (ExistingUserException e) {
-                errors.add(BulkCreationErrorDetailDTO.builder()
+                errors.add(BulkTaskErrorDetailDTO.builder()
                         .lineNumber(currentLine)
                         .identifier(bulkDTO.getEmail())
                         .reason("El usuario ya existe en el sistema.")
                         .build());
             } catch (IllegalArgumentException e) {
-                errors.add(BulkCreationErrorDetailDTO.builder()
+                errors.add(BulkTaskErrorDetailDTO.builder()
                         .lineNumber(currentLine)
                         .identifier(bulkDTO.getEmail())
                         .reason(e.getMessage())
                         .build());
             } catch (Exception e) {
-                errors.add(BulkCreationErrorDetailDTO.builder()
+                errors.add(BulkTaskErrorDetailDTO.builder()
                         .lineNumber(currentLine)
                         .identifier(bulkDTO.getEmail())
                         .reason("Error desconocido al crear el usuario: " + e.getMessage())
@@ -175,10 +171,10 @@ public class UserService {
             }
         }
 
-        return BulkCreationResponseDTO.builder()
+        return BulkTaskResponseDTO.builder()
                 .totalRecords(bulkCreationList.size())
-                .successfulCreations(successfulCreations)
-                .failedCreations(errors.size())
+                .successfulRecords(successfulCreations)
+                .failedRecords(errors.size())
                 .errors(errors)
                 .build();
     }

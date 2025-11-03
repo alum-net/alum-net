@@ -5,12 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.CourseContentDTO;
 import org.alumnet.application.dtos.CourseDTO;
 import org.alumnet.application.dtos.UserDTO;
-import org.alumnet.application.dtos.requests.CourseBulkCreationDTO;
-import org.alumnet.application.dtos.requests.CourseCreationRequestDTO;
-import org.alumnet.application.dtos.requests.CourseFilterDTO;
-import org.alumnet.application.dtos.requests.UserFilterDTO;
-import org.alumnet.application.dtos.responses.BulkCreationErrorDetailDTO;
-import org.alumnet.application.dtos.responses.BulkCreationResponseDTO;
+import org.alumnet.application.dtos.requests.*;
+import org.alumnet.application.dtos.responses.BulkTaskErrorDetailDTO;
+import org.alumnet.application.dtos.responses.BulkTaskResponseDTO;
 import org.alumnet.application.enums.ShiftType;
 import org.alumnet.application.enums.UserRole;
 import org.alumnet.application.mapper.CourseMapper;
@@ -206,12 +203,12 @@ public class CourseService {
         return courseContent;
     }
 
-    public BulkCreationResponseDTO bulkCreateCourses(MultipartFile file, boolean hasHeaders) {
+    public BulkTaskResponseDTO bulkCreateCourses(MultipartFile file, boolean hasHeaders) {
         if (file.isEmpty()) {
             throw new IllegalArgumentException("El archivo CSV no debe estar vacío.");
         }
 
-        List<BulkCreationErrorDetailDTO> errors = new ArrayList<>();
+        List<BulkTaskErrorDetailDTO> errors = new ArrayList<>();
         List<CourseBulkCreationDTO> bulkCreationList;
         int successfulCreations = 0;
 
@@ -273,19 +270,19 @@ public class CourseService {
                 successfulCreations++;
 
             } catch (InvalidAttributeException e) {
-                errors.add(BulkCreationErrorDetailDTO.builder()
+                errors.add(BulkTaskErrorDetailDTO.builder()
                         .lineNumber(currentLine)
                         .identifier(identifier)
                         .reason("Error de validación: " + e.getMessage())
                         .build());
             } catch (DateTimeParseException e) {
-                errors.add(BulkCreationErrorDetailDTO.builder()
+                errors.add(BulkTaskErrorDetailDTO.builder()
                         .lineNumber(currentLine)
                         .identifier(identifier)
                         .reason("Error de formato de fecha. Use YYYY-MM-DD.")
                         .build());
             } catch (Exception e) {
-                errors.add(BulkCreationErrorDetailDTO.builder()
+                errors.add(BulkTaskErrorDetailDTO.builder()
                         .lineNumber(currentLine)
                         .identifier(identifier)
                         .reason("Error desconocido al crear curso: " + e.getMessage())
@@ -293,10 +290,91 @@ public class CourseService {
             }
         }
 
-        return BulkCreationResponseDTO.builder()
+        return BulkTaskResponseDTO.builder()
                 .totalRecords(bulkCreationList.size())
-                .successfulCreations(successfulCreations)
-                .failedCreations(errors.size())
+                .successfulRecords(successfulCreations)
+                .failedRecords(errors.size())
+                .errors(errors)
+                .build();
+    }
+
+    public List<Student> findEnrolledStudentsInCourse(int id) {
+        return participationRepository.findEnrolledStudentsByCourseId(id);
+    }
+
+    public BulkTaskResponseDTO bulkDeleteCourses(MultipartFile file, boolean hasHeaders) {
+        if(file.isEmpty()){
+            throw new IllegalArgumentException("El archivo CSV no debe estar vacío");
+        }
+
+        List<BulkTaskErrorDetailDTO> errors = new ArrayList<>();
+        List<CourseBulkDeletionDTO> bulkDeletionList;
+
+        int successfulDeletions = 0;
+
+        try (Reader reader = new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8)){
+            CsvToBeanBuilder<CourseBulkDeletionDTO> builder = new CsvToBeanBuilder<CourseBulkDeletionDTO>(reader)
+                    .withType(CourseBulkDeletionDTO.class)
+                    .withSeparator(',');
+
+            if(hasHeaders){
+                builder.withSkipLines(1);
+            }
+
+            bulkDeletionList = builder.build().parse();
+
+        }catch (Exception ex){
+            throw new RuntimeException("Error al leer o parsear archivo CSV.");
+        }
+
+        int initialLineNumber = hasHeaders ? 2 : 1;
+
+        for(CourseBulkDeletionDTO deletion : bulkDeletionList){
+            int currentLine = initialLineNumber++;
+            String identifier = deletion.getCourseId() != null
+                    ? deletion.getCourseId().toString()
+                    : "Id vacío";
+
+            int courseId;
+
+            try{
+                if(deletion.getCourseId() == null){
+                    throw new InvalidAttributeException("El ID del curso no puede ser nulo.");
+                }
+
+                deleteCourse(deletion.getCourseId());
+                successfulDeletions++;
+            }catch (CourseNotFoundException e) {
+                errors.add(BulkTaskErrorDetailDTO.builder()
+                        .lineNumber(currentLine)
+                        .identifier(identifier)
+                        .reason("Error: Curso con ID " + identifier + " no encontrado.")
+                        .build());
+            } catch (ActiveCourseException e) {
+                errors.add(BulkTaskErrorDetailDTO.builder()
+                        .lineNumber(currentLine)
+                        .identifier(identifier)
+                        .reason("Error: " + e.getMessage())
+                        .build());
+            } catch (InvalidAttributeException e) {
+                errors.add(BulkTaskErrorDetailDTO.builder()
+                        .lineNumber(currentLine)
+                        .identifier(identifier)
+                        .reason("Error de validación: " + e.getMessage())
+                        .build());
+            } catch (Exception e) {
+                errors.add(BulkTaskErrorDetailDTO.builder()
+                        .lineNumber(currentLine)
+                        .identifier(identifier)
+                        .reason("Error desconocido al dar de baja: " + e.getMessage())
+                        .build());
+            }
+        }
+
+        return BulkTaskResponseDTO.builder()
+                .totalRecords(bulkDeletionList.size())
+                .successfulRecords(successfulDeletions)
+                .failedRecords(errors.size())
                 .errors(errors)
                 .build();
     }
@@ -375,9 +453,5 @@ public class CourseService {
         if (approvalGrade == null || approvalGrade < 0.0 || approvalGrade > 1.0) {
             throw new InvalidAttributeException("La nota mínima debe estar entre 0.0 y 1.0");
         }
-    }
-
-    public List<Student> findEnrolledStudentsInCourse(int id) {
-        return participationRepository.findEnrolledStudentsByCourseId(id);
     }
 }
