@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface LibraryResourceRepository extends JpaRepository<LibraryResource, Integer>, JpaSpecificationExecutor<LibraryResource> {
     @EntityGraph(attributePaths = {"labels", "creator"})
@@ -16,4 +18,7 @@ public interface LibraryResourceRepository extends JpaRepository<LibraryResource
 
     @EntityGraph(attributePaths = {"labels", "creator"})
     Page<LibraryResource> findAll(Specification<LibraryResource> spec, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"labels", "creator"})
+    Optional<LibraryResource> findById(Integer id);
 }

@@ -1,5 +1,6 @@
 package org.alumnet.infrastructure.controllers;
 
+import jakarta.ws.rs.Path;
 import lombok.RequiredArgsConstructor;
 
 import java.net.URLDecoder;
@@ -7,10 +8,7 @@ import java.nio.charset.StandardCharsets;
 
 import org.alumnet.application.dtos.LabelDTO;
 import org.alumnet.application.dtos.LibraryResourceDTO;
-import org.alumnet.application.dtos.requests.LabelCreationDTO;
-import org.alumnet.application.dtos.requests.LibraryResourceCreationRequestDTO;
-import org.alumnet.application.dtos.requests.LibraryResourceFilterDTO;
-import org.alumnet.application.dtos.requests.UpdateLabelRequestDTO;
+import org.alumnet.application.dtos.requests.*;
 import org.alumnet.application.dtos.responses.PageableResultResponse;
 import org.alumnet.application.dtos.responses.ResultResponse;
 import org.alumnet.application.services.LibraryService;
@@ -110,4 +108,14 @@ public class LibraryController {
         libraryService.modifyLabel(labelId, label.getName());
         return ResponseEntity.ok(ResultResponse.success(null, "Etiqueta modificada exitosamente"));
     }
+
+    @PatchMapping(path = "/resources/{resourceId}", produces = "application/json")
+    @PreAuthorize("hasAnyRole('admin', 'teacher')")
+    public ResponseEntity<ResultResponse<Object>> modifyResource(
+            @PathVariable int resourceId,
+            @RequestBody(required = true) LibraryResourceUpdateRequestDTO modifyRequest){
+        libraryService.modifyResource(resourceId, modifyRequest);
+        return ResponseEntity.ok(ResultResponse.success(null, "Recurso modificado exitosamente"));
+    }
+
 }

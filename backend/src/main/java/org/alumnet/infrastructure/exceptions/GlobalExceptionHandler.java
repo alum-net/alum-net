@@ -131,4 +131,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ResultResponse<Object>> handleSectionNotFoundException(SectionNotFoundException ex){
         return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "No existe la sección"));
     }
+
+    @ExceptionHandler(AuthorizationException.class)
+    public ResponseEntity<ResultResponse<Object>> handleAuthorizationException(AuthorizationException ex){
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResultResponse.error(ex.getMessage(), "Problema en la autorización"));
+    }
 }

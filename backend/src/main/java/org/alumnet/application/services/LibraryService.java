@@ -2,12 +2,12 @@ package org.alumnet.application.services;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-
-import org.alumnet.application.dtos.CourseContentDTO;
 import org.alumnet.application.dtos.LabelDTO;
 import org.alumnet.application.dtos.LibraryResourceDTO;
 import org.alumnet.application.dtos.requests.LibraryResourceCreationRequestDTO;
 import org.alumnet.application.dtos.requests.LibraryResourceFilterDTO;
+import org.alumnet.application.dtos.requests.LibraryResourceUpdateRequestDTO;
+import org.alumnet.application.enums.UserRole;
 import org.alumnet.application.mapper.LibraryMapper;
 import org.alumnet.application.query_builders.LabelSpecification;
 import org.alumnet.application.query_builders.LibraryResourceSpecification;
@@ -151,6 +151,35 @@ public class LibraryService {
         if(!Objects.equals(name, label.getName())){
             label.setName(name);
             labelRepository.save(label);
+        }
+    }
+
+    public void modifyResource(int resourceId, LibraryResourceUpdateRequestDTO modifyRequest) {
+        if(modifyRequest == null) throw new NoPendingChangesException();
+
+        if(modifyRequest.getTitle() != null || (modifyRequest.getLabelIds() != null && !modifyRequest.getLabelIds().isEmpty())){
+            LibraryResource libraryResource = libraryResourceRepository.findById(resourceId)
+                    .orElseThrow(LibraryResourceNotFoundException::new);
+
+            if(libraryResource.getCreator().getRole() != UserRole.ADMIN){
+                if(!Objects.equals(libraryResource.getCreator().getEmail(), modifyRequest.getCurrentUserEmail())){
+                    throw new AuthorizationException("Solo el administrador o el creador puede modificar el recurso");
+                }
+            }
+
+            if(modifyRequest.getTitle() != null) libraryResource.setTitle(modifyRequest.getTitle());
+
+            if(modifyRequest.getLabelIds() != null && !modifyRequest.getLabelIds().isEmpty()){
+                Set<Label> newLabelSet = new HashSet<>(labelRepository.findAllById(modifyRequest.getLabelIds()));
+
+                if(newLabelSet.size() != modifyRequest.getLabelIds().size()){
+                    throw new InvalidAttributeException("Una o más etiquetas no son válidas");
+                }
+
+                libraryResource.setLabels(newLabelSet);
+            }
+
+            libraryResourceRepository.save(libraryResource);
         }
     }
 }
