@@ -6,7 +6,7 @@ import org.alumnet.application.dtos.*;
 import org.alumnet.application.dtos.requests.CourseCreationRequestDTO;
 import org.alumnet.application.dtos.requests.CourseFilterDTO;
 import org.alumnet.application.dtos.requests.EnrollmentRequestDTO;
-import org.alumnet.application.dtos.responses.BulkTaskResponseDTO;
+import org.alumnet.application.dtos.responses.BulkResponseDTO;
 import org.alumnet.application.dtos.responses.PageableResultResponse;
 import org.alumnet.application.dtos.responses.ResultResponse;
 import org.alumnet.application.services.CourseService;
@@ -116,11 +116,11 @@ public class CourseController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<ResultResponse<BulkTaskResponseDTO>> bulkCreateCourses(
+    public ResponseEntity<ResultResponse<BulkResponseDTO>> bulkCreateCourses(
             @RequestPart("file") MultipartFile file,
             @RequestParam(value = "hasHeaders", required = false, defaultValue = "false") boolean hasHeaders) {
 
-        BulkTaskResponseDTO bulkCreationResponse = courseService.bulkCreateCourses(file, hasHeaders);
+        BulkResponseDTO bulkCreationResponse = courseService.bulkCreateCourses(file, hasHeaders);
 
         if (bulkCreationResponse.getTotalRecords() > 0 &&
                 bulkCreationResponse.getTotalRecords() == bulkCreationResponse.getFailedRecords()) {
@@ -147,7 +147,7 @@ public class CourseController {
             @RequestPart(value = "file", required = true) MultipartFile file,
             @RequestParam(value = "hasHeaders", required = false, defaultValue = "false") boolean hasHeaders){
 
-        BulkTaskResponseDTO bulkDeletionResponse = courseService.bulkDeleteCourses(file, hasHeaders);
+        BulkResponseDTO bulkDeletionResponse = courseService.bulkDeleteCourses(file, hasHeaders);
 
         if(bulkDeletionResponse.getFailedRecords() == bulkDeletionResponse.getTotalRecords()){
             return ResponseEntity.badRequest().body(ResultResponse
@@ -166,5 +166,31 @@ public class CourseController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ResultResponse.success(bulkDeletionResponse, successMessage));
     }
 
+    @PostMapping(path = "/{courseId}/participations/bulk-enroll",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('teacher')")
+    public ResponseEntity<ResultResponse<BulkResponseDTO>> bulkEnrollStudents(
+            @PathVariable int courseId,
+            @RequestPart("file") MultipartFile file,
+            @RequestParam(value = "hasHeaders", required = false, defaultValue = "false") boolean hasHeaders){
 
+        BulkResponseDTO bulkEnrollResponse = courseService.bulkEnrollment(courseId, file, hasHeaders);
+
+        if(bulkEnrollResponse.getFailedRecords() == bulkEnrollResponse.getTotalRecords()){
+            return ResponseEntity.badRequest().body(ResultResponse
+                    .error(bulkEnrollResponse
+                                    .getErrors().stream()
+                                    .map(error ->
+                                            "Linea " + error.getLineNumber() + ": " + error.getReason())
+                                    .collect(Collectors.toList()),
+                            "La solicitud de matriculación masiva no se pudo completar"));
+        }
+
+        String successMessage = bulkEnrollResponse.getFailedRecords() == 0
+                ? "Matriculación masiva de cursos completada exitosamente."
+                : "Matriculación masiva finalizada con " + bulkEnrollResponse.getFailedRecords() + " errores. Revise el reporte.";
+
+        return ResponseEntity.ok(ResultResponse.success(bulkEnrollResponse ,successMessage));
+    }
 }

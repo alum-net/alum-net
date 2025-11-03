@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class BulkTaskErrorDetailDTO {
+public class BulkErrorDetailDTO {
     private int lineNumber;
     private String identifier;
     private String reason;
