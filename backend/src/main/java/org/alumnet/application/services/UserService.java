@@ -45,8 +45,6 @@ public class UserService {
     private final UserMapper userMapper;
     private final S3FileStorageService fileStorageService;
     private final FileValidationService fileValidationService;
-    @Value("${aws.s3.duration-url-hours}")
-    private long urlDuration;
 
     public void createUser(UserCreationRequestDTO userCreationRequestDTO) throws ExistingUserException {
         try {
@@ -88,7 +86,7 @@ public class UserService {
             UserDTO dto = userMapper.userToUserDTO(user);
             if (user.getAvatarUrl() != null) {
                 dto.setAvatarUrl(fileStorageService.generatePresignedUrl(
-                        dto.getAvatarUrl(), Duration.ofDays(urlDuration)));
+                        dto.getAvatarUrl()));
             }
             return dto;
         });
@@ -100,7 +98,7 @@ public class UserService {
                     UserDTO dto = userMapper.userToUserDTO(user);
                     if (user.getAvatarUrl() != null) {
                         dto.setAvatarUrl(fileStorageService.generatePresignedUrl(
-                                dto.getAvatarUrl(), Duration.ofDays(urlDuration)));
+                                dto.getAvatarUrl()));
                     }
                     return dto;
                 })

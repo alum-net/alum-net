@@ -58,8 +58,6 @@ public class CourseService {
     private final ParticipationRepository participationRepository;
     private final CourseContentStrategyFactory courseContentStrategyFactory;
     private final S3FileStorageService s3FileStorageService;
-    @Value("${aws.s3.duration-url-hours}")
-    private long urlDuration;
 
     private final CourseMapper courseMapper;
 
@@ -434,7 +432,7 @@ public class CourseService {
         courseContent.getSections().getData()
                 .forEach(section -> section.getSectionResources()
                         .forEach(sectionResource -> sectionResource.setUrl(s3FileStorageService
-                                .generatePresignedUrl(sectionResource.getUrl(), Duration.ofHours(urlDuration)))));
+                                .generatePresignedUrl(sectionResource.getUrl()))));
     }
 
     private void validateTeachers(List<String> teacherEmails, List<Teacher> teachers) {
