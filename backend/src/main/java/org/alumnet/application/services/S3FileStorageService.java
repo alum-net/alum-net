@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.alumnet.infrastructure.config.AmazonS3Config;
 import org.alumnet.infrastructure.exceptions.FileStorageException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -24,163 +25,165 @@ import java.util.stream.Collectors;
 @Slf4j
 public class S3FileStorageService {
 
-        private final S3Client s3Client;
-        private final AmazonS3Config.S3Properties s3Properties;
-        private final S3Presigner s3Presigner;
+    private final S3Client s3Client;
+    private final AmazonS3Config.S3Properties s3Properties;
+    private final S3Presigner s3Presigner;
+    @Value("${aws.s3.duration-url-hours}")
+    private long urlDuration;
 
-        public String store(MultipartFile file, String folderPath) throws FileStorageException {
-                try {
-                        String key = String.format("%s/%s",
-                                        folderPath.endsWith("/") ? folderPath.substring(0, folderPath.lastIndexOf("/"))
-                                                        : folderPath,
-                                        file.getOriginalFilename());
+    public String store(MultipartFile file, String folderPath) throws FileStorageException {
+        try {
+            String key = String.format("%s/%s",
+                    folderPath.endsWith("/") ? folderPath.substring(0, folderPath.lastIndexOf("/"))
+                            : folderPath,
+                    file.getOriginalFilename());
 
-                        Map<String, String> metadata = Map.of(
-                                        "original-filename", file.getOriginalFilename(),
-                                        "content-type", file.getContentType());
+            Map<String, String> metadata = Map.of(
+                    "original-filename", file.getOriginalFilename(),
+                    "content-type", file.getContentType());
 
-                        PutObjectResponse response = s3Client.putObject(createPutObjectRequest(file, key, metadata),
-                                        createAWSrequestBody(file));
+            PutObjectResponse response = s3Client.putObject(createPutObjectRequest(file, key, metadata),
+                    createAWSrequestBody(file));
 
-                        log.info("Archivo subido exitosamente a S3: bucket={}, key={}, etag={}",
-                                        s3Properties.getBucketName(), key, response.eTag());
+            log.info("Archivo subido exitosamente a S3: bucket={}, key={}, etag={}",
+                    s3Properties.getBucketName(), key, response.eTag());
 
-                        return key;
+            return key;
 
-                } catch (Exception e) {
-                        log.error("Error subiendo archivo a S3: {}", file.getOriginalFilename(), e);
-                        throw new FileStorageException(
-                                        String.format("Error almacenando archivo en S3: %s",
-                                                        file.getOriginalFilename()),
-                                        "upload");
-                }
+        } catch (Exception e) {
+            log.error("Error subiendo archivo a S3: {}", file.getOriginalFilename(), e);
+            throw new FileStorageException(
+                    String.format("Error almacenando archivo en S3: %s",
+                            file.getOriginalFilename()),
+                    "upload");
         }
+    }
 
-        private static RequestBody createAWSrequestBody(MultipartFile file) throws IOException {
-                return RequestBody.fromInputStream(
-                                file.getInputStream(), file.getSize());
+    private static RequestBody createAWSrequestBody(MultipartFile file) throws IOException {
+        return RequestBody.fromInputStream(
+                file.getInputStream(), file.getSize());
+    }
+
+    private PutObjectRequest createPutObjectRequest(MultipartFile file, String key, Map<String, String> metadata) {
+        return PutObjectRequest.builder()
+                .bucket(s3Properties.getBucketName())
+                .key(key)
+                .contentType(file.getContentType())
+                .contentLength(file.getSize())
+                .metadata(metadata)
+                .serverSideEncryption(ServerSideEncryption.AES256)
+                .build();
+    }
+
+    public String generatePresignedUrl(String key) {
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(s3Properties.getBucketName())
+                .key(key)
+                .build();
+
+        PresignedGetObjectRequest presignedRequest = s3Presigner
+                .presignGetObject(r -> r.signatureDuration(Duration.ofHours(urlDuration))
+                        .getObjectRequest(getObjectRequest));
+
+        return presignedRequest.url().toString();
+    }
+
+    public void deleteFolder(String folderPath) {
+        try {
+            String normalizedPath = folderPath.endsWith("/") ? folderPath : folderPath + "/";
+
+            log.info("Iniciando eliminación de carpeta en S3: bucket={}, prefix={}",
+                    s3Properties.getBucketName(), normalizedPath);
+
+            List<ObjectIdentifier> objectsToDelete = new ArrayList<>();
+
+            s3Client.listObjectsV2Paginator(builder -> builder
+                            .bucket(s3Properties.getBucketName())
+                            .prefix(normalizedPath))
+                    .contents()
+                    .forEach(s3Object -> {
+                        objectsToDelete.add(ObjectIdentifier.builder()
+                                .key(s3Object.key())
+                                .build());
+                    });
+
+            if (objectsToDelete.isEmpty()) {
+                log.warn("No se encontraron archivos para eliminar en: {}", normalizedPath);
+                return;
+            }
+
+            DeleteObjectsRequest deleteRequest = DeleteObjectsRequest.builder()
+                    .bucket(s3Properties.getBucketName())
+                    .delete(Delete.builder()
+                            .objects(objectsToDelete)
+                            .build())
+                    .build();
+
+            DeleteObjectsResponse response = s3Client.deleteObjects(deleteRequest);
+
+            log.info("Carpeta eliminada exitosamente de S3: {} archivos eliminados",
+                    response.deleted().size());
+
+            if (!response.errors().isEmpty()) {
+                response.errors()
+                        .forEach(error -> log.error(
+                                "Error eliminando objeto: key={}, code={}, message={}",
+                                error.key(), error.code(), error.message()));
+            }
+
+        } catch (S3Exception e) {
+            log.error("Error de S3 eliminando carpeta: {}", folderPath, e);
+            throw new FileStorageException(
+                    String.format("Error eliminando carpeta en S3: %s - %s", folderPath,
+                            e.awsErrorDetails().errorMessage()),
+                    "delete");
+        } catch (Exception e) {
+            log.error("Error inesperado eliminando carpeta de S3: {}", folderPath, e);
+            throw new FileStorageException(
+                    String.format("Error eliminando carpeta en S3: %s", folderPath),
+                    "delete");
         }
+    }
 
-        private PutObjectRequest createPutObjectRequest(MultipartFile file, String key, Map<String, String> metadata) {
-                return PutObjectRequest.builder()
-                                .bucket(s3Properties.getBucketName())
-                                .key(key)
-                                .contentType(file.getContentType())
-                                .contentLength(file.getSize())
-                                .metadata(metadata)
-                                .serverSideEncryption(ServerSideEncryption.AES256)
-                                .build();
+    public void deleteMultipleFiles(List<String> fileKeys) {
+        try {
+            List<ObjectIdentifier> keys = fileKeys.stream()
+                    .map(key -> ObjectIdentifier.builder().key(key).build())
+                    .collect(Collectors.toList());
+
+            Delete delete = Delete.builder()
+                    .objects(keys)
+                    .build();
+
+            DeleteObjectsRequest deleteObjectsRequest = DeleteObjectsRequest.builder()
+                    .bucket(s3Properties.getBucketName())
+                    .delete(delete)
+                    .build();
+
+            s3Client.deleteObjects(deleteObjectsRequest);
+            log.info("Archivos eliminados exitosamente de S3: {}", fileKeys);
+        } catch (S3Exception e) {
+            throw new RuntimeException("Error al eliminar archivos: " + e.getMessage());
         }
+    }
 
-        public String generatePresignedUrl(String key, Duration expiration) {
-                GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                                .bucket(s3Properties.getBucketName())
-                                .key(key)
-                                .build();
+    public void deleteMultipleFile(String fileKey) {
+        try {
+            ObjectIdentifier key = ObjectIdentifier.builder().key(fileKey).build();
 
-                PresignedGetObjectRequest presignedRequest = s3Presigner
-                                .presignGetObject(r -> r.signatureDuration(expiration)
-                                                .getObjectRequest(getObjectRequest));
+            Delete delete = Delete.builder()
+                    .objects(key)
+                    .build();
 
-                return presignedRequest.url().toString();
+            DeleteObjectsRequest deleteObjectsRequest = DeleteObjectsRequest.builder()
+                    .bucket(s3Properties.getBucketName())
+                    .delete(delete)
+                    .build();
+
+            s3Client.deleteObjects(deleteObjectsRequest);
+            log.info("Archivo eliminado exitosamente de S3: {}", fileKey);
+        } catch (S3Exception e) {
+            throw new RuntimeException("Error al eliminar archivos: " + e.getMessage());
         }
-
-        public void deleteFolder(String folderPath) {
-                try {
-                        String normalizedPath = folderPath.endsWith("/") ? folderPath : folderPath + "/";
-
-                        log.info("Iniciando eliminación de carpeta en S3: bucket={}, prefix={}",
-                                        s3Properties.getBucketName(), normalizedPath);
-
-                        List<ObjectIdentifier> objectsToDelete = new ArrayList<>();
-
-                        s3Client.listObjectsV2Paginator(builder -> builder
-                                        .bucket(s3Properties.getBucketName())
-                                        .prefix(normalizedPath))
-                                        .contents()
-                                        .forEach(s3Object -> {
-                                                objectsToDelete.add(ObjectIdentifier.builder()
-                                                                .key(s3Object.key())
-                                                                .build());
-                                        });
-
-                        if (objectsToDelete.isEmpty()) {
-                                log.warn("No se encontraron archivos para eliminar en: {}", normalizedPath);
-                                return;
-                        }
-
-                        DeleteObjectsRequest deleteRequest = DeleteObjectsRequest.builder()
-                                        .bucket(s3Properties.getBucketName())
-                                        .delete(Delete.builder()
-                                                        .objects(objectsToDelete)
-                                                        .build())
-                                        .build();
-
-                        DeleteObjectsResponse response = s3Client.deleteObjects(deleteRequest);
-
-                        log.info("Carpeta eliminada exitosamente de S3: {} archivos eliminados",
-                                        response.deleted().size());
-
-                        if (!response.errors().isEmpty()) {
-                                response.errors()
-                                                .forEach(error -> log.error(
-                                                                "Error eliminando objeto: key={}, code={}, message={}",
-                                                                error.key(), error.code(), error.message()));
-                        }
-
-                } catch (S3Exception e) {
-                        log.error("Error de S3 eliminando carpeta: {}", folderPath, e);
-                        throw new FileStorageException(
-                                        String.format("Error eliminando carpeta en S3: %s - %s", folderPath,
-                                                        e.awsErrorDetails().errorMessage()),
-                                        "delete");
-                } catch (Exception e) {
-                        log.error("Error inesperado eliminando carpeta de S3: {}", folderPath, e);
-                        throw new FileStorageException(
-                                        String.format("Error eliminando carpeta en S3: %s", folderPath),
-                                        "delete");
-                }
-        }
-
-        public void deleteMultipleFiles(List<String> fileKeys) {
-                try {
-                        List<ObjectIdentifier> keys = fileKeys.stream()
-                                        .map(key -> ObjectIdentifier.builder().key(key).build())
-                                        .collect(Collectors.toList());
-
-                        Delete delete = Delete.builder()
-                                        .objects(keys)
-                                        .build();
-
-                        DeleteObjectsRequest deleteObjectsRequest = DeleteObjectsRequest.builder()
-                                        .bucket(s3Properties.getBucketName())
-                                        .delete(delete)
-                                        .build();
-
-                        s3Client.deleteObjects(deleteObjectsRequest);
-                        log.info("Archivos eliminados exitosamente de S3: {}", fileKeys);
-                } catch (S3Exception e) {
-                        throw new RuntimeException("Error al eliminar archivos: " + e.getMessage());
-                }
-        }
-
-        public void deleteMultipleFile(String fileKey) {
-                try {
-                        ObjectIdentifier key = ObjectIdentifier.builder().key(fileKey).build();
-
-                        Delete delete = Delete.builder()
-                                        .objects(key)
-                                        .build();
-
-                        DeleteObjectsRequest deleteObjectsRequest = DeleteObjectsRequest.builder()
-                                        .bucket(s3Properties.getBucketName())
-                                        .delete(delete)
-                                        .build();
-
-                        s3Client.deleteObjects(deleteObjectsRequest);
-                        log.info("Archivo eliminado exitosamente de S3: {}", fileKey);
-                } catch (S3Exception e) {
-                        throw new RuntimeException("Error al eliminar archivos: " + e.getMessage());
-                }
-        }
+    }
 }
