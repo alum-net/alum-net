@@ -27,6 +27,7 @@ import org.alumnet.domain.users.Student;
 import org.alumnet.domain.users.Teacher;
 import org.alumnet.domain.users.User;
 import org.alumnet.infrastructure.exceptions.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -36,6 +37,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -56,6 +58,8 @@ public class CourseService {
     private final ParticipationRepository participationRepository;
     private final CourseContentStrategyFactory courseContentStrategyFactory;
     private final S3FileStorageService s3FileStorageService;
+    @Value("${aws.s3.duration-url-hours}")
+    private long urlDuration;
 
     private final CourseMapper courseMapper;
 
@@ -529,6 +533,84 @@ public class CourseService {
         return BulkResponseDTO.builder()
                 .totalRecords(bulkEnrollmentList.size())
                 .successfulRecords(successfulEnrollments)
+                .failedRecords(errors.size())
+                .errors(errors)
+                .build();
+    }
+
+    public BulkResponseDTO bulkUnenrollment(int courseId, MultipartFile file, boolean hasHeaders) {
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("El archivo CSV no debe estar vacío.");
+        }
+
+        List<BulkErrorDetailDTO> errors = new ArrayList<>();
+        List<EnrollmentBulkDTO> bulkEnrollmentList;
+        int successfulUnenrollments = 0;
+
+        try (Reader reader = new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8)) {
+            CsvToBeanBuilder<EnrollmentBulkDTO> builder = new CsvToBeanBuilder<EnrollmentBulkDTO>(reader)
+                    .withType(EnrollmentBulkDTO.class)
+                    .withSeparator(',');
+
+            if (hasHeaders) {
+                builder.withSkipLines(1);
+            }
+            bulkEnrollmentList = builder.build().parse();
+        } catch (Exception e) {
+            throw new RuntimeException("Error fatal al leer o parsear el archivo CSV. Verifique el formato general del archivo.", e);
+        }
+
+        int initialLineNumber = hasHeaders ? 2 : 1;
+
+        for (EnrollmentBulkDTO bulkDTO : bulkEnrollmentList) {
+            int currentLine = initialLineNumber++;
+            String studentEmail = bulkDTO.getStudentEmail() != null ? bulkDTO.getStudentEmail().trim() : "Email vacío";
+
+            String identifier = studentEmail;
+
+            try {
+                if (studentEmail.isEmpty()) {
+                    throw new InvalidAttributeException("El email del estudiante no puede estar vacío.");
+                }
+
+                if (!isValidEmailFormat(studentEmail)) {
+                    throw new InvalidAttributeException("El formato del email no es válido.");
+                }
+
+                removeMemberFromCourse(courseId, studentEmail);
+                successfulUnenrollments++;
+
+            } catch (EnrollmentNotFoundException e) {
+                errors.add(BulkErrorDetailDTO.builder()
+                        .lineNumber(currentLine)
+                        .identifier(identifier)
+                        .reason("Error: El estudiante no estaba matriculado en este curso.")
+                        .build());
+            } catch (CourseNotFoundException e) {
+                // Este error debería ser raro si el courseId es correcto, pero se captura
+                errors.add(BulkErrorDetailDTO.builder()
+                        .lineNumber(currentLine)
+                        .identifier(identifier)
+                        .reason("Error fatal: Curso con ID " + courseId + " no encontrado.")
+                        .build());
+            } catch (InvalidAttributeException e) {
+                errors.add(BulkErrorDetailDTO.builder()
+                        .lineNumber(currentLine)
+                        .identifier(identifier)
+                        .reason("Error de validación: " + e.getMessage())
+                        .build());
+            } catch (Exception e) {
+                errors.add(BulkErrorDetailDTO.builder()
+                        .lineNumber(currentLine)
+                        .identifier(identifier)
+                        .reason("Error desconocido al desmatricular: " + e.getMessage())
+                        .build());
+            }
+        }
+
+        return BulkResponseDTO.builder()
+                .totalRecords(bulkEnrollmentList.size())
+                .successfulRecords(successfulUnenrollments)
                 .failedRecords(errors.size())
                 .errors(errors)
                 .build();
