@@ -163,7 +163,8 @@ public class CourseController {
                 ? "Eliminación masiva de cursos completada exitosamente."
                 : "Eliminación masiva finalizada con " + bulkDeletionResponse.getFailedRecords() + " errores. Revise el reporte.";
 
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ResultResponse.success(bulkDeletionResponse, successMessage));
+        // Va en ok en lugar de no content para que viaje la response
+        return ResponseEntity.ok(ResultResponse.success(bulkDeletionResponse, successMessage));
     }
 
     @PostMapping(path = "/{courseId}/participations/bulk-enroll",
@@ -192,5 +193,34 @@ public class CourseController {
                 : "Matriculación masiva finalizada con " + bulkEnrollResponse.getFailedRecords() + " errores. Revise el reporte.";
 
         return ResponseEntity.ok(ResultResponse.success(bulkEnrollResponse ,successMessage));
+    }
+
+    @DeleteMapping(path = "/{courseId}/participations/bulk-unenroll",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('teacher')")
+    public ResponseEntity<ResultResponse<BulkResponseDTO>> bulkUnenrollStudents(
+            @PathVariable int courseId,
+            @RequestPart("file") MultipartFile file,
+            @RequestParam(value = "hasHeaders", required = false, defaultValue = "false") boolean hasHeaders) {
+
+        BulkResponseDTO bulkResponse = courseService.bulkUnenrollment(courseId, file, hasHeaders);
+
+        if (bulkResponse.getTotalRecords() > 0 &&
+                bulkResponse.getTotalRecords() == bulkResponse.getFailedRecords()) {
+
+            return ResponseEntity.badRequest().body(ResultResponse.success(
+                    bulkResponse,
+                    "La solicitud de des-matriculación masiva no se pudo procesar completamente (todos los registros fallaron)."));
+        }
+
+        String successMessage = bulkResponse.getFailedRecords() == 0
+                ? "Des-matriculación masiva completada exitosamente."
+                : "Des-matriculación masiva finalizada con " + bulkResponse.getFailedRecords() + " errores. Revise el reporte.";
+
+        // Va en ok en lugar de no content para que viaje la response
+        return ResponseEntity.ok(ResultResponse.success(
+                bulkResponse,
+                successMessage));
     }
 }
