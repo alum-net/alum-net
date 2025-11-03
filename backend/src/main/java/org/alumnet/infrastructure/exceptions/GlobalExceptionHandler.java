@@ -116,4 +116,19 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ResultResponse<Object>> handleQuestionnaireValidationException(QuestionnaireValidationException ex) {
         return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Error de validación del cuestionario"));
     }
+
+    @ExceptionHandler(EventNotFoundException.class)
+    public ResponseEntity<ResultResponse<Object>> handleEventNotFoundException(EventNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultResponse.error(ex.getMessage(), "Evento no encontrado"));
+    }
+
+    @ExceptionHandler(AssignmentDueDateExpiredException.class)
+    public ResponseEntity<ResultResponse<Object>> handleAssignmentDueDateExpiredException(AssignmentDueDateExpiredException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ResultResponse.error(ex.getMessage(), "La fecha de entrega de la tarea ha expirado"));
+    }
+
+    @ExceptionHandler(HomeworkAlreadySubmittedException.class)
+    public ResponseEntity<ResultResponse<Object>> handleHomeworkAlreadySubmittedException(HomeworkAlreadySubmittedException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ResultResponse.error(ex.getMessage(), "La tarea ya ha sido enviada"));
+    }
 }

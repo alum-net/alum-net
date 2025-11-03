@@ -104,8 +104,8 @@ public class EventService {
     }
 
     private void validateDates(LocalDateTime startDate, LocalDateTime endDate) {
-        if (endDate.isBefore(LocalDateTime.now()))
-            throw new InvalidAttributeException("La fecha de fin debe ser posterior a la fecha actual");
+        if (startDate.isBefore(LocalDateTime.now()))
+            throw new InvalidAttributeException("La fecha de inicio debe ser posterior a la fecha actual");
         if (endDate.isBefore(startDate))
             throw new InvalidAttributeException("La fecha de inicio debe ser anterior a la fecha de fin");
 
@@ -121,6 +121,8 @@ public class EventService {
             throw new AssignmentDueDateExpiredException("No se puede enviar la tarea despues de la fecha de fin del evento");
 
         fileValidationService.validateFile(homeworkFile, false);
+
+        validateHomeworkAlreadySubmitted(eventId, studentEmail);
 
         Student student = userRepository.findById(studentEmail)
                 .filter(user -> user instanceof Student)
@@ -153,5 +155,16 @@ public class EventService {
 
         eventParticipationRepository.save(eventParticipation);
 
+    }
+
+    private void validateHomeworkAlreadySubmitted(Integer eventId, String studentEmail) {
+        eventParticipationRepository.findById(EventParticipationId.builder()
+                        .eventId(eventId)
+                        .studentEmail(studentEmail)
+                        .build())
+                .ifPresent(participation -> {
+                    if (participation.getResource() != null)
+                        throw new HomeworkAlreadySubmittedException("El estudiante ya ha enviado la tarea para este evento");
+                });
     }
 }

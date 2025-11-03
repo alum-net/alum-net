@@ -3,6 +3,8 @@ package org.alumnet.application.mapper;
 import org.alumnet.application.dtos.AnswerDTO;
 import org.alumnet.application.dtos.EventDTO;
 import org.alumnet.application.dtos.QuestionDTO;
+import org.alumnet.application.dtos.responses.SummaryEventDTO;
+import org.alumnet.application.enums.EventType;
 import org.alumnet.domain.events.Answer;
 import org.alumnet.domain.events.Question;
 import org.alumnet.domain.events.Event;
@@ -32,6 +34,11 @@ public interface EventMapper {
     @Mapping(target = "sectionId", source = "section.sectionId")
     EventDTO eventToQuestionnaireDTO(Questionnaire questionnaire);
 
+    @Mapping(target = "id" , source = "id")
+    @Mapping(target = "title", source = "title")
+    @Mapping(target = "type", ignore = true)
+    SummaryEventDTO eventToSummaryEventDTO(Event event);
+
     default Event eventDTOToEvent(EventDTO eventDTO) {
         return switch (eventDTO.getType()) {
             case "task" -> eventDTOToTask(eventDTO);
@@ -60,5 +67,17 @@ public interface EventMapper {
                 }
             });
         }
+    }
+
+    @AfterMapping
+    default void setEventType(@MappingTarget SummaryEventDTO dto, Event event) {
+        String type = switch (event) {
+            case Task task -> EventType.TASK.getValue();
+            case OnSite onSite -> EventType.ONSITE.getValue();
+            case Questionnaire questionnaire -> EventType.QUESTIONNAIRE.getValue();
+            case null -> throw new IllegalArgumentException("Event cannot be null");
+            default -> throw new IllegalArgumentException("Unknown event type: " + event.getClass().getName());
+        };
+        dto.setType(type);
     }
 }
