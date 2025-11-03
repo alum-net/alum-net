@@ -10,5 +10,5 @@ public class BulkTaskResponseDTO {
     private int totalRecords;
     private int successfulRecords;
     private int failedRecords;
-    private List<BulkTaskErrorDetailDTO> errors;
+    private List<BulkErrorDetailDTO> errors;
 }
