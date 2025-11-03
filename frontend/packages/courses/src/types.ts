@@ -62,3 +62,28 @@ export interface CourseContent {
   totalEnrollments?: number;
   description: string;
 }
+
+export enum EventType {
+  QUESTIONNAIRE = 'QUESTIONNAIRE',
+  ONSITE = 'ONSITE',
+  TASK = 'TASK',
+}
+
+export interface QuestionDTO {
+  id: number;
+  text: string;
+  options: string[];
+  correctOption: number;
+}
+
+export interface EventDTO {
+  type: EventType;
+  sectionId: number;
+  title: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  maxGrade: number;
+  questions: QuestionDTO[];
+  durationInMinutes: number;
+}

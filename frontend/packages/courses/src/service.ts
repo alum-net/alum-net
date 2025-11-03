@@ -4,6 +4,7 @@ import {
   FiltersDirectory,
   CourseCreationPayload,
   CourseContent,
+  EventDTO as Event,
 } from './types';
 import { AxiosResponse } from 'axios';
 import { UserInfo } from '@alum-net/users/src/types';
@@ -93,4 +94,11 @@ export const unenrollStudent = async (courseId: string, email: string) => {
   };
 
   return normalized;
+};
+
+export const getEventById = async (eventId: number) => {
+  const { data }: AxiosResponse<Response<Event>> = await api.get(
+    `/courses/events/${eventId}`,
+  );
+  return data;
 };
