@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.Duration;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -143,5 +144,13 @@ public class LibraryService {
         fileStorageService.deleteMultipleFile(libraryResource.getUrl());
 
         libraryResourceRepository.delete(libraryResource);
+    }
+
+    public void modifyLabel(int labelId, String name) {
+        Label label = labelRepository.findById(labelId).orElseThrow(LabelNotFoundException::new);
+        if(!Objects.equals(name, label.getName())){
+            label.setName(name);
+            labelRepository.save(label);
+        }
     }
 }
