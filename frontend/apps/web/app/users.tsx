@@ -1,12 +1,21 @@
-'use dom';
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Button, Text, DataTable, ActivityIndicator, Menu, } from 'react-native-paper';
+import {
+  Button,
+  Text,
+  DataTable,
+  ActivityIndicator,
+  Menu,
+} from 'react-native-paper';
 import { FormTextInput, THEME } from '@alum-net/ui';
 import { useForm } from 'react-hook-form';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@alum-net/api';
-import { type UserInfo, type UserFilterDTO, UserRole } from '@alum-net/users/src/types';
+import {
+  type UserInfo,
+  type UserFilterDTO,
+  UserRole,
+} from '@alum-net/users/src/types';
 import { fetchUsers } from '@alum-net/users/src/service';
 
 import CreateUserModal from '../features/users/src/create-user';
@@ -15,7 +24,7 @@ import BulkUserUploadModal from '../features/users/src/bulk-user-upload-modal';
 
 type FormData = { name: string; lastname: string; email: string };
 
-const ROLE_OPTIONS: Array<{ value: '' | UserRole; label: string }> = [
+const ROLE_OPTIONS: { value: '' | UserRole; label: string }[] = [
   { value: '' as const, label: 'Todos los roles' },
   { value: UserRole.admin, label: 'Admin' },
   { value: UserRole.teacher, label: 'Profesor' },
@@ -183,15 +192,13 @@ export default function UsersPage() {
               <DataTable.Cell style={{ flex: 1.2 }}>
                 {u.lastname}
               </DataTable.Cell>
-              <DataTable.Cell style={{ flex: 2 }}>
-                {u.email}
-              </DataTable.Cell>
+              <DataTable.Cell style={{ flex: 2 }}>{u.email}</DataTable.Cell>
               <DataTable.Cell>
                 {u.role === 'ADMIN'
                   ? 'Admin'
                   : u.role === 'TEACHER'
-                  ? 'Profesor'
-                  : 'Estudiante'}
+                    ? 'Profesor'
+                    : 'Estudiante'}
               </DataTable.Cell>
               <DataTable.Cell>
                 {u.enabled ? 'Activo' : 'Inactivo'}

@@ -14,12 +14,13 @@ export default function WebHeader() {
 
   const navItems: {
     label: string;
-    route: '/home' | '/profile' | '/users' | '/courses';
+    route: '/home' | '/profile' | '/users' | '/courses' | '/library';
   }[] = [
     { label: 'Inicio', route: '/home' },
     { label: 'Cursos', route: '/courses' },
     ...(isAdmin ? [{ label: 'Usuarios', route: '/users' as const }] : []),
     // { label: "Mensajes", route: "/messages" },
+    { label: 'Libreria', route: '/library' },
     { label: 'Perfil', route: '/profile' },
   ];
 

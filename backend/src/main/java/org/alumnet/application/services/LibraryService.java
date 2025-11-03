@@ -2,6 +2,8 @@ package org.alumnet.application.services;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+
+import org.alumnet.application.dtos.CourseContentDTO;
 import org.alumnet.application.dtos.LabelDTO;
 import org.alumnet.application.dtos.LibraryResourceDTO;
 import org.alumnet.application.dtos.requests.LibraryResourceCreationRequestDTO;
@@ -16,12 +18,14 @@ import org.alumnet.domain.resources.Label;
 import org.alumnet.domain.resources.LibraryResource;
 import org.alumnet.domain.users.User;
 import org.alumnet.infrastructure.exceptions.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Duration;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Objects;
@@ -36,13 +40,16 @@ public class LibraryService {
     private final S3FileStorageService fileStorageService;
     private final FileValidationService fileValidationService;
     private final LibraryMapper libraryMapper;
+    private final S3FileStorageService s3FileStorageService;
+    @Value("${aws.s3.duration-url-hours}")
+    private long urlDuration;
 
     public Page<LabelDTO> getLabel(String textToSearch, Pageable page) {
         Page<Label> labelPage;
 
-        if(textToSearch == null){
+        if (textToSearch == null) {
             labelPage = labelRepository.findAll(page);
-        }else{
+        } else {
             Specification<Label> labelSpec = LabelSpecification.byName(textToSearch, false);
             labelPage = labelRepository.findAll(labelSpec, page);
         }
@@ -53,7 +60,8 @@ public class LibraryService {
     public LabelDTO createLabel(String label) {
         Specification<Label> labelSpec = LabelSpecification.byName(label, true);
 
-        if(labelRepository.exists(labelSpec)) throw new LabelAlreadyExistsException();
+        if (labelRepository.exists(labelSpec))
+            throw new LabelAlreadyExistsException();
 
         Label newLabel = Label.builder().name(label).build();
 
@@ -79,28 +87,33 @@ public class LibraryService {
     public Page<LibraryResourceDTO> getResources(LibraryResourceFilterDTO filter, Pageable page) {
         boolean hasFilter = filter != null
                 && (filter.getName() != null
-                    || (filter.getLabelIds() != null && !filter.getLabelIds().isEmpty()));
+                        || (filter.getLabelIds() != null && !filter.getLabelIds().isEmpty()));
 
         Page<LibraryResource> resources;
 
-        if(!hasFilter){
+        if (!hasFilter) {
             resources = libraryResourceRepository.findAll(page);
-        }
-        else{
+        } else {
             Specification<LibraryResource> resourceSpec = LibraryResourceSpecification.byFilters(filter);
             resources = libraryResourceRepository.findAll(resourceSpec, page);
         }
 
-        return resources.map(libraryMapper::libraryToLibraryResourceDTO);
+        return resources.map(resource -> {
+            LibraryResourceDTO dto = libraryMapper.libraryToLibraryResourceDTO(resource);
+            dto.setUrl(s3FileStorageService
+                    .generatePresignedUrl(dto.getUrl(), Duration.ofHours(urlDuration)));
+            return dto;
+        });
     }
 
     public void createResource(MultipartFile file, LibraryResourceCreationRequestDTO metadata) {
-        String fileName =  file.getOriginalFilename();
+        String fileName = file.getOriginalFilename();
 
         fileValidationService.validateFile(file, false);
 
         Specification<LibraryResource> resourceSpec = LibraryResourceSpecification.byName(fileName, true);
-        if(libraryResourceRepository.exists(resourceSpec)) throw new LibraryResourceAlreadyExistsException();
+        if (libraryResourceRepository.exists(resourceSpec))
+            throw new LibraryResourceAlreadyExistsException();
 
         String url = fileStorageService.store(file, "library/resources");
 
