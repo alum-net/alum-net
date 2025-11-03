@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.alumnet.domain.Section;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,10 +28,10 @@ public abstract class Event {
     private String description;
 
     @Column(name = "start_date")
-    private String startDate;
+    private LocalDateTime startDate;
 
     @Column(name = "end_date")
-    private String endDate;
+    private LocalDateTime endDate;
 
     @Column(name = "max_grade")
     private Integer maxGrade;

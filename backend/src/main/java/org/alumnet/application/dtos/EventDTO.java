@@ -1,6 +1,7 @@
 package org.alumnet.application.dtos;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,6 +17,7 @@ import org.alumnet.application.enums.EventType;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class EventDTO {
     @NotNull(message = "El tipo no puede ser nulo o vacio")
     private EventType type;

@@ -1,8 +1,7 @@
-package org.alumnet.domain;
+package org.alumnet.domain.events;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.alumnet.domain.events.Questionnaire;
 
 import java.util.ArrayList;
 import java.util.List;
