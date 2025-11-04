@@ -3,16 +3,14 @@ package org.alumnet.application.services;
 
 import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.*;
+import org.alumnet.application.dtos.requests.SubmitQuestionnaireRequestDTO;
 import org.alumnet.application.dtos.responses.EventDetailDTO;
 import org.alumnet.application.enums.EventType;
 import org.alumnet.application.enums.UserRole;
 import org.alumnet.application.mapper.EventMapper;
 import org.alumnet.domain.Section;
 import org.alumnet.domain.events.*;
-import org.alumnet.domain.repositories.EventParticipationRepository;
-import org.alumnet.domain.repositories.EventRepository;
-import org.alumnet.domain.repositories.QuestionnaireResponseDetailRepository;
-import org.alumnet.domain.repositories.UserRepository;
+import org.alumnet.domain.repositories.*;
 import org.alumnet.domain.resources.TaskResource;
 import org.alumnet.domain.users.Student;
 import org.alumnet.domain.users.User;
@@ -21,10 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,6 +29,7 @@ public class EventService {
     private final CourseService courseService;
     private final SectionService sectionService;
     private final QuestionnaireResponseDetailRepository responseDetailRepository;
+    private final EventParticipationRepository participationRepository;
     private final NotificationService notificationService;
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
@@ -250,5 +246,57 @@ public class EventService {
         }
 
         return eventDTOBuilder.build();
+    }
+
+    public void submitQuestionnaireResponses(SubmitQuestionnaireRequestDTO request, Integer eventId) {
+        Student student = (Student) userRepository.findById(request.getUserEmail())
+                .orElseThrow(UserNotFoundException::new);
+
+        if (request.getResponses().isEmpty()) {
+            throw new InvalidSubmissionException("No se enviaron respuestas.");
+        }
+
+        Questionnaire questionnaire = eventRepository.findQuestionnaireById(eventId)
+                .orElseThrow(EventNotFoundException::new);
+
+        EventParticipation participation = getOrCreateParticipation(student, questionnaire);
+        Set<QuestionnaireResponseDetail> newResponses = new HashSet<>();
+
+        for(Question question : questionnaire.getQuestions()){
+            var responseDetailBuilder = QuestionnaireResponseDetail
+                    .builder()
+                    .attempt(participation)
+                    .question(question);
+
+            request.getResponses().stream()
+                    .filter(r -> Objects.equals(r.getQuestionId(), question.getId()))
+                    .findFirst()
+                    .ifPresent(response -> responseDetailBuilder
+                            .attemptDate(response.getTimeStamp())
+                            .studentAnswer(question.getAnswers().stream()
+                                    .filter(a -> Objects.equals(a.getId(), response.getAnswerId()))
+                                    .findFirst().orElse(null)));
+
+            QuestionnaireResponseDetail responseDetail =  responseDetailBuilder.build();
+
+            newResponses.add(responseDetail);
+        }
+        participation.setResponses(newResponses);
+        participationRepository.save(participation);
+    }
+
+    private EventParticipation getOrCreateParticipation(Student student, Questionnaire questionnaire) {
+        EventParticipationId id = EventParticipationId.builder()
+                .eventId(questionnaire.getId())
+                .studentEmail(student.getEmail())
+                .build();
+
+        return participationRepository.findById(id)
+                .orElseGet(() -> EventParticipation.builder()
+                        .id(id)
+                        .event(questionnaire)
+                        .student(student)
+                        .responses(new HashSet<>())
+                        .build());
     }
 }

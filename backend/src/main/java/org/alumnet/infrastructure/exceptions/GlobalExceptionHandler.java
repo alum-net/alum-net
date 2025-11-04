@@ -151,4 +151,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ResultResponse<Object>> handleCourseParticipationNotFoundException(CourseParticipationNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultResponse.error(ex.getMessage(), "El usuario no está matriculado en el curso"));
     }
+
+    @ExceptionHandler(InvalidSubmissionException.class)
+    public ResponseEntity<ResultResponse<Object>> handleInvalidSubmissionException(InvalidSubmissionException ex) {
+        return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "El pedido no se pudo completar"));
+    }
 }
