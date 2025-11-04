@@ -198,7 +198,7 @@ public class EventService {
         User user = userRepository.findById(userEmail)
                 .orElseThrow(UserNotFoundException::new);
 
-        var eventDTOBuilder = EventDTO.builder()
+        EventDTO.EventDTOBuilder<?, ?> eventDTOBuilder = EventDTO.builder()
                 .title(questionnaire.getTitle())
                 .description(questionnaire.getDescription())
                 .type(questionnaire.getType())
@@ -215,37 +215,46 @@ public class EventService {
             Set<QuestionnaireResponseDetail> allResponses = responseDetailRepository
                     .findAllResponsesByEventId(eventId);
 
-            Map<EventParticipation, List<QuestionResponseDTO>> groupedResponses = allResponses.stream()
-                    .collect(Collectors.groupingBy(
-                            QuestionnaireResponseDetail::getAttempt,
-                            Collectors.mapping(
-                                    r -> QuestionResponseDTO.builder()
-                                            .questionId(r.getQuestion().getId())
-                                            .answerId(r.getStudentAnswer() != null ? r.getStudentAnswer().getId() : null)
-                                            .isCorrect(r.getStudentAnswer().getCorrect())
-                                            .timeStamp(r.getAttemptDate())
-                                            .build(),
-                                    Collectors.toList()
-                            )
-                    ));
+            Map<EventParticipation, List<QuestionResponseDTO>> groupedResponses = generateGroupedResponses(allResponses);
 
-            List<QuestionnaireResponseDTO> teacherResponsesDTO = groupedResponses.entrySet().stream()
-                    .map(entry -> {
-                        EventParticipation attempt = entry.getKey();
-                        List<QuestionResponseDTO> responses = entry.getValue();
-
-                        return QuestionnaireResponseDTO.builder()
-                                .studentEmail(attempt.getStudent().getEmail())
-                                .name(attempt.getStudent().getName())
-                                .responses(responses)
-                                .build();
-                    })
-                    .collect(Collectors.toList());
+            List<QuestionnaireResponseDTO> teacherResponsesDTO = generateQuestionnaireResponses(groupedResponses);
 
             eventDTOBuilder.responses(teacherResponsesDTO);
         }
 
         return eventDTOBuilder.build();
+    }
+
+    private List<QuestionnaireResponseDTO> generateQuestionnaireResponses(Map<EventParticipation, List<QuestionResponseDTO>> groupedResponses) {
+        return groupedResponses.entrySet().stream()
+                .map(entry -> {
+                    EventParticipation attempt = entry.getKey();
+                    List<QuestionResponseDTO> responses = entry.getValue();
+
+                    return QuestionnaireResponseDTO.builder()
+                            .studentEmail(attempt.getStudent().getEmail())
+                            .name(attempt.getStudent().getName())
+                            .responses(responses)
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
+
+    private Map<EventParticipation, List<QuestionResponseDTO>> generateGroupedResponses(Set<QuestionnaireResponseDetail> allResponses) {
+        Map<EventParticipation, List<QuestionResponseDTO>> groupedResponses = allResponses.stream()
+                .collect(Collectors.groupingBy(
+                        QuestionnaireResponseDetail::getAttempt,
+                        Collectors.mapping(
+                                r -> QuestionResponseDTO.builder()
+                                        .questionId(r.getQuestion().getId())
+                                        .answerId(r.getStudentAnswer() != null ? r.getStudentAnswer().getId() : null)
+                                        .isCorrect(r.getStudentAnswer().getCorrect())
+                                        .timeStamp(r.getAttemptDate())
+                                        .build(),
+                                Collectors.toList()
+                        )
+                ));
+        return groupedResponses;
     }
 
     public void submitQuestionnaireResponses(SubmitQuestionnaireRequestDTO request, Integer eventId) {
