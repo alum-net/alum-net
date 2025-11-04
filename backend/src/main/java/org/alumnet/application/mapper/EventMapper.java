@@ -3,6 +3,7 @@ package org.alumnet.application.mapper;
 import org.alumnet.application.dtos.AnswerDTO;
 import org.alumnet.application.dtos.EventDTO;
 import org.alumnet.application.dtos.QuestionDTO;
+import org.alumnet.application.dtos.responses.EventDetailDTO;
 import org.alumnet.application.dtos.responses.SummaryEventDTO;
 import org.alumnet.application.enums.EventType;
 import org.alumnet.domain.events.*;
@@ -27,10 +28,10 @@ public interface EventMapper {
     QuestionDTO questionDTOToQuestionDTO(Question question);
     AnswerDTO answerDTOToAnswerDTO(Answer answer);
 
-    EventDTO eventToTaskDTO(Task task);
-    EventDTO eventToOnSiteDTO(OnSite onSite);
+    EventDetailDTO eventToTaskDTO(Task task);
+    EventDetailDTO eventToOnSiteDTO(OnSite onSite);
     @Mapping(target = "sectionId", source = "section.sectionId")
-    EventDTO eventToQuestionnaireDTO(Questionnaire questionnaire);
+    EventDetailDTO eventToQuestionnaireDTO(Questionnaire questionnaire);
 
     @Mapping(target = "id" , source = "id")
     @Mapping(target = "title", source = "title")
@@ -45,7 +46,9 @@ public interface EventMapper {
             default -> throw new IllegalArgumentException("Unknown role: " + eventDTO.getType());
         };
     }
-    default EventDTO eventToEventDTO(Event event) {
+
+
+    default EventDetailDTO eventToEventDTO(Event event) {
         return switch (event) {
             case Task task -> eventToTaskDTO(task);
             case OnSite onSite -> eventToOnSiteDTO(onSite);
