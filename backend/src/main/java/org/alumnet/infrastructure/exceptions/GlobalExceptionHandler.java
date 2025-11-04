@@ -146,4 +146,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ResultResponse<Object>> handleHomeworkAlreadySubmittedException(HomeworkAlreadySubmittedException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ResultResponse.error(ex.getMessage(), "La tarea ya ha sido enviada"));
     }
+
+    @ExceptionHandler(CourseParticipationNotFoundException.class)
+    public ResponseEntity<ResultResponse<Object>> handleCourseParticipationNotFoundException(CourseParticipationNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultResponse.error(ex.getMessage(), "El usuario no está matriculado en el curso"));
+    }
 }
