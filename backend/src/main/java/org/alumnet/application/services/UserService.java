@@ -8,8 +8,8 @@ import org.alumnet.application.dtos.requests.UserCreationRequestDTO;
 import org.alumnet.application.dtos.UserDTO;
 import org.alumnet.application.dtos.requests.UserFilterDTO;
 import org.alumnet.application.dtos.requests.UserModifyRequestDTO;
-import org.alumnet.application.dtos.responses.BulkTaskErrorDetailDTO;
-import org.alumnet.application.dtos.responses.BulkTaskResponseDTO;
+import org.alumnet.application.dtos.responses.BulkErrorDetailDTO;
+import org.alumnet.application.dtos.responses.BulkResponseDTO;
 import org.alumnet.application.mapper.UserMapper;
 import org.alumnet.application.query_builders.UserSpecification;
 import org.alumnet.domain.repositories.UserRepository;
@@ -21,7 +21,6 @@ import org.alumnet.infrastructure.exceptions.UserNotFoundException;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -31,7 +30,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -45,8 +43,6 @@ public class UserService {
     private final UserMapper userMapper;
     private final S3FileStorageService fileStorageService;
     private final FileValidationService fileValidationService;
-    @Value("${aws.s3.duration-url-hours}")
-    private long urlDuration;
 
     public void createUser(UserCreationRequestDTO userCreationRequestDTO) throws ExistingUserException {
         try {
@@ -88,7 +84,7 @@ public class UserService {
             UserDTO dto = userMapper.userToUserDTO(user);
             if (user.getAvatarUrl() != null) {
                 dto.setAvatarUrl(fileStorageService.generatePresignedUrl(
-                        dto.getAvatarUrl(), Duration.ofDays(urlDuration)));
+                        dto.getAvatarUrl()));
             }
             return dto;
         });
@@ -100,19 +96,19 @@ public class UserService {
                     UserDTO dto = userMapper.userToUserDTO(user);
                     if (user.getAvatarUrl() != null) {
                         dto.setAvatarUrl(fileStorageService.generatePresignedUrl(
-                                dto.getAvatarUrl(), Duration.ofDays(urlDuration)));
+                                dto.getAvatarUrl()));
                     }
                     return dto;
                 })
                 .orElseThrow(UserNotFoundException::new);
     }
 
-    public BulkTaskResponseDTO bulkCreateUsers(MultipartFile file, boolean hasHeaders) {
+    public BulkResponseDTO bulkCreateUsers(MultipartFile file, boolean hasHeaders) {
         if (file.isEmpty()) {
             throw new IllegalArgumentException("El archivo CSV no debe estar vacío.");
         }
 
-        List<BulkTaskErrorDetailDTO> errors = new ArrayList<>();
+        List<BulkErrorDetailDTO> errors = new ArrayList<>();
         List<UserBulkCreationDTO> bulkCreationList;
         int successfulCreations = 0;
 
@@ -151,19 +147,19 @@ public class UserService {
                 successfulCreations++;
 
             } catch (ExistingUserException e) {
-                errors.add(BulkTaskErrorDetailDTO.builder()
+                errors.add(BulkErrorDetailDTO.builder()
                         .lineNumber(currentLine)
                         .identifier(bulkDTO.getEmail())
                         .reason("El usuario ya existe en el sistema.")
                         .build());
             } catch (IllegalArgumentException e) {
-                errors.add(BulkTaskErrorDetailDTO.builder()
+                errors.add(BulkErrorDetailDTO.builder()
                         .lineNumber(currentLine)
                         .identifier(bulkDTO.getEmail())
                         .reason(e.getMessage())
                         .build());
             } catch (Exception e) {
-                errors.add(BulkTaskErrorDetailDTO.builder()
+                errors.add(BulkErrorDetailDTO.builder()
                         .lineNumber(currentLine)
                         .identifier(bulkDTO.getEmail())
                         .reason("Error desconocido al crear el usuario: " + e.getMessage())
@@ -171,7 +167,7 @@ public class UserService {
             }
         }
 
-        return BulkTaskResponseDTO.builder()
+        return BulkResponseDTO.builder()
                 .totalRecords(bulkCreationList.size())
                 .successfulRecords(successfulCreations)
                 .failedRecords(errors.size())

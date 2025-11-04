@@ -2,6 +2,8 @@ package org.alumnet.application.services;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+
+import org.alumnet.application.dtos.CourseContentDTO;
 import org.alumnet.application.dtos.LabelDTO;
 import org.alumnet.application.dtos.LibraryResourceDTO;
 import org.alumnet.application.dtos.requests.LibraryResourceCreationRequestDTO;
@@ -41,8 +43,6 @@ public class LibraryService {
     private final FileValidationService fileValidationService;
     private final LibraryMapper libraryMapper;
     private final S3FileStorageService s3FileStorageService;
-    @Value("${aws.s3.duration-url-hours}")
-    private long urlDuration;
 
     public Page<LabelDTO> getLabel(String textToSearch, Pageable page) {
         Page<Label> labelPage;
@@ -101,7 +101,7 @@ public class LibraryService {
         return resources.map(resource -> {
             LibraryResourceDTO dto = libraryMapper.libraryToLibraryResourceDTO(resource);
             dto.setUrl(s3FileStorageService
-                    .generatePresignedUrl(dto.getUrl(), Duration.ofHours(urlDuration)));
+                    .generatePresignedUrl(dto.getUrl()));
             return dto;
         });
     }

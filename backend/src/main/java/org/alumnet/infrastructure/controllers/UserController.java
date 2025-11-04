@@ -6,7 +6,7 @@ import org.alumnet.application.dtos.requests.UserCreationRequestDTO;
 import org.alumnet.application.dtos.UserDTO;
 import org.alumnet.application.dtos.requests.UserFilterDTO;
 import org.alumnet.application.dtos.requests.UserModifyRequestDTO;
-import org.alumnet.application.dtos.responses.BulkTaskResponseDTO;
+import org.alumnet.application.dtos.responses.BulkResponseDTO;
 import org.alumnet.application.dtos.responses.PageableResultResponse;
 import org.alumnet.application.dtos.responses.ResultResponse;
 import org.alumnet.application.services.UserService;
@@ -74,7 +74,7 @@ public class UserController {
         public ResponseEntity<ResultResponse<Object>> bulkCreateUsers(
                         @RequestPart("file") MultipartFile file,
                         @RequestParam(value = "hasHeaders", required = false, defaultValue = "false") boolean hasHeaders) {
-                BulkTaskResponseDTO bulkCreationResponse = userService.bulkCreateUsers(file, hasHeaders);
+                BulkResponseDTO bulkCreationResponse = userService.bulkCreateUsers(file, hasHeaders);
 
                 if (bulkCreationResponse.getTotalRecords() == bulkCreationResponse.getErrors().size()) {
                         return ResponseEntity.badRequest().body(ResultResponse.success(
