@@ -23,7 +23,8 @@ public class EventController {
     @PreAuthorize("hasRole('teacher')")
     public ResponseEntity<ResultResponse<Object>> createEvent(@RequestBody @Valid EventDTO eventDTO) {
         eventService.createEvent(eventDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ResultResponse.success(null, "Tarea creada exitosamente"));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ResultResponse.success(null, "Tarea creada exitosamente"));
     }
 
     @GetMapping("/{eventId}")
@@ -36,9 +37,9 @@ public class EventController {
     @PostMapping("/{eventId}/submit-homework")
     @PreAuthorize("hasRole('student')")
     public ResponseEntity<ResultResponse<Object>> submitHomework(@PathVariable Integer eventId,
-                                                                 @RequestParam String studentEmail,
-                                                                 @RequestPart("homeworkFile") MultipartFile homeworkFile) {
-        eventService.submitHomework(eventId, homeworkFile,studentEmail);
+            @RequestParam String studentEmail,
+            @RequestPart("homeworkFile") MultipartFile homeworkFile) {
+        eventService.submitHomework(eventId, homeworkFile, studentEmail);
         return ResponseEntity.ok(ResultResponse.success(null, "Tarea enviada exitosamente"));
     }
 
@@ -46,7 +47,8 @@ public class EventController {
     @PreAuthorize("hasRole('teacher')")
     public ResponseEntity<ResultResponse<Object>> deleteEvent(@PathVariable(required = true) int eventId) {
         eventService.deleteEvent(eventId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ResultResponse.success(null, "Tarea eliminada exitosamente"));
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .body(ResultResponse.success(null, "Tarea eliminada exitosamente"));
     }
 
     @GetMapping(value = "/{eventId}/details", produces = "application/json")

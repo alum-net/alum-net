@@ -3,6 +3,7 @@ import { Section } from '../types';
 import { THEME } from '@alum-net/ui';
 import { Linking } from 'react-native';
 import RenderHtml from 'react-native-render-html';
+import { Link } from 'expo-router';
 
 export function SectionContent({
   item,
@@ -41,6 +42,35 @@ export function SectionContent({
             📄 {r.name}.{r.extension}
           </Button>
         ))}
+      {item.summaryEvents.length > 0 && (
+        <Text variant="titleMedium">Eventos</Text>
+      )}
+      {item.summaryEvents.map(event => (
+        <Link
+          href={{
+            pathname: '/event/[id]',
+            params: { id: event.id, type: event.type },
+          }}
+          key={event.title + event.type}
+          asChild
+        >
+          <Button
+            elevation={5}
+            contentStyle={{
+              justifyContent: 'flex-start',
+            }}
+            buttonColor={THEME.colors.background}
+            style={{
+              marginVertical: 5,
+              borderColor: THEME.colors.secondary,
+              borderWidth: 1,
+            }}
+            mode="elevated"
+          >
+            {event.type} - {event.title}
+          </Button>
+        </Link>
+      ))}
     </>
   );
 }

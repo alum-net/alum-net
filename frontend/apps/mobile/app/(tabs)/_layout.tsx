@@ -45,6 +45,16 @@ export default function TabLayout() {
           headerShown: false,
         }}
       />
+      <Tabs.Screen
+        name="library"
+        options={{
+          title: 'Libreria',
+          tabBarIcon: ({ color }) => (
+            <TabBarIcon name="bookmark" color={color} />
+          ),
+          headerShown: false,
+        }}
+      />
     </Tabs>
   );
 }

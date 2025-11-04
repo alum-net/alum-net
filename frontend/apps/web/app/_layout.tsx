@@ -30,6 +30,10 @@ const InitialLayout = () => {
                 options={{ headerShown: false }}
               />
               <Stack.Screen name="library" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="event/[id]"
+                options={{ headerShown: false }}
+              />
             </Stack.Protected>
             <Stack.Screen name="+not-found" />
           </Stack>

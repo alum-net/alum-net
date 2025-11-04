@@ -15,7 +15,8 @@ import { THEME, Toast } from '@alum-net/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@alum-net/api';
 import { createEvent } from '../service';
-import { EventType, SectionOption } from '../types';
+import { SectionOption } from '../types';
+import { EventType } from '@alum-net/courses';
 import FormDateInput from '../../../components/date-input';
 import SelectField from './select-field';
 
@@ -167,8 +168,6 @@ export default function EventCreationModal({
       })),
     [sections],
   );
-
-  console.log(errors);
 
   return (
     <Portal>
