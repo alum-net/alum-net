@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.AnswerDTO;
 import org.alumnet.application.dtos.EventDTO;
 import org.alumnet.application.dtos.QuestionDTO;
+import org.alumnet.application.dtos.responses.EventDetailDTO;
 import org.alumnet.application.enums.EventType;
 import org.alumnet.application.mapper.EventMapper;
 import org.alumnet.domain.Section;
@@ -23,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -130,8 +132,12 @@ public class EventService {
 
     }
 
-    public EventDTO getEventById(Integer eventId) {
-        return eventMapper.eventToEventDTO(eventRepository.findById(eventId).orElseThrow(EventNotFoundException::new));
+    public EventDetailDTO getEventById(Integer eventId) {
+        Event event = eventRepository.findById(eventId).orElseThrow(EventNotFoundException::new);
+        EventDetailDTO eventDetailDTO = eventMapper.eventToEventDTO(event);
+        eventDetailDTO.setStudentsWithPendingSubmission(
+                userRepository.findStudentsWithPendingSubmission(eventId, event.getSection().getCourseId()));
+        return eventDetailDTO;
     }
 
     public void submitHomework(Integer eventId, MultipartFile homeworkFile, String studentEmail) {
