@@ -27,18 +27,16 @@ public interface UserRepository extends JpaRepository<User, String>, JpaSpecific
     AND (se.course.id = :courseId OR se.course.id IS NULL)
     """)
     Optional<Student> findUserWithEventParticipations(String userEmail, Integer courseId);
+
     @Query("""
-    SELECT s.email FROM Student s 
-    WHERE s IN (
-        SELECT cp.student FROM CourseParticipation cp 
-        WHERE cp.course.id = :courseId
-    )
-    AND s NOT IN (
-        SELECT ep.student FROM EventParticipation ep 
-        WHERE ep.event.id = :eventId 
-        AND ep.resource IS NOT NULL
-    )
-    """)
+            SELECT s.email FROM Student s 
+            JOIN CourseParticipation cp ON cp.student = s
+            JOIN EventParticipation ep ON ep.student = s
+            WHERE cp.course.id = :courseId
+            AND ep.event.id = :eventId
+            AND ep.grade IS NULL
+            AND ep.resource IS NULL
+            """)
     Set<String> findStudentsWithPendingSubmission(
             @Param("eventId") Integer eventId,
             @Param("courseId") Integer courseId
