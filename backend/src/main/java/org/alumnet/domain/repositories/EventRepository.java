@@ -21,5 +21,5 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
     LEFT JOIN FETCH qs.answers a
     WHERE q.id = :eventId
     """)
-    Optional<Questionnaire> findQuestionnaireById(Integer eventId);
+    Optional<Questionnaire> findQuestionnaireById(@Param("eventId") Integer eventId);
 }

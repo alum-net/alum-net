@@ -50,8 +50,10 @@ public class EventController {
 
     @GetMapping("/{eventId}/details")
     @PreAuthorize("hasAnyRole('teacher', 'student')")
-    public ResponseEntity<ResultResponse<EventDTO>> getQuestionnaireDetailsById(@PathVariable Integer eventId) {
-        EventDTO questionnaire = eventService.getQuestionnaireDetails(eventId);
+    public ResponseEntity<ResultResponse<EventDTO>> getQuestionnaireDetailsById(
+            @PathVariable Integer eventId,
+            String userEmail) {
+        EventDTO questionnaire = eventService.getQuestionnaireDetails(eventId, userEmail);
         return ResponseEntity.ok(ResultResponse.success(questionnaire, "Cuestionario obtenido exitosamente"));
     }
 }

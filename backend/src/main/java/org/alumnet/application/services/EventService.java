@@ -2,29 +2,29 @@ package org.alumnet.application.services;
 
 
 import lombok.RequiredArgsConstructor;
-import org.alumnet.application.dtos.AnswerDTO;
-import org.alumnet.application.dtos.EventDTO;
-import org.alumnet.application.dtos.QuestionDTO;
+import org.alumnet.application.dtos.*;
 import org.alumnet.application.dtos.responses.EventDetailDTO;
 import org.alumnet.application.enums.EventType;
+import org.alumnet.application.enums.UserRole;
 import org.alumnet.application.mapper.EventMapper;
 import org.alumnet.domain.Section;
-import org.alumnet.domain.events.Event;
-import org.alumnet.domain.events.EventParticipation;
-import org.alumnet.domain.events.EventParticipationId;
-import org.alumnet.domain.events.Questionnaire;
+import org.alumnet.domain.events.*;
 import org.alumnet.domain.repositories.EventParticipationRepository;
 import org.alumnet.domain.repositories.EventRepository;
+import org.alumnet.domain.repositories.QuestionnaireResponseDetailRepository;
 import org.alumnet.domain.repositories.UserRepository;
 import org.alumnet.domain.resources.TaskResource;
 import org.alumnet.domain.users.Student;
+import org.alumnet.domain.users.User;
 import org.alumnet.infrastructure.exceptions.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,6 +33,7 @@ public class EventService {
 
     private final CourseService courseService;
     private final SectionService sectionService;
+    private final QuestionnaireResponseDetailRepository responseDetailRepository;
     private final NotificationService notificationService;
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
@@ -194,11 +195,14 @@ public class EventService {
                 });
     }
 
-    public EventDTO getQuestionnaireDetails(Integer eventId) {
+    public EventDTO getQuestionnaireDetails(Integer eventId, String userEmail) {
         Questionnaire questionnaire = eventRepository.findQuestionnaireById(eventId)
                 .orElseThrow(EventNotFoundException::new);
 
-        return EventDTO.builder()
+        User user = userRepository.findById(userEmail)
+                .orElseThrow(UserNotFoundException::new);
+
+        var eventDTOBuilder = EventDTO.builder()
                 .title(questionnaire.getTitle())
                 .description(questionnaire.getDescription())
                 .type(questionnaire.getType())
@@ -208,7 +212,43 @@ public class EventService {
                 .maxGrade(questionnaire.getMaxGrade())
                 .questions(questionnaire.getQuestions().stream()
                         .map(eventMapper::questionDTOToQuestionDTO)
-                        .collect(Collectors.toList()))
-                .build();
+                        .collect(Collectors.toList()));
+
+        if(user.getRole() == UserRole.TEACHER){
+            // Si es el teacher el que pregunta me traigo también todas las respuestas
+            Set<QuestionnaireResponseDetail> allResponses = responseDetailRepository
+                    .findAllResponsesByEventId(eventId);
+
+            Map<EventParticipation, List<QuestionResponseDTO>> groupedResponses = allResponses.stream()
+                    .collect(Collectors.groupingBy(
+                            QuestionnaireResponseDetail::getAttempt,
+                            Collectors.mapping(
+                                    r -> QuestionResponseDTO.builder()
+                                            .questionId(r.getQuestion().getId())
+                                            .answerId(r.getStudentAnswer() != null ? r.getStudentAnswer().getId() : null)
+                                            .isCorrect(r.getStudentAnswer().getCorrect())
+                                            .timeStamp(r.getAttemptDate())
+                                            .build(),
+                                    Collectors.toList()
+                            )
+                    ));
+
+            List<QuestionnaireResponseDTO> teacherResponsesDTO = groupedResponses.entrySet().stream()
+                    .map(entry -> {
+                        EventParticipation attempt = entry.getKey();
+                        List<QuestionResponseDTO> responses = entry.getValue();
+
+                        return QuestionnaireResponseDTO.builder()
+                                .studentEmail(attempt.getStudent().getEmail())
+                                .name(attempt.getStudent().getName())
+                                .responses(responses)
+                                .build();
+                    })
+                    .collect(Collectors.toList());
+
+            eventDTOBuilder.responses(teacherResponsesDTO);
+        }
+
+        return eventDTOBuilder.build();
     }
 }

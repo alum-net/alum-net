@@ -28,4 +28,6 @@ public class Question {
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Answer> answers = new HashSet<>();
 
+    @OneToMany(mappedBy = "question", fetch = FetchType.LAZY)
+    private Set<QuestionnaireResponseDetail> responses;
 }
