@@ -169,8 +169,6 @@ export default function EventCreationModal({
     [sections],
   );
 
-  console.log(errors);
-
   return (
     <Portal>
       <Dialog visible={visible} onDismiss={onClose} style={styles.dialog}>

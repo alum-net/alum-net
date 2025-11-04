@@ -54,7 +54,14 @@ export interface Section {
   title: string;
   description: string;
   sectionResources: SectionResource[];
+  summaryEvents: SummaryEvent[];
 }
+
+export type SummaryEvent = {
+  id: number;
+  type: EventType;
+  title: string;
+};
 
 export interface CourseContent {
   sections: PageableContent<Section>;
@@ -76,14 +83,24 @@ export interface QuestionDTO {
   correctOption: number;
 }
 
-export interface EventDTO {
-  type: EventType;
-  sectionId: number;
-  title: string;
+export interface Event {
   description: string;
   startDate: string;
   endDate: string;
   maxGrade: number;
-  questions: QuestionDTO[];
-  durationInMinutes: number;
+  questions?: QuestionDTO[];
+  durationInMinutes?: number;
+  title: string;
 }
+
+export type Homework = {
+  eventId: string;
+  studentEmail: string;
+  homeworkFile: FilesToUpload;
+};
+
+export type FilesToUpload = {
+  uri: string;
+  name: string;
+  type: string;
+};

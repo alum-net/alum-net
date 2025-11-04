@@ -1,27 +1,43 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Button, Card, Text, ActivityIndicator } from 'react-native-paper';
 import * as DocumentPicker from 'expo-document-picker';
-import { EventDTO, EventType } from '../types';
+import { EventType, FilesToUpload } from '../types';
 import { PERMITTED_FILE_TYPES } from '../constants';
+import { useLocalSearchParams } from 'expo-router';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { getEventById, submitHomework } from '../service';
+import { QUERY_KEYS } from '@alum-net/api';
+import { MAX_FILE_SIZE, UserRole, useUserInfo } from '@alum-net/users';
+import { Toast } from '@alum-net/ui';
+import { isAxiosError } from 'axios';
 
-interface EventDetailsProps {
-  event: EventDTO;
-  // TODO: Add mutation for submitting the task
-}
+export const EventDetails = () => {
+  const { id, type } = useLocalSearchParams<{ id: string; type: EventType }>();
+  const { data: userInfo } = useUserInfo();
 
-const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString('es-ES', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
+  const { data, isLoading: loadingData } = useQuery({
+    queryKey: [QUERY_KEYS.getEventDetails, id],
+    queryFn: () => getEventById(id),
   });
-};
 
-export const EventDetails = ({ event }: EventDetailsProps) => {
-  const [selectedFile, setSelectedFile] =
-    useState<DocumentPicker.DocumentPickerAsset | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<FilesToUpload | null>(null);
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: submitHomework,
+    onSuccess: async () => {
+      Toast.success('Tarea enviada correctamente');
+      setSelectedFile(null);
+    },
+    onError: (err: unknown) => {
+      if (isAxiosError(err)) {
+        Toast.error(err.response?.data.message || 'Error al enviar la tarea');
+      } else {
+        Toast.error('Error al enviar la tarea');
+      }
+      console.error(err);
+    },
+  });
 
   const handleFileSelect = async () => {
     try {
@@ -31,7 +47,21 @@ export const EventDetails = ({ event }: EventDetailsProps) => {
       });
 
       if (res.assets && res.assets.length > 0) {
-        setSelectedFile(res.assets[0]);
+        if (
+          !(
+            res.assets[0].size &&
+            res.assets[0].size > MAX_FILE_SIZE * Math.pow(1024, 2)
+          )
+        ) {
+          const file = res.assets[0];
+          setSelectedFile({
+            uri: file.uri,
+            name: file.name,
+            type: file.mimeType || 'application/octet-stream',
+          });
+        } else {
+          Toast.error('El archivo pesa mas de 10MB');
+        }
       }
     } catch (e) {
       console.error('File selection error:', e);
@@ -39,51 +69,59 @@ export const EventDetails = ({ event }: EventDetailsProps) => {
   };
 
   const handleSubmit = () => {
-    if (!selectedFile) {
-      // TODO: show error toast
+    if (!selectedFile || !userInfo?.email || !id) {
+      Toast.error('No se ha seleccionado ningun archivo');
       return;
     }
-    setIsLoading(true);
-    console.log('Submitting file:', selectedFile.name);
-    // Simulate submission
-    setTimeout(() => {
-      setIsLoading(false);
-      setSelectedFile(null);
-    }, 2000);
+
+    mutate({
+      eventId: id,
+      studentEmail: userInfo.email,
+      homeworkFile: selectedFile,
+    });
   };
 
-  const isTask = event.type === EventType.TASK;
+  const canUploadFile = useMemo(
+    () =>
+      type.toUpperCase() === EventType.TASK &&
+      userInfo?.role === UserRole.student &&
+      data &&
+      new Date(data.endDate) > new Date(),
+    [userInfo, data, type],
+  );
+
+  if (loadingData) return <ActivityIndicator />;
 
   return (
     <Card style={styles.card}>
       <Card.Title
-        title={`Tarea: ${event.title}`}
+        title={`Tarea: ${data?.title}`}
         titleVariant="headlineMedium"
         style={styles.cardTitle}
       />
       <Card.Content>
         <Text variant="bodyLarge" style={styles.description}>
-          {event.description}
+          {data?.description}
         </Text>
 
         <View style={styles.infoRow}>
           <Text variant="bodyLarge">Fecha de inicio</Text>
-          <Text variant="bodyLarge">{formatDate(event.startDate)}</Text>
+          <Text variant="bodyLarge">{data?.startDate.toString()}</Text>
         </View>
 
         <View style={styles.infoRow}>
           <Text variant="bodyLarge">Fecha de fin</Text>
-          <Text variant="bodyLarge">{formatDate(event.endDate)}</Text>
+          <Text variant="bodyLarge">{data?.endDate.toString()}</Text>
         </View>
 
         <View style={styles.infoRow}>
           <Text variant="bodyLarge">Nota máxima</Text>
-          <Text variant="bodyLarge">{event.maxGrade} puntos</Text>
+          <Text variant="bodyLarge">{data?.maxGrade} puntos</Text>
         </View>
 
-        {isTask && (
+        {canUploadFile && (
           <View style={styles.uploadBox}>
-            {isLoading ? (
+            {isPending ? (
               <ActivityIndicator />
             ) : (
               <>
@@ -93,7 +131,7 @@ export const EventDetails = ({ event }: EventDetailsProps) => {
                   onPress={handleFileSelect}
                   style={styles.uploadButton}
                 >
-                  Arrastra y suelta o haz clic para subir
+                  {selectedFile ? 'Cambiar archivo' : 'Seleccionar archivo'}
                 </Button>
                 <Text style={styles.fileHint}>
                   PDF, PPTX, XLSX, MP4, JPG, PNG, DOCX, ZIP
@@ -104,7 +142,7 @@ export const EventDetails = ({ event }: EventDetailsProps) => {
                 <Button
                   mode="contained"
                   onPress={handleSubmit}
-                  disabled={!selectedFile || isLoading}
+                  disabled={!selectedFile || isPending}
                   style={styles.submitButton}
                 >
                   Subir archivo

@@ -4,11 +4,13 @@ import {
   FiltersDirectory,
   CourseCreationPayload,
   CourseContent,
-  EventDTO as Event,
+  Event as Event,
+  Homework,
 } from './types';
 import { AxiosResponse } from 'axios';
 import { UserInfo } from '@alum-net/users/src/types';
 import { deleteFalsyKeys } from './helpers';
+import { Platform } from 'react-native';
 
 function mapFilterKeys(filters: FiltersDirectory, userEmail: string) {
   return {
@@ -96,9 +98,35 @@ export const unenrollStudent = async (courseId: string, email: string) => {
   return normalized;
 };
 
-export const getEventById = async (eventId: number) => {
+export const getEventById = async (eventId: string) => {
   const { data }: AxiosResponse<Response<Event>> = await api.get(
-    `/courses/events/${eventId}`,
+    `/events/${eventId}`,
   );
-  return data;
+  return data.data;
+};
+
+export const submitHomework = async (homework: Homework) => {
+  const data = new FormData();
+
+  data.append(
+    'homeworkFile',
+    Platform.OS === 'web'
+      ? await (await fetch(homework.homeworkFile.uri)).blob()
+      : ({
+          name: homework.homeworkFile.name,
+          uri: homework.homeworkFile.uri,
+          type: homework.homeworkFile.type,
+        } as any),
+    homework.homeworkFile.name,
+  );
+
+  return await api.post(
+    `/events/${homework.eventId}/submit-homework?studentEmail=${homework.studentEmail}`,
+    data,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    },
+  );
 };
