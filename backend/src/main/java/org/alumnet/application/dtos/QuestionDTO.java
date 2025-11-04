@@ -13,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class QuestionDTO {
+    private Integer id;
     private String text;
     @Size(min = 2, message = "La pregunta debe tener al menos 2 respuestas")
     private List<AnswerDTO> answers;
