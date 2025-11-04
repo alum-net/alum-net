@@ -2,6 +2,8 @@ package org.alumnet.infrastructure.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.alumnet.application.dtos.responses.OneSignalCreateNotificationDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
@@ -38,13 +40,13 @@ public class OneSignalClient {
 
         log.debug("Sending OneSignal notification payload: {}", payload);
 
-        ResponseEntity<String> response = buildRestTemplate().postForEntity(
+        ResponseEntity<OneSignalCreateNotificationDTO> response = buildRestTemplate().postForEntity(
                 "/notifications?c=push",
-                payload, String.class);
+                payload, OneSignalCreateNotificationDTO.class);
 
-        if (response.getStatusCode().is2xxSuccessful()) {
+        if (response.getStatusCode().is2xxSuccessful() && response.getBody().getId().isPresent()) {
             log.info("Notification sent successfully: {}", response.getBody());
-            return response.getBody();
+            return response.getBody().getId().get();
         } else {
             log.error("Failed to send notification. Status: {}, Body: {}", response.getStatusCode(),
                     response.getBody());
@@ -54,7 +56,7 @@ public class OneSignalClient {
 
     public void cancelNotification(String notificationId) {
         log.info("Cancelling OneSignal notification: {}", notificationId);
-        buildRestTemplate().delete("/notifications/" + notificationId);
+        buildRestTemplate().delete("/notifications/" + notificationId + "?app_id=" + appId);
     }
 
     private RestTemplate buildRestTemplate() {

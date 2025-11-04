@@ -30,10 +30,10 @@ export const EventDetails = () => {
         [QUERY_KEYS.getEventDetails, id],
         (oldData: Event) => ({
           ...oldData,
-          studentsWithPendingSubmission: [
-            ...oldData.studentsWithPendingSubmission,
-            userInfo?.email,
-          ],
+          studentsWithPendingSubmission:
+            oldData.studentsWithPendingSubmission.filter(
+              studentEmail => studentEmail !== userInfo?.email,
+            ),
         }),
       );
       Toast.success('Tarea enviada correctamente');

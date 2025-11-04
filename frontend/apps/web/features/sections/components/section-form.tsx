@@ -19,7 +19,6 @@ import {
   HelperText,
   Text,
 } from 'react-native-paper';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import * as DocumentPicker from 'expo-document-picker';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -224,11 +223,11 @@ export const SectionForm: React.FC<SectionFormProps> = ({
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ScrollView style={styles.container}>
       {isLoadingMutation ? (
         <ActivityIndicator />
       ) : (
-        <ScrollView>
+        <>
           <FormTextInput
             name="title"
             label="Título de la sección *"
@@ -285,9 +284,9 @@ export const SectionForm: React.FC<SectionFormProps> = ({
               {isEditMode ? 'Guardar cambios' : 'Crear sección'}
             </Button>
           </View>
-        </ScrollView>
+        </>
       )}
-    </SafeAreaView>
+    </ScrollView>
   );
 };
 
