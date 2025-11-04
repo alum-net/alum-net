@@ -7,6 +7,7 @@ import org.alumnet.application.dtos.requests.CourseCreationRequestDTO;
 import org.alumnet.application.dtos.requests.CourseFilterDTO;
 import org.alumnet.application.dtos.requests.EnrollmentRequestDTO;
 import org.alumnet.application.dtos.responses.BulkResponseDTO;
+import org.alumnet.application.dtos.responses.CourseGradesResponseDTO;
 import org.alumnet.application.dtos.responses.PageableResultResponse;
 import org.alumnet.application.dtos.responses.ResultResponse;
 import org.alumnet.application.services.CourseService;
@@ -222,5 +223,16 @@ public class CourseController {
         return ResponseEntity.ok(ResultResponse.success(
                 bulkResponse,
                 successMessage));
+    }
+
+    @GetMapping(path = "/{courseId}/grades/{userEmail}", produces = "application/json")
+    @PreAuthorize("hasRole('student')")
+    public ResponseEntity<ResultResponse<CourseGradesResponseDTO>> getGrades(
+            @PathVariable int courseId,
+            @PathVariable String userEmail){
+
+        CourseGradesResponseDTO grades = courseService.getGrades(courseId, userEmail);
+
+        return ResponseEntity.ok(ResultResponse.success(grades, "Se obtuvieron las notas correctamente"));
     }
 }

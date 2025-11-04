@@ -8,6 +8,8 @@ import org.alumnet.application.dtos.UserDTO;
 import org.alumnet.application.dtos.requests.*;
 import org.alumnet.application.dtos.responses.BulkErrorDetailDTO;
 import org.alumnet.application.dtos.responses.BulkResponseDTO;
+import org.alumnet.application.dtos.responses.CourseGradesResponseDTO;
+import org.alumnet.application.dtos.responses.EventGradeDetailResponseDTO;
 import org.alumnet.application.enums.ShiftType;
 import org.alumnet.application.enums.UserRole;
 import org.alumnet.application.mapper.CourseMapper;
@@ -17,6 +19,7 @@ import org.alumnet.application.query_builders.UserSpecification;
 import org.alumnet.domain.Course;
 import org.alumnet.domain.CourseParticipation;
 import org.alumnet.domain.CourseParticipationId;
+import org.alumnet.domain.events.EventParticipation;
 import org.alumnet.domain.repositories.CourseParticipationRepository;
 import org.alumnet.domain.repositories.CourseRepository;
 import org.alumnet.domain.repositories.ParticipationRepository;
@@ -37,7 +40,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -58,8 +60,6 @@ public class CourseService {
     private final ParticipationRepository participationRepository;
     private final CourseContentStrategyFactory courseContentStrategyFactory;
     private final S3FileStorageService s3FileStorageService;
-    @Value("${aws.s3.duration-url-hours}")
-    private long urlDuration;
 
     private final CourseMapper courseMapper;
 
@@ -614,5 +614,45 @@ public class CourseService {
                 .failedRecords(errors.size())
                 .errors(errors)
                 .build();
+    }
+
+    public CourseGradesResponseDTO getGrades(int courseId, String userEmail) {
+        Student student = userRepository
+                .findUserWithCourseParticipations(userEmail)
+                .orElseThrow(UserNotFoundException::new);
+
+        userRepository
+                .findUserWithEventParticipations(userEmail, courseId)
+                .orElseThrow(UserNotFoundException::new);
+
+        CourseParticipation courseParticipation = student
+                .getParticipations().stream()
+                .filter(p -> p.getCourse().getId() == courseId)
+                .findFirst().orElseThrow(CourseParticipationNotFoundException::new);
+
+        boolean isUnrated = courseParticipation.getGrade() == null;
+        boolean isApproved = !isUnrated && courseParticipation.getCourse().getApprovalGrade() <= courseParticipation.getGrade();
+
+        CourseGradesResponseDTO grades = CourseGradesResponseDTO
+                .builder()
+                .finalGrade(courseParticipation.getGrade())
+                .approvalGrade(courseParticipation.getCourse().getApprovalGrade())
+                .isUnrated(isUnrated)
+                .isApproved(isApproved)
+                .eventGrades(new ArrayList<>())
+                .build();
+
+        for(EventParticipation ep : student.getEventParticipations()){
+            boolean isEventUnrated = ep.getGrade() == null;
+
+            grades.getEventGrades().add(EventGradeDetailResponseDTO
+                    .builder()
+                            .grade(ep.getGrade())
+                            .isUnrated(isEventUnrated)
+                            .maxGrade(ep.getEvent().getMaxGrade().doubleValue())
+                    .build());
+        }
+
+        return grades;
     }
 }
