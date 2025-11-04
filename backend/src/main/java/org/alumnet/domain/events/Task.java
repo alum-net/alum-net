@@ -4,11 +4,15 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.Getter;
 import lombok.Setter;
+import org.alumnet.application.enums.EventType;
 
 @Getter
 @Setter
 @Entity
 @DiscriminatorValue("task")
 public class Task extends Event {
-
+    @Override
+    public EventType getType(){
+        return EventType.TASK;
+    }
 }

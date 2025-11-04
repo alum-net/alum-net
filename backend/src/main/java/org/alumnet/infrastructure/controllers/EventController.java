@@ -47,4 +47,11 @@ public class EventController {
         eventService.deleteEvent(eventId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ResultResponse.success(null, "Tarea eliminada exitosamente"));
     }
+
+    @GetMapping("/{eventId}/details")
+    @PreAuthorize("hasAnyRole('teacher', 'student')")
+    public ResponseEntity<ResultResponse<EventDTO>> getQuestionnaireDetailsById(@PathVariable Integer eventId) {
+        EventDTO questionnaire = eventService.getQuestionnaireDetails(eventId);
+        return ResponseEntity.ok(ResultResponse.success(questionnaire, "Cuestionario obtenido exitosamente"));
+    }
 }

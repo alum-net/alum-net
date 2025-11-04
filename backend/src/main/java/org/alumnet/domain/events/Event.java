@@ -2,6 +2,7 @@ package org.alumnet.domain.events;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.alumnet.application.enums.EventType;
 import org.alumnet.domain.Section;
 
 import java.time.LocalDateTime;
@@ -45,4 +46,6 @@ public abstract class Event {
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EventParticipation> participation = new ArrayList<>();
+
+    public abstract EventType getType();
 }

@@ -12,6 +12,7 @@ import org.alumnet.domain.Section;
 import org.alumnet.domain.events.Event;
 import org.alumnet.domain.events.EventParticipation;
 import org.alumnet.domain.events.EventParticipationId;
+import org.alumnet.domain.events.Questionnaire;
 import org.alumnet.domain.repositories.EventParticipationRepository;
 import org.alumnet.domain.repositories.EventRepository;
 import org.alumnet.domain.repositories.UserRepository;
@@ -24,8 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -192,5 +192,23 @@ public class EventService {
                     if (participation.getResource() != null)
                         throw new HomeworkAlreadySubmittedException("El estudiante ya ha enviado la tarea para este evento");
                 });
+    }
+
+    public EventDTO getQuestionnaireDetails(Integer eventId) {
+        Questionnaire questionnaire = eventRepository.findQuestionnaireById(eventId)
+                .orElseThrow(EventNotFoundException::new);
+
+        return EventDTO.builder()
+                .title(questionnaire.getTitle())
+                .description(questionnaire.getDescription())
+                .type(questionnaire.getType())
+                .startDate(questionnaire.getStartDate())
+                .endDate(questionnaire.getEndDate())
+                .durationInMinutes(questionnaire.getDurationInMinutes())
+                .maxGrade(questionnaire.getMaxGrade())
+                .questions(questionnaire.getQuestions().stream()
+                        .map(eventMapper::questionDTOToQuestionDTO)
+                        .collect(Collectors.toList()))
+                .build();
     }
 }
