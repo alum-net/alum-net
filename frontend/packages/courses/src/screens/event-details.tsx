@@ -2,10 +2,10 @@ import React, { useMemo, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Button, Card, Text, ActivityIndicator } from 'react-native-paper';
 import * as DocumentPicker from 'expo-document-picker';
-import { EventType, FilesToUpload } from '../types';
+import { Event, EventType, FilesToUpload } from '../types';
 import { PERMITTED_FILE_TYPES } from '../constants';
 import { useLocalSearchParams } from 'expo-router';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getEventById, submitHomework } from '../service';
 import { QUERY_KEYS } from '@alum-net/api';
 import { MAX_FILE_SIZE, UserRole, useUserInfo } from '@alum-net/users';
@@ -14,8 +14,8 @@ import { isAxiosError } from 'axios';
 
 export const EventDetails = () => {
   const { id, type } = useLocalSearchParams<{ id: string; type: EventType }>();
+  const queryClient = useQueryClient();
   const { data: userInfo } = useUserInfo();
-
   const { data, isLoading: loadingData } = useQuery({
     queryKey: [QUERY_KEYS.getEventDetails, id],
     queryFn: () => getEventById(id),
@@ -26,6 +26,16 @@ export const EventDetails = () => {
   const { mutate, isPending } = useMutation({
     mutationFn: submitHomework,
     onSuccess: async () => {
+      await queryClient.setQueryData(
+        [QUERY_KEYS.getEventDetails, id],
+        (oldData: Event) => ({
+          ...oldData,
+          studentsWithPendingSubmission: [
+            ...oldData.studentsWithPendingSubmission,
+            userInfo?.email,
+          ],
+        }),
+      );
       Toast.success('Tarea enviada correctamente');
       setSelectedFile(null);
     },
@@ -81,6 +91,10 @@ export const EventDetails = () => {
     });
   };
 
+  const hasToUploadHomework = data?.studentsWithPendingSubmission.includes(
+    userInfo!.email,
+  );
+
   const canUploadFile = useMemo(
     () =>
       type.toUpperCase() === EventType.TASK &&
@@ -123,7 +137,7 @@ export const EventDetails = () => {
           <View style={styles.uploadBox}>
             {isPending ? (
               <ActivityIndicator />
-            ) : (
+            ) : hasToUploadHomework ? (
               <>
                 <Button
                   icon="cloud-upload-outline"
@@ -148,6 +162,8 @@ export const EventDetails = () => {
                   Subir archivo
                 </Button>
               </>
+            ) : (
+              <Text style={{ color: 'green' }}>Tarea subida correctamente</Text>
             )}
           </View>
         )}

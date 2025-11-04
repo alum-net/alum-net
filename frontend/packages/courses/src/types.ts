@@ -88,6 +88,7 @@ export interface Event {
   startDate: string;
   endDate: string;
   maxGrade: number;
+  studentsWithPendingSubmission: string[];
   questions?: QuestionDTO[];
   durationInMinutes?: number;
   title: string;
