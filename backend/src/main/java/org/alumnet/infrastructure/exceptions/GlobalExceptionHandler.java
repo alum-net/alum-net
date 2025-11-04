@@ -156,4 +156,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ResultResponse<Object>> handleInvalidSubmissionException(InvalidSubmissionException ex) {
         return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "El pedido no se pudo completar"));
     }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ResultResponse<Object>> handleUserNotFoundException(UserNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultResponse.error(ex.getMessage(), "No se encontró el usuario"));
+    }
+
+    @ExceptionHandler(InsufficientPermissionsException.class)
+    public ResponseEntity<ResultResponse<Object>> handleInsufficientPermissionsException(InsufficientPermissionsException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ResultResponse.error(ex.getMessage(), "Permisos insuficientes"));
+    }
 }
