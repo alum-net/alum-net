@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AnswerDTO {
+    private Integer id;
     private String text;
     private boolean correct;
 }

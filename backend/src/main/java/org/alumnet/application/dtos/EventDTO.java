@@ -39,6 +39,8 @@ public class EventDTO {
     @Min(value = 1, message = "La duracion debe ser al menos 1 minuto")
     private Integer durationInMinutes;
 
+    private List<QuestionnaireResponseDTO> responses;
+
     public String mapType() {
         switch (type) {
             case EventType.QUESTIONNAIRE:
