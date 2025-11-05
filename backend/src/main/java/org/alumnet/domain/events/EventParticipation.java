@@ -5,6 +5,9 @@ import lombok.*;
 import org.alumnet.domain.resources.TaskResource;
 import org.alumnet.domain.users.Student;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Setter
 @Getter
@@ -30,4 +33,7 @@ public class EventParticipation {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "resource_id", referencedColumnName = "id")
     private TaskResource resource;
+
+    @OneToMany(mappedBy = "attempt", cascade = CascadeType.ALL)
+    private Set<QuestionnaireResponseDetail> responses = new HashSet<>();
 }

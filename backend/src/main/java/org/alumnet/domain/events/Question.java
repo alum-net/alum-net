@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "questions")
@@ -24,6 +26,8 @@ public class Question {
     @JoinColumn(name = "questionnaire_id", nullable = false)
     private Questionnaire questionnaire;
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Answer> answers = new ArrayList<>();
+    private Set<Answer> answers = new HashSet<>();
 
+    @OneToMany(mappedBy = "question", fetch = FetchType.LAZY)
+    private Set<QuestionnaireResponseDetail> responses;
 }

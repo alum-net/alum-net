@@ -1,10 +1,13 @@
 package org.alumnet.domain.repositories;
 
 import org.alumnet.domain.events.Event;
+import org.alumnet.domain.events.Questionnaire;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import java.util.Optional;
 
 @Repository
 public interface EventRepository extends JpaRepository<Event, Integer> {
@@ -12,4 +15,12 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
             "FROM EventParticipation ep WHERE ep.event.id = :eventId " +
             "AND ep.grade IS NOT NULL OR ep.resource IS NOT NULL")
     boolean someParticipationByEventId(@Param("eventId") int eventId);
+
+    @Query("""
+    SELECT q FROM Questionnaire q
+    LEFT JOIN FETCH q.questions qs
+    LEFT JOIN FETCH qs.answers a
+    WHERE q.id = :eventId
+    """)
+    Optional<Questionnaire> findQuestionnaireById(@Param("eventId") Integer eventId);
 }

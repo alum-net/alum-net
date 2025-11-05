@@ -3,6 +3,8 @@ package org.alumnet.domain.events;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Set;
+
 @Entity
 @Table(name = "answers")
 @Getter
@@ -23,4 +25,7 @@ public class Answer {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id", nullable = false)
     private Question question;
+
+    @OneToMany(mappedBy = "studentAnswer", fetch = FetchType.LAZY)
+    private Set<QuestionnaireResponseDetail> responses;
 }
