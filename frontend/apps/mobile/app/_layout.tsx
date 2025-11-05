@@ -28,13 +28,12 @@ const InitialLayout = () => {
     OneSignal.initialize(process.env.EXPO_PUBLIC_ONE_SIGNAL_ID as string);
     OneSignal.Notifications.requestPermission(true);
     OneSignal.Notifications.addEventListener('foregroundWillDisplay', event => {
-      console.log('Notification received in foreground:', event);
       event.getNotification().display();
     });
 
-    OneSignal.Notifications.addEventListener('click', event => {
-      console.log('Notification clicked:', event);
-    });
+    // OneSignal.Notifications.addEventListener('click', event => {
+    //   console.log('Notification clicked:', event);
+    // });
   }, []);
 
   return (
