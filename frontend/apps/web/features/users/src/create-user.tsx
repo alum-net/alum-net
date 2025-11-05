@@ -1,4 +1,3 @@
-'use dom';
 import React, { useCallback, useState } from 'react';
 import { View, StyleSheet, Modal, ScrollView } from 'react-native';
 import { Button, Text, SegmentedButtons } from 'react-native-paper';
@@ -8,7 +7,10 @@ import { FormTextInput, THEME } from '@alum-net/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@alum-net/api';
 import { UserRole } from '@alum-net/users/src/types';
-import { UserCreationFormData, userCreationSchema } from '../validations/user-creation';
+import {
+  UserCreationFormData,
+  userCreationSchema,
+} from '../validations/user-creation';
 import { createUser, CreateUserForm, getAxiosErrorMessage } from './users';
 
 type Props = { visible: boolean; onDismiss: () => void };
@@ -60,7 +62,9 @@ export default function CreateUserModal({ visible, onDismiss }: Props) {
           // cerrar modal e invalidar lista
           reset();
           onDismiss();
-          await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.getUsers] });
+          await queryClient.invalidateQueries({
+            queryKey: [QUERY_KEYS.getUsers],
+          });
         } else {
           // Error (success:false) -> mostrar mensaje del back y no cerrar
           const msg =

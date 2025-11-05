@@ -1,73 +1,17 @@
 import api from '@alum-net/api';
-import { Platform } from 'react-native';
-import { FilesToUpload, SectionData } from './types';
-import { deleteFalsyKeys } from '@alum-net/courses/src/helpers';
-
-async function buildFormData(
-  sectionData: SectionData,
-  selectedFiles?: FilesToUpload[],
-) {
-  const formData = new FormData();
-  formData.append(
-    'section',
-    new Blob([JSON.stringify(deleteFalsyKeys(sectionData))], {
-      type: 'application/json',
-    }),
-  );
-
-  if (selectedFiles)
-    for (const file of selectedFiles) {
-      if (Platform.OS === 'web') {
-        const response = await fetch(file.uri);
-        const blob = await response.blob();
-        formData.append('resources', blob, file.name);
-      }
-    }
-  return formData;
-}
-
-export const createSection = async ({
-  courseId,
-  sectionData,
-  selectedFiles,
-}: {
-  courseId: string;
-  sectionData: SectionData;
-  selectedFiles?: FilesToUpload[];
-}) => {
-  const { data } = await api.post(
-    `/sections/${courseId}`,
-    await buildFormData(sectionData, selectedFiles),
-    {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    },
-  );
-
-  return data;
-};
+import { BulkCreationResponse } from './types';
 
 export const deleteCourse = async (courseId: string, sectionId: number) => {
   return await api.delete(`/sections/${courseId}/${sectionId}`);
 };
 
-export const updateSection = async ({
-  courseId,
-  sectionId,
-  sectionData,
-  selectedFiles,
-}: {
-  courseId: string;
-  sectionId: number;
-  sectionData: SectionData;
-  selectedFiles?: FilesToUpload[];
-}) => {
-  const { data } = await api.put(
-    `/sections/${courseId}/${sectionId}`,
-    await buildFormData(sectionData, selectedFiles),
-    { headers: { 'Content-Type': 'multipart/form-data' } },
-  );
+export async function bulkCreateCourses(file: File, hasHeaders = true) {
+  const form = new FormData();
+  form.append('file', file);
 
-  return data;
-};
+  return api.post<BulkCreationResponse>(
+    `/courses/bulk-creation?hasHeaders=${hasHeaders}`,
+    form,
+    { headers: { 'Content-Type': 'multipart/form-data' } }
+  );
+}

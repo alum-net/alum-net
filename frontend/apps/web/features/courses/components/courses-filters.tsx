@@ -5,29 +5,50 @@ import { memo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button } from 'react-native-paper';
 import CreateCourseModal from './course-creation-modal';
+import BulkCourseUploadModal from './bulk-course-upload-modal';
 import { UserRole } from '@alum-net/users/src/types';
 
 function CourseFilters() {
   const { data } = useUserInfo();
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isBulkModalVisible, setIsBulkModalVisible] = useState(false);
 
   return (
     <View>
       <FilterBar />
+
       {data?.role === UserRole.admin && (
         <>
-          <Button
-            mode="contained"
-            style={styles.createButton}
-            labelStyle={styles.createButtonLabel}
-            icon="plus"
-            onPress={() => setIsModalVisible(true)}
-          >
-            Crear nuevo curso
-          </Button>
+          <View style={styles.buttonRow}>
+            <Button
+              mode="contained"
+              style={styles.createButton}
+              labelStyle={styles.createButtonLabel}
+              icon="plus"
+              onPress={() => setIsModalVisible(true)}
+            >
+              Crear nuevo curso
+            </Button>
+
+            <Button
+              mode="contained"
+              style={styles.createButton}
+              labelStyle={styles.createButtonLabel}
+              icon="upload"
+              onPress={() => setIsBulkModalVisible(true)}
+            >
+              Carga masiva de cursos
+            </Button>
+          </View>
+
           <CreateCourseModal
             visible={isModalVisible}
             onDismiss={() => setIsModalVisible(false)}
+          />
+
+          <BulkCourseUploadModal
+            visible={isBulkModalVisible}
+            onDismiss={() => setIsBulkModalVisible(false)}
           />
         </>
       )}
@@ -38,11 +59,15 @@ function CourseFilters() {
 export default memo(CourseFilters);
 
 const styles = StyleSheet.create({
-  createButton: {
-    backgroundColor: THEME.colors.primary,
-    alignSelf: 'flex-end',
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 10,
     marginHorizontal: 16,
     marginBottom: 16,
+  },
+  createButton: {
+    backgroundColor: THEME.colors.primary,
   },
   createButtonLabel: {
     color: 'white',

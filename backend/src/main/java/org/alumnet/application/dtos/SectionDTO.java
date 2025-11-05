@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.alumnet.application.dtos.responses.SectionResourceResponseDTO;
+import org.alumnet.application.dtos.responses.SummaryEventDTO;
 
 import java.util.List;
 
@@ -16,6 +17,7 @@ public class SectionDTO {
     private Integer id;
     private String title;
     private String description;
+    private List<SummaryEventDTO> summaryEvents;
     private List<SectionResourceResponseDTO> sectionResources;
 
 }

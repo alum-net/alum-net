@@ -16,3 +16,16 @@ export type SectionData = {
   resourcesMetadata?: FileMetadata[];
   eliminatedResourcesIds?: number[];
 };
+
+export type BulkCreationError = {
+  lineNumber: number;
+  identifier?: string;
+  reason: string;
+};
+
+export type BulkCreationResponse = {
+  totalRecords: number;
+  successfulCreations: number;
+  failedCreations: number;
+  errors: BulkCreationError[];
+};

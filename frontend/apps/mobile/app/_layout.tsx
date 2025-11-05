@@ -10,6 +10,7 @@ import { THEME, ToastProvider } from '@alum-net/ui';
 import { useMMKVString } from 'react-native-mmkv';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
+import { OneSignal, LogLevel } from 'react-native-onesignal';
 export { ErrorBoundary } from 'expo-router';
 
 SplashScreen.preventAutoHideAsync();
@@ -17,6 +18,24 @@ const queryClient = new QueryClient();
 
 const InitialLayout = () => {
   const [refreshToken] = useMMKVString(STORAGE_KEYS.REFRESH_TOKEN, storage);
+
+  useEffect(() => {
+    OneSignal.Debug.setLogLevel(
+      process.env.EXPO_PUBLIC_ENV === 'development'
+        ? LogLevel.Verbose
+        : LogLevel.None,
+    );
+    OneSignal.initialize(process.env.EXPO_PUBLIC_ONE_SIGNAL_ID as string);
+    OneSignal.Notifications.requestPermission(true);
+    OneSignal.Notifications.addEventListener('foregroundWillDisplay', event => {
+      console.log('Notification received in foreground:', event);
+      event.getNotification().display();
+    });
+
+    OneSignal.Notifications.addEventListener('click', event => {
+      console.log('Notification clicked:', event);
+    });
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

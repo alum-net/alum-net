@@ -17,7 +17,10 @@ export const useCourse = (id: string) => {
 
   useEffect(() => {
     if (error || (data?.errors && data?.errors.length > 0)) {
-      Toast.error('No estas inscripto al curso');
+      Toast.error(
+        data?.errors?.[0] ||
+          'A ocurrido un error inesperado, intentalo mas tarde',
+      );
       if (nav.canGoBack()) nav.goBack();
       else
         nav.reset({

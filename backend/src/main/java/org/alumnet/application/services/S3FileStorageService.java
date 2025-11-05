@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.alumnet.infrastructure.config.AmazonS3Config;
 import org.alumnet.infrastructure.exceptions.FileStorageException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -17,7 +18,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,17 +28,22 @@ public class S3FileStorageService {
     private final S3Client s3Client;
     private final AmazonS3Config.S3Properties s3Properties;
     private final S3Presigner s3Presigner;
+    @Value("${aws.s3.duration-url-hours}")
+    private long urlDuration;
 
-    public String store(MultipartFile file,String folderPath) throws FileStorageException {
+    public String store(MultipartFile file, String folderPath) throws FileStorageException {
         try {
-            String key = String.format("%s/%s", folderPath, file.getOriginalFilename());
+            String key = String.format("%s/%s",
+                    folderPath.endsWith("/") ? folderPath.substring(0, folderPath.lastIndexOf("/"))
+                            : folderPath,
+                    file.getOriginalFilename());
 
             Map<String, String> metadata = Map.of(
                     "original-filename", file.getOriginalFilename(),
-                    "content-type", file.getContentType()
-            );
+                    "content-type", file.getContentType());
 
-            PutObjectResponse response = s3Client.putObject(createPutObjectRequest(file, key, metadata), createAWSrequestBody(file));
+            PutObjectResponse response = s3Client.putObject(createPutObjectRequest(file, key, metadata),
+                    createAWSrequestBody(file));
 
             log.info("Archivo subido exitosamente a S3: bucket={}, key={}, etag={}",
                     s3Properties.getBucketName(), key, response.eTag());
@@ -48,9 +53,9 @@ public class S3FileStorageService {
         } catch (Exception e) {
             log.error("Error subiendo archivo a S3: {}", file.getOriginalFilename(), e);
             throw new FileStorageException(
-                    String.format("Error almacenando archivo en S3: %s", file.getOriginalFilename()),
-                    "upload"
-            );
+                    String.format("Error almacenando archivo en S3: %s",
+                            file.getOriginalFilename()),
+                    "upload");
         }
     }
 
@@ -70,14 +75,14 @@ public class S3FileStorageService {
                 .build();
     }
 
-    public String generatePresignedUrl(String key, Duration expiration) {
+    public String generatePresignedUrl(String key) {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(s3Properties.getBucketName())
                 .key(key)
                 .build();
 
-        PresignedGetObjectRequest presignedRequest = s3Presigner.presignGetObject(r ->
-                r.signatureDuration(expiration)
+        PresignedGetObjectRequest presignedRequest = s3Presigner
+                .presignGetObject(r -> r.signatureDuration(Duration.ofHours(urlDuration))
                         .getObjectRequest(getObjectRequest));
 
         return presignedRequest.url().toString();
@@ -120,24 +125,23 @@ public class S3FileStorageService {
                     response.deleted().size());
 
             if (!response.errors().isEmpty()) {
-                response.errors().forEach(error ->
-                        log.error("Error eliminando objeto: key={}, code={}, message={}",
-                                error.key(), error.code(), error.message())
-                );
+                response.errors()
+                        .forEach(error -> log.error(
+                                "Error eliminando objeto: key={}, code={}, message={}",
+                                error.key(), error.code(), error.message()));
             }
 
         } catch (S3Exception e) {
             log.error("Error de S3 eliminando carpeta: {}", folderPath, e);
             throw new FileStorageException(
-                    String.format("Error eliminando carpeta en S3: %s - %s", folderPath, e.awsErrorDetails().errorMessage()),
-                    "delete"
-            );
+                    String.format("Error eliminando carpeta en S3: %s - %s", folderPath,
+                            e.awsErrorDetails().errorMessage()),
+                    "delete");
         } catch (Exception e) {
             log.error("Error inesperado eliminando carpeta de S3: {}", folderPath, e);
             throw new FileStorageException(
                     String.format("Error eliminando carpeta en S3: %s", folderPath),
-                    "delete"
-            );
+                    "delete");
         }
     }
 

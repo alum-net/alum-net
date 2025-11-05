@@ -6,7 +6,8 @@ import org.alumnet.application.dtos.*;
 import org.alumnet.application.dtos.requests.CourseCreationRequestDTO;
 import org.alumnet.application.dtos.requests.CourseFilterDTO;
 import org.alumnet.application.dtos.requests.EnrollmentRequestDTO;
-import org.alumnet.application.dtos.responses.BulkCreationResponseDTO;
+import org.alumnet.application.dtos.responses.BulkResponseDTO;
+import org.alumnet.application.dtos.responses.CourseGradesResponseDTO;
 import org.alumnet.application.dtos.responses.PageableResultResponse;
 import org.alumnet.application.dtos.responses.ResultResponse;
 import org.alumnet.application.services.CourseService;
@@ -19,6 +20,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/courses")
@@ -70,8 +73,9 @@ public class CourseController {
         public ResponseEntity<PageableResultResponse<CourseDTO>> getCourses(
                         CourseFilterDTO filter,
                         @PageableDefault(page = 0, size = 15) Pageable page) {
+                                
                 Page<CourseDTO> coursePage = courseService.getCourses(filter, page);
-
+                                
                 PageableResultResponse<CourseDTO> response = PageableResultResponse.fromPage(
                                 coursePage,
                                 coursePage.getContent(),
@@ -113,27 +117,122 @@ public class CourseController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<ResultResponse<BulkCreationResponseDTO>> bulkCreateCourses(
+    public ResponseEntity<ResultResponse<BulkResponseDTO>> bulkCreateCourses(
             @RequestPart("file") MultipartFile file,
             @RequestParam(value = "hasHeaders", required = false, defaultValue = "false") boolean hasHeaders) {
 
-        BulkCreationResponseDTO bulkCreationResponse = courseService.bulkCreateCourses(file, hasHeaders);
+        BulkResponseDTO bulkCreationResponse = courseService.bulkCreateCourses(file, hasHeaders);
 
         if (bulkCreationResponse.getTotalRecords() > 0 &&
-                bulkCreationResponse.getTotalRecords() == bulkCreationResponse.getFailedCreations()) {
+                bulkCreationResponse.getTotalRecords() == bulkCreationResponse.getFailedRecords()) {
 
             return ResponseEntity.badRequest().body(ResultResponse.success(
                     bulkCreationResponse,
                     "La solicitud de creación masiva de cursos no se pudo procesar completamente (todos los registros fallaron)."));
         }
 
-        String successMessage = bulkCreationResponse.getFailedCreations() == 0
+        String successMessage = bulkCreationResponse.getFailedRecords() == 0
                 ? "Carga masiva de cursos completada exitosamente."
-                : "Carga masiva finalizada con " + bulkCreationResponse.getFailedCreations() + " errores. Revise el reporte.";
+                : "Carga masiva finalizada con " + bulkCreationResponse.getFailedRecords() + " errores. Revise el reporte.";
 
         return ResponseEntity.ok(ResultResponse.success(
                 bulkCreationResponse,
                 successMessage));
     }
 
+    @DeleteMapping(path = "/bulk-deletion",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('admin')")
+    public ResponseEntity<ResultResponse<Object>> bulkDeletion(
+            @RequestPart(value = "file", required = true) MultipartFile file,
+            @RequestParam(value = "hasHeaders", required = false, defaultValue = "false") boolean hasHeaders){
+
+        BulkResponseDTO bulkDeletionResponse = courseService.bulkDeleteCourses(file, hasHeaders);
+
+        if(bulkDeletionResponse.getFailedRecords() == bulkDeletionResponse.getTotalRecords()){
+            return ResponseEntity.badRequest().body(ResultResponse
+                    .error(bulkDeletionResponse
+                            .getErrors().stream()
+                                    .map(error ->
+                                            "Linea " + error.getLineNumber() + ": " + error.getReason())
+                                    .collect(Collectors.toList()),
+                            "La solicitud de baja masiva de cursos no se pudo completar"));
+        }
+
+        String successMessage = bulkDeletionResponse.getFailedRecords() == 0
+                ? "Eliminación masiva de cursos completada exitosamente."
+                : "Eliminación masiva finalizada con " + bulkDeletionResponse.getFailedRecords() + " errores. Revise el reporte.";
+
+        // Va en ok en lugar de no content para que viaje la response
+        return ResponseEntity.ok(ResultResponse.success(bulkDeletionResponse, successMessage));
+    }
+
+    @PostMapping(path = "/{courseId}/participations/bulk-enroll",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('teacher')")
+    public ResponseEntity<ResultResponse<BulkResponseDTO>> bulkEnrollStudents(
+            @PathVariable int courseId,
+            @RequestPart("file") MultipartFile file,
+            @RequestParam(value = "hasHeaders", required = false, defaultValue = "false") boolean hasHeaders){
+
+        BulkResponseDTO bulkEnrollResponse = courseService.bulkEnrollment(courseId, file, hasHeaders);
+
+        if(bulkEnrollResponse.getFailedRecords() == bulkEnrollResponse.getTotalRecords()){
+            return ResponseEntity.badRequest().body(ResultResponse
+                    .error(bulkEnrollResponse
+                                    .getErrors().stream()
+                                    .map(error ->
+                                            "Linea " + error.getLineNumber() + ": " + error.getReason())
+                                    .collect(Collectors.toList()),
+                            "La solicitud de matriculación masiva no se pudo completar"));
+        }
+
+        String successMessage = bulkEnrollResponse.getFailedRecords() == 0
+                ? "Matriculación masiva de cursos completada exitosamente."
+                : "Matriculación masiva finalizada con " + bulkEnrollResponse.getFailedRecords() + " errores. Revise el reporte.";
+
+        return ResponseEntity.ok(ResultResponse.success(bulkEnrollResponse ,successMessage));
+    }
+
+    @DeleteMapping(path = "/{courseId}/participations/bulk-unenroll",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('teacher')")
+    public ResponseEntity<ResultResponse<BulkResponseDTO>> bulkUnenrollStudents(
+            @PathVariable int courseId,
+            @RequestPart("file") MultipartFile file,
+            @RequestParam(value = "hasHeaders", required = false, defaultValue = "false") boolean hasHeaders) {
+
+        BulkResponseDTO bulkResponse = courseService.bulkUnenrollment(courseId, file, hasHeaders);
+
+        if (bulkResponse.getTotalRecords() > 0 &&
+                bulkResponse.getTotalRecords() == bulkResponse.getFailedRecords()) {
+
+            return ResponseEntity.badRequest().body(ResultResponse.success(
+                    bulkResponse,
+                    "La solicitud de des-matriculación masiva no se pudo procesar completamente (todos los registros fallaron)."));
+        }
+
+        String successMessage = bulkResponse.getFailedRecords() == 0
+                ? "Des-matriculación masiva completada exitosamente."
+                : "Des-matriculación masiva finalizada con " + bulkResponse.getFailedRecords() + " errores. Revise el reporte.";
+
+        // Va en ok en lugar de no content para que viaje la response
+        return ResponseEntity.ok(ResultResponse.success(
+                bulkResponse,
+                successMessage));
+    }
+
+    @GetMapping(path = "/{courseId}/grades/{userEmail}", produces = "application/json")
+    @PreAuthorize("hasRole('student')")
+    public ResponseEntity<ResultResponse<CourseGradesResponseDTO>> getGrades(
+            @PathVariable int courseId,
+            @PathVariable String userEmail){
+
+        CourseGradesResponseDTO grades = courseService.getGrades(courseId, userEmail);
+
+        return ResponseEntity.ok(ResultResponse.success(grades, "Se obtuvieron las notas correctamente"));
+    }
 }

@@ -1,3 +1,16 @@
 {
-  "java.compile.nullAnalysis.mode": "automatic"
+  "java.compile.nullAnalysis.mode": "automatic",
+  "sqltools.connections": [
+    {
+      "ssh": "Disabled",
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 5001,
+      "driver": "PostgreSQL",
+      "name": "alumnet",
+      "database": "alum-net",
+      "username": "postgres",
+      "password": "postgres"
+    }
+  ]
 }

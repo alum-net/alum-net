@@ -3,7 +3,7 @@ import { UpdateProfile } from '@alum-net/users';
 
 export default function Profile() {
   return (
-    <Screen>
+    <Screen edges={['top']}>
       <UpdateProfile />
     </Screen>
   );

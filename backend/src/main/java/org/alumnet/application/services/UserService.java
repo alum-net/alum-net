@@ -4,14 +4,12 @@ import com.opencsv.bean.CsvToBeanBuilder;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.requests.UserBulkCreationDTO;
-import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.requests.UserCreationRequestDTO;
 import org.alumnet.application.dtos.UserDTO;
 import org.alumnet.application.dtos.requests.UserFilterDTO;
 import org.alumnet.application.dtos.requests.UserModifyRequestDTO;
-import org.alumnet.application.dtos.responses.BulkCreationErrorDetailDTO;
-import org.alumnet.application.dtos.responses.BulkCreationResponseDTO;
-import org.alumnet.application.dtos.requests.UserModifyRequestDTO;
+import org.alumnet.application.dtos.responses.BulkErrorDetailDTO;
+import org.alumnet.application.dtos.responses.BulkResponseDTO;
 import org.alumnet.application.mapper.UserMapper;
 import org.alumnet.application.query_builders.UserSpecification;
 import org.alumnet.domain.repositories.UserRepository;
@@ -23,14 +21,12 @@ import org.alumnet.infrastructure.exceptions.UserNotFoundException;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
@@ -61,7 +57,8 @@ public class UserService {
         UserRepresentation userRepresentation = createUserRepresentation(userCreationRequestDTO);
         try (Response keycloakResponse = keycloak.realm(properties.getRealm()).users().create(userRepresentation)) {
             if (keycloakResponse.getStatus() != 201) {
-                throw new ExistingUserException("Failed to create user in Keycloak: " + keycloakResponse.getStatusInfo().getReasonPhrase());
+                throw new ExistingUserException(
+                        "Failed to create user in Keycloak: " + keycloakResponse.getStatusInfo().getReasonPhrase());
             }
         }
         saveUser(userCreationRequestDTO);
@@ -83,21 +80,35 @@ public class UserService {
             userPage = userRepository.findAll(userSpec, page);
         }
 
-        return userPage.map(userMapper::userToUserDTO);
+        return userPage.map(user -> {
+            UserDTO dto = userMapper.userToUserDTO(user);
+            if (user.getAvatarUrl() != null) {
+                dto.setAvatarUrl(fileStorageService.generatePresignedUrl(
+                        dto.getAvatarUrl()));
+            }
+            return dto;
+        });
     }
 
-    public UserDTO getUser(String userEmail){
+    public UserDTO getUser(String userEmail) {
         return userRepository.findById(userEmail)
-                .map(userMapper::userToUserDTO)
+                .map(user -> {
+                    UserDTO dto = userMapper.userToUserDTO(user);
+                    if (user.getAvatarUrl() != null) {
+                        dto.setAvatarUrl(fileStorageService.generatePresignedUrl(
+                                dto.getAvatarUrl()));
+                    }
+                    return dto;
+                })
                 .orElseThrow(UserNotFoundException::new);
     }
 
-    public BulkCreationResponseDTO bulkCreateUsers(MultipartFile file, boolean hasHeaders) {
+    public BulkResponseDTO bulkCreateUsers(MultipartFile file, boolean hasHeaders) {
         if (file.isEmpty()) {
             throw new IllegalArgumentException("El archivo CSV no debe estar vacío.");
         }
 
-        List<BulkCreationErrorDetailDTO> errors = new ArrayList<>();
+        List<BulkErrorDetailDTO> errors = new ArrayList<>();
         List<UserBulkCreationDTO> bulkCreationList;
         int successfulCreations = 0;
 
@@ -106,7 +117,7 @@ public class UserService {
             CsvToBeanBuilder<UserBulkCreationDTO> builder = new CsvToBeanBuilder<UserBulkCreationDTO>(reader)
                     .withType(UserBulkCreationDTO.class)
                     .withSeparator(',');
-            if(hasHeaders){
+            if (hasHeaders) {
                 builder.withSkipLines(1);
             }
 
@@ -130,26 +141,25 @@ public class UserService {
                         bulkDTO.getLastname(),
                         keycloakGroup,
                         bulkDTO.getEmail(),
-                        initialPassword
-                );
+                        initialPassword);
 
                 createUser(creationRequestDTO);
                 successfulCreations++;
 
             } catch (ExistingUserException e) {
-                errors.add(BulkCreationErrorDetailDTO.builder()
+                errors.add(BulkErrorDetailDTO.builder()
                         .lineNumber(currentLine)
                         .identifier(bulkDTO.getEmail())
                         .reason("El usuario ya existe en el sistema.")
                         .build());
             } catch (IllegalArgumentException e) {
-                errors.add(BulkCreationErrorDetailDTO.builder()
+                errors.add(BulkErrorDetailDTO.builder()
                         .lineNumber(currentLine)
                         .identifier(bulkDTO.getEmail())
                         .reason(e.getMessage())
                         .build());
             } catch (Exception e) {
-                errors.add(BulkCreationErrorDetailDTO.builder()
+                errors.add(BulkErrorDetailDTO.builder()
                         .lineNumber(currentLine)
                         .identifier(bulkDTO.getEmail())
                         .reason("Error desconocido al crear el usuario: " + e.getMessage())
@@ -157,30 +167,33 @@ public class UserService {
             }
         }
 
-        return BulkCreationResponseDTO.builder()
+        return BulkResponseDTO.builder()
                 .totalRecords(bulkCreationList.size())
-                .successfulCreations(successfulCreations)
-                .failedCreations(errors.size())
+                .successfulRecords(successfulCreations)
+                .failedRecords(errors.size())
                 .errors(errors)
                 .build();
     }
 
     public void modifyUser(String userEmail, UserModifyRequestDTO modifyRequest, MultipartFile userAvatar) {
-        if(modifyRequest == null && userAvatar == null) throw new NoPendingChangesException();
+        if (modifyRequest == null && userAvatar == null)
+            throw new NoPendingChangesException();
 
         User user = userRepository.findById(userEmail).orElseThrow(UserNotFoundException::new);
 
-        if(modifyRequest != null)
-        {
-            if(modifyRequest.getName() != null) user.setName(modifyRequest.getName());
-            if(modifyRequest.getLastname() != null) user.setLastname(modifyRequest.getLastname());
+        if (modifyRequest != null) {
+            if (modifyRequest.getName() != null)
+                user.setName(modifyRequest.getName());
+            if (modifyRequest.getLastname() != null)
+                user.setLastname(modifyRequest.getLastname());
         }
 
         if (userAvatar != null) {
             fileValidationService.validateFile(userAvatar, true);
             String userAvatarFolder = "users/" + userEmail + "/avatar/";
 
-            if(user.getAvatarUrl() != null) fileStorageService.deleteMultipleFile(user.getAvatarUrl());
+            if (user.getAvatarUrl() != null)
+                fileStorageService.deleteMultipleFile(user.getAvatarUrl());
             fileStorageService.store(userAvatar, userAvatarFolder);
 
             user.setAvatarUrl(userAvatarFolder + userAvatar.getOriginalFilename());

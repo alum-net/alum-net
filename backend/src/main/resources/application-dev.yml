@@ -48,6 +48,15 @@ aws:
     base-url: https://${aws.s3.bucket-name}.s3.${aws.s3.region}.amazonaws.com
     duration-url-hours: 1
 
+onesignal:
+  config:
+    id: ${ONESIGNAL_APP_ID}
+    rest:
+      api-key: ${ONESIGNAL_API_KEY}
+
+mailgun:
+    api-key: ${MAILGUN_API_KEY}
+
 
 
 

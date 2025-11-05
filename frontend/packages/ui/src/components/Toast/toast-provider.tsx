@@ -143,6 +143,7 @@ export function ToastProvider({ children }: ToastProviderProps) {
 
 const styles = StyleSheet.create({
   container: {
+    zIndex: 99999999,
     position: 'absolute',
     left: 16,
     right: 16,

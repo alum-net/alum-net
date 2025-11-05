@@ -19,3 +19,15 @@ export type UserFilterDTO = {
   email?: string;
   role?: UserRole | '';
 };
+
+export type AvatarFile = {
+  uri?: string;
+  filename?: string;
+  type?: string;
+};
+
+export type UpdatePayload = {
+  avatar: AvatarFile;
+  name: string;
+  lastname: string;
+};

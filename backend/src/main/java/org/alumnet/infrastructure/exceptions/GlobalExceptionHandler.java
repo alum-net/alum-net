@@ -9,8 +9,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import javax.xml.transform.Result;
-
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -92,5 +90,65 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(LabelAlreadyExistsException.class)
     public ResponseEntity<ResultResponse<Object>> handleLabelAlreadyExistsException(LabelAlreadyExistsException ex){
         return  ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Ya existe la etiqueta"));
+    }
+
+    @ExceptionHandler(LabelNotFoundException.class)
+    public ResponseEntity<ResultResponse<Object>> handleLabelNotFoundException(LabelNotFoundException ex){
+        return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultResponse.error(ex.getMessage(), "No se encontró la etiqueta"));
+    }
+
+    @ExceptionHandler(LibraryResourceAlreadyExistsException.class)
+    public ResponseEntity<ResultResponse<Object>> handleLibraryResourceAlreadyExistsException(LibraryResourceAlreadyExistsException ex) {
+        return  ResponseEntity.status(HttpStatus.CONFLICT).body(ResultResponse.error(ex.getMessage(), "Ya existe el recurso en la librería"));
+    }
+
+    @ExceptionHandler(LibraryResourceNotFoundException.class)
+    public ResponseEntity<ResultResponse<Object>> handleLibraryResourceNotFoundException(LibraryResourceNotFoundException ex) {
+        return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultResponse.error(ex.getMessage(), "No existe el recurso en la librería"));
+    }
+
+    @ExceptionHandler(InvalidAttributeException.class)
+    public ResponseEntity<ResultResponse<Object>> handleInvalidAttributeException(InvalidAttributeException ex) {
+        return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Atributo inválido"));
+    }
+
+    @ExceptionHandler(QuestionnaireValidationException.class)
+    public ResponseEntity<ResultResponse<Object>> handleQuestionnaireValidationException(QuestionnaireValidationException ex) {
+        return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Error de validación del cuestionario"));
+    }
+
+    @ExceptionHandler(EventHasParticipationException.class)
+    public ResponseEntity<ResultResponse<Object>> handleEventHasParticipationException(EventHasParticipationException ex) {
+        return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "El evento tiene participaciones activas"));
+    }
+
+    @ExceptionHandler(EventNotFoundException.class)
+    public ResponseEntity<ResultResponse<Object>> handleEventNotFoundException(EventNotFoundException ex) {
+        return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "No existe el evento"));
+    }
+
+    @ExceptionHandler(SectionNotFoundException.class)
+    public ResponseEntity<ResultResponse<Object>> handleSectionNotFoundException(SectionNotFoundException ex){
+        return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "No existe la sección"));
+    }
+
+    @ExceptionHandler(AuthorizationException.class)
+    public ResponseEntity<ResultResponse<Object>> handleAuthorizationException(AuthorizationException ex){
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResultResponse.error(ex.getMessage(), "Problema en la autorización"));
+    }
+
+    @ExceptionHandler(AssignmentDueDateExpiredException.class)
+    public ResponseEntity<ResultResponse<Object>> handleAssignmentDueDateExpiredException(AssignmentDueDateExpiredException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ResultResponse.error(ex.getMessage(), "La fecha de entrega de la tarea ha expirado"));
+    }
+
+    @ExceptionHandler(HomeworkAlreadySubmittedException.class)
+    public ResponseEntity<ResultResponse<Object>> handleHomeworkAlreadySubmittedException(HomeworkAlreadySubmittedException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ResultResponse.error(ex.getMessage(), "La tarea ya ha sido enviada"));
+    }
+
+    @ExceptionHandler(CourseParticipationNotFoundException.class)
+    public ResponseEntity<ResultResponse<Object>> handleCourseParticipationNotFoundException(CourseParticipationNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultResponse.error(ex.getMessage(), "El usuario no está matriculado en el curso"));
     }
 }

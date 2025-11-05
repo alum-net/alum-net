@@ -7,7 +7,7 @@ import org.alumnet.domain.Section;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {EventMapper.class})
 public interface SectionMapper {
 
     @Mapping(target = "sectionId", ignore = true)
@@ -19,5 +19,6 @@ public interface SectionMapper {
     Section toSectionWithCourse(SectionRequestDTO dto, Course course);
 
     @Mapping(target = "id", source = "section.sectionId")
+    @Mapping(target = "summaryEvents", source = "section.events")
     SectionDTO sectionToSectionDTO(Section section);
 }
