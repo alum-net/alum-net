@@ -1,4 +1,4 @@
-package org.alumnet.domain.audit;
+package org.alumnet.domain;
 
 import jakarta.persistence.*;
 import lombok.*;

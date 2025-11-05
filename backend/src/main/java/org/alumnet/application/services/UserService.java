@@ -11,12 +11,15 @@ import org.alumnet.application.dtos.requests.UserModifyRequestDTO;
 import org.alumnet.application.dtos.responses.BulkErrorDetailDTO;
 import org.alumnet.application.dtos.responses.BulkResponseDTO;
 import org.alumnet.application.dtos.responses.CalendarEventDetailDTO;
+import org.alumnet.application.dtos.responses.UserActivityLogDTO;
 import org.alumnet.application.enums.UserRole;
 import org.alumnet.application.mapper.UserMapper;
 import org.alumnet.application.query_builders.UserSpecification;
 import org.alumnet.domain.Section;
+import org.alumnet.domain.UserActivityLog;
 import org.alumnet.domain.events.Event;
 import org.alumnet.domain.repositories.EventRepository;
+import org.alumnet.domain.repositories.UserActivityLogRepository;
 import org.alumnet.domain.repositories.UserRepository;
 import org.alumnet.domain.users.Teacher;
 import org.alumnet.domain.users.User;
@@ -50,6 +53,7 @@ public class UserService {
     private final KeycloakProperties properties;
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
+    private final UserActivityLogRepository userActivityLogRepository;
     private final UserMapper userMapper;
     private final S3FileStorageService fileStorageService;
     private final FileValidationService fileValidationService;
@@ -298,5 +302,19 @@ public class UserService {
                 .courseId(e.getSection().getCourseId())
                 .courseName(e.getSection().getCourse().getName())
                 .build()).collect(Collectors.toList());
+    }
+
+    public Page<UserActivityLogDTO> getUserLogs(String userId, Pageable page) {
+        Page<UserActivityLog> activities = userActivityLogRepository.findAllByUserEmail(userId, page);
+
+        return activities.map(x -> UserActivityLogDTO
+                .builder()
+                .userEmail(userId)
+                .id(x.getId())
+                .description(x.getDescription())
+                .type(x.getActivityType())
+                .timestamp(x.getTimestamp())
+                .resourceId(x.getResourceId())
+                .build());
     }
 }

@@ -1,7 +1,7 @@
 package org.alumnet.application.mapper;
 
 import org.alumnet.application.dtos.responses.UserActivityLogDTO;
-import org.alumnet.domain.audit.UserActivityLog;
+import org.alumnet.domain.UserActivityLog;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;

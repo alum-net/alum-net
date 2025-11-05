@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.responses.UserActivityLogDTO;
 import org.alumnet.application.enums.ActivityType;
 import org.alumnet.application.mapper.ActivityMapper;
-import org.alumnet.domain.audit.UserActivityLog;
+import org.alumnet.domain.UserActivityLog;
 import org.alumnet.domain.repositories.UserActivityLogRepository;
 import org.alumnet.domain.repositories.UserRepository;
 import org.alumnet.domain.users.User;

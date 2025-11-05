@@ -7,18 +7,22 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.alumnet.application.enums.ActivityType;
 import org.alumnet.application.services.UserActivityLogService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Component
 @RequiredArgsConstructor
 public class ContentAccessLoggingFilter extends OncePerRequestFilter {
+    @Value("${keycloak.username}")
+    private String adminUserName;
 
     private final UserActivityLogService activityLogService;
 
@@ -37,8 +41,10 @@ public class ContentAccessLoggingFilter extends OncePerRequestFilter {
                 String userEmail = authentication.getName();
                 String uri = request.getRequestURI();
 
-                attemptLog(userEmail, uri, COURSE_PATTERN, ActivityType.COURSE_ACCESS, "Curso");
-                attemptLog(userEmail, uri, SECTION_PATTERN, ActivityType.SECTION_ACCESS, "Sección");
+                if(!Objects.equals(userEmail, adminUserName)){
+                    attemptLog(userEmail, uri, COURSE_PATTERN, ActivityType.COURSE_ACCESS, "Curso");
+                    attemptLog(userEmail, uri, SECTION_PATTERN, ActivityType.SECTION_ACCESS, "Sección");
+                }
             }
         }
     }

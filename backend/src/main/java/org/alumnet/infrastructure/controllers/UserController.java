@@ -6,10 +6,7 @@ import org.alumnet.application.dtos.requests.UserCreationRequestDTO;
 import org.alumnet.application.dtos.UserDTO;
 import org.alumnet.application.dtos.requests.UserFilterDTO;
 import org.alumnet.application.dtos.requests.UserModifyRequestDTO;
-import org.alumnet.application.dtos.responses.BulkResponseDTO;
-import org.alumnet.application.dtos.responses.CalendarEventDetailDTO;
-import org.alumnet.application.dtos.responses.PageableResultResponse;
-import org.alumnet.application.dtos.responses.ResultResponse;
+import org.alumnet.application.dtos.responses.*;
 import org.alumnet.application.services.UserService;
 import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
@@ -105,5 +102,23 @@ public class UserController {
         List<CalendarEventDetailDTO> events = userService.getCalendarEvents(since, to, principal.getName());
 
         return ResponseEntity.ok(ResultResponse.success(events, "Se devuelven los eventos asociados"));
+    }
+
+    @GetMapping(path = "/{userId}/user-activity", produces = "application/json")
+    @PreAuthorize("hasAnyRole('admin')")
+    public ResponseEntity<PageableResultResponse<UserActivityLogDTO>> getUserActivity(
+            @PathVariable String userId,
+            @PageableDefault(page = 0, size = 15) Pageable page
+    ){
+        Page<UserActivityLogDTO> logs = userService.getUserLogs(userId, page);
+
+        PageableResultResponse<UserActivityLogDTO> response = PageableResultResponse.fromPage(
+                logs,
+                logs.getContent(),
+                logs.getTotalElements() > 0
+                        ? "Registros de actividad obtenidos exitosamente"
+                        : "No se encontraron registros de actividad para el usuario");
+
+        return ResponseEntity.ok(response);
     }
 }
