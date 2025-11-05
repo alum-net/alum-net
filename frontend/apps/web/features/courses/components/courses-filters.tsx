@@ -6,12 +6,14 @@ import { StyleSheet, View } from 'react-native';
 import { Button } from 'react-native-paper';
 import CreateCourseModal from './course-creation-modal';
 import BulkCourseUploadModal from './bulk-course-upload-modal';
+import BulkCourseDeletionModal from './bulk-course-deletion-modal';
 import { UserRole } from '@alum-net/users/src/types';
 
 function CourseFilters() {
   const { data } = useUserInfo();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isBulkModalVisible, setIsBulkModalVisible] = useState(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
 
   return (
     <View>
@@ -39,6 +41,15 @@ function CourseFilters() {
             >
               Carga masiva de cursos
             </Button>
+            <Button
+              mode="contained"
+              style={styles.createButton}
+              labelStyle={styles.createButtonLabel}
+              icon="delete"
+              onPress={() => setIsDeleteModalVisible(true)}
+            >
+              Eliminación masiva
+            </Button>
           </View>
 
           <CreateCourseModal
@@ -49,6 +60,11 @@ function CourseFilters() {
           <BulkCourseUploadModal
             visible={isBulkModalVisible}
             onDismiss={() => setIsBulkModalVisible(false)}
+          />
+
+          <BulkCourseDeletionModal
+            visible={isDeleteModalVisible}
+            onDismiss={() => setIsDeleteModalVisible(false)}
           />
         </>
       )}
