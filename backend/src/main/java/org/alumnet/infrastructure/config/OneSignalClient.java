@@ -3,13 +3,16 @@ package org.alumnet.infrastructure.config;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.alumnet.application.dtos.responses.OneSignalCreateNotificationDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -26,7 +29,10 @@ public class OneSignalClient {
     @Value("${onesignal.config.id}")
     private String appId;
 
-    public String sendNotification(String title, String message, List<String> externalUserIds, LocalDateTime sendTime) {
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
+    public String sendNotification(String title, String message, List<String> externalUserIds, LocalDateTime sendTime)
+            throws JsonProcessingException {
         Map<String, Object> payload = new HashMap<>();
         payload.put("app_id", appId);
         payload.put("include_external_user_ids", externalUserIds);
@@ -40,13 +46,17 @@ public class OneSignalClient {
 
         log.debug("Sending OneSignal notification payload: {}", payload);
 
-        ResponseEntity<OneSignalCreateNotificationDTO> response = buildRestTemplate().postForEntity(
+        ResponseEntity<String> response = buildRestTemplate().postForEntity(
                 "/notifications?c=push",
-                payload, OneSignalCreateNotificationDTO.class);
+                payload, String.class);
+        JsonNode responseJson = MAPPER.readTree(response.getBody());
+        boolean hasErrors = responseJson.has("errors") && responseJson.get("errors").isArray()
+                && !responseJson.get("errors").isEmpty();
+        boolean hasValidId = responseJson.has("id") && !responseJson.get("id").asText().isBlank();
 
-        if (response.getStatusCode().is2xxSuccessful() && response.getBody().getId().isPresent()) {
+        if (response.getStatusCode().is2xxSuccessful() && !hasErrors && hasValidId) {
             log.info("Notification sent successfully: {}", response.getBody());
-            return response.getBody().getId().get();
+            return responseJson.get("id").asText();
         } else {
             log.error("Failed to send notification. Status: {}, Body: {}", response.getStatusCode(),
                     response.getBody());
