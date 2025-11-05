@@ -7,6 +7,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -23,4 +25,37 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
     WHERE q.id = :eventId
     """)
     Optional<Questionnaire> findQuestionnaireById(@Param("eventId") Integer eventId);
+
+    @Query("""
+    SELECT e FROM Event e
+    JOIN FETCH e.section s
+    JOIN FETCH s.course c
+    JOIN c.teachers t
+    WHERE
+        t.email = :teacherEmail AND
+        e.startDate >= COALESCE(:since, e.startDate) AND
+        e.endDate <= COALESCE(:to, e.endDate)
+    """)
+    List<Event> findEventsByTeacherEmailAndDates(
+            @Param("teacherEmail") String teacherEmail,
+            @Param("since") LocalDateTime since,
+            @Param("to") LocalDateTime to
+    );
+
+    @Query("""
+    SELECT e FROM Event e
+    JOIN FETCH e.section s
+    JOIN FETCH s.course c
+    JOIN c.participations cp
+    JOIN cp.student stud
+    WHERE
+        stud.email = :studentEmail AND
+        e.startDate >= COALESCE(:since, e.startDate) AND
+        e.endDate <= COALESCE(:to, e.endDate)
+    """)
+    List<Event> findEventsByStudentEmailAndDates(
+            @Param("studentEmail") String studentEmail,
+            @Param("since") LocalDateTime since,
+            @Param("to") LocalDateTime to
+    );
 }
