@@ -130,3 +130,7 @@ export const submitHomework = async (homework: Homework) => {
     },
   );
 };
+
+export const deleteEvent = async (id: number) => {
+  return await api.delete(`/events/${id}`);
+};

@@ -12,7 +12,8 @@ import java.util.Optional;
 @Repository
 public interface EventRepository extends JpaRepository<Event, Integer> {
     @Query("SELECT CASE WHEN COUNT(ep) > 0 THEN TRUE ELSE FALSE END " +
-            "FROM EventParticipation ep WHERE ep.event.id = :eventId")
+            "FROM EventParticipation ep WHERE ep.event.id = :eventId " +
+            "AND ep.grade IS NOT NULL OR ep.resource IS NOT NULL")
     boolean someParticipationByEventId(@Param("eventId") int eventId);
 
     @Query("""
