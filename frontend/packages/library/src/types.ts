@@ -15,3 +15,8 @@ export type Label = {
   id: number;
   name: string;
 };
+
+export interface LibraryResourceFilter {
+  name?: string;
+  labelIds?: number[];
+}

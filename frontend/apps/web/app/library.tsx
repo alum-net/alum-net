@@ -1,6 +1,11 @@
 import { Toast } from '@alum-net/ui';
 import { deleteLabel, deleteResource } from '../features/library/service';
-import { Label, LibraryDashboard, LibraryResource } from '@alum-net/library';
+import {
+  Label,
+  LibraryContextProvider,
+  LibraryDashboard,
+  LibraryResource,
+} from '@alum-net/library';
 import { UserRole, useUserInfo } from '@alum-net/users';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { View } from 'react-native';
@@ -49,24 +54,28 @@ export default function Library() {
 
   return (
     <View style={{ paddingVertical: 10, paddingHorizontal: 20, gap: 20 }}>
-      <Text variant="headlineLarge">Bienvenido a la libreria!</Text>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
-        {userInfo?.role === UserRole.admin && <CreateLabelForm />}
-        {userInfo?.role !== UserRole.student && <FileUploadForm />}
-      </View>
-      <Text variant="headlineSmall">
-        Utiliza los filtros para obtener los recursos que buscas:
-      </Text>
-      <LibraryDashboard
-        deleteLabel={
-          userInfo?.role !== UserRole.student ? deleteLabelMutation : undefined
-        }
-        deleteResource={
-          userInfo?.role !== UserRole.student
-            ? deleteResourceMutation
-            : undefined
-        }
-      />
+      <LibraryContextProvider>
+        <Text variant="headlineLarge">Bienvenido a la libreria!</Text>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
+          {userInfo?.role === UserRole.admin && <CreateLabelForm />}
+          {userInfo?.role !== UserRole.student && <FileUploadForm />}
+        </View>
+        <Text variant="headlineSmall">
+          Utiliza los filtros para obtener los recursos que buscas:
+        </Text>
+        <LibraryDashboard
+          deleteLabel={
+            userInfo?.role !== UserRole.student
+              ? deleteLabelMutation
+              : undefined
+          }
+          deleteResource={
+            userInfo?.role !== UserRole.student
+              ? deleteResourceMutation
+              : undefined
+          }
+        />
+      </LibraryContextProvider>
     </View>
   );
 }

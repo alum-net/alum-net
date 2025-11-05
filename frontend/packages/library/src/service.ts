@@ -1,11 +1,14 @@
 import api, { PageableResponse } from '@alum-net/api';
-import { Label, LibraryResource } from './types';
+import { Label, LibraryResource, LibraryResourceFilter } from './types';
 
-export const getResources = async (page = 0) => {
+export const getResources = async (
+  page = 0,
+  filters: LibraryResourceFilter = {},
+) => {
   const { data } = await api.get<PageableResponse<LibraryResource>>(
     '/library/resources',
     {
-      params: { page },
+      params: { page, ...filters },
     },
   );
 
