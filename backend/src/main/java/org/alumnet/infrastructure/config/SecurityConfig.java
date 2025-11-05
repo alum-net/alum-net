@@ -1,6 +1,8 @@
 package org.alumnet.infrastructure.config;
 
 import lombok.RequiredArgsConstructor;
+import org.alumnet.infrastructure.filters.ContentAccessLoggingFilter;
+import org.alumnet.infrastructure.filters.JwtActivityLoggingFilter;
 import org.alumnet.infrastructure.security.JwtAuthConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +21,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -31,6 +34,9 @@ import java.util.List;
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final JwtActivityLoggingFilter jwtActivityLoggingFilter;
+    private final ContentAccessLoggingFilter contentAccessLoggingFilter;
 
         private final JwtAuthConverter jwtAuthConverter;
         @Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri}")
@@ -91,6 +97,9 @@ public class SecurityConfig {
                                                                 .jwtAuthenticationConverter(jwtAuthConverter)))
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+                http.addFilterAfter(jwtActivityLoggingFilter, BearerTokenAuthenticationFilter.class);
+                http.addFilterAfter(contentAccessLoggingFilter, BearerTokenAuthenticationFilter.class);
 
                 return http.build();
         }

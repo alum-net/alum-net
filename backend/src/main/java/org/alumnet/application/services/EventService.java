@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.*;
 import org.alumnet.application.dtos.requests.SubmitQuestionnaireRequestDTO;
 import org.alumnet.application.dtos.responses.EventDetailDTO;
+import org.alumnet.application.enums.ActivityType;
 import org.alumnet.application.enums.EventType;
 import org.alumnet.application.enums.UserRole;
 import org.alumnet.application.mapper.EventMapper;
@@ -37,6 +38,7 @@ public class EventService {
     private final EventParticipationRepository eventParticipationRepository;
     private final UserRepository userRepository;
     private final S3FileStorageService s3FileStorageService;
+    private final UserActivityLogService activityLogService;
 
     public void createEvent(EventDTO eventDTO) {
         validateDates(eventDTO.getStartDate(),eventDTO.getEndDate());
@@ -178,6 +180,12 @@ public class EventService {
 
         eventParticipationRepository.save(eventParticipation);
 
+        activityLogService.logActivity(
+                studentEmail,
+                ActivityType.TASK_SUBMISSION,
+                "Entrega de tarea: " + event.getTitle(),
+                eventId.toString()
+        );
     }
 
     private void validateHomeworkAlreadySubmitted(Integer eventId, String studentEmail) {
@@ -292,6 +300,13 @@ public class EventService {
         }
         participation.setResponses(newResponses);
         participationRepository.save(participation);
+
+        activityLogService.logActivity(
+                request.getUserEmail(),
+                ActivityType.QUESTIONNAIRE_RESOLUTION,
+                "Cuestionario resuelto: " + questionnaire.getTitle(),
+                eventId.toString()
+        );
     }
 
     private EventParticipation getOrCreateParticipation(Student student, Questionnaire questionnaire) {
