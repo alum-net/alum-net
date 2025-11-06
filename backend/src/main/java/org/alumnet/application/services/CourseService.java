@@ -129,6 +129,10 @@ public class CourseService {
                 .findById(courseId)
                 .orElseThrow(CourseNotFoundException::new);
 
+        if (!course.isEnabled()) {
+            throw new CourseNotFoundException();
+        }
+
         boolean hasEnrolledStudents = participationRepository.hasEnrolledStudents(courseId);
 
         if (course.isEnabled() && hasEnrolledStudents) {
@@ -332,8 +336,6 @@ public class CourseService {
             String identifier = deletion.getCourseId() != null
                     ? deletion.getCourseId().toString()
                     : "Id vacío";
-
-            int courseId;
 
             try {
                 if (deletion.getCourseId() == null) {

@@ -54,3 +54,15 @@ export async function bulkUnenrollStudents(
     headers: { 'Content-Type': 'multipart/form-data' },
   });
 }
+
+export async function bulkDeleteCourses(file: File, hasHeaders = false) {
+  const form = new FormData();
+  form.append('file', file);
+
+  return api.request<Response<any>>({
+    url: `/courses/bulk-deletion?hasHeaders=${hasHeaders}`,
+    method: 'delete',
+    data: form,
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+}
