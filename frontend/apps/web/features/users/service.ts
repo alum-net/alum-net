@@ -1,5 +1,6 @@
-import api from '@alum-net/api';
+import api, { PageableResponse } from '@alum-net/api';
 import type { UserRole } from '@alum-net/users/src/types';
+import { UserActivityLog } from './types';
 
 export type CreateUserForm = {
   firstName: string;
@@ -30,7 +31,9 @@ const roleToGroup = (r: UserRole): 'students' | 'teachers' | 'admins' => {
   }
 };
 
-export async function createUser(form: CreateUserForm): Promise<BackendEnvelope> {
+export async function createUser(
+  form: CreateUserForm,
+): Promise<BackendEnvelope> {
   const payload = {
     name: form.firstName,
     lastname: form.lastName,
@@ -41,6 +44,18 @@ export async function createUser(form: CreateUserForm): Promise<BackendEnvelope>
 
   const res = await api.post<BackendEnvelope>('users/create-user', payload);
   return res.data;
+}
+
+export async function getUserActivity(
+  userId: string,
+  page?: number,
+): Promise<PageableResponse<UserActivityLog>> {
+  const { data } = await api.get<PageableResponse<UserActivityLog>>(
+    `/users/${encodeURIComponent(userId)}/user-activity`,
+    { params: page !== undefined ? { page } : {} },
+  );
+
+  return data;
 }
 
 export function getAxiosErrorMessage(e: any): string {

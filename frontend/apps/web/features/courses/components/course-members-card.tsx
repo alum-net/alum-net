@@ -19,7 +19,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@alum-net/api';
-import { getAxiosErrorMessage } from '../../../features/users/src/users';
+import { getAxiosErrorMessage } from '../../users/service';
 import BulkEnrollModal from './bulk-enroll-modal';
 import BulkUnenrollModal from './bulk-unenroll-modal';
 

@@ -11,7 +11,7 @@ import {
   UserCreationFormData,
   userCreationSchema,
 } from '../validations/user-creation';
-import { createUser, CreateUserForm, getAxiosErrorMessage } from './users';
+import { createUser, CreateUserForm, getAxiosErrorMessage } from '../service';
 
 type Props = { visible: boolean; onDismiss: () => void };
 

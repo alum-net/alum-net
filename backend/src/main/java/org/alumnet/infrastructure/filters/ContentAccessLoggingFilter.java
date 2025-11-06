@@ -27,7 +27,6 @@ public class ContentAccessLoggingFilter extends OncePerRequestFilter {
     private final UserActivityLogService activityLogService;
 
     private static final Pattern COURSE_PATTERN = Pattern.compile("/api/courses/(\\d+)(?:/|$)");
-    private static final Pattern SECTION_PATTERN = Pattern.compile("/api/sections/(\\d+)(?:/|$)");
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -41,9 +40,8 @@ public class ContentAccessLoggingFilter extends OncePerRequestFilter {
                 String userEmail = authentication.getName();
                 String uri = request.getRequestURI();
 
-                if(!Objects.equals(userEmail, adminUserName)){
+                if (!Objects.equals(userEmail, adminUserName)) {
                     attemptLog(userEmail, uri, COURSE_PATTERN, ActivityType.COURSE_ACCESS, "Curso");
-                    attemptLog(userEmail, uri, SECTION_PATTERN, ActivityType.SECTION_ACCESS, "Sección");
                 }
             }
         }
@@ -59,8 +57,7 @@ public class ContentAccessLoggingFilter extends OncePerRequestFilter {
                     userEmail,
                     type,
                     String.format("Acceso a %s con ID %s", resourceName, resourceId),
-                    resourceId
-            );
+                    resourceId);
             return true;
         }
         return false;

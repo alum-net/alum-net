@@ -8,4 +8,5 @@ export const QUERY_KEYS = {
   getLibraryLabels: 'get-library-labels',
   getLibraryResources: 'get-library-resources',
   getEventDetails: 'get-event-details',
+  getUserActivity: 'get-user-activity',
 };
