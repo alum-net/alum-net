@@ -15,13 +15,11 @@ import org.alumnet.application.dtos.responses.UserActivityLogDTO;
 import org.alumnet.application.enums.UserRole;
 import org.alumnet.application.mapper.UserMapper;
 import org.alumnet.application.query_builders.UserSpecification;
-import org.alumnet.domain.Section;
 import org.alumnet.domain.UserActivityLog;
 import org.alumnet.domain.events.Event;
 import org.alumnet.domain.repositories.EventRepository;
 import org.alumnet.domain.repositories.UserActivityLogRepository;
 import org.alumnet.domain.repositories.UserRepository;
-import org.alumnet.domain.users.Teacher;
 import org.alumnet.domain.users.User;
 import org.alumnet.infrastructure.config.KeycloakProperties;
 import org.alumnet.infrastructure.exceptions.ExistingUserException;
@@ -43,7 +41,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -275,17 +272,15 @@ public class UserService {
 
         List<Event> events;
 
-        switch (userRole){
+        switch (userRole) {
             case UserRole.STUDENT -> {
                 events = eventRepository.findEventsByStudentEmailAndDates(
-                        userEmail, since, to
-                );
+                        userEmail, since, to);
                 break;
             }
             case UserRole.TEACHER -> {
                 events = eventRepository.findEventsByTeacherEmailAndDates(
-                        userEmail, since, to
-                );
+                        userEmail, since, to);
                 break;
             }
             default -> throw new RuntimeException("Error al conseguir el rol");

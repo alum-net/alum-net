@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { MAX_FILE_SIZE } from '../courses/constants';
 
 export const schema = z.object({
-  creatorEmail: z.email('Email inválido'),
+  creatorEmail: z.email().optional(),
   title: z.string().min(1, 'Título requerido'),
   labelIds: z.array(z.number()).min(1, 'Selecciona al menos una etiqueta'),
   file: z

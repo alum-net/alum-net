@@ -101,9 +101,7 @@ public class CourseService {
 
     public void addMemberToCourse(int courseId, String studentEmail) {
 
-        Student student = userRepository.findOne(UserSpecification.byFilters(UserFilterDTO.builder()
-                .email(studentEmail)
-                .role(UserRole.STUDENT).build()))
+        Student student = userRepository.findById(studentEmail)
                 .map(user -> (Student) user)
                 .orElseThrow(UserNotFoundException::new);
 
@@ -130,6 +128,10 @@ public class CourseService {
         Course course = courseRepository
                 .findById(courseId)
                 .orElseThrow(CourseNotFoundException::new);
+
+        if (!course.isEnabled()) {
+            throw new CourseNotFoundException();
+        }
 
         boolean hasEnrolledStudents = participationRepository.hasEnrolledStudents(courseId);
 
@@ -222,7 +224,8 @@ public class CourseService {
             }
             bulkCreationList = builder.build().parse();
         } catch (Exception e) {
-            throw new RuntimeException("Error fatal al leer o parsear el archivo CSV. Verifique el formato general del archivo.", e);
+            throw new RuntimeException(
+                    "Error fatal al leer o parsear el archivo CSV. Verifique el formato general del archivo.", e);
         }
 
         int initialLineNumber = hasHeaders ? 2 : 1;
@@ -263,8 +266,7 @@ public class CourseService {
                         bulkDTO.getApprovalGrade(),
                         startDate,
                         endDate,
-                        teacherEmails
-                );
+                        teacherEmails);
 
                 create(creationRequestDTO);
                 successfulCreations++;
@@ -303,7 +305,7 @@ public class CourseService {
     }
 
     public BulkResponseDTO bulkDeleteCourses(MultipartFile file, boolean hasHeaders) {
-        if(file.isEmpty()){
+        if (file.isEmpty()) {
             throw new IllegalArgumentException("El archivo CSV no debe estar vacío");
         }
 
@@ -312,39 +314,37 @@ public class CourseService {
 
         int successfulDeletions = 0;
 
-        try (Reader reader = new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8)){
+        try (Reader reader = new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8)) {
             CsvToBeanBuilder<CourseBulkDeletionDTO> builder = new CsvToBeanBuilder<CourseBulkDeletionDTO>(reader)
                     .withType(CourseBulkDeletionDTO.class)
                     .withSeparator(',');
 
-            if(hasHeaders){
+            if (hasHeaders) {
                 builder.withSkipLines(1);
             }
 
             bulkDeletionList = builder.build().parse();
 
-        }catch (Exception ex){
+        } catch (Exception ex) {
             throw new RuntimeException("Error al leer o parsear archivo CSV.");
         }
 
         int initialLineNumber = hasHeaders ? 2 : 1;
 
-        for(CourseBulkDeletionDTO deletion : bulkDeletionList){
+        for (CourseBulkDeletionDTO deletion : bulkDeletionList) {
             int currentLine = initialLineNumber++;
             String identifier = deletion.getCourseId() != null
                     ? deletion.getCourseId().toString()
                     : "Id vacío";
 
-            int courseId;
-
-            try{
-                if(deletion.getCourseId() == null){
+            try {
+                if (deletion.getCourseId() == null) {
                     throw new InvalidAttributeException("El ID del curso no puede ser nulo.");
                 }
 
                 deleteCourse(deletion.getCourseId());
                 successfulDeletions++;
-            }catch (CourseNotFoundException e) {
+            } catch (CourseNotFoundException e) {
                 errors.add(BulkErrorDetailDTO.builder()
                         .lineNumber(currentLine)
                         .identifier(identifier)
@@ -395,7 +395,8 @@ public class CourseService {
 
         for (String email : emails) {
             if (!isValidEmailFormat(email)) {
-                throw new InvalidAttributeException("El email del docente '" + email + "' tiene un formato incorrecto.");
+                throw new InvalidAttributeException(
+                        "El email del docente '" + email + "' tiene un formato incorrecto.");
             }
         }
 
@@ -409,7 +410,8 @@ public class CourseService {
         try {
             return LocalDate.parse(dateString.trim(), DateTimeFormatter.ISO_LOCAL_DATE);
         } catch (DateTimeParseException e) {
-            throw new DateTimeParseException("El campo '" + fieldName + "' tiene un formato inválido. Use YYYY-MM-DD.", dateString, e.getErrorIndex());
+            throw new DateTimeParseException("El campo '" + fieldName + "' tiene un formato inválido. Use YYYY-MM-DD.",
+                    dateString, e.getErrorIndex());
         }
     }
 
@@ -474,7 +476,8 @@ public class CourseService {
             }
             bulkEnrollmentList = builder.build().parse();
         } catch (Exception e) {
-            throw new RuntimeException("Error fatal al leer o parsear el archivo CSV. Verifique el formato general del archivo.", e);
+            throw new RuntimeException(
+                    "Error fatal al leer o parsear el archivo CSV. Verifique el formato general del archivo.", e);
         }
 
         int initialLineNumber = hasHeaders ? 2 : 1;
@@ -557,7 +560,8 @@ public class CourseService {
             }
             bulkEnrollmentList = builder.build().parse();
         } catch (Exception e) {
-            throw new RuntimeException("Error fatal al leer o parsear el archivo CSV. Verifique el formato general del archivo.", e);
+            throw new RuntimeException(
+                    "Error fatal al leer o parsear el archivo CSV. Verifique el formato general del archivo.", e);
         }
 
         int initialLineNumber = hasHeaders ? 2 : 1;
@@ -631,7 +635,8 @@ public class CourseService {
                 .findFirst().orElseThrow(CourseParticipationNotFoundException::new);
 
         boolean isUnrated = courseParticipation.getGrade() == null;
-        boolean isApproved = !isUnrated && courseParticipation.getCourse().getApprovalGrade() <= courseParticipation.getGrade();
+        boolean isApproved = !isUnrated
+                && courseParticipation.getCourse().getApprovalGrade() <= courseParticipation.getGrade();
 
         CourseGradesResponseDTO grades = CourseGradesResponseDTO
                 .builder()
@@ -642,14 +647,14 @@ public class CourseService {
                 .eventGrades(new ArrayList<>())
                 .build();
 
-        for(EventParticipation ep : student.getEventParticipations()){
+        for (EventParticipation ep : student.getEventParticipations()) {
             boolean isEventUnrated = ep.getGrade() == null;
 
             grades.getEventGrades().add(EventGradeDetailResponseDTO
                     .builder()
-                            .grade(ep.getGrade())
-                            .isUnrated(isEventUnrated)
-                            .maxGrade(ep.getEvent().getMaxGrade().doubleValue())
+                    .grade(ep.getGrade())
+                    .isUnrated(isEventUnrated)
+                    .maxGrade(ep.getEvent().getMaxGrade().doubleValue())
                     .build());
         }
 

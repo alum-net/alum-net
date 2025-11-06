@@ -1,24 +1,83 @@
-import { useQuery } from '@tanstack/react-query';
 import { FlatList, Linking, Platform, View } from 'react-native';
-import { Button, Card, Chip, Divider, Text } from 'react-native-paper';
-import { getResources } from '../service';
-import { QUERY_KEYS } from '@alum-net/api';
+import {
+  ActivityIndicator,
+  Button,
+  Card,
+  Chip,
+  Divider,
+  Text,
+  TextInput,
+} from 'react-native-paper';
 import { THEME } from '@alum-net/ui';
 import { useLabels } from '../hooks/useLables';
+import { PropsWithChildren, ReactElement } from 'react';
+import { useLibraryContext } from '../library-context';
+
+const LibraryFilters = ({
+  deleteLabel,
+}: {
+  deleteLabel: undefined | (({ id }: { id: number }) => void);
+}) => {
+  const { data: labels } = useLabels();
+  console.log(labels);
+  const { appliedFilters, setFilters, nameFilter, setNameFilter } =
+    useLibraryContext();
+
+  const toggleLabelFilter = (labelId: number) => {
+    const currentLabelIds = appliedFilters?.labelIds || [];
+    const newLabelIds = currentLabelIds.includes(labelId)
+      ? currentLabelIds.filter(id => id !== labelId)
+      : [...currentLabelIds, labelId];
+    setFilters({ ...appliedFilters, labelIds: newLabelIds });
+  };
+
+  return (
+    <View style={{ padding: 10 }}>
+      <TextInput
+        label="Buscar por nombre"
+        value={nameFilter}
+        onChangeText={setNameFilter}
+        style={{ marginBottom: 10 }}
+      />
+      <View style={{ gap: 5, flexDirection: 'row', flexWrap: 'wrap' }}>
+        {!!labels?.length && labels.length > 0 && (
+          <Text variant="titleLarge">Etiquetas</Text>
+        )}
+        {labels?.map(label => (
+          <Chip
+            mode="outlined"
+            selected={appliedFilters?.labelIds?.includes(label.id)}
+            selectedColor={THEME.colors.primary}
+            onPress={() => toggleLabelFilter(label.id)}
+            key={label.id}
+            closeIcon="delete"
+            onClose={
+              deleteLabel ? () => deleteLabel({ id: label.id }) : undefined
+            }
+          >
+            {label.name}
+          </Chip>
+        ))}
+      </View>
+    </View>
+  );
+};
+
 export const LibraryDashboard = ({
   deleteLabel,
   deleteResource,
+  filterContainer: FilterContainer,
 }: {
   deleteLabel?: ({ id }: { id: number }) => void;
   deleteResource?: ({ id }: { id: number }) => void;
+  filterContainer?: (props: PropsWithChildren) => ReactElement;
 }) => {
-  const { data: labels } = useLabels();
-
-  const { data: resources } = useQuery({
-    queryFn: () => getResources(),
-    queryKey: [QUERY_KEYS.getLibraryResources],
-    retry: 0,
-  });
+  const {
+    data: resources,
+    currentPage,
+    setPage,
+    isLoading,
+  } = useLibraryContext();
 
   return (
     <FlatList
@@ -66,33 +125,62 @@ export const LibraryDashboard = ({
       )}
       keyExtractor={resource => resource.id.toString()}
       ListHeaderComponent={
-        <View style={{ gap: 5, flexDirection: 'row', flexWrap: 'wrap' }}>
-          {!!labels?.length && labels.length > 0 && (
-            <Text variant="titleLarge">Etiquetas</Text>
+        <>
+          {FilterContainer ? (
+            <FilterContainer>
+              <LibraryFilters deleteLabel={deleteLabel} />
+            </FilterContainer>
+          ) : (
+            <LibraryFilters deleteLabel={deleteLabel} />
           )}
-          {labels?.map(label => (
-            <Chip
-              mode="outlined"
-              selected
-              selectedColor={THEME.colors.secondary}
-              onPress={() => console.log('selecciono ' + label.name)}
-              key={label.id}
-              closeIcon="delete"
-              onClose={
-                deleteLabel ? () => deleteLabel({ id: label.id }) : undefined
-              }
-            >
-              {label.name}
-            </Chip>
-          ))}
-        </View>
+        </>
       }
-      ListEmptyComponent={() => (
-        <Text variant="titleMedium" style={{ color: THEME.colors.error }}>
-          No hay archivos en la biblioteca aún
-        </Text>
-      )}
-      // ListFooterComponent={}
+      ListEmptyComponent={() =>
+        isLoading ? (
+          <ActivityIndicator />
+        ) : (
+          <Text variant="titleMedium" style={{ color: THEME.colors.error }}>
+            No hay archivos en la biblioteca aún
+          </Text>
+        )
+      }
+      ListFooterComponent={
+        resources && resources.totalPages > 0 ? (
+          <View
+            style={{
+              width: '100%',
+              flexDirection: 'row',
+              justifyContent: 'space-around',
+              marginVertical: 16,
+            }}
+          >
+            {resources.pageNumber > 0 && (
+              <Button
+                mode="contained-tonal"
+                onPress={() => setPage(currentPage - 1)}
+                buttonColor={THEME.colors.secondary}
+                labelStyle={{
+                  color: 'white',
+                }}
+              >
+                Página anterior
+              </Button>
+            )}
+            {resources.pageNumber < resources.totalPages - 1 && (
+              <Button
+                mode="contained-tonal"
+                onPress={() => setPage(currentPage + 1)}
+                buttonColor={THEME.colors.secondary}
+                labelStyle={{
+                  color: 'white',
+                }}
+              >
+                Página siguiente
+              </Button>
+            )}
+          </View>
+        ) : null
+      }
     />
   );
 };

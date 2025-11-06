@@ -22,7 +22,6 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   useEffect(() => {
-    console.log(refreshToken && data?.email);
     if (refreshToken && data?.email) {
       OneSignal.login(data.email);
     }

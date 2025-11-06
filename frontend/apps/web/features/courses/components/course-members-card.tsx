@@ -20,6 +20,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@alum-net/api';
 import { getAxiosErrorMessage } from '../../../features/users/src/users';
+import BulkEnrollModal from './bulk-enroll-modal';
+import BulkUnenrollModal from './bulk-unenroll-modal';
 
 const schema = z.object({
   email: z.string().email('Email inválido'),
@@ -27,13 +29,9 @@ const schema = z.object({
 
 type Props = {
   courseId: string;
-  totalEnrollments?: number | null;
 };
 
-export default function CourseMembersCard({
-  courseId,
-  totalEnrollments,
-}: Props) {
+export default function CourseMembersCard({ courseId }: Props) {
   const { data: user } = useUserInfo();
   const canManage = user?.role === UserRole.teacher;
 
@@ -55,6 +53,8 @@ export default function CourseMembersCard({
 
   // modal matricular
   const [open, setOpen] = useState(false);
+  const [bulkOpen, setBulkOpen] = useState(false);
+  const [bulkUnenrollOpen, setBulkUnenrollOpen] = useState(false);
   const { control, handleSubmit, reset } = useForm<{ email: string }>({
     resolver: zodResolver(schema),
     defaultValues: { email: '' },
@@ -69,20 +69,16 @@ export default function CourseMembersCard({
   const onEnroll = async ({ email }: { email: string }) => {
     try {
       const res = await enrollStudent(courseId, email.trim());
-      if (res.success) {
-        Toast.success(res.message || 'Estudiante matriculado correctamente');
-        setOpen(false);
-        reset({ email: '' });
-        focusTrigger();
-        await Promise.all([
-          queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.getCourse] }),
-          queryClient.invalidateQueries({
-            queryKey: [QUERY_KEYS.getCourseMembers, courseId],
-          }),
-        ]);
-      } else {
-        Toast.error(res.errors?.[0] || res.message || 'Error al matricular');
-      }
+      Toast.success(res.message || 'Estudiante matriculado correctamente');
+      setOpen(false);
+      reset({ email: '' });
+      focusTrigger();
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.getCourse] }),
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.getCourseMembers, courseId],
+        }),
+      ]);
     } catch (e: any) {
       Toast.error(getAxiosErrorMessage(e));
     }
@@ -94,7 +90,6 @@ export default function CourseMembersCard({
       if (res.success || res.statusCode === 204) {
         Toast.success(res.message || 'Estudiante desmatriculado');
         await Promise.all([
-          queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.getCourse] }),
           queryClient.invalidateQueries({
             queryKey: [QUERY_KEYS.getCourseMembers, courseId],
           }),
@@ -140,22 +135,39 @@ export default function CourseMembersCard({
     focusTrigger();
   };
 
-  if (user?.role === UserRole.student) return null;
-
   return (
     <Card style={{ marginTop: 16 }}>
       <Card.Title
-        title={`Estudiantes (${totalEnrollments ?? 0})`}
+        title={`Miembros (${data?.totalElements ?? 0})`}
         right={props => (
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
             {canManage && (
               <Button
                 ref={enrollBtnRef}
                 mode="contained"
                 onPress={() => setOpen(true)}
-                style={{ marginRight: 4 }}
+                style={styles.titleActionButton}
               >
                 Matricular estudiante
+              </Button>
+            )}
+            {canManage && (
+              <Button
+                mode="outlined"
+                icon="cloud-upload"
+                onPress={() => setBulkOpen(true)}
+                style={styles.titleActionButton}
+              >
+                Matriculación masiva
+              </Button>
+            )}
+            {canManage && (
+              <Button
+                mode="outlined"
+                onPress={() => setBulkUnenrollOpen(true)}
+                style={styles.titleActionButton}
+              >
+                Des-matriculación masiva
               </Button>
             )}
             <IconButton
@@ -309,6 +321,22 @@ export default function CourseMembersCard({
           </Dialog>
         </Portal>
       )}
+      {/* Modal matriculación masiva */}
+      {bulkOpen && (
+        <BulkEnrollModal
+          visible={bulkOpen}
+          onDismiss={() => setBulkOpen(false)}
+          courseId={courseId}
+        />
+      )}
+      {/* Modal des-matriculación masiva */}
+      {bulkUnenrollOpen && (
+        <BulkUnenrollModal
+          visible={bulkUnenrollOpen}
+          onDismiss={() => setBulkUnenrollOpen(false)}
+          courseId={courseId}
+        />
+      )}
     </Card>
   );
 }
@@ -320,7 +348,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   loading: { paddingVertical: 12, alignItems: 'center' },
-
+  titleActionButton: {},
   dialog: {
     backgroundColor: 'white',
     alignSelf: 'center',
