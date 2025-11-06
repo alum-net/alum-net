@@ -3,6 +3,8 @@ package org.alumnet.domain.users;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
+import lombok.Getter;
+import lombok.Setter;
 import org.alumnet.application.enums.UserRole;
 import org.alumnet.domain.Course;
 
@@ -10,6 +12,8 @@ import java.util.List;
 
 
 @Entity
+@Getter
+@Setter
 @DiscriminatorValue("teacher")
 public class Teacher extends User {
     @ManyToMany(mappedBy = "teachers")
