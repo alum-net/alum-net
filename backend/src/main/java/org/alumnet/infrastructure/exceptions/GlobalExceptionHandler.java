@@ -166,4 +166,25 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ResultResponse<Object>> handleInsufficientPermissionsException(InsufficientPermissionsException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ResultResponse.error(ex.getMessage(), "Permisos insuficientes"));
     }
+
+    @ExceptionHandler(ConversationNotFoundException.class)
+    public ResponseEntity<ResultResponse<Object>> handleConversationNotFound(ConversationNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultResponse.error(ex.getMessage(), "Conversación no encontrada"));
+    }
+
+    @ExceptionHandler(UnauthorizedConversationAccessException.class)
+    public ResponseEntity<ResultResponse<Object>> handleUnauthorizedAccess(UnauthorizedConversationAccessException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ResultResponse.error(ex.getMessage(), "No tienes acceso a esta conversación"));
+    }
+
+    @ExceptionHandler(InvalidMessageException.class)
+    public ResponseEntity<ResultResponse<Object>> handleInvalidMessage(InvalidMessageException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResultResponse.error(ex.getMessage(), "Contenido invalido"));
+    }
+
+    @ExceptionHandler(NotFoundParticipationException.class)
+    public ResponseEntity<ResultResponse<Object>> handleNotFoundParticipation(NotFoundParticipationException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResultResponse.error(ex.getMessage(), "Participante invalido"));
+    }
+
 }
