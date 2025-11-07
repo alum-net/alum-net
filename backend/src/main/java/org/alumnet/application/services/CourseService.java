@@ -106,6 +106,7 @@ public class CourseService {
                 .orElseThrow(UserNotFoundException::new);
 
         Course course = courseRepository.findById(courseId)
+                .filter(Course::isEnabled)
                 .orElseThrow(CourseNotFoundException::new);
 
         CourseParticipationId id = new CourseParticipationId(studentEmail, courseId);

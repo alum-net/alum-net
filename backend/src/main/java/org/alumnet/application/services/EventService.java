@@ -141,9 +141,11 @@ public class EventService {
 
 	public void submitHomework(Integer eventId, MultipartFile homeworkFile, String studentEmail) {
 		Event event = eventRepository.findById(eventId).orElseThrow(EventNotFoundException::new);
-		if (LocalDateTime.now().isAfter(event.getEndDate()))
-			throw new AssignmentDueDateExpiredException(
-					"No se puede enviar la tarea despues de la fecha de fin del evento");
+
+		if (LocalDateTime.now().isAfter(event.getEndDate()) || LocalDateTime.now().isBefore(event.getStartDate())){
+            throw new AssignmentDueDateExpiredException(
+                    "No se puede enviar la tarea despues de la fecha de fin del evento");
+        }
 
 		fileValidationService.validateFile(homeworkFile, false);
 
