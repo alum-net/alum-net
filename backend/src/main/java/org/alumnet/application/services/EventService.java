@@ -1,6 +1,5 @@
 package org.alumnet.application.services;
 
-
 import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.*;
 import org.alumnet.application.dtos.requests.SubmitQuestionnaireRequestDTO;
@@ -41,7 +40,7 @@ public class EventService {
     private final UserActivityLogService activityLogService;
 
     public void createEvent(EventDTO eventDTO) {
-        validateDates(eventDTO.getStartDate(),eventDTO.getEndDate());
+        validateDates(eventDTO.getStartDate(), eventDTO.getEndDate());
 
         if (eventDTO.getType() == EventType.QUESTIONNAIRE)
             validateQuestions(eventDTO.getQuestions());
@@ -143,7 +142,8 @@ public class EventService {
     public void submitHomework(Integer eventId, MultipartFile homeworkFile, String studentEmail) {
         Event event = eventRepository.findById(eventId).orElseThrow(EventNotFoundException::new);
         if (LocalDateTime.now().isAfter(event.getEndDate()))
-            throw new AssignmentDueDateExpiredException("No se puede enviar la tarea despues de la fecha de fin del evento");
+            throw new AssignmentDueDateExpiredException(
+                    "No se puede enviar la tarea despues de la fecha de fin del evento");
 
         fileValidationService.validateFile(homeworkFile, false);
 
@@ -184,18 +184,18 @@ public class EventService {
                 studentEmail,
                 ActivityType.TASK_SUBMISSION,
                 "Entrega de tarea: " + event.getTitle(),
-                eventId.toString()
-        );
+                eventId.toString());
     }
 
     private void validateHomeworkAlreadySubmitted(Integer eventId, String studentEmail) {
         eventParticipationRepository.findById(EventParticipationId.builder()
-                        .eventId(eventId)
-                        .studentEmail(studentEmail)
-                        .build())
+                .eventId(eventId)
+                .studentEmail(studentEmail)
+                .build())
                 .ifPresent(participation -> {
                     if (participation.getResource() != null)
-                        throw new HomeworkAlreadySubmittedException("El estudiante ya ha enviado la tarea para este evento");
+                        throw new HomeworkAlreadySubmittedException(
+                                "El estudiante ya ha enviado la tarea para este evento");
                 });
     }
 
@@ -218,12 +218,13 @@ public class EventService {
                         .map(eventMapper::questionDTOToQuestionDTO)
                         .collect(Collectors.toList()));
 
-        if(user.getRole() == UserRole.TEACHER){
+        if (user.getRole() == UserRole.TEACHER) {
             // Si es el teacher el que pregunta me traigo también todas las respuestas
             Set<QuestionnaireResponseDetail> allResponses = responseDetailRepository
                     .findAllResponsesByEventId(eventId);
 
-            Map<EventParticipation, List<QuestionResponseDTO>> groupedResponses = generateGroupedResponses(allResponses);
+            Map<EventParticipation, List<QuestionResponseDTO>> groupedResponses = generateGroupedResponses(
+                    allResponses);
 
             List<QuestionnaireResponseDTO> teacherResponsesDTO = generateQuestionnaireResponses(groupedResponses);
 
@@ -233,7 +234,8 @@ public class EventService {
         return eventDTOBuilder.build();
     }
 
-    private List<QuestionnaireResponseDTO> generateQuestionnaireResponses(Map<EventParticipation, List<QuestionResponseDTO>> groupedResponses) {
+    private List<QuestionnaireResponseDTO> generateQuestionnaireResponses(
+            Map<EventParticipation, List<QuestionResponseDTO>> groupedResponses) {
         return groupedResponses.entrySet().stream()
                 .map(entry -> {
                     EventParticipation attempt = entry.getKey();
@@ -248,7 +250,8 @@ public class EventService {
                 .collect(Collectors.toList());
     }
 
-    private Map<EventParticipation, List<QuestionResponseDTO>> generateGroupedResponses(Set<QuestionnaireResponseDetail> allResponses) {
+    private Map<EventParticipation, List<QuestionResponseDTO>> generateGroupedResponses(
+            Set<QuestionnaireResponseDetail> allResponses) {
         Map<EventParticipation, List<QuestionResponseDTO>> groupedResponses = allResponses.stream()
                 .collect(Collectors.groupingBy(
                         QuestionnaireResponseDetail::getAttempt,
@@ -259,9 +262,7 @@ public class EventService {
                                         .isCorrect(r.getStudentAnswer().getCorrect())
                                         .timeStamp(r.getAttemptDate())
                                         .build(),
-                                Collectors.toList()
-                        )
-                ));
+                                Collectors.toList())));
         return groupedResponses;
     }
 
@@ -279,7 +280,7 @@ public class EventService {
         EventParticipation participation = getOrCreateParticipation(student, questionnaire);
         Set<QuestionnaireResponseDetail> newResponses = new HashSet<>();
 
-        for(Question question : questionnaire.getQuestions()){
+        for (Question question : questionnaire.getQuestions()) {
             var responseDetailBuilder = QuestionnaireResponseDetail
                     .builder()
                     .attempt(participation)
@@ -294,7 +295,7 @@ public class EventService {
                                     .filter(a -> Objects.equals(a.getId(), response.getAnswerId()))
                                     .findFirst().orElse(null)));
 
-            QuestionnaireResponseDetail responseDetail =  responseDetailBuilder.build();
+            QuestionnaireResponseDetail responseDetail = responseDetailBuilder.build();
 
             newResponses.add(responseDetail);
         }
@@ -305,8 +306,7 @@ public class EventService {
                 request.getUserEmail(),
                 ActivityType.QUESTIONNAIRE_RESOLUTION,
                 "Cuestionario resuelto: " + questionnaire.getTitle(),
-                eventId.toString()
-        );
+                eventId.toString());
     }
 
     private EventParticipation getOrCreateParticipation(Student student, Questionnaire questionnaire) {

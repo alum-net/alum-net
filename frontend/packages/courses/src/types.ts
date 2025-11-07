@@ -76,10 +76,16 @@ export enum EventType {
   TASK = 'TASK',
 }
 
-export interface QuestionDTO {
+export interface Answer {
+  correct: boolean;
   id: number;
   text: string;
-  options: string[];
+}
+
+export interface Question {
+  id: number;
+  text: string;
+  answers: Answer[];
   correctOption: number;
 }
 
@@ -89,7 +95,7 @@ export interface Event {
   endDate: string;
   maxGrade: number;
   studentsWithPendingSubmission: string[];
-  questions?: QuestionDTO[];
+  questions?: Question[];
   durationInMinutes?: number;
   title: string;
 }

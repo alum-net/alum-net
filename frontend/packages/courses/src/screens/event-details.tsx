@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import { Card, Text, ActivityIndicator } from 'react-native-paper';
 import { EventType } from '../types';
 import { useLocalSearchParams } from 'expo-router';
@@ -7,8 +7,8 @@ import { useQuery } from '@tanstack/react-query';
 import { getEventById } from '../service';
 import { QUERY_KEYS } from '@alum-net/api';
 import { useUserInfo } from '@alum-net/users';
-import { TaskDetails } from './task-details';
-import { QuestionnaireDetails } from './questionnaire-details';
+import { TaskDetails } from '../components/task-details';
+import { QuestionnaireDetails } from '../components/questionnaire-details';
 
 export const EventDetails = () => {
   const { id, type } = useLocalSearchParams<{ id: string; type: EventType }>();
@@ -21,41 +21,47 @@ export const EventDetails = () => {
   if (loadingData) return <ActivityIndicator />;
 
   return (
-    <Card style={styles.card}>
-      <Card.Title
-        title={`Tarea: ${data?.title}`}
-        titleVariant="headlineMedium"
-        style={styles.cardTitle}
-      />
-      <Card.Content>
-        <Text variant="bodyLarge" style={styles.description}>
-          {data?.description}
-        </Text>
+    <ScrollView>
+      <Card style={styles.card}>
+        <Card.Title
+          title={`Tarea: ${data?.title}`}
+          titleVariant="headlineMedium"
+          style={styles.cardTitle}
+        />
+        <Card.Content>
+          <Text variant="bodyLarge" style={styles.description}>
+            {data?.description}
+          </Text>
 
-        <View style={styles.infoRow}>
-          <Text variant="bodyLarge">Fecha de inicio</Text>
-          <Text variant="bodyLarge">{data?.startDate.toString()}</Text>
-        </View>
+          <View style={styles.infoRow}>
+            <Text variant="bodyLarge">Fecha de inicio</Text>
+            <Text variant="bodyLarge">{data?.startDate.toString()}</Text>
+          </View>
 
-        <View style={styles.infoRow}>
-          <Text variant="bodyLarge">Fecha de fin</Text>
-          <Text variant="bodyLarge">{data?.endDate.toString()}</Text>
-        </View>
+          <View style={styles.infoRow}>
+            <Text variant="bodyLarge">Fecha de fin</Text>
+            <Text variant="bodyLarge">{data?.endDate.toString()}</Text>
+          </View>
 
-        <View style={styles.infoRow}>
-          <Text variant="bodyLarge">Nota máxima</Text>
-          <Text variant="bodyLarge">{data?.maxGrade} puntos</Text>
-        </View>
+          <View style={styles.infoRow}>
+            <Text variant="bodyLarge">Nota máxima</Text>
+            <Text variant="bodyLarge">{data?.maxGrade} puntos</Text>
+          </View>
 
-        {type === EventType.TASK.toLowerCase() && (
-          <TaskDetails eventId={id} data={data} userInfo={userInfo!} />
-        )}
+          {type === EventType.TASK.toLowerCase() && (
+            <TaskDetails eventId={id} data={data} userInfo={userInfo!} />
+          )}
 
-        {type === EventType.QUESTIONNAIRE.toLowerCase() && (
-          <QuestionnaireDetails data={data} eventId={id} userInfo={userInfo} />
-        )}
-      </Card.Content>
-    </Card>
+          {type === EventType.QUESTIONNAIRE.toLowerCase() && (
+            <QuestionnaireDetails
+              data={data}
+              eventId={id}
+              userInfo={userInfo}
+            />
+          )}
+        </Card.Content>
+      </Card>
+    </ScrollView>
   );
 };
 

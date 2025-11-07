@@ -58,6 +58,7 @@ export const QuestionnaireDetails: React.FC<QuestionnaireDetailsProps> = ({
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [submitted, setSubmitted] = useState(false);
   const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const timerRef = useRef<number | null>(null);
 
   const totalQuestions = questions?.length;
@@ -93,7 +94,6 @@ export const QuestionnaireDetails: React.FC<QuestionnaireDetailsProps> = ({
   const handleStart = () => {
     setStarted(true);
     setCurrentIndex(0);
-    // initialize timer if duration is provided
     const mins = data?.durationInMinutes ?? null;
     if (typeof mins === 'number' && mins > 0) {
       setRemainingSeconds(mins * 60);
@@ -105,50 +105,45 @@ export const QuestionnaireDetails: React.FC<QuestionnaireDetailsProps> = ({
       submitQuestionnaireResponses(eventId || 0, body),
     onSuccess: () => {
       setSubmitted(true);
+      setConfirmOpen(false);
       Toast.success('Respuestas enviadas correctamente');
     },
     onError: err => {
       console.error(err);
       Toast.error('Error al enviar las respuestas');
+      setConfirmOpen(false);
     },
   });
-  const [confirmVisible, setConfirmVisible] = useState(false);
-
-  const buildResponsesPayload = () =>
-    Object.entries(answers).map(([questionIdStr, selectedAnswerId]) => {
-      const questionId = Number(questionIdStr);
-      const q = questions?.find(q => q.id === questionId) as
-        | EventQuestion
-        | undefined;
-      const answerId = Number(selectedAnswerId ?? -1);
-      const answerObj = (q?.answers as unknown as EventAnswer[])?.find(
-        (a: EventAnswer) => a.id === answerId,
-      );
-      const isCorrect = !!answerObj?.correct;
-      return {
-        questionId,
-        answerId: answerId >= 0 ? answerId : -1,
-        isCorrect,
-        timeStamp: new Date().toISOString(),
-      };
-    });
 
   const handleSubmit = () => {
-    // show confirmation modal (works on web and native)
-    setConfirmVisible(true);
-  };
+    const responsesPayload = Object.entries(answers).map(
+      ([questionIdStr, selectedAnswerId]) => {
+        const questionId = Number(questionIdStr);
+        const q = questions?.find(q => q.id === questionId) as
+          | EventQuestion
+          | undefined;
+        const answerId = Number(selectedAnswerId ?? -1);
+        const answerObj = (q?.answers as unknown as EventAnswer[])?.find(
+          (a: EventAnswer) => a.id === answerId,
+        );
+        const isCorrect = !!answerObj?.correct;
+        return {
+          questionId,
+          answerId: answerId >= 0 ? answerId : -1,
+          isCorrect,
+          timeStamp: new Date().toISOString(),
+        };
+      },
+    );
 
-  const confirmSubmit = () => {
-    setConfirmVisible(false);
-    const responsesPayload = buildResponsesPayload();
     const payload: SubmitQuestionnaireRequest = {
       userEmail: userInfo?.email,
       responses: responsesPayload,
     };
+
     mutation.mutate(payload);
   };
 
-  // helper to auto-submit without confirmation (used when timer expires)
   const autoSubmit = () => {
     if (submitted) return;
     const responsesPayload = Object.entries(answers).map(
@@ -179,12 +174,9 @@ export const QuestionnaireDetails: React.FC<QuestionnaireDetailsProps> = ({
     mutation.mutate(payload);
   };
 
-  // Timer effect: decrement every second; when reaches 0 auto-submit
   useEffect(() => {
-    // start timer only after user started and there is a remainingSeconds value
     if (!started || submitted || remainingSeconds === null) return;
 
-    // clear any existing timer
     if (timerRef.current) {
       clearInterval(timerRef.current);
       timerRef.current = null;
@@ -194,12 +186,10 @@ export const QuestionnaireDetails: React.FC<QuestionnaireDetailsProps> = ({
       setRemainingSeconds(prev => {
         if (prev === null) return null;
         if (prev <= 1) {
-          // time's up: clear timer and auto-submit
           if (timerRef.current) {
             clearInterval(timerRef.current);
             timerRef.current = null;
           }
-          // run auto submit
           autoSubmit();
           return 0;
         }
@@ -288,19 +278,26 @@ export const QuestionnaireDetails: React.FC<QuestionnaireDetailsProps> = ({
             ))}
           </View>
         ) : (
-          <>
-            {!started && (
-              <Button
-                mode="contained"
-                onPress={handleStart}
-                style={styles.startButton}
-              >
-                Comenzar cuestionario
-              </Button>
-            )}
+          <View style={styles.quizBox}>
+            {!started &&
+              (!data?.studentsWithPendingSubmission.includes(
+                userInfo!.email,
+              ) ? (
+                <Button
+                  mode="contained"
+                  onPress={handleStart}
+                  style={styles.startButton}
+                >
+                  Comenzar cuestionario
+                </Button>
+              ) : (
+                <Text style={{ color: 'green' }}>
+                  Estamos corrigiendo tu cuestionario!
+                </Text>
+              ))}
 
             {started && (
-              <View style={styles.quizBox}>
+              <>
                 {remainingSeconds !== null && (
                   <Text variant="bodyLarge" style={{ marginBottom: 8 }}>
                     <Text style={{ fontWeight: '700' }}>Tiempo restante: </Text>
@@ -353,7 +350,7 @@ export const QuestionnaireDetails: React.FC<QuestionnaireDetailsProps> = ({
                   ) : (
                     <Button
                       mode="contained"
-                      onPress={handleSubmit}
+                      onPress={() => setConfirmOpen(true)}
                       disabled={submitted}
                     >
                       Enviar respuestas
@@ -366,31 +363,28 @@ export const QuestionnaireDetails: React.FC<QuestionnaireDetailsProps> = ({
                     Omitir pregunta
                   </Button>
                 </View>
-              </View>
+              </>
             )}
-            <Portal>
-              <Dialog
-                visible={confirmVisible}
-                onDismiss={() => setConfirmVisible(false)}
-              >
-                <Dialog.Title>Enviar respuestas</Dialog.Title>
-                <Dialog.Content>
-                  <Text>
-                    Una vez enviadas, las respuestas no se podrán modificar.
-                    ¿Desea continuar?
-                  </Text>
-                </Dialog.Content>
-                <Dialog.Actions>
-                  <Button onPress={() => setConfirmVisible(false)}>
-                    Cancelar
-                  </Button>
-                  <Button mode="contained" onPress={confirmSubmit}>
-                    Enviar respuestas
-                  </Button>
-                </Dialog.Actions>
-              </Dialog>
-            </Portal>
-          </>
+            {confirmOpen && (
+              <Portal>
+                <Dialog
+                  visible
+                  style={{ maxWidth: 400, alignSelf: 'center' }}
+                  onDismiss={() => setConfirmOpen(false)}
+                >
+                  <Dialog.Title>Enviar cuestionario</Dialog.Title>
+                  <Dialog.Actions>
+                    <Button onPress={() => setConfirmOpen(false)}>
+                      Cancelar
+                    </Button>
+                    <Button mode="contained" onPress={handleSubmit}>
+                      Enviar
+                    </Button>
+                  </Dialog.Actions>
+                </Dialog>
+              </Portal>
+            )}
+          </View>
         )}
       </Card.Content>
     </Card>
