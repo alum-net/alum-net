@@ -25,6 +25,7 @@ const InitialLayout = () => {
               <Stack.Screen name="profile" options={{ headerShown: false }} />
               <Stack.Screen name="courses" options={{ headerShown: false }} />
               <Stack.Screen name="users" options={{ headerShown: false }} />
+              <Stack.Screen name="messages" options={{ headerShown: false }} />
               <Stack.Screen
                 name="course/[id]"
                 options={{ headerShown: false }}

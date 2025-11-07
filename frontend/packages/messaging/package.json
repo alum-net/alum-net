@@ -1,0 +1,17 @@
+{
+  "name": "@alum-net/messaging",
+  "version": "1.0.0",
+  "main": "./src/index.ts",
+  "private": true,
+  "dependencies": {
+    "@alum-net/api": "*",
+    "@alum-net/storage": "*",
+    "@stomp/stompjs": "^7.0.0"
+  },
+  "peerDependencies": {
+    "@tanstack/react-query": "^5.90.5",
+    "react": "19.0.0",
+    "react-native": "0.79.6"
+  }
+}
+
