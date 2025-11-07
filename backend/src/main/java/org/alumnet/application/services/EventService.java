@@ -144,7 +144,7 @@ public class EventService {
 
 		if (LocalDateTime.now().isAfter(event.getEndDate()) || LocalDateTime.now().isBefore(event.getStartDate())){
             throw new AssignmentDueDateExpiredException(
-                    "No se puede enviar la tarea despues de la fecha de fin del evento");
+                    "No se puede enviar la tarea despues de la fecha de fin del evento o antes de la fecha inicio del evento");
         }
 
 		fileValidationService.validateFile(homeworkFile, false);
