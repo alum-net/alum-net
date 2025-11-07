@@ -59,12 +59,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidPostContentLenghtException.class)
     public ResponseEntity<ResultResponse<Object>> handleInvalidPostContentLenghtException(InvalidPostContentLenghtException ex) {
-        return  ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Formato incorrecto"));
+        return  ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "El mensaje supera los 350 caracteres"));
     }
 
     @ExceptionHandler(InvalidPostTitleException.class)
     public ResponseEntity<ResultResponse<Object>> handleInvalidPostTitleException(InvalidPostTitleException ex) {
-        return  ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Formato incorrecto"));
+        return  ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Las respuestas no pueden tener título."));
     }
 
     @ExceptionHandler(PostNotFoundException.class)
@@ -166,4 +166,15 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ResultResponse<Object>> handleInsufficientPermissionsException(InsufficientPermissionsException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ResultResponse.error(ex.getMessage(), "Permisos insuficientes"));
     }
+
+    @ExceptionHandler(ActiveCourseException.class)
+    public ResponseEntity<ResultResponse<Object>> handleActiveCourseException(ActiveCourseException ex) {
+        return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "El curso se encuentra activo"));
+    }
+
+    @ExceptionHandler(AlreadyEnrolledStudentException.class)
+    public ResponseEntity<ResultResponse<Object>> handleAlreadyEnrolledStudentException(AlreadyEnrolledStudentException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ResultResponse.error(ex.getMessage(), "El estudiante ya está matriculado en el curso"));
+    }
+
 }
