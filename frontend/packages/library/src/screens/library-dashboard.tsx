@@ -19,7 +19,6 @@ const LibraryFilters = ({
   deleteLabel: undefined | (({ id }: { id: number }) => void);
 }) => {
   const { data: labels } = useLabels();
-  console.log(labels);
   const { appliedFilters, setFilters, nameFilter, setNameFilter } =
     useLibraryContext();
 

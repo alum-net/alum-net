@@ -115,11 +115,11 @@ export default function EventCreationModal({
     watch,
     reset,
     formState: { errors },
+    setValue,
   } = useForm<EventFormData>({
     resolver: zodResolver(eventSchema),
     defaultValues,
   });
-
   const selectedEventType = watch('type');
 
   const { fields, append, remove } = useFieldArray({
@@ -460,7 +460,7 @@ export default function EventCreationModal({
 
                         <View style={styles.fieldWrapper}>
                           <Text style={styles.label}>
-                            Opciones de respuesta (mínimo 2)
+                            Opciones de respuesta
                           </Text>
                           {[0, 1, 2, 3].map(answerIndex => (
                             <View
@@ -490,7 +490,7 @@ export default function EventCreationModal({
 
                         <View style={styles.fieldWrapper}>
                           <Text style={styles.label}>Respuesta correcta</Text>
-                          <SelectField<any>
+                          <SelectField
                             name={
                               `questions.${questionIndex}.correctAnswerIndex` as any
                             }
@@ -509,10 +509,11 @@ export default function EventCreationModal({
                                   `questions.${questionIndex}.answers.${answerIndex}.text` as any,
                                 );
                                 if (answerText) {
-                                  (control as any)._formValues.questions[
-                                    questionIndex
-                                  ].answers[answerIndex].correct =
-                                    answerIndex === correctIndex;
+                                  // use setValue to update nested form values instead of mutating internal state
+                                  setValue(
+                                    `questions.${questionIndex}.answers.${answerIndex}.correct` as any,
+                                    answerIndex === correctIndex,
+                                  );
                                 }
                               });
                               return correctIndex;

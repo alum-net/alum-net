@@ -134,3 +134,22 @@ export const submitHomework = async (homework: Homework) => {
 export const deleteEvent = async (id: number) => {
   return await api.delete(`/events/${id}`);
 };
+
+export type QuestionnaireResponse = {
+  questionId: number;
+  answerId: number;
+  isCorrect: boolean;
+  timeStamp?: string;
+};
+
+export type SubmitQuestionnaireRequest = {
+  userEmail?: string;
+  responses: QuestionnaireResponse[];
+};
+
+export const submitQuestionnaireResponses = async (
+  eventId: number | string,
+  payload: SubmitQuestionnaireRequest,
+) => {
+  return await api.post<Response>(`/events/${eventId}/submit`, payload);
+};
