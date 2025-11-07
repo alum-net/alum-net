@@ -115,11 +115,12 @@ export default function EventCreationModal({
     watch,
     reset,
     formState: { errors },
+    setValue,
   } = useForm<EventFormData>({
     resolver: zodResolver(eventSchema),
     defaultValues,
   });
-
+  console.log(errors);
   const selectedEventType = watch('type');
 
   const { fields, append, remove } = useFieldArray({
@@ -490,7 +491,7 @@ export default function EventCreationModal({
 
                         <View style={styles.fieldWrapper}>
                           <Text style={styles.label}>Respuesta correcta</Text>
-                          <SelectField<any>
+                          <SelectField
                             name={
                               `questions.${questionIndex}.correctAnswerIndex` as any
                             }
