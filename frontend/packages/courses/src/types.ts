@@ -86,7 +86,6 @@ export interface Question {
   id: number;
   text: string;
   answers: Answer[];
-  correctOption: number;
 }
 
 export interface Event {
