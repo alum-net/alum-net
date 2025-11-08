@@ -2,7 +2,6 @@ package org.alumnet.infrastructure.config;
 
 import lombok.RequiredArgsConstructor;
 import org.alumnet.infrastructure.filters.ContentAccessLoggingFilter;
-import org.alumnet.infrastructure.filters.JwtActivityLoggingFilter;
 import org.alumnet.infrastructure.security.JwtAuthConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -35,7 +34,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtActivityLoggingFilter jwtActivityLoggingFilter;
     private final ContentAccessLoggingFilter contentAccessLoggingFilter;
 
         private final JwtAuthConverter jwtAuthConverter;
@@ -98,7 +96,6 @@ public class SecurityConfig {
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-                http.addFilterAfter(jwtActivityLoggingFilter, BearerTokenAuthenticationFilter.class);
                 http.addFilterAfter(contentAccessLoggingFilter, BearerTokenAuthenticationFilter.class);
 
                 return http.build();
