@@ -38,6 +38,5 @@ public interface ParticipationRepository extends JpaRepository<CourseParticipati
 """)
     Integer countStudentsByCourseId(@Param("courseId") Integer courseId);
 
-    CourseParticipation findByStudentEmailAndCourseId(String email, Integer courseId);
 
 }

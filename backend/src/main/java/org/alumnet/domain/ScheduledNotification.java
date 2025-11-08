@@ -41,6 +41,8 @@ public class ScheduledNotification {
     private LocalDateTime updatedAt;
     @Field("scheduled_send_time")
     private LocalDateTime scheduledSendTime;
+    @Field("notification_target_type")
+    private String notificationType;
 
     public void markAsSent() {
         this.state = NotificationStatus.SENT;

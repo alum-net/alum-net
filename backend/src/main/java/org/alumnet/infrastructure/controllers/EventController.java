@@ -3,6 +3,7 @@ package org.alumnet.infrastructure.controllers;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.EventDTO;
+import org.alumnet.application.dtos.requests.GradeSubmissionsRequestDTO;
 import org.alumnet.application.dtos.requests.SubmitQuestionnaireRequestDTO;
 import org.alumnet.application.dtos.responses.ResultResponse;
 import org.alumnet.application.services.EventService;
@@ -66,4 +67,25 @@ public class EventController {
         eventService.submitQuestionnaireResponses(request, eventId);
         return ResponseEntity.ok(ResultResponse.success(null, "Se guardaron las respuestas exitosamente"));
     }
+
+    @GetMapping(value = "/course/{courseId}", produces = "application/json")
+    @PreAuthorize("hasRole('teacher')")
+    public ResponseEntity<ResultResponse<Object>> getUnratedEventsByCourseId(@PathVariable Integer courseId) {
+        return ResponseEntity.ok(ResultResponse.success(eventService.getUnratedEventsByCourseId(courseId), "Eventos sin calificar obtenidos exitosamente"));
+    }
+
+    @GetMapping(value = "/{eventId}/students", produces = "application/json")
+    @PreAuthorize("hasRole('teacher')")
+    public ResponseEntity<ResultResponse<Object>> getEventStudents(@PathVariable Integer eventId) {
+        return ResponseEntity.ok(ResultResponse.success(eventService.getEventStudents(eventId), "Libro de calificaciones obtenido exitosamente"));
+    }
+
+    @PostMapping(value = "/grade-submissions", produces = "application/json")
+    @PreAuthorize("hasRole('teacher')")
+    public ResponseEntity<ResultResponse<Object>> gradeSubmissions(@RequestBody GradeSubmissionsRequestDTO request) {
+        eventService.gradeSubmissions(request);
+        return ResponseEntity.ok(ResultResponse.success(null, "Calificaciones guardadas exitosamente"));
+    }
+
+
 }

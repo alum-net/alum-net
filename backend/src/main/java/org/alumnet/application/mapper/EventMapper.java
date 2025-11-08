@@ -35,6 +35,7 @@ public interface EventMapper {
 
     @Mapping(target = "id" , source = "id")
     @Mapping(target = "title", source = "title")
+    @Mapping(target = "maxGrade", source = "maxGrade")
     @Mapping(target = "type", ignore = true)
     SummaryEventDTO eventToSummaryEventDTO(Event event);
 

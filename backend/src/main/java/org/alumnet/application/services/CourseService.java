@@ -4,12 +4,14 @@ import com.opencsv.bean.CsvToBeanBuilder;
 import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.CourseContentDTO;
 import org.alumnet.application.dtos.CourseDTO;
+import org.alumnet.application.dtos.StudentSummaryDTO;
 import org.alumnet.application.dtos.UserDTO;
 import org.alumnet.application.dtos.requests.*;
 import org.alumnet.application.dtos.responses.BulkErrorDetailDTO;
 import org.alumnet.application.dtos.responses.BulkResponseDTO;
 import org.alumnet.application.dtos.responses.CourseGradesResponseDTO;
 import org.alumnet.application.dtos.responses.EventGradeDetailResponseDTO;
+import org.alumnet.application.enums.GradeContextType;
 import org.alumnet.application.enums.ShiftType;
 import org.alumnet.application.enums.UserRole;
 import org.alumnet.application.mapper.CourseMapper;
@@ -19,6 +21,7 @@ import org.alumnet.application.query_builders.UserSpecification;
 import org.alumnet.domain.Course;
 import org.alumnet.domain.CourseParticipation;
 import org.alumnet.domain.CourseParticipationId;
+import org.alumnet.domain.events.Event;
 import org.alumnet.domain.events.EventParticipation;
 import org.alumnet.domain.repositories.CourseParticipationRepository;
 import org.alumnet.domain.repositories.CourseRepository;
@@ -30,7 +33,6 @@ import org.alumnet.domain.users.Student;
 import org.alumnet.domain.users.Teacher;
 import org.alumnet.domain.users.User;
 import org.alumnet.infrastructure.exceptions.*;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -48,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service
@@ -60,10 +63,9 @@ public class CourseService {
     private final ParticipationRepository participationRepository;
     private final CourseContentStrategyFactory courseContentStrategyFactory;
     private final S3FileStorageService s3FileStorageService;
-
     private final CourseMapper courseMapper;
-
     private final UserMapper userMapper;
+    private final GradeSubmissionService gradeSubmissionService;
 
     public void create(CourseCreationRequestDTO courseCreationRequestDTO) {
 
@@ -204,9 +206,7 @@ public class CourseService {
     }
 
     public BulkResponseDTO bulkCreateCourses(MultipartFile file, boolean hasHeaders) {
-        if (file.isEmpty()) {
-            throw new IllegalArgumentException("El archivo CSV no debe estar vacío.");
-        }
+        validateFile(file, "El archivo CSV no debe estar vacío.");
 
         List<BulkErrorDetailDTO> errors = new ArrayList<>();
         List<CourseBulkCreationDTO> bulkCreationList;
@@ -298,14 +298,22 @@ public class CourseService {
                 .build();
     }
 
+    private void validateFile(MultipartFile file, String message) {
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException(message);
+        }
+    }
+
     public List<Student> findEnrolledStudentsInCourse(int id) {
         return participationRepository.findEnrolledStudentsByCourseId(id);
     }
 
+    public List<StudentSummaryDTO> findSummaryEnrolledStudentsInCourse(int courseId) {
+        return findEnrolledStudentsInCourse(courseId).stream().map(userMapper::studentToStudentSummaryDTO).collect(Collectors.toList());
+    }
+
     public BulkResponseDTO bulkDeleteCourses(MultipartFile file, boolean hasHeaders) {
-        if(file.isEmpty()){
-            throw new IllegalArgumentException("El archivo CSV no debe estar vacío");
-        }
+        validateFile(file, "El archivo CSV no debe estar vacío");
 
         List<BulkErrorDetailDTO> errors = new ArrayList<>();
         List<CourseBulkDeletionDTO> bulkDeletionList;
@@ -456,23 +464,14 @@ public class CourseService {
     }
 
     public BulkResponseDTO bulkEnrollment(int courseId, MultipartFile file, boolean hasHeaders) {
-        if (file.isEmpty()) {
-            throw new IllegalArgumentException("El archivo CSV no debe estar vacío.");
-        }
+        validateFile(file, "El archivo CSV no debe estar vacío.");
 
         List<BulkErrorDetailDTO> errors = new ArrayList<>();
         List<EnrollmentBulkDTO> bulkEnrollmentList;
         int successfulEnrollments = 0;
 
         try (Reader reader = new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8)) {
-            CsvToBeanBuilder<EnrollmentBulkDTO> builder = new CsvToBeanBuilder<EnrollmentBulkDTO>(reader)
-                    .withType(EnrollmentBulkDTO.class)
-                    .withSeparator(',');
-
-            if (hasHeaders) {
-                builder.withSkipLines(1);
-            }
-            bulkEnrollmentList = builder.build().parse();
+            bulkEnrollmentList = generateBulkEnrollmentList(hasHeaders, reader);
         } catch (Exception e) {
             throw new RuntimeException("Error fatal al leer o parsear el archivo CSV. Verifique el formato general del archivo.", e);
         }
@@ -539,23 +538,14 @@ public class CourseService {
     }
 
     public BulkResponseDTO bulkUnenrollment(int courseId, MultipartFile file, boolean hasHeaders) {
-        if (file.isEmpty()) {
-            throw new IllegalArgumentException("El archivo CSV no debe estar vacío.");
-        }
+        validateFile(file, "El archivo CSV no debe estar vacío.");
 
         List<BulkErrorDetailDTO> errors = new ArrayList<>();
         List<EnrollmentBulkDTO> bulkEnrollmentList;
         int successfulUnenrollments = 0;
 
         try (Reader reader = new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8)) {
-            CsvToBeanBuilder<EnrollmentBulkDTO> builder = new CsvToBeanBuilder<EnrollmentBulkDTO>(reader)
-                    .withType(EnrollmentBulkDTO.class)
-                    .withSeparator(',');
-
-            if (hasHeaders) {
-                builder.withSkipLines(1);
-            }
-            bulkEnrollmentList = builder.build().parse();
+            bulkEnrollmentList = generateBulkEnrollmentList(hasHeaders, reader);
         } catch (Exception e) {
             throw new RuntimeException("Error fatal al leer o parsear el archivo CSV. Verifique el formato general del archivo.", e);
         }
@@ -616,6 +606,17 @@ public class CourseService {
                 .build();
     }
 
+    private List<EnrollmentBulkDTO> generateBulkEnrollmentList(boolean hasHeaders, Reader reader) {
+        CsvToBeanBuilder<EnrollmentBulkDTO> builder = new CsvToBeanBuilder<EnrollmentBulkDTO>(reader)
+                .withType(EnrollmentBulkDTO.class)
+                .withSeparator(',');
+
+        if (hasHeaders) {
+            builder.withSkipLines(1);
+        }
+        return builder.build().parse();
+    }
+
     public CourseGradesResponseDTO getGrades(int courseId, String userEmail) {
         Student student = userRepository
                 .findUserWithCourseParticipations(userEmail)
@@ -655,4 +656,51 @@ public class CourseService {
 
         return grades;
     }
+
+    public List<StudentSummaryDTO> autoGradeCourse(Integer courseId) {
+        List<StudentSummaryDTO> studentSummaryDTOS = new ArrayList<>();
+        Course course = courseRepository.findById(courseId).orElseThrow(CourseNotFoundException::new);
+        int maxGradeEvents = course.getEvents().stream().mapToInt(Event::getMaxGrade).sum();
+        List<Student> enrolledStudentsInCourse = findEnrolledStudentsInCourse(courseId);
+
+        AtomicReference<Double> totalGrade = new AtomicReference<>(0.0);
+        enrolledStudentsInCourse.forEach(student -> {
+            totalGrade.set(0.0);
+            for (EventParticipation ep : student.getEventParticipations().stream().filter(ep-> ep
+                                        .getEvent()
+                                        .getCourse()
+                                        .getId() == courseId).toList()) {
+
+                if (ep.getGrade() != null) {
+                    totalGrade.updateAndGet(v -> v + ep.getGrade());
+                }
+            }
+            double calculatedGrade = totalGrade.get() / maxGradeEvents;
+            studentSummaryDTOS.add(StudentSummaryDTO.builder()
+                    .name(student.getName())
+                    .email(student.getEmail())
+                    .lastname(student.getLastname())
+                    .calculatedGrade(calculatedGrade)
+                    .approved(course.getApprovalGrade() < calculatedGrade).build());
+
+        });
+
+        return studentSummaryDTOS;
+
+    }
+
+    public void gradeSubmissionsForCourse(GradeSubmissionsRequestDTO requestDTO) {
+        Course course = courseRepository.findById(requestDTO.getCourseId())
+                .orElseThrow(CourseNotFoundException::new);
+
+        List<CourseParticipation> allCourseParticipations = courseParticipationRepository.findAllByCourseId(course.getId());
+
+        gradeSubmissionService.gradeStudents(allCourseParticipations,requestDTO.getStudents(),
+                cp -> cp.getId().getStudentEmail(), CourseParticipation::setGrade, GradeContextType.COURSE.getValue());
+
+        courseParticipationRepository.saveAll(allCourseParticipations);
+
+    }
+
 }
+

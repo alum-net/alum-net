@@ -1,7 +1,8 @@
 package org.alumnet.application.mapper;
 
-import org.alumnet.application.dtos.requests.UserCreationRequestDTO;
+import org.alumnet.application.dtos.StudentSummaryDTO;
 import org.alumnet.application.dtos.UserDTO;
+import org.alumnet.application.dtos.requests.UserCreationRequestDTO;
 import org.alumnet.domain.users.Administrator;
 import org.alumnet.domain.users.Student;
 import org.alumnet.domain.users.Teacher;
@@ -44,4 +45,7 @@ public interface UserMapper {
     UserDTO teacherToUserDTO(Teacher teacher);
     @Mapping(target = "role", constant = "STUDENT")
     UserDTO studentToUserDTO(Student student);
+
+    StudentSummaryDTO studentToStudentSummaryDTO(Student student);
+
 }

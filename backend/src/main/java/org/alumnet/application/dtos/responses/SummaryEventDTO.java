@@ -13,4 +13,6 @@ public class SummaryEventDTO {
     private Integer id;
     private String type;
     private String title;
+    private Integer maxGrade;
+
 }
