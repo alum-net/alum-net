@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UnreadCountDTO {
+public class ConversationCount {
     private String conversationId;
-    private Long count;
+    private Long unreadMessages;
 }
 

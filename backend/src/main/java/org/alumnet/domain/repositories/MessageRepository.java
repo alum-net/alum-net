@@ -1,6 +1,6 @@
 package org.alumnet.domain.repositories;
 
-import org.alumnet.application.dtos.messaging.UnreadCountDTO;
+import org.alumnet.application.dtos.messaging.ConversationCount;
 import org.alumnet.domain.messaging.Message;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,5 +32,5 @@ public interface MessageRepository extends MongoRepository<Message, String> {
             "{ $group: { _id: '$conversationId', count: { $sum: 1 } } }",
             "{ $project: { conversationId: '$_id', count: '$count', _id: 0 } }"
     })
-    List<UnreadCountDTO> countUnreadByConversationIds(List<String> conversationIds, String userEmail);
+    List<ConversationCount> countUnreadByConversationIds(List<String> conversationIds, String userEmail);
 }

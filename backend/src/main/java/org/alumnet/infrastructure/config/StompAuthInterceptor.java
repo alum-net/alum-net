@@ -79,7 +79,7 @@ public class StompAuthInterceptor implements ChannelInterceptor {
             String userEmail = auth.getName();
 
             try {
-                messageService.validateUserCanAccessConversation(conversationId, userEmail);
+                messageService.validateUserCanAccessByConversationId(conversationId, userEmail);
                 log.debug("Suscripción autorizada: usuario {} a conversación {}", userEmail, conversationId);
             } catch (ConversationNotFoundException e) {
                 log.warn("Intento de suscripción a conversación inexistente: {} por usuario: {}", 

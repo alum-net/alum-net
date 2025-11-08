@@ -1,6 +1,7 @@
 package org.alumnet.application.services;
 
 import lombok.RequiredArgsConstructor;
+import org.alumnet.application.enums.UserRole;
 import org.alumnet.domain.Course;
 import org.alumnet.domain.CourseParticipation;
 import org.alumnet.domain.repositories.CourseParticipationRepository;
@@ -34,16 +35,16 @@ public class ConversationPermissionService {
             return false;
         }
 
-        if (!isValidTeacherStudentPair(firstUser, secondUser)) {
+        if (!isValidTeacherStudentPair(firstUser.getRole(), secondUser.getRole())) {
             return false;
         }
 
         return doUsersShareActiveCourse(firstUser, secondUser);
     }
 
-    private boolean isValidTeacherStudentPair(User firstUser, User secondUser) {
-        return (firstUser instanceof Teacher && secondUser instanceof Student) ||
-                (firstUser instanceof Student && secondUser instanceof Teacher);
+    private boolean isValidTeacherStudentPair(UserRole firstUser, UserRole secondUser) {
+        return (firstUser.equals(UserRole.TEACHER) && secondUser.equals(UserRole.STUDENT)) ||
+                (firstUser.equals(UserRole.STUDENT) && secondUser.equals(UserRole.TEACHER));
     }
 
     private boolean doUsersShareActiveCourse(User firstUser, User secondUser) {
@@ -54,10 +55,10 @@ public class ConversationPermissionService {
     }
 
     private Set<Integer> getActiveCoursesForUser(User user) {
-        if (user instanceof Teacher teacher) {
-            return getActiveCoursesForTeacher(teacher);
-        } else if (user instanceof Student student) {
-            return getActiveCoursesForStudent(student);
+        if (user.getRole().equals(UserRole.TEACHER)) {
+            return getActiveCoursesForTeacher((Teacher)  user);
+        } else if (user.getRole().equals(UserRole.STUDENT)) {
+            return getActiveCoursesForStudent((Student) user);
         }
         return Set.of();
     }
@@ -76,14 +77,6 @@ public class ConversationPermissionService {
     }
 
     private Set<Integer> getActiveCoursesForStudent(Student student) {
-        List<CourseParticipation> studentParticipations =
-                participationRepository.findByStudentEmail(student.getEmail());
-
-        return studentParticipations.stream()
-                .map(CourseParticipation::getCourse)
-                .filter(Objects::nonNull)
-                .filter(Course::isEnabled)
-                .map(Course::getId)
-                .collect(Collectors.toSet());
+        return participationRepository.findActiveCourseIdsByStudentEmail(student.getEmail());
     }
 }

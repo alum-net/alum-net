@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -65,7 +66,7 @@ public class MessageService {
     }
 
     public List<ConversationSummaryDTO> getUserConversations(String userEmail) {
-        List<Conversation> userConversations = conversationRepository.findByParticipantsContaining(userEmail);
+        List<Conversation> userConversations = conversationRepository.findConversationsByUserEmail(userEmail);
 
         if (userConversations.isEmpty()) {
             return List.of();
@@ -100,11 +101,8 @@ public class MessageService {
     }
 
     private Set<String> extractOtherParticipantEmails(List<Conversation> conversations, String currentUserEmail) {
-        Set<String> otherEmails = new HashSet<>();
-        for (Conversation conversation : conversations) {
-            otherEmails.add(getOtherParticipantEmail(conversation, currentUserEmail));
-        }
-        return otherEmails;
+       return conversations.stream().flatMap(conversation -> conversation.getParticipants().stream())
+                .filter(participant -> !participant.equals(currentUserEmail)).collect(Collectors.toSet());
     }
 
 
@@ -231,18 +229,27 @@ public class MessageService {
                 .collect(Collectors.toMap(Message::getConversationId, message -> message));
     }
 
-    private Map<String, Long> countUnreadMessagesByConversation(List<Conversation> conversations, String userEmail) {
+    private Map<String, Long> countUnreadMessagesByConversation(List<Conversation> conversations, String currentUserEmail) {
         if (conversations.isEmpty()) {
             return new HashMap<>();
         }
 
         List<String> conversationIds = extractConversationIds(conversations);
-        List<UnreadCountDTO> unreadCountResults = messageRepository.countUnreadByConversationIds(conversationIds, userEmail);
+        List<ConversationCount> unreadCountResults = messageRepository.countUnreadByConversationIds(conversationIds, currentUserEmail);
 
         Map<String, Long> unreadCountByConversationId = mapUnreadCountResults(unreadCountResults);
         ensureAllConversationsHaveCount(conversationIds, unreadCountByConversationId);
 
         return unreadCountByConversationId;
+    }
+
+    private Map<String, Long> mapUnreadCountResults(List<ConversationCount> unreadCountResults) {
+        return unreadCountResults.stream()
+                .filter(count -> count.getConversationId() != null && count.getUnreadMessages() != null)
+                .collect(Collectors.toMap(
+                        ConversationCount::getConversationId,
+                        ConversationCount::getUnreadMessages
+                ));
     }
 
     private List<String> extractConversationIds(List<Conversation> conversations) {
@@ -251,17 +258,6 @@ public class MessageService {
                 .collect(Collectors.toList());
     }
 
-    private Map<String, Long> mapUnreadCountResults(List<UnreadCountDTO> unreadCountResults) {
-        Map<String, Long> unreadCountByConversationId = new HashMap<>();
-        for (UnreadCountDTO unreadCountResult : unreadCountResults) {
-            String convId = unreadCountResult.getConversationId();
-            Long count = unreadCountResult.getCount();
-            if (convId != null && count != null) {
-                unreadCountByConversationId.put(convId, count);
-            }
-        }
-        return unreadCountByConversationId;
-    }
 
     private void ensureAllConversationsHaveCount(List<String> conversationIds, Map<String, Long> unreadCountByConversationId) {
         for (String conversationId : conversationIds) {
@@ -274,7 +270,7 @@ public class MessageService {
             String currentUserEmail,
             ConversationData conversationData) {
 
-        String otherParticipantEmail = getOtherParticipantEmail(conversation, currentUserEmail);
+        String otherParticipantEmail = findOtherParticipantsEmails(conversation.getParticipants(), currentUserEmail);
         User otherParticipant = conversationData.getParticipantsByEmail().get(otherParticipantEmail);
 
         Message lastMessage = conversationData.getLastMessageByConversationId().get(conversation.getId());
@@ -314,8 +310,8 @@ public class MessageService {
                 );
     }
 
-    private String getOtherParticipantEmail(Conversation conversation, String currentUserEmail) {
-        return conversation.getParticipants().stream()
+    private String findOtherParticipantsEmails(List<String> participants, String currentUserEmail) {
+        return participants.stream()
                 .filter(email -> !email.equals(currentUserEmail))
                 .findFirst().orElseThrow(NotFoundParticipationException::new);
     }
@@ -325,11 +321,9 @@ public class MessageService {
                 .orElseThrow(() -> new ConversationNotFoundException("Conversación no encontrada"));
     }
 
-    public void validateUserCanAccessConversation(String conversationId, String userEmail) {
+    public void validateUserCanAccessByConversationId(String conversationId, String userEmail) {
         Conversation conversation = findConversationOrThrow(conversationId);
-        if (!conversation.getParticipants().contains(userEmail)) {
-            throw new UnauthorizedConversationAccessException("No tienes acceso a esta conversación");
-        }
+        validateUserCanAccessConversation(conversation, userEmail);
     }
 
     private void validateUserCanAccessConversation(Conversation conversation, String userEmail) {
