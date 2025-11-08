@@ -26,7 +26,6 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -66,7 +65,7 @@ public class MessageService {
     }
 
     public List<ConversationSummaryDTO> getUserConversations(String userEmail) {
-        List<Conversation> userConversations = conversationRepository.findConversationsByUserEmail(userEmail);
+        List<Conversation> userConversations = conversationRepository.findByParticipantEmail(userEmail);
 
         if (userConversations.isEmpty()) {
             return List.of();

@@ -11,7 +11,8 @@ import java.util.Optional;
 @Repository
 public interface ConversationRepository extends MongoRepository<Conversation, String> {
 
-    List<Conversation> findConversationsByUserEmail(String userEmail);
+    @Query("{ 'participants': { $in: [?0] } }")
+    List<Conversation> findByParticipantEmail(String userEmail);
 
     @Query("{ 'participants': ?0 }")
     Optional<Conversation> findByParticipants(List<String> participants);
