@@ -2,6 +2,7 @@ package org.alumnet.application.services;
 
 import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.*;
+import org.alumnet.application.dtos.requests.SubmissionsDTO;
 import org.alumnet.application.dtos.requests.SubmitQuestionnaireRequestDTO;
 import org.alumnet.application.dtos.responses.EventDetailDTO;
 import org.alumnet.application.enums.ActivityType;
@@ -136,6 +137,32 @@ public class EventService {
 		EventDetailDTO eventDetailDTO = eventMapper.eventToEventDTO(event);
 		eventDetailDTO.setStudentsWithPendingSubmission(
 				userRepository.findStudentsWithPendingSubmission(eventId, event.getSection().getCourseId()));
+
+        // Si es task devolvemos las entregas de los usuarios
+        if(event.getType() == EventType.TASK){
+            List<SubmissionsDTO> submissions = new ArrayList<>();
+
+            for(EventParticipation p : eventParticipationRepository.findAllById_EventId(eventId)){
+                TaskResource tr = p.getResource();
+
+                SubmissionsDTO.SubmissionsDTOBuilder submissionsBuilder = SubmissionsDTO
+                        .builder()
+                        .studentEmail(p.getStudent().getEmail())
+                        .studentName(p.getStudent().getName())
+                        .studentLastname(p.getStudent().getLastname());
+
+                if(tr != null){
+                    submissionsBuilder
+                            .fileName(p.getResource() != null ? p.getResource().getName() : null)
+                            .fileUrl(s3FileStorageService.generatePresignedUrl(p.getResource().getUrl()));
+                }
+
+                submissions.add(submissionsBuilder.build());
+            }
+
+            eventDetailDTO.setSubmissions(submissions);
+        }
+
 		return eventDetailDTO;
 	}
 

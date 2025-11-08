@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.experimental.SuperBuilder;
+import org.alumnet.application.dtos.requests.SubmissionsDTO;
 import org.alumnet.application.enums.EventType;
 
 @Data
@@ -38,6 +39,8 @@ public class EventDTO {
     private List<QuestionDTO> questions;
     @Min(value = 1, message = "La duracion debe ser al menos 1 minuto")
     private Integer durationInMinutes;
+
+    private List<SubmissionsDTO> submissions;
 
     private List<QuestionnaireResponseDTO> responses;
 
