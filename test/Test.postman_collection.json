@@ -92,6 +92,96 @@
 					"response": []
 				},
 				{
+					"name": "Get members",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"",
+									"function runInitProcess() {",
+									"  getAccessToken(function() {",
+									"    initTestUsers(function() {",
+									"      initTestCourses(function() {",
+									"        getCursoId(\"Test-curso-get-members\", \"curso5-verificar-get-members\", function(){",
+									"            enrollStudent(\"estudiante3@alumnet.com\", function () { })",
+									"        })",
+									"      });",
+									"    });",
+									"  });",
+									"}",
+									"",
+									"runInitProcess();"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"El status code es el esperado\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"const json = pm.response.json();",
+									"",
+									"pm.test(\"La respuesta contiene los miembros esperados\", function () {",
+									"    pm.expect(json).to.have.property('data').that.is.an('array').with.lengthOf(2);",
+									"    const emails = json.data.map(item => item.email);",
+									"    pm.expect(emails).to.include.members([",
+									"        \"estudiante3@alumnet.com\",",
+									"        \"profesor6@alumnet.com\"",
+									"    ]);",
+									"});",
+									"",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () {",
+									"    const requiredKeys = [\"avatarUrl\", \"email\", \"enabled\", \"lastname\", \"name\", \"role\"];",
+									"    pm.expect(json).to.have.property('data').that.is.an('array');",
+									"    json.data.forEach(item => {",
+									"        requiredKeys.forEach(key => {",
+									"            pm.expect(item).to.have.property(key);",
+									"        });",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{alumnetUrl}}/api/courses/{{id_curso}}/members",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"courses",
+								"{{id_curso}}",
+								"members"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Course delete",
 					"event": [
 						{
@@ -236,96 +326,6 @@
 					"response": []
 				},
 				{
-					"name": "Get members",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"eval(pm.collectionVariables.get(\"utils-Course\"));",
-									"",
-									"function runInitProcess() {",
-									"  getAccessToken(function() {",
-									"    initTestUsers(function() {",
-									"      initTestCourses(function() {",
-									"        getCursoId(\"Test-curso-get-members\", \"curso5-verificar-get-members\", function(){",
-									"            enrollStudent(\"estudiante3@alumnet.com\", function () { })",
-									"        })",
-									"      });",
-									"    });",
-									"  });",
-									"}",
-									"",
-									"runInitProcess();"
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"El status code es el esperado\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"const json = pm.response.json();",
-									"",
-									"pm.test(\"La respuesta contiene los miembros esperados\", function () {",
-									"    pm.expect(json).to.have.property('data').that.is.an('array').with.lengthOf(2);",
-									"    const emails = json.data.map(item => item.email);",
-									"    pm.expect(emails).to.include.members([",
-									"        \"estudiante3@alumnet.com\",",
-									"        \"profesor6@alumnet.com\"",
-									"    ]);",
-									"});",
-									"",
-									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () {",
-									"    const requiredKeys = [\"avatarUrl\", \"email\", \"enabled\", \"lastname\", \"name\", \"role\"];",
-									"    pm.expect(json).to.have.property('data').that.is.an('array');",
-									"    json.data.forEach(item => {",
-									"        requiredKeys.forEach(key => {",
-									"            pm.expect(item).to.have.property(key);",
-									"        });",
-									"    });",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{access_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{alumnetUrl}}/api/courses/{{id_curso}}/members",
-							"host": [
-								"{{alumnetUrl}}"
-							],
-							"path": [
-								"api",
-								"courses",
-								"{{id_curso}}",
-								"members"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Enrollment student",
 					"event": [
 						{
@@ -389,7 +389,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"studentEmail\": \"estudiante2@alumnet.com\"\r\n}\r\n",
+							"raw": "{\r\n  \"studentEmail\": \"student@alumnet.com\"\r\n}\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -529,28 +529,30 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"",
 									"pm.test(\"El status code es el esperado\", function () {",
 									"    pm.response.to.have.status(200);",
 									"});",
 									"",
 									"var jsonData = pm.response.json();",
+									"",
 									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () {",
 									"    // Validar claves principales",
 									"    pm.expect(jsonData).to.have.property('data');",
 									"    pm.expect(jsonData).to.have.property('message');",
+									"    ",
 									"    // Validar claves dentro de 'data'",
 									"    pm.expect(jsonData.data).to.have.property('errors');",
-									"    pm.expect(jsonData.data).to.have.property('failedCreations');",
-									"    pm.expect(jsonData.data).to.have.property('successfulCreations');",
+									"    pm.expect(jsonData.data).to.have.property('failedRecords');",
+									"    pm.expect(jsonData.data).to.have.property('successfulRecords');",
 									"    pm.expect(jsonData.data).to.have.property('totalRecords');",
 									"});",
 									"",
 									"pm.test(\"El número de errores coincide con el esperado\", function () {",
-									"    pm.expect(jsonData.data[\"failedCreations\"]).to.equal(2);",
-									"    pm.expect(jsonData.data[\"successfulCreations\"]).to.equal(6);",
+									"    pm.expect(jsonData.data[\"failedRecords\"]).to.equal(2);",
+									"    pm.expect(jsonData.data[\"successfulRecords\"]).to.equal(6);",
 									"    pm.expect(jsonData.data[\"totalRecords\"]).to.equal(8);",
-									"})"
+									"});",
+									""
 								],
 								"type": "text/javascript",
 								"packages": {},
@@ -1042,7 +1044,7 @@
 									"var jsonData = pm.response.json();",
 									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () {",
 									"    pm.expect(jsonData).to.have.all.keys('data', 'message');",
-									"    pm.expect(jsonData.data).to.have.all.keys('errors', 'failedCreations', 'successfulCreations', 'totalRecords');",
+									"    pm.expect(jsonData.data).to.have.all.keys('errors', 'failedRecords', 'successfulRecords', 'totalRecords');",
 									"});",
 									"",
 									"pm.test(\"El mensaje de respuesta es el esperado\", function () {",
@@ -1128,19 +1130,19 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"// eval(pm.collectionVariables.get(\"utils-Course\"));",
 									"",
-									"function runInitProcess() {",
-									"  getAccessToken(function() {",
-									"    initTestUsers(function() {",
-									"      initTestCourses(function() {",
-									"        getCursoId(\"Test-curso-create-section\", \"curso6-verificar-create-section\", function(){})",
-									"      });",
-									"    });",
-									"  });",
-									"}",
+									"// function runInitProcess() {",
+									"//   getAccessToken(function() {",
+									"//     initTestUsers(function() {",
+									"//       initTestCourses(function() {",
+									"//         getCursoId(\"Test-curso-create-section\", \"curso6-verificar-create-section\", function(){})",
+									"//       });",
+									"//     });",
+									"//   });",
+									"// }",
 									"",
-									"runInitProcess();",
+									"// runInitProcess();",
 									""
 								],
 								"type": "text/javascript",
@@ -2116,35 +2118,6 @@
 					"response": []
 				},
 				{
-					"name": "DeleteEvent",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{alumnetUrl}}/api/events/1",
-							"host": [
-								"{{alumnetUrl}}"
-							],
-							"path": [
-								"api",
-								"events",
-								"1"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Submit Task",
 					"request": {
 						"auth": {
@@ -2185,6 +2158,35 @@
 									"key": "studentEmail",
 									"value": "students@alumnet.com"
 								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteEvent",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{alumnetUrl}}/api/events/1",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"events",
+								"1"
 							]
 						}
 					},
@@ -2297,7 +2299,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{alumnetUrl}}/api/library/labels?textToSearch=etiquetaCreadaTest",
+							"raw": "{{alumnetUrl}}/api/library/labels?textToSearch=EtiquetaTestGet",
 							"host": [
 								"{{alumnetUrl}}"
 							],
@@ -2309,7 +2311,7 @@
 							"query": [
 								{
 									"key": "textToSearch",
-									"value": "etiquetaCreadaTest"
+									"value": "EtiquetaTestGet"
 								}
 							]
 						}
@@ -2423,74 +2425,6 @@
 					"response": []
 				},
 				{
-					"name": "DeleteLabel",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"eval(pm.collectionVariables.get(\"utils-Course\"));",
-									"",
-									"function runInitProcess() {",
-									"      getAccessToken(function() {",
-									"        createLable(\"EtiquetaTestBorrar\", function(){",
-									"            getLabelId(\"EtiquetaTestBorrar\", function(){})",
-									"        })",
-									"      })",
-									"};",
-									"",
-									"runInitProcess();",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"// Mantener test de status code",
-									"pm.test(\"El status code es el esperado\", function () {",
-									"    pm.response.to.have.status(204);",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{access_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{alumnetUrl}}/api/library/labels/{{id_label}}",
-							"host": [
-								"{{alumnetUrl}}"
-							],
-							"path": [
-								"api",
-								"library",
-								"labels",
-								"{{id_label}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "UpdateLabel",
 					"event": [
 						{
@@ -2576,6 +2510,74 @@
 					"response": []
 				},
 				{
+					"name": "DeleteLabel",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"",
+									"function runInitProcess() {",
+									"      getAccessToken(function() {",
+									"        createLable(\"EtiquetaTestBorrar\", function(){",
+									"            getLabelId(\"EtiquetaTestBorrar\", function(){})",
+									"        })",
+									"      })",
+									"};",
+									"",
+									"runInitProcess();",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Mantener test de status code",
+									"pm.test(\"El status code es el esperado\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{alumnetUrl}}/api/library/labels/{{id_label}}",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"library",
+								"labels",
+								"{{id_label}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "CreateResource",
 					"event": [
 						{
@@ -2644,12 +2646,12 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": "/Users/fede/Downloads/Pantalla Verde.pdf"
+									"src": "postman-cloud:///1f0bac1b-b875-4b70-9e05-0bd1ce44cf40"
 								},
 								{
 									"key": "metadata",
 									"type": "file",
-									"src": "/Users/fede/Documents/proyectos/tests/proyecto tecnoinf/alum-net/test/createResources.json"
+									"src": "postman-cloud:///1f0bac1b-c622-4b10-9541-b43bb485aec8"
 								}
 							]
 						},
@@ -3783,10 +3785,6 @@
 		},
 		{
 			"key": "id_label",
-			"value": ""
-		},
-		{
-			"key": "id_recurso",
 			"value": ""
 		}
 	]
