@@ -7,6 +7,7 @@ import {
   RadioButton,
   Portal,
   Dialog,
+  HelperText,
 } from 'react-native-paper';
 import { useMutation } from '@tanstack/react-query';
 import {
@@ -28,7 +29,7 @@ type QuestionnaireDetailsProps = {
 };
 
 const manual =
-  'Una vez comience el cuestionario, tendras los minutos disponibles para completarlo, si no lo completas en el tiempo indicado no podras completar el questionario.';
+  'Una vez comience el cuestionario, tendras los minutos disponibles para completarlo, si no lo completas en el tiempo indicado el questionario sera completado automaticamente.';
 
 export const QuestionnaireDetails: React.FC<QuestionnaireDetailsProps> = ({
   data,
@@ -62,16 +63,6 @@ export const QuestionnaireDetails: React.FC<QuestionnaireDetailsProps> = ({
   const timerRef = useRef<number | null>(null);
 
   const totalQuestions = questions?.length;
-
-  const title = data?.title || 'Cuestionario sin título';
-  const description = data?.description || 'Sin descripción';
-  const startDate = data?.startDate
-    ? new Date(data.startDate).toLocaleString()
-    : 'Sin fecha';
-  const endDate = data?.endDate
-    ? new Date(data.endDate).toLocaleString()
-    : 'Sin fecha';
-
   const currentQuestion = questions?.[currentIndex];
 
   const selectAnswer = (questionId: number, answerId: number) => {
@@ -208,41 +199,13 @@ export const QuestionnaireDetails: React.FC<QuestionnaireDetailsProps> = ({
   }, [started, submitted]);
 
   return (
-    <Card style={styles.card} mode="contained">
-      <Card.Title
-        title={`Título del cuestionario: ${title}`}
-        titleVariant="headlineSmall"
-      />
+    <Card mode="contained">
       <Card.Content>
-        <Text variant="bodyLarge" style={styles.field}>
-          <Text style={{ fontWeight: '700' }}>Descripción: </Text>
-          {description}
-        </Text>
-
-        <Text variant="bodyLarge" style={styles.field}>
-          <Text style={{ fontWeight: '700' }}>
-            Fecha desde cuándo se reciben respuestas:{' '}
-          </Text>
-          {startDate}
-        </Text>
-
-        <Text variant="bodyLarge" style={styles.field}>
-          <Text style={{ fontWeight: '700' }}>
-            Fecha hasta cuando se reciben respuestas:{' '}
-          </Text>
-          {endDate}
-        </Text>
-
         <Text variant="bodyLarge" style={styles.field}>
           <Text style={{ fontWeight: '700' }}>Tiempo disponible: </Text>
           {data?.durationInMinutes
             ? `${data.durationInMinutes} minutos`
             : 'No especificado'}
-        </Text>
-
-        <Text variant="bodyLarge" style={styles.field}>
-          <Text style={{ fontWeight: '700' }}>Puntos posibles: </Text>
-          {data?.maxGrade}
         </Text>
 
         <Text variant="bodyLarge" style={styles.field}>
@@ -280,20 +243,26 @@ export const QuestionnaireDetails: React.FC<QuestionnaireDetailsProps> = ({
         ) : (
           <View style={styles.quizBox}>
             {!started &&
-              (!data?.studentsWithPendingSubmission.includes(
-                userInfo!.email,
-              ) ? (
-                <Button
-                  mode="contained"
-                  onPress={handleStart}
-                  style={styles.startButton}
-                >
-                  Comenzar cuestionario
-                </Button>
+              (new Date(data!.startDate) < new Date() ? (
+                data?.studentsWithPendingSubmission.includes(
+                  userInfo!.email,
+                ) ? (
+                  <Button
+                    mode="contained"
+                    onPress={handleStart}
+                    style={styles.startButton}
+                  >
+                    Comenzar cuestionario
+                  </Button>
+                ) : (
+                  <Text style={{ color: 'green' }}>
+                    Estamos corrigiendo tu cuestionario!
+                  </Text>
+                )
               ) : (
-                <Text style={{ color: 'green' }}>
-                  Estamos corrigiendo tu cuestionario!
-                </Text>
+                <HelperText type="info">
+                  Todavia no puedes comenzar el cuestionario
+                </HelperText>
               ))}
 
             {started && (
@@ -392,9 +361,6 @@ export const QuestionnaireDetails: React.FC<QuestionnaireDetailsProps> = ({
 };
 
 const styles = StyleSheet.create({
-  card: {
-    margin: 16,
-  },
   field: {
     marginBottom: 12,
   },

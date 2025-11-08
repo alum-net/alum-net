@@ -10,6 +10,17 @@ import { useUserInfo } from '@alum-net/users';
 import { TaskDetails } from '../components/task-details';
 import { QuestionnaireDetails } from '../components/questionnaire-details';
 
+const mapEventTypeToTitle = (type: EventType) => {
+  switch (type.toUpperCase()) {
+    case EventType.TASK:
+      return 'Tarea';
+    case EventType.QUESTIONNAIRE:
+      return 'Questionario';
+    case EventType.ONSITE:
+      return 'Evento presencial';
+  }
+};
+
 export const EventDetails = () => {
   const { id, type } = useLocalSearchParams<{ id: string; type: EventType }>();
   const { data: userInfo } = useUserInfo();
@@ -24,7 +35,7 @@ export const EventDetails = () => {
     <ScrollView>
       <Card style={styles.card}>
         <Card.Title
-          title={`Tarea: ${data?.title}`}
+          title={`${mapEventTypeToTitle(type)}: ${data?.title}`}
           titleVariant="headlineMedium"
           style={styles.cardTitle}
         />
