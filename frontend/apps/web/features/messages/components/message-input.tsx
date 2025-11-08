@@ -1,7 +1,12 @@
 import React, { useRef, useEffect, useCallback } from 'react';
 import { View, StyleSheet, TextInput } from 'react-native';
 import { IconButton, Text } from 'react-native-paper';
-import { MESSAGING_CONSTANTS } from '@alum-net/messaging';
+import {
+  MAX_MESSAGE_LENGTH,
+  MIN_MESSAGE_LENGTH,
+  TYPING_DEBOUNCE_MS,
+  WS_ENDPOINTS,
+} from '@alum-net/messaging';
 
 type Props = {
   messageText: string;
@@ -31,57 +36,67 @@ export default function MessageInput({
   const lastTypingSentRef = useRef<boolean>(false);
 
   const canSend =
-    messageText.trim().length >= MESSAGING_CONSTANTS.MIN_MESSAGE_LENGTH &&
+    messageText.trim().length >= MIN_MESSAGE_LENGTH &&
     !isSending &&
     !isDisabled &&
-    messageText.length <= MESSAGING_CONSTANTS.MAX_MESSAGE_LENGTH;
+    messageText.length <= MAX_MESSAGE_LENGTH;
 
-  const sendTypingEvent = useCallback((isTyping: boolean) => {
-    if (!conversationId || !isConnected) {
-      return;
-    }
-    
-    try {
-      const typingDestination = MESSAGING_CONSTANTS.WS.SEND_TYPING(conversationId);
-      send(typingDestination, { isTyping });
-      lastTypingSentRef.current = isTyping;
-    } catch (error) {
-      
-    }
-  }, [conversationId, isConnected, send]);
+  const sendTypingEvent = useCallback(
+    (isTyping: boolean) => {
+      if (!conversationId || !isConnected) {
+        return;
+      }
 
-  const handleTextChange = useCallback((text: string) => {
-    onMessageChange(text);
-    
-    if (onMarkAsRead && text.trim().length > 0) {
-      onMarkAsRead();
-    }
-    
-    if (!conversationId || !isConnected) {
-      return;
-    }
+      try {
+        const typingDestination = WS_ENDPOINTS.SEND_TYPING(conversationId);
+        send(typingDestination, { isTyping });
+        lastTypingSentRef.current = isTyping;
+      } catch (error) {}
+    },
+    [conversationId, isConnected, send],
+  );
 
-    const hasText = text.trim().length > 0;
-    const wasTyping = lastTypingSentRef.current;
+  const handleTextChange = useCallback(
+    (text: string) => {
+      onMessageChange(text);
 
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current);
-    }
+      if (onMarkAsRead && text.trim().length > 0) {
+        onMarkAsRead();
+      }
 
-    if (hasText && !wasTyping) {
-      sendTypingEvent(true);
-    }
+      if (!conversationId || !isConnected) {
+        return;
+      }
 
-    if (hasText) {
-      typingTimeoutRef.current = setTimeout(() => {
-        if (lastTypingSentRef.current) {
-          sendTypingEvent(false);
-        }
-      }, MESSAGING_CONSTANTS.TYPING_DEBOUNCE_MS);
-    } else if (wasTyping) {
-      sendTypingEvent(false);
-    }
-  }, [conversationId, isConnected, onMessageChange, sendTypingEvent, onMarkAsRead]);
+      const hasText = text.trim().length > 0;
+      const wasTyping = lastTypingSentRef.current;
+
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+
+      if (hasText && !wasTyping) {
+        sendTypingEvent(true);
+      }
+
+      if (hasText) {
+        typingTimeoutRef.current = setTimeout(() => {
+          if (lastTypingSentRef.current) {
+            sendTypingEvent(false);
+          }
+        }, TYPING_DEBOUNCE_MS);
+      } else if (wasTyping) {
+        sendTypingEvent(false);
+      }
+    },
+    [
+      conversationId,
+      isConnected,
+      onMessageChange,
+      sendTypingEvent,
+      onMarkAsRead,
+    ],
+  );
 
   useEffect(() => {
     return () => {
@@ -102,7 +117,7 @@ export default function MessageInput({
 
     const timeoutId = setTimeout(() => {
       textarea = document.querySelector(
-        'textarea[placeholder="Escribe un mensaje..."]'
+        'textarea[placeholder="Escribe un mensaje..."]',
       ) as HTMLTextAreaElement | null;
 
       if (!textarea) return;
@@ -136,7 +151,7 @@ export default function MessageInput({
           placeholder="Escribe un mensaje..."
           placeholderTextColor="#999"
           multiline
-          maxLength={MESSAGING_CONSTANTS.MAX_MESSAGE_LENGTH}
+          maxLength={MAX_MESSAGE_LENGTH}
           editable={!isSending && !isDisabled}
           returnKeyType="send"
           onSubmitEditing={canSend ? onSend : undefined}

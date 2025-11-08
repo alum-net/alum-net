@@ -2062,6 +2062,11 @@
   resolved "https://registry.yarnpkg.com/@standard-schema/utils/-/utils-0.3.0.tgz#3d5e608f16c2390c10528e98e59aef6bf73cae7b"
   integrity sha512-e7Mew686owMaPJVNNLs55PUvgz371nKgwsc4vxE49zsODpJEnxgxRo2y/OKrqueavXgZNMDVj3DdHFlaSAeU8g==
 
+"@stomp/stompjs@^7.0.0":
+  version "7.2.1"
+  resolved "https://registry.yarnpkg.com/@stomp/stompjs/-/stompjs-7.2.1.tgz#ca29522e1da78539e468bf99dc54b4bdb7fea858"
+  integrity sha512-DLd/WeicnHS5SsWWSk3x6/pcivqchNaEvg9UEGVqAcfYEBVmS9D6980ckXjTtfpXLjdLDsd96M7IuX4w7nzq5g==
+
 "@tanstack/eslint-plugin-query@^5.91.2":
   version "5.91.2"
   resolved "https://registry.yarnpkg.com/@tanstack/eslint-plugin-query/-/eslint-plugin-query-5.91.2.tgz#dc47394f9d08d78ce811c405b9620a259e4368cb"

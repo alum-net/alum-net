@@ -1,19 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { getConversations } from '../service';
 import { QUERY_KEYS } from '@alum-net/api';
-import { useUserInfo } from '@alum-net/users';
-import { UserRole } from '@alum-net/users/src/types';
+import { UserRole } from '@alum-net/users';
 
-export const useConversations = () => {
-  const { data: userInfo, isLoading: isLoadingUserInfo } = useUserInfo();
-  const isTeacher = userInfo?.role === UserRole.teacher;
-  
+export const useConversations = (userRole: UserRole | undefined) => {
   return useQuery({
     queryKey: [QUERY_KEYS.getConversations],
     queryFn: getConversations,
-    enabled: !isLoadingUserInfo && isTeacher && !!userInfo,
+    enabled: userRole && userRole !== UserRole.admin,
     staleTime: 10_000,
     refetchOnWindowFocus: true,
   });
-
 };

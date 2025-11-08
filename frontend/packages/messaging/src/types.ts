@@ -1,4 +1,4 @@
-export interface MessageDTO {
+export interface Message {
   id: string;
   conversationId: string;
   author: string;
@@ -14,13 +14,13 @@ export interface ConversationSummary {
   otherParticipantName: string;
   otherParticipantAvatarUrl?: string;
   otherParticipantRole: 'TEACHER' | 'STUDENT' | 'ADMIN';
-  lastMessage?: MessageDTO;
+  lastMessage?: Message;
   unreadCount: number;
   lastMessageAt?: string;
 }
 
 export interface MessagePage {
-  items: MessageDTO[];
+  items: Message[];
   hasMore: boolean;
   totalUnread: number;
 }
@@ -34,4 +34,3 @@ export interface ReadReceipt {
   conversationId: string;
   readByUser: string;
 }
-

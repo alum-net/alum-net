@@ -1,10 +1,21 @@
 import React, { useRef, useEffect, useCallback, useState } from 'react';
-import { View, StyleSheet, ScrollView, NativeSyntheticEvent, NativeScrollEvent } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
+} from 'react-native';
 import { Text, ActivityIndicator } from 'react-native-paper';
-import { MessageDTO, TypingEvent, MESSAGING_CONSTANTS } from '@alum-net/messaging';
+import {
+  Message,
+  TypingEvent,
+  useMessaging,
+  WS_ENDPOINTS,
+} from '@alum-net/messaging';
 
 type Props = {
-  messages: MessageDTO[] | undefined;
+  messages: Message[] | undefined;
   isLoading: boolean;
   error: Error | null;
   currentUserEmail: string;
@@ -12,7 +23,6 @@ type Props = {
   conversationId: string | null;
   isConnected: boolean;
   onMarkAsRead: () => void;
-  subscribe: (destination: string, handler: (message: any) => void) => () => void;
 };
 
 export default function ChatView({
@@ -24,18 +34,21 @@ export default function ChatView({
   conversationId,
   isConnected,
   onMarkAsRead,
-  subscribe,
 }: Props) {
-
+  const { subscribe } = useMessaging();
   const scrollViewRef = useRef<ScrollView>(null);
-  const markAsReadTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const typingIndicatorTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const markAsReadTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
+  const typingIndicatorTimeoutRef = useRef<ReturnType<
+    typeof setTimeout
+  > | null>(null);
   const isAutoScrollingRef = useRef<boolean>(false);
   const [typingUser, setTypingUser] = useState<string | null>(null);
 
   const markAsRead = useCallback(() => {
     if (!conversationId || !isConnected) return;
-    
+
     if (markAsReadTimeoutRef.current) {
       clearTimeout(markAsReadTimeoutRef.current);
     }
@@ -45,7 +58,13 @@ export default function ChatView({
   }, [onMarkAsRead, conversationId, isConnected]);
 
   useEffect(() => {
-    if (messages && messages.length > 0 && !isLoading && conversationId && isConnected) {
+    if (
+      messages &&
+      messages.length > 0 &&
+      !isLoading &&
+      conversationId &&
+      isConnected
+    ) {
       isAutoScrollingRef.current = true;
       setTimeout(() => {
         scrollViewRef.current?.scrollToEnd({ animated: true });
@@ -56,12 +75,15 @@ export default function ChatView({
     }
   }, [messages?.length, isLoading, conversationId, isConnected]);
 
-  const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    if (isAutoScrollingRef.current) {
-      return;
-    }
-    markAsRead();
-  }, [markAsRead]);
+  const handleScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      if (isAutoScrollingRef.current) {
+        return;
+      }
+      markAsRead();
+    },
+    [markAsRead],
+  );
 
   useEffect(() => {
     if (!isConnected || !conversationId) {
@@ -69,7 +91,7 @@ export default function ChatView({
       return;
     }
 
-    const typingDestination = MESSAGING_CONSTANTS.WS.SUBSCRIBE_TYPING(conversationId);
+    const typingDestination = WS_ENDPOINTS.SUBSCRIBE_TYPING(conversationId);
 
     const unsubscribe = subscribe(
       typingDestination,
@@ -92,7 +114,7 @@ export default function ChatView({
             clearTimeout(typingIndicatorTimeoutRef.current);
           }
         }
-      }
+      },
     );
 
     return () => {
@@ -101,7 +123,7 @@ export default function ChatView({
         clearTimeout(typingIndicatorTimeoutRef.current);
       }
     };
-  }, [isConnected, conversationId, subscribe, currentUserEmail]);
+  }, [isConnected, conversationId, currentUserEmail, subscribe]);
 
   useEffect(() => {
     if (typingUser) {
@@ -143,7 +165,9 @@ export default function ChatView({
 
         {error && (
           <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>Error al cargar mensajes: {String(error)}</Text>
+            <Text style={styles.errorText}>
+              Error al cargar mensajes: {String(error)}
+            </Text>
           </View>
         )}
 
@@ -157,7 +181,7 @@ export default function ChatView({
 
         {!isLoading &&
           messages &&
-          messages.map((message: MessageDTO) => {
+          messages.map((message: Message) => {
             const isOwnMessage = message.author === currentUserEmail;
 
             return (
@@ -165,26 +189,38 @@ export default function ChatView({
                 key={message.id}
                 style={[
                   styles.messageWrapper,
-                  isOwnMessage ? styles.ownMessageWrapper : styles.otherMessageWrapper,
+                  isOwnMessage
+                    ? styles.ownMessageWrapper
+                    : styles.otherMessageWrapper,
                 ]}
               >
                 <View
                   style={[
                     styles.messageBubble,
-                    isOwnMessage ? styles.ownMessageBubble : styles.otherMessageBubble,
+                    isOwnMessage
+                      ? styles.ownMessageBubble
+                      : styles.otherMessageBubble,
                   ]}
                 >
                   {!isOwnMessage && (
-                    <Text style={styles.messageAuthor}>{message.authorName}</Text>
+                    <Text style={styles.messageAuthor}>
+                      {message.authorName}
+                    </Text>
                   )}
                   <Text
-                    style={[styles.messageText, isOwnMessage && styles.ownMessageText]}
+                    style={[
+                      styles.messageText,
+                      isOwnMessage && styles.ownMessageText,
+                    ]}
                   >
                     {message.content}
                   </Text>
                   <View style={styles.messageFooter}>
                     <Text
-                      style={[styles.messageTime, isOwnMessage && styles.ownMessageTime]}
+                      style={[
+                        styles.messageTime,
+                        isOwnMessage && styles.ownMessageTime,
+                      ]}
                     >
                       {new Date(message.timestamp).toLocaleTimeString('es-ES', {
                         hour: '2-digit',
@@ -201,7 +237,7 @@ export default function ChatView({
               </View>
             );
           })}
-        
+
         {typingUser && (
           <View style={styles.typingIndicator}>
             <Text style={styles.typingText}>Escribiendo...</Text>

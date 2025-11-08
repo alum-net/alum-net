@@ -11,9 +11,7 @@ export default function WebHeader() {
   const pathname = usePathname();
 
   const { data: userInfo } = useUserInfo();
-  const isAdmin = userInfo?.role === UserRole.admin;
-  const isTeacher = userInfo?.role === UserRole.teacher;
-  const { data: conversations } = useConversations();
+  const { data: conversations } = useConversations(userInfo?.role);
 
   const totalUnreadCount = useMemo(() => {
     if (!conversations) return 0;
@@ -24,13 +22,29 @@ export default function WebHeader() {
 
   const navItems: {
     label: string;
-    route: '/home' | '/profile' | '/users' | '/courses' | '/library' | '/messages';
+    route:
+      | '/home'
+      | '/profile'
+      | '/users'
+      | '/courses'
+      | '/library'
+      | '/messages';
     badge?: number;
   }[] = [
     { label: 'Inicio', route: '/home' },
     { label: 'Cursos', route: '/courses' },
-    ...(isAdmin ? [{ label: 'Usuarios', route: '/users' as const }] : []),
-    ...(isTeacher ? [{ label: 'Mensajes', route: '/messages' as const, badge: totalUnreadCount > 0 ? totalUnreadCount : undefined }] : []),
+    ...(userInfo?.role === UserRole.admin
+      ? [{ label: 'Usuarios', route: '/users' as const }]
+      : []),
+    ...(userInfo && userInfo.role !== UserRole.admin
+      ? [
+          {
+            label: 'Mensajes',
+            route: '/messages' as const,
+            badge: totalUnreadCount > 0 ? totalUnreadCount : undefined,
+          },
+        ]
+      : []),
     { label: 'Libreria', route: '/library' },
     { label: 'Perfil', route: '/profile' },
   ];
@@ -43,7 +57,7 @@ export default function WebHeader() {
         {navItems.map(item => {
           const isActive = pathname === item.route;
           const hasBadge = item.badge !== undefined && item.badge > 0;
-          
+
           return (
             <Pressable key={item.route} onPress={() => router.push(item.route)}>
               <View style={styles.navItemContainer}>

@@ -1,7 +1,12 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { Text, ActivityIndicator } from 'react-native-paper';
-import { ConversationSummary } from '@alum-net/messaging';
+import {
+  ConversationSummary,
+  useConversations,
+  useMessaging,
+} from '@alum-net/messaging';
+import { useUserInfo } from '@alum-net/users';
 
 const formatMessageTimestamp = (timestamp?: string): string => {
   if (!timestamp) return '';
@@ -17,28 +22,25 @@ const formatMessageTimestamp = (timestamp?: string): string => {
     if (diffMins < 60) return `${diffMins}m`;
     if (diffHours < 24) return `${diffHours}h`;
     if (diffDays < 7) return `${diffDays}d`;
-    
-    return messageDate.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
+
+    return messageDate.toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+    });
   } catch {
     return '';
   }
 };
 
-type Props = {
-  conversations: ConversationSummary[] | undefined;
-  isLoading: boolean;
-  error: Error | null;
-  selectedConversation: string | null;
-  onSelectConversation: (conversationId: string) => void;
-};
+export default function ConversationsList() {
+  const { selectedConversation, setSelectedConversation } = useMessaging();
+  const { data: userInfo } = useUserInfo();
+  const {
+    data: conversations,
+    isLoading: isLoading,
+    error,
+  } = useConversations(userInfo?.role);
 
-export default function ConversationsList({
-  conversations,
-  isLoading,
-  error,
-  selectedConversation,
-  onSelectConversation,
-}: Props) {
   return (
     <ScrollView style={styles.conversationsList}>
       {isLoading && (
@@ -73,7 +75,7 @@ export default function ConversationsList({
           return (
             <Pressable
               key={conversation.id}
-              onPress={() => onSelectConversation(conversation.id)}
+              onPress={() => setSelectedConversation(conversation.id)}
               style={[
                 styles.conversationItem,
                 hasUnread && styles.unreadConversation,
@@ -84,7 +86,10 @@ export default function ConversationsList({
               <View style={styles.conversationContent}>
                 <View style={styles.conversationHeader}>
                   <Text
-                    style={[styles.conversationName, hasUnread && styles.unreadName]}
+                    style={[
+                      styles.conversationName,
+                      hasUnread && styles.unreadName,
+                    ]}
                     numberOfLines={1}
                   >
                     {conversation.otherParticipantName}
@@ -103,7 +108,10 @@ export default function ConversationsList({
                   </View>
                 </View>
                 <Text
-                  style={[styles.lastMessage, hasUnread && styles.unreadMessage]}
+                  style={[
+                    styles.lastMessage,
+                    hasUnread && styles.unreadMessage,
+                  ]}
                   numberOfLines={1}
                 >
                   {lastMessageText}
@@ -215,4 +223,3 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
-

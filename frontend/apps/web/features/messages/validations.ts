@@ -1,14 +1,13 @@
 import { z } from 'zod';
-import { MESSAGING_CONSTANTS } from '@alum-net/messaging';
+import { MAX_MESSAGE_LENGTH, MIN_MESSAGE_LENGTH } from '@alum-net/messaging';
 
 export const messageContentSchema = z
   .string()
   .trim()
-  .min(MESSAGING_CONSTANTS.MIN_MESSAGE_LENGTH, 'El mensaje no puede estar vacío')
+  .min(MIN_MESSAGE_LENGTH, 'El mensaje no puede estar vacío')
   .max(
-    MESSAGING_CONSTANTS.MAX_MESSAGE_LENGTH,
-    `El mensaje no puede superar los ${MESSAGING_CONSTANTS.MAX_MESSAGE_LENGTH} caracteres`
+    MAX_MESSAGE_LENGTH,
+    `El mensaje no puede superar los ${MAX_MESSAGE_LENGTH} caracteres`,
   );
 
 export type MessageContent = z.infer<typeof messageContentSchema>;
-

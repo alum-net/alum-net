@@ -1,7 +1,6 @@
-import api, { baseURL } from './alumnet';
+import api from './alumnet';
 
 export default api;
 
 export * from './types';
 export * from './constants';
-export { baseURL };

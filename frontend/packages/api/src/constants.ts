@@ -11,5 +11,5 @@ export const QUERY_KEYS = {
   getUserActivity: 'get-user-activity',
   getConversations: 'get-conversations',
   getMessages: 'get-messages',
-  searchAvailableUsers: 'search-available-users',
+  getAvailableConversations: 'get-available-conversations',
 };

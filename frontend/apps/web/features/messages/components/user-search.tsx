@@ -1,34 +1,41 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, Pressable, TextInput } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  Pressable,
+  TextInput,
+} from 'react-native';
 import { Text, ActivityIndicator, IconButton } from 'react-native-paper';
-import { ConversationSummary } from '@alum-net/messaging';
+import {
+  ConversationSummary,
+  getOrCreateConversation,
+  searchAvailableUsers,
+  useConversations,
+  useMessaging,
+} from '@alum-net/messaging';
 import { UserInfo } from '@alum-net/users/src/types';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { QUERY_KEYS } from '@alum-net/api';
+import { useUserInfo } from '@alum-net/users';
+import { Toast } from '@alum-net/ui';
 
-type Props = {
-  searchQuery: string;
-  onSearchChange: (query: string) => void;
-  searchResults: UserInfo[] | undefined;
-  isSearching: boolean;
-  conversations: ConversationSummary[] | undefined;
-  currentUserEmail: string;
-  onSelectUser: (userEmail: string) => void;
-  onSelectExistingConversation: (conversationId: string) => void;
-};
-
-export default function UserSearch({
-  searchQuery,
-  onSearchChange,
-  searchResults,
-  isSearching,
-  conversations,
-  currentUserEmail,
-  onSelectUser,
-  onSelectExistingConversation,
-}: Props) {
+export default function UserSearch() {
   const [showSearchResults, setShowSearchResults] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const queryClient = useQueryClient();
+  const { setSelectedConversation } = useMessaging();
+  const { data: searchResults, isLoading: isSearching } = useQuery({
+    queryKey: [QUERY_KEYS.getAvailableConversations, searchQuery],
+    queryFn: () => searchAvailableUsers(searchQuery.trim()),
+    enabled: searchQuery.trim().length >= 2,
+    staleTime: 30_000,
+  });
+  const { data: userInfo } = useUserInfo();
+  const { data: conversations } = useConversations(userInfo?.role);
 
   const handleSearchChange = (text: string) => {
-    onSearchChange(text);
+    setSearchQuery(text);
     setShowSearchResults(text.trim().length >= 2);
   };
 
@@ -42,15 +49,36 @@ export default function UserSearch({
     setTimeout(() => setShowSearchResults(false), 200);
   };
 
+  const handleSelectUser = async (userEmail: string) => {
+    try {
+      const conversationId = await getOrCreateConversation(userEmail);
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.getConversations],
+      });
+      setSelectedConversation(conversationId);
+      setSearchQuery('');
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Error desconocido';
+      Toast.error(`Error al crear conversación: ${errorMessage}`);
+    }
+  };
+
+  const handleSelectExistingConversation = (conversationId: string) => {
+    setSelectedConversation(conversationId);
+    setSearchQuery('');
+  };
+
   const handleUserPress = (user: UserInfo) => {
     const existingConversation = conversations?.find(
-      (conversation: ConversationSummary) => conversation.otherParticipantEmail === user.email
+      (conversation: ConversationSummary) =>
+        conversation.otherParticipantEmail === user.email,
     );
 
     if (existingConversation) {
-      onSelectExistingConversation(existingConversation.id);
+      handleSelectExistingConversation(existingConversation.id);
     } else {
-      onSelectUser(user.email);
+      handleSelectUser(user.email);
     }
   };
 
@@ -71,7 +99,9 @@ export default function UserSearch({
       {showSearchResults && searchQuery.trim().length >= 2 && (
         <View style={styles.searchResultsContainer}>
           <View style={styles.searchResultsHeader}>
-            <Text style={styles.searchResultsTitle}>Resultados de búsqueda</Text>
+            <Text style={styles.searchResultsTitle}>
+              Resultados de búsqueda
+            </Text>
           </View>
           {isSearching && (
             <View style={styles.loadingContainer}>
@@ -86,10 +116,11 @@ export default function UserSearch({
               keyboardShouldPersistTaps="handled"
             >
               {searchResults
-                .filter((user: UserInfo) => user.email !== currentUserEmail)
+                .filter(user => user.email !== userInfo?.email)
                 .map((user: UserInfo) => {
                   const existingConversation = conversations?.find(
-                    (conversation: ConversationSummary) => conversation.otherParticipantEmail === user.email
+                    (conversation: ConversationSummary) =>
+                      conversation.otherParticipantEmail === user.email,
                   );
 
                   return (
@@ -107,16 +138,25 @@ export default function UserSearch({
                           <Text style={styles.searchResultName}>
                             {user.name} {user.lastname}
                           </Text>
-                          <Text style={styles.searchResultEmail}>{user.email}</Text>
+                          <Text style={styles.searchResultEmail}>
+                            {user.email}
+                          </Text>
                         </View>
                         {existingConversation ? (
                           <View style={styles.existingBadge}>
-                            <Text style={styles.existingBadgeText}>Existente</Text>
+                            <Text style={styles.existingBadgeText}>
+                              Existente
+                            </Text>
                           </View>
                         ) : (
                           <Pressable
                             onPress={() => handleUserPress(user)}
-                            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                            hitSlop={{
+                              top: 10,
+                              bottom: 10,
+                              left: 10,
+                              right: 10,
+                            }}
                           >
                             <View style={styles.addIconContainer}>
                               <IconButton
@@ -137,7 +177,9 @@ export default function UserSearch({
 
           {!isSearching && searchResults && searchResults.length === 0 && (
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>No se encontraron usuarios disponibles</Text>
+              <Text style={styles.emptyText}>
+                No se encontraron usuarios disponibles
+              </Text>
             </View>
           )}
         </View>
@@ -254,4 +296,3 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
-
