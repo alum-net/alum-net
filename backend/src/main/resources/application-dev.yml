@@ -3,6 +3,10 @@ spring:
     name: alum-net
     cors:
       allowed-origins: http://localhost:8081,http://localhost:8082
+  servlet:
+    multipart:
+      max-file-size:
+        10MB
   datasource:
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}

@@ -54,7 +54,14 @@ export interface Section {
   title: string;
   description: string;
   sectionResources: SectionResource[];
+  summaryEvents: SummaryEvent[];
 }
+
+export type SummaryEvent = {
+  id: number;
+  type: EventType;
+  title: string;
+};
 
 export interface CourseContent {
   sections: PageableContent<Section>;
@@ -62,3 +69,44 @@ export interface CourseContent {
   totalEnrollments?: number;
   description: string;
 }
+
+export enum EventType {
+  QUESTIONNAIRE = 'QUESTIONNAIRE',
+  ONSITE = 'ONSITE',
+  TASK = 'TASK',
+}
+
+export interface Answer {
+  correct: boolean;
+  id: number;
+  text: string;
+}
+
+export interface Question {
+  id: number;
+  text: string;
+  answers: Answer[];
+}
+
+export interface Event {
+  description: string;
+  startDate: string;
+  endDate: string;
+  maxGrade: number;
+  studentsWithPendingSubmission: string[];
+  questions?: Question[];
+  durationInMinutes?: number;
+  title: string;
+}
+
+export type Homework = {
+  eventId: string;
+  studentEmail: string;
+  homeworkFile: FilesToUpload;
+};
+
+export type FilesToUpload = {
+  uri: string;
+  name: string;
+  type: string;
+};

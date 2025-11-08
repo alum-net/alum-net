@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import {
   Button,
   Text,
@@ -18,9 +18,9 @@ import {
 } from '@alum-net/users/src/types';
 import { fetchUsers } from '@alum-net/users/src/service';
 
-import CreateUserModal from '../features/users/src/create-user';
-import UsersDashboard from '../features/users/src/users-dashboard';
-import BulkUserUploadModal from '../features/users/src/bulk-user-upload-modal';
+import CreateUserModal from '../features/users/components/create-user';
+import BulkUserUploadModal from '../features/users/components/bulk-user-upload-modal';
+import UserActivityDialog from '../features/users/components/user-activity-dialog';
 
 type FormData = { name: string; lastname: string; email: string };
 
@@ -34,6 +34,8 @@ const ROLE_OPTIONS: { value: '' | UserRole; label: string }[] = [
 export default function UsersPage() {
   const [open, setOpen] = useState(false);
   const [bulkModalVisible, setBulkModalVisible] = useState(false);
+  const [activityVisible, setActivityVisible] = useState(false);
+  const [selectedEmail, setSelectedEmail] = useState('');
 
   // paginación
   const [page, setPage] = useState(0);
@@ -76,16 +78,12 @@ export default function UsersPage() {
   };
 
   return (
-    <UsersDashboard>
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.headerRow}>
         <Text variant="headlineSmall">Usuarios</Text>
-        
+
         <View style={styles.buttonGroup}>
-          <Button
-            mode="contained"
-            icon="plus"
-            onPress={() => setOpen(true)}
-          >
+          <Button mode="contained" icon="plus" onPress={() => setOpen(true)}>
             Crear nuevo usuario
           </Button>
 
@@ -184,6 +182,7 @@ export default function UsersPage() {
             <DataTable.Title style={{ flex: 2 }}>Email</DataTable.Title>
             <DataTable.Title>Rol</DataTable.Title>
             <DataTable.Title>Estado</DataTable.Title>
+            <DataTable.Title>Acciones</DataTable.Title>
           </DataTable.Header>
 
           {rows.map(u => (
@@ -202,6 +201,18 @@ export default function UsersPage() {
               </DataTable.Cell>
               <DataTable.Cell>
                 {u.enabled ? 'Activo' : 'Inactivo'}
+              </DataTable.Cell>
+              <DataTable.Cell>
+                <Button
+                  compact
+                  mode="outlined"
+                  onPress={() => {
+                    setSelectedEmail(u.email);
+                    setActivityVisible(true);
+                  }}
+                >
+                  Ver Actividad
+                </Button>
               </DataTable.Cell>
             </DataTable.Row>
           ))}
@@ -236,19 +247,32 @@ export default function UsersPage() {
           />
         </DataTable>
       </View>
-      
+
       <CreateUserModal visible={open} onDismiss={() => setOpen(false)} />
-    
+
       <BulkUserUploadModal
         visible={bulkModalVisible}
         onDismiss={() => setBulkModalVisible(false)}
       />
-      
-    </UsersDashboard>
+
+      <UserActivityDialog
+        visible={activityVisible}
+        onDismiss={() => setActivityVisible(false)}
+        userEmail={selectedEmail}
+      />
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f6f6f6',
+  },
+  content: {
+    padding: 24,
+    gap: 16,
+  },
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',

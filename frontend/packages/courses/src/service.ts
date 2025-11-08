@@ -4,10 +4,13 @@ import {
   FiltersDirectory,
   CourseCreationPayload,
   CourseContent,
+  Event as Event,
+  Homework,
 } from './types';
 import { AxiosResponse } from 'axios';
 import { UserInfo } from '@alum-net/users/src/types';
 import { deleteFalsyKeys } from './helpers';
+import { Platform } from 'react-native';
 
 function mapFilterKeys(filters: FiltersDirectory, userEmail: string) {
   return {
@@ -93,4 +96,60 @@ export const unenrollStudent = async (courseId: string, email: string) => {
   };
 
   return normalized;
+};
+
+export const getEventById = async (eventId: string) => {
+  const { data }: AxiosResponse<Response<Event>> = await api.get(
+    `/events/${eventId}`,
+  );
+  return data.data;
+};
+
+export const submitHomework = async (homework: Homework) => {
+  const data = new FormData();
+
+  data.append(
+    'homeworkFile',
+    Platform.OS === 'web'
+      ? await (await fetch(homework.homeworkFile.uri)).blob()
+      : ({
+          name: homework.homeworkFile.name,
+          uri: homework.homeworkFile.uri,
+          type: homework.homeworkFile.type,
+        } as any),
+    homework.homeworkFile.name,
+  );
+
+  return await api.post(
+    `/events/${homework.eventId}/submit-homework?studentEmail=${homework.studentEmail}`,
+    data,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    },
+  );
+};
+
+export const deleteEvent = async (id: number) => {
+  return await api.delete(`/events/${id}`);
+};
+
+export type QuestionnaireResponse = {
+  questionId: number;
+  answerId: number;
+  isCorrect: boolean;
+  timeStamp?: string;
+};
+
+export type SubmitQuestionnaireRequest = {
+  userEmail?: string;
+  responses: QuestionnaireResponse[];
+};
+
+export const submitQuestionnaireResponses = async (
+  eventId: number | string,
+  payload: SubmitQuestionnaireRequest,
+) => {
+  return await api.post<Response>(`/events/${eventId}/submit`, payload);
 };

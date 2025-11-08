@@ -5,6 +5,7 @@ import org.alumnet.application.dtos.PostDTO;
 import org.alumnet.application.dtos.requests.PostCreationRequestDTO;
 import org.alumnet.application.dtos.requests.PostFilterDTO;
 import org.alumnet.application.dtos.requests.UpdatePostRequestDTO;
+import org.alumnet.application.enums.ActivityType;
 import org.alumnet.application.mapper.PostMapper;
 import org.alumnet.application.query_builders.PostQueryBuilder;
 import org.alumnet.domain.forums.Post;
@@ -32,6 +33,7 @@ public class ForumService {
     private final ForumRepository forumRepository;
     private final PostMapper postMapper;
     private final MongoTemplate mongoTemplate;
+    private final UserActivityLogService activityLogService;
 
     public Page<PostDTO> getPosts(PostFilterDTO postFilter, Pageable page) {
         Query query = PostQueryBuilder.byFilters(postFilter).with(page);
@@ -69,6 +71,13 @@ public class ForumService {
 
             forumRepository.save(parentPost);
         }
+
+        activityLogService.logActivity(
+                post.getAuthor().getEmail(),
+                ActivityType.FORUM_POST,
+                String.format("Se publicó en el foro del curso ID %s", post.getCourseId()),
+                newPost.getId()
+        );
     }
 
     public void deletePost(String postId) {

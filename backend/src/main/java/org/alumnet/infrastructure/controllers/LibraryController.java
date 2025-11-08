@@ -1,11 +1,6 @@
 package org.alumnet.infrastructure.controllers;
 
-import jakarta.ws.rs.Path;
 import lombok.RequiredArgsConstructor;
-
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-
 import org.alumnet.application.dtos.LabelDTO;
 import org.alumnet.application.dtos.LibraryResourceDTO;
 import org.alumnet.application.dtos.requests.*;
@@ -28,7 +23,7 @@ public class LibraryController {
     private final LibraryService libraryService;
 
     @GetMapping(path = "/labels", produces = "application/json")
-    @PreAuthorize("hasAnyRole('admin', 'teacher')")
+    @PreAuthorize("hasAnyRole('admin', 'teacher', 'student')")
     public ResponseEntity<PageableResultResponse<LabelDTO>> getLabels(
             @PageableDefault(page = 0, size = 15) Pageable page,
             String textToSearch) {
@@ -113,7 +108,7 @@ public class LibraryController {
     @PreAuthorize("hasAnyRole('admin', 'teacher')")
     public ResponseEntity<ResultResponse<Object>> modifyResource(
             @PathVariable int resourceId,
-            @RequestBody(required = true) LibraryResourceUpdateRequestDTO modifyRequest){
+            @RequestBody(required = true) LibraryResourceUpdateRequestDTO modifyRequest) {
         libraryService.modifyResource(resourceId, modifyRequest);
         return ResponseEntity.ok(ResultResponse.success(null, "Recurso modificado exitosamente"));
     }

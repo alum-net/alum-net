@@ -10,3 +10,12 @@ export type BulkUserCreationResponse = {
   failedCreations: number;
   errors: BulkUserCreationError[];
 };
+
+export type UserActivityLog = {
+  id: number;
+  userEmail: string;
+  type: string;
+  description?: string | null;
+  resourceId?: string | null;
+  timestamp: string;
+};

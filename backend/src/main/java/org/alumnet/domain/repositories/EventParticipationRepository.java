@@ -3,6 +3,7 @@ package org.alumnet.domain.repositories;
 import org.alumnet.application.dtos.StudentSummaryDTO;
 import org.alumnet.domain.events.EventParticipation;
 import org.alumnet.domain.events.EventParticipationId;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -29,4 +30,6 @@ public interface EventParticipationRepository extends JpaRepository<EventPartici
 
 
     List<EventParticipation> findAllByIdEventId(Integer eventId);
+    @EntityGraph(attributePaths = {"student", "resource"})
+    List<EventParticipation> findAllById_EventId(Integer eventId);
 }

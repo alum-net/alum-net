@@ -16,6 +16,8 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -92,8 +94,11 @@ public class NotificationService {
 
     /**
      * Builds the OneSignal payload and sends it through the client.
+     *
+     * @throws JsonProcessingException
      */
-    private String sendPushNotifications(String title, String message, List<String> userEmails, LocalDateTime endDate) throws JsonProcessingException {
+    private String sendPushNotifications(String title, String message, List<String> userEmails, LocalDateTime endDate)
+            throws JsonProcessingException {
         log.info("Preparing to send notification to {} users: {} - {}", userEmails.size(), title, message);
         log.debug("sendNotificationNow: {}", sendNotificationNow);
 

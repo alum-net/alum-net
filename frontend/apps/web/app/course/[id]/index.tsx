@@ -145,11 +145,12 @@ export default function Course() {
                 </Card.Content>
               </Card>
             )}
-
-            <CourseMembersCard
-              courseId={id.toString()}
-              totalEnrollments={data.data?.totalEnrollments ?? 0}
-            />
+            {(isTeacher || userInfo?.role === UserRole.admin) && (
+              <CourseMembersCard
+                courseId={id.toString()}
+                totalEnrollments={data.data?.totalEnrollments ?? 0}
+              />
+            )}
           </>
         }
       />

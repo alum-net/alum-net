@@ -7,4 +7,6 @@ export const QUERY_KEYS = {
   getForumPosts: 'get-forum-posts',
   getLibraryLabels: 'get-library-labels',
   getLibraryResources: 'get-library-resources',
+  getEventDetails: 'get-event-details',
+  getUserActivity: 'get-user-activity',
 };

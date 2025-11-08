@@ -26,14 +26,17 @@ public interface EventMapper {
     Answer answerDTOToAnswer(AnswerDTO answerDTO);
 
     QuestionDTO questionDTOToQuestionDTO(Question question);
+
     AnswerDTO answerDTOToAnswerDTO(Answer answer);
 
     EventDetailDTO eventToTaskDTO(Task task);
+
     EventDetailDTO eventToOnSiteDTO(OnSite onSite);
+
     @Mapping(target = "sectionId", source = "section.sectionId")
     EventDetailDTO eventToQuestionnaireDTO(Questionnaire questionnaire);
 
-    @Mapping(target = "id" , source = "id")
+    @Mapping(target = "id", source = "id")
     @Mapping(target = "title", source = "title")
     @Mapping(target = "maxGrade", source = "maxGrade")
     @Mapping(target = "type", ignore = true)
@@ -48,7 +51,6 @@ public interface EventMapper {
         };
     }
 
-
     default EventDetailDTO eventToEventDTO(Event event) {
         return switch (event) {
             case Task task -> eventToTaskDTO(task);
@@ -58,7 +60,6 @@ public interface EventMapper {
             default -> throw new IllegalArgumentException("Unknown event type: " + event.getClass().getName());
         };
     }
-
 
     @AfterMapping
     default void linkRelations(@MappingTarget Questionnaire questionnaire) {

@@ -42,9 +42,3 @@ export type Answer = {
   text: string;
   correct: boolean;
 };
-
-export enum EventType {
-  TASK = 'TASK',
-  QUESTIONNAIRE = 'QUESTIONNAIRE',
-  ONSITE = 'ONSITE',
-}

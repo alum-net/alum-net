@@ -1,6 +1,12 @@
 import React, { useCallback, useState } from 'react';
 import { View, ScrollView, StyleSheet, Modal } from 'react-native';
-import { Button, Text, SegmentedButtons, TextInput } from 'react-native-paper';
+import {
+  Button,
+  Text,
+  SegmentedButtons,
+  TextInput,
+  HelperText,
+} from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormTextInput, THEME, Toast } from '@alum-net/ui';
@@ -19,6 +25,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@alum-net/api';
 import { isValidDecimal } from '@alum-net/courses/src/helpers';
 import { z } from 'zod';
+import { isAxiosError } from 'axios';
 
 type CreateCourseModalProps = {
   visible: boolean;
@@ -46,8 +53,13 @@ export default function CreateCourseModal({
       Toast.success('Curso creado correctamente!');
       onDismiss();
     },
-    onError: () => {
-      Toast.error('Hubo un error en la creación del curso');
+    onError: error => {
+      setError('teachersEmails', {
+        message:
+          isAxiosError(error) && error?.response?.data.errors
+            ? error.response.data.errors[0]
+            : 'Hubo un error en la creación del curso',
+      });
     },
   });
 
@@ -75,6 +87,7 @@ export default function CreateCourseModal({
     watch,
     getValues,
     setValue,
+    setError,
   } = useForm<CourseFormData>({
     resolver: zodResolver(courseCreationSchema),
     defaultValues: {
@@ -92,12 +105,12 @@ export default function CreateCourseModal({
     const email = teacherEmailInput.trim();
     if (email) {
       try {
-        z.string().email().parse(email); // validate email
+        z.email().parse(email);
         const current = getValues('teachersEmails') || [];
         setValue('teachersEmails', [...current, email]);
         setTeacherEmailInput('');
       } catch {
-        Toast.error('Email inválido');
+        setError('teachersEmails', { message: 'Email inválido' });
       }
     }
   };
@@ -231,7 +244,9 @@ export default function CreateCourseModal({
         />
 
         {errors.teachersEmails && (
-          <Text style={styles.errorText}>{errors.teachersEmails.message}</Text>
+          <HelperText type="error" style={styles.errorText}>
+            {errors.teachersEmails.message}
+          </HelperText>
         )}
 
         <View style={{ marginTop: 8 }}>

@@ -21,7 +21,7 @@ import { FormValues, schema } from '../validator';
 import { useUserInfo } from '@alum-net/users';
 import { isAxiosError } from 'axios';
 
-export const CreateResourceForm = () => {
+export const FileUploadForm = () => {
   const [selectedFile, setSelectedFile] = useState<FilesToUpload>();
   const [isLoading, setIsLoading] = useState(false);
   const [isVisible, setIsVisible] = useState(false);

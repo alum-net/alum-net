@@ -10,8 +10,15 @@ import org.alumnet.application.dtos.requests.UserFilterDTO;
 import org.alumnet.application.dtos.requests.UserModifyRequestDTO;
 import org.alumnet.application.dtos.responses.BulkErrorDetailDTO;
 import org.alumnet.application.dtos.responses.BulkResponseDTO;
+import org.alumnet.application.dtos.responses.CalendarEventDetailDTO;
+import org.alumnet.application.dtos.responses.UserActivityLogDTO;
+import org.alumnet.application.enums.UserRole;
 import org.alumnet.application.mapper.UserMapper;
 import org.alumnet.application.query_builders.UserSpecification;
+import org.alumnet.domain.UserActivityLog;
+import org.alumnet.domain.events.Event;
+import org.alumnet.domain.repositories.EventRepository;
+import org.alumnet.domain.repositories.UserActivityLogRepository;
 import org.alumnet.domain.repositories.UserRepository;
 import org.alumnet.domain.users.User;
 import org.alumnet.infrastructure.config.KeycloakProperties;
@@ -30,9 +37,11 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +49,8 @@ public class UserService {
     private final Keycloak keycloak;
     private final KeycloakProperties properties;
     private final UserRepository userRepository;
+    private final EventRepository eventRepository;
+    private final UserActivityLogRepository userActivityLogRepository;
     private final UserMapper userMapper;
     private final S3FileStorageService fileStorageService;
     private final FileValidationService fileValidationService;
@@ -253,4 +264,52 @@ public class UserService {
         return user;
     }
 
+    public List<CalendarEventDetailDTO> getCalendarEvents(LocalDateTime since, LocalDateTime to, String userEmail) {
+        User currentUser = userRepository.findById(userEmail)
+                .orElseThrow(UserNotFoundException::new);
+
+        UserRole userRole = currentUser.getRole();
+
+        List<Event> events;
+
+        switch (userRole) {
+            case UserRole.STUDENT -> {
+                events = eventRepository.findEventsByStudentEmailAndDates(
+                        userEmail, since, to);
+                break;
+            }
+            case UserRole.TEACHER -> {
+                events = eventRepository.findEventsByTeacherEmailAndDates(
+                        userEmail, since, to);
+                break;
+            }
+            default -> throw new RuntimeException("Error al conseguir el rol");
+        }
+
+        return events.stream().map(e -> CalendarEventDetailDTO
+                .builder()
+                .eventId(e.getId())
+                .title(e.getTitle())
+                .description(e.getDescription())
+                .type(e.getType())
+                .startDate(e.getStartDate())
+                .endDate(e.getEndDate())
+                .courseId(e.getSection().getCourseId())
+                .courseName(e.getSection().getCourse().getName())
+                .build()).collect(Collectors.toList());
+    }
+
+    public Page<UserActivityLogDTO> getUserLogs(String userId, Pageable page) {
+        Page<UserActivityLog> activities = userActivityLogRepository.findAllByUserEmail(userId, page);
+
+        return activities.map(x -> UserActivityLogDTO
+                .builder()
+                .userEmail(userId)
+                .id(x.getId())
+                .description(x.getDescription())
+                .type(x.getActivityType())
+                .timestamp(x.getTimestamp())
+                .resourceId(x.getResourceId())
+                .build());
+    }
 }
