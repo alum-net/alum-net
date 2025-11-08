@@ -18,7 +18,7 @@ export const getConversationHistory = async (
   conversationId: string,
   page: number = 0,
   size: number = 30,
-): Promise<MessagePage> => {
+) => {
   const { data }: AxiosResponse<Response<MessagePage>> = await api.get(
     `/messages/${conversationId}`,
     {

@@ -1,41 +1,46 @@
-import React, { useRef, useEffect, useCallback, useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
-} from 'react-native';
+import React, {
+  useRef,
+  useEffect,
+  useCallback,
+  useState,
+  useMemo,
+} from 'react';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import { Text, ActivityIndicator } from 'react-native-paper';
 import {
+  getConversationHistory,
+  markMessagesAsRead,
   Message,
   TypingEvent,
+  useConversations,
   useMessaging,
   WS_ENDPOINTS,
 } from '@alum-net/messaging';
+import { useQuery } from '@tanstack/react-query';
+import { QUERY_KEYS } from '@alum-net/api';
+import { useUserInfo } from '@alum-net/users';
 
-type Props = {
-  messages: Message[] | undefined;
-  isLoading: boolean;
-  error: Error | null;
-  currentUserEmail: string;
-  conversationTitle: string;
-  conversationId: string | null;
-  isConnected: boolean;
-  onMarkAsRead: () => void;
-};
-
-export default function ChatView({
-  messages,
-  isLoading,
-  error,
-  currentUserEmail,
-  conversationTitle,
-  conversationId,
-  isConnected,
-  onMarkAsRead,
-}: Props) {
-  const { subscribe } = useMessaging();
+export default function ChatView() {
+  const { subscribe, selectedConversation, isConnected } = useMessaging();
+  const {
+    data: messages,
+    isLoading: isLoading,
+    error,
+  } = useQuery({
+    queryKey: [QUERY_KEYS.getMessages, selectedConversation],
+    queryFn: () => getConversationHistory(selectedConversation!),
+    enabled: !!selectedConversation,
+    staleTime: 30_000,
+  });
+  const { data: userInfo } = useUserInfo();
+  const { data: conversations } = useConversations(userInfo?.role);
+  const activeConversation = useMemo(
+    () =>
+      conversations?.find(
+        conversation => conversation.id === selectedConversation,
+      ),
+    [conversations, selectedConversation],
+  );
   const scrollViewRef = useRef<ScrollView>(null);
   const markAsReadTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
@@ -47,22 +52,34 @@ export default function ChatView({
   const [typingUser, setTypingUser] = useState<string | null>(null);
 
   const markAsRead = useCallback(() => {
-    if (!conversationId || !isConnected) return;
+    if (!activeConversation?.id || !isConnected) return;
 
     if (markAsReadTimeoutRef.current) {
       clearTimeout(markAsReadTimeoutRef.current);
     }
     markAsReadTimeoutRef.current = setTimeout(() => {
-      onMarkAsRead();
+      if (selectedConversation && isConnected) {
+        markMessagesAsRead(selectedConversation).catch(() => {});
+      }
     }, 300);
-  }, [onMarkAsRead, conversationId, isConnected]);
+  }, [selectedConversation, activeConversation?.id, isConnected]);
+
+  useEffect(() => {
+    if (selectedConversation && isConnected) {
+      const timeoutId = setTimeout(() => {
+        markMessagesAsRead(selectedConversation).catch(() => {});
+      }, 500);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [selectedConversation, isConnected]);
 
   useEffect(() => {
     if (
-      messages &&
-      messages.length > 0 &&
+      messages?.items &&
+      messages?.items.length > 0 &&
       !isLoading &&
-      conversationId &&
+      activeConversation?.id &&
       isConnected
     ) {
       isAutoScrollingRef.current = true;
@@ -73,30 +90,29 @@ export default function ChatView({
         }, 500);
       }, 100);
     }
-  }, [messages?.length, isLoading, conversationId, isConnected]);
+  }, [messages?.items, isLoading, activeConversation?.id, isConnected]);
 
-  const handleScroll = useCallback(
-    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-      if (isAutoScrollingRef.current) {
-        return;
-      }
-      markAsRead();
-    },
-    [markAsRead],
-  );
+  const handleScroll = useCallback(() => {
+    if (isAutoScrollingRef.current) {
+      return;
+    }
+    markAsRead();
+  }, [markAsRead]);
 
   useEffect(() => {
-    if (!isConnected || !conversationId) {
+    if (!isConnected || !activeConversation?.id) {
       setTypingUser(null);
       return;
     }
 
-    const typingDestination = WS_ENDPOINTS.SUBSCRIBE_TYPING(conversationId);
+    const typingDestination = WS_ENDPOINTS.SUBSCRIBE_TYPING(
+      activeConversation?.id,
+    );
 
     const unsubscribe = subscribe(
       typingDestination,
       (typingEvent: TypingEvent) => {
-        if (typingEvent.userEmail === currentUserEmail) {
+        if (typingEvent.userEmail === userInfo?.email) {
           return;
         }
 
@@ -123,7 +139,7 @@ export default function ChatView({
         clearTimeout(typingIndicatorTimeoutRef.current);
       }
     };
-  }, [isConnected, conversationId, currentUserEmail, subscribe]);
+  }, [isConnected, activeConversation?.id, userInfo?.email, subscribe]);
 
   useEffect(() => {
     if (typingUser) {
@@ -140,12 +156,14 @@ export default function ChatView({
         markAsReadTimeoutRef.current = null;
       }
     };
-  }, [conversationId]);
+  }, [activeConversation?.id]);
 
   return (
     <View style={styles.chatArea}>
       <View style={styles.chatHeader}>
-        <Text style={styles.chatTitle}>{conversationTitle}</Text>
+        <Text style={styles.chatTitle}>
+          {activeConversation?.otherParticipantName || 'Conversación'}
+        </Text>
       </View>
 
       <ScrollView
@@ -171,18 +189,21 @@ export default function ChatView({
           </View>
         )}
 
-        {!isLoading && !error && messages && messages.length === 0 && (
-          <View style={styles.emptyMessagesContainer}>
-            <Text style={styles.emptyMessagesText}>
-              No hay mensajes aún. ¡Comienza la conversación!
-            </Text>
-          </View>
-        )}
+        {!isLoading &&
+          !error &&
+          messages?.items &&
+          messages?.items.length === 0 && (
+            <View style={styles.emptyMessagesContainer}>
+              <Text style={styles.emptyMessagesText}>
+                No hay mensajes aún. ¡Comienza la conversación!
+              </Text>
+            </View>
+          )}
 
         {!isLoading &&
-          messages &&
-          messages.map((message: Message) => {
-            const isOwnMessage = message.author === currentUserEmail;
+          messages?.items &&
+          messages?.items.map((message: Message) => {
+            const isOwnMessage = message.author === userInfo?.email;
 
             return (
               <View

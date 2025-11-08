@@ -10,24 +10,22 @@ import React, {
 import { Client, IFrame } from '@stomp/stompjs';
 import { storage, STORAGE_KEYS } from '@alum-net/storage';
 import { useMMKVString } from 'react-native-mmkv';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useUserInfo } from '@alum-net/users/src/hooks/useUserInfo';
 import { QUERY_KEYS } from '@alum-net/api';
-import { Toast } from '@alum-net/ui';
 import {
   ConversationSummary,
-  markMessagesAsRead,
-  ReadReceipt,
   Message,
   MessagePage,
-  WS_ENDPOINTS,
-  MAX_MESSAGE_LENGTH,
-  MIN_MESSAGE_LENGTH,
-  getConversationHistory,
-  useConversations,
-} from '../index';
+  ReadReceipt,
+  TypingEvent,
+} from '../types';
+import { useConversations } from './useConversations';
+import { WS_ENDPOINTS } from '../constants';
 
-export type MessageHandler = (message: any) => void;
+export type MessageHandler = (
+  message: TypingEvent & Message & ReadReceipt,
+) => void;
 
 type PendingSubscription = {
   destination: string;
@@ -42,17 +40,6 @@ interface MessagingContextType {
   unsubscribe: (destination: string) => void;
   selectedConversation: string | null;
   setSelectedConversation: (conversationId: string | null) => void;
-  messageText: string;
-  setMessageText: (text: string) => void;
-  isSending: boolean;
-  sendMessage: (content: string) => void;
-  handleSendMessage: () => void;
-  messagesData: MessagePage | undefined;
-  isLoadingMessages: boolean;
-  errorMessages: any;
-  conversationTitle: string;
-  currentUserEmail: string;
-  handleMarkAsRead: () => void;
 }
 
 const MessagingContext = createContext<MessagingContextType | undefined>(
@@ -75,25 +62,11 @@ export const MessagingProvider = ({ children }: MessagingProviderProps) => {
   const [selectedConversation, setSelectedConversation] = useState<
     string | null
   >(null);
-  const [messageText, setMessageText] = useState('');
-  const [isSending, setIsSending] = useState(false);
 
   const queryClient = useQueryClient();
   const { data: userInfo } = useUserInfo();
-  const currentUserEmail = userInfo?.email || '';
 
   const { data: conversations } = useConversations(userInfo?.role);
-
-  const {
-    data: messagesData,
-    isLoading: isLoadingMessages,
-    error: errorMessages,
-  } = useQuery({
-    queryKey: [QUERY_KEYS.getMessages, selectedConversation],
-    queryFn: () => getConversationHistory(selectedConversation!),
-    enabled: !!selectedConversation,
-    staleTime: 30_000,
-  });
 
   useEffect(() => {
     if (!accessToken) {
@@ -236,12 +209,6 @@ export const MessagingProvider = ({ children }: MessagingProviderProps) => {
     });
   }, []);
 
-  const handleMarkAsRead = useCallback(() => {
-    if (selectedConversation && isConnected) {
-      markMessagesAsRead(selectedConversation).catch(() => {});
-    }
-  }, [selectedConversation, isConnected]);
-
   const handleNewMessage = useCallback(
     (newMessage: Message, conversationId: string) => {
       queryClient.invalidateQueries({
@@ -308,16 +275,6 @@ export const MessagingProvider = ({ children }: MessagingProviderProps) => {
   }, [isConnected, selectedConversation, subscribe, queryClient]);
 
   useEffect(() => {
-    if (selectedConversation && isConnected) {
-      const timeoutId = setTimeout(() => {
-        markMessagesAsRead(selectedConversation).catch(() => {});
-      }, 500);
-
-      return () => clearTimeout(timeoutId);
-    }
-  }, [selectedConversation, isConnected]);
-
-  useEffect(() => {
     if (!isConnected || !conversations || conversations.length === 0) return;
 
     const messageUnsubscribes = conversations.map(
@@ -339,7 +296,7 @@ export const MessagingProvider = ({ children }: MessagingProviderProps) => {
 
   const handleReadReceipt = useCallback(
     (readReceipt: ReadReceipt, conversationId: string) => {
-      if (readReceipt.readByUser !== currentUserEmail) {
+      if (readReceipt.readByUser !== userInfo?.email) {
         queryClient.setQueryData(
           [QUERY_KEYS.getMessages, conversationId],
           (previousMessagesData: MessagePage | undefined) => {
@@ -349,7 +306,7 @@ export const MessagingProvider = ({ children }: MessagingProviderProps) => {
               ...previousMessagesData,
               items: previousMessagesData.items.map((message: Message) => ({
                 ...message,
-                read: message.author === currentUserEmail ? true : message.read,
+                read: message.author === userInfo?.email ? true : message.read,
               })),
             };
           },
@@ -359,7 +316,7 @@ export const MessagingProvider = ({ children }: MessagingProviderProps) => {
         queryKey: [QUERY_KEYS.getConversations],
       });
     },
-    [queryClient, currentUserEmail],
+    [queryClient, userInfo?.email],
   );
 
   useEffect(() => {
@@ -382,89 +339,6 @@ export const MessagingProvider = ({ children }: MessagingProviderProps) => {
     };
   }, [isConnected, conversations, subscribe, handleReadReceipt]);
 
-  const sendMessage = (content: string) => {
-    if (!selectedConversation) {
-      throw new Error('No hay conversación seleccionada');
-    }
-
-    if (!isConnected) {
-      throw new Error('WebSocket no conectado');
-    }
-
-    const trimmedContent = content.trim();
-
-    if (trimmedContent.length < MIN_MESSAGE_LENGTH) {
-      throw new Error('El mensaje no puede estar vacío');
-    }
-
-    if (trimmedContent.length > MAX_MESSAGE_LENGTH) {
-      throw new Error('El mensaje no puede superar los 2000 caracteres');
-    }
-
-    setIsSending(true);
-
-    try {
-      const destination = WS_ENDPOINTS.SEND_MESSAGE(selectedConversation);
-      const body = { content: trimmedContent };
-
-      send(destination, body);
-    } catch (error) {
-      setIsSending(false);
-      throw error;
-    }
-
-    setIsSending(false);
-  };
-
-  const handleSendMessage = () => {
-    const message = messageText.trim();
-
-    if (message.length === 0) {
-      return;
-    }
-
-    if (isSending) {
-      return;
-    }
-
-    if (!selectedConversation) {
-      Toast.error('Selecciona una conversación primero');
-      return;
-    }
-
-    if (message.length > MAX_MESSAGE_LENGTH) {
-      Toast.error(
-        `El mensaje no puede superar los ${MAX_MESSAGE_LENGTH} caracteres`,
-      );
-      return;
-    }
-
-    try {
-      sendMessage(message);
-      setMessageText('');
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.getConversations],
-      });
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Error desconocido';
-
-      if (errorMessage === 'WebSocket no conectado') {
-        Toast.error(
-          'No se pudo conectar al servidor. El sistema intentará reconectar automáticamente. Por favor, espera unos segundos e intenta enviar nuevamente.',
-        );
-      } else {
-        Toast.error(`Error al enviar el mensaje: ${errorMessage}`);
-      }
-    }
-  };
-
-  const conversationTitle =
-    conversations?.find(
-      (conversation: ConversationSummary) =>
-        conversation.id === selectedConversation,
-    )?.otherParticipantName || 'Conversación';
-
   const value = {
     isConnected,
     error,
@@ -472,19 +346,8 @@ export const MessagingProvider = ({ children }: MessagingProviderProps) => {
     send,
     unsubscribe,
     selectedConversation,
-    messageText,
-    setMessageText,
     conversations,
     setSelectedConversation,
-    isSending,
-    sendMessage,
-    handleSendMessage,
-    messagesData,
-    isLoadingMessages,
-    errorMessages,
-    conversationTitle,
-    currentUserEmail,
-    handleMarkAsRead,
   };
 
   return (

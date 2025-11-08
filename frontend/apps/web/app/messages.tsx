@@ -8,21 +8,7 @@ import ChatView from '../features/messages/components/chat-view';
 import MessageInput from '../features/messages/components/message-input';
 
 export default function MessagesPage() {
-  const {
-    selectedConversation,
-    messageText,
-    setMessageText,
-    isSending,
-    handleSendMessage,
-    messagesData,
-    isLoadingMessages,
-    errorMessages,
-    conversationTitle,
-    currentUserEmail,
-    isConnected,
-    send,
-    handleMarkAsRead,
-  } = useMessaging();
+  const { selectedConversation } = useMessaging();
 
   return (
     <View style={styles.container}>
@@ -40,27 +26,8 @@ export default function MessagesPage() {
         <View style={styles.mainArea}>
           {selectedConversation ? (
             <>
-              <ChatView
-                messages={messagesData?.items}
-                isLoading={isLoadingMessages}
-                error={errorMessages}
-                currentUserEmail={currentUserEmail}
-                conversationTitle={conversationTitle}
-                conversationId={selectedConversation}
-                isConnected={isConnected}
-                onMarkAsRead={handleMarkAsRead}
-              />
-              <MessageInput
-                messageText={messageText}
-                onMessageChange={setMessageText}
-                onSend={handleSendMessage}
-                isSending={isSending}
-                isDisabled={!selectedConversation}
-                conversationId={selectedConversation}
-                isConnected={isConnected}
-                send={send}
-                onMarkAsRead={handleMarkAsRead}
-              />
+              <ChatView />
+              <MessageInput />
             </>
           ) : (
             <View style={styles.emptyState}>

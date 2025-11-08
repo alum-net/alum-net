@@ -1,70 +1,53 @@
-import React, { useRef, useEffect, useCallback } from 'react';
+import React, { useRef, useEffect, useCallback, useState } from 'react';
 import { View, StyleSheet, TextInput } from 'react-native';
-import { IconButton, Text } from 'react-native-paper';
+import { IconButton } from 'react-native-paper';
 import {
   MAX_MESSAGE_LENGTH,
   MIN_MESSAGE_LENGTH,
   TYPING_DEBOUNCE_MS,
+  useMessaging,
   WS_ENDPOINTS,
 } from '@alum-net/messaging';
+import { Toast } from '@alum-net/ui';
+import { useQueryClient } from '@tanstack/react-query';
+import { QUERY_KEYS } from '@alum-net/api';
 
-type Props = {
-  messageText: string;
-  onMessageChange: (text: string) => void;
-  onSend: () => void;
-  isSending: boolean;
-  isDisabled: boolean;
-  conversationId: string | null;
-  isConnected: boolean;
-  send: (destination: string, body: any) => void;
-  onMarkAsRead?: () => void;
-};
-
-export default function MessageInput({
-  messageText,
-  onMessageChange,
-  onSend,
-  isSending,
-  isDisabled,
-  conversationId,
-  isConnected,
-  send,
-  onMarkAsRead,
-}: Props) {
-  const inputRef = useRef<any>(null);
+export default function MessageInput() {
+  const { selectedConversation, send, isConnected } = useMessaging();
+  const inputRef = useRef(null);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastTypingSentRef = useRef<boolean>(false);
+  const [messageText, setMessageText] = useState('');
+  const [isSending, setIsSending] = useState(false);
+  const queryClient = useQueryClient();
 
   const canSend =
     messageText.trim().length >= MIN_MESSAGE_LENGTH &&
     !isSending &&
-    !isDisabled &&
+    !!selectedConversation &&
     messageText.length <= MAX_MESSAGE_LENGTH;
 
   const sendTypingEvent = useCallback(
     (isTyping: boolean) => {
-      if (!conversationId || !isConnected) {
+      if (!selectedConversation || !isConnected) {
         return;
       }
 
       try {
-        const typingDestination = WS_ENDPOINTS.SEND_TYPING(conversationId);
+        const typingDestination =
+          WS_ENDPOINTS.SEND_TYPING(selectedConversation);
         send(typingDestination, { isTyping });
         lastTypingSentRef.current = isTyping;
-      } catch (error) {}
+      } catch {}
     },
-    [conversationId, isConnected, send],
+    [selectedConversation, isConnected, send],
   );
 
   const handleTextChange = useCallback(
     (text: string) => {
-      onMessageChange(text);
+      setMessageText(text);
 
-      if (onMarkAsRead && text.trim().length > 0) {
-        onMarkAsRead();
-      }
-
-      if (!conversationId || !isConnected) {
+      if (!selectedConversation || !isConnected) {
         return;
       }
 
@@ -89,25 +72,98 @@ export default function MessageInput({
         sendTypingEvent(false);
       }
     },
-    [
-      conversationId,
-      isConnected,
-      onMessageChange,
-      sendTypingEvent,
-      onMarkAsRead,
-    ],
+    [selectedConversation, isConnected, setMessageText, sendTypingEvent],
   );
+  const sendMessage = useCallback(
+    (content: string) => {
+      if (!selectedConversation) {
+        throw new Error('No hay conversación seleccionada');
+      }
+
+      if (!isConnected) {
+        throw new Error('WebSocket no conectado');
+      }
+
+      const trimmedContent = content.trim();
+
+      if (trimmedContent.length < MIN_MESSAGE_LENGTH) {
+        throw new Error('El mensaje no puede estar vacío');
+      }
+
+      if (trimmedContent.length > MAX_MESSAGE_LENGTH) {
+        throw new Error('El mensaje no puede superar los 2000 caracteres');
+      }
+
+      setIsSending(true);
+
+      try {
+        const destination = WS_ENDPOINTS.SEND_MESSAGE(selectedConversation);
+        const body = { content: trimmedContent };
+
+        send(destination, body);
+      } catch (error) {
+        setIsSending(false);
+        throw error;
+      }
+
+      setIsSending(false);
+    },
+    [isConnected, selectedConversation, send],
+  );
+
+  const onSend = useCallback(() => {
+    const message = messageText.trim();
+
+    if (message.length === 0) {
+      return;
+    }
+
+    if (isSending) {
+      return;
+    }
+
+    if (!selectedConversation) {
+      Toast.error('Selecciona una conversación primero');
+      return;
+    }
+
+    if (message.length > MAX_MESSAGE_LENGTH) {
+      Toast.error(
+        `El mensaje no puede superar los ${MAX_MESSAGE_LENGTH} caracteres`,
+      );
+      return;
+    }
+
+    try {
+      sendMessage(message);
+      setMessageText('');
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.getConversations],
+      });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Error desconocido';
+
+      if (errorMessage === 'WebSocket no conectado') {
+        Toast.error(
+          'No se pudo conectar al servidor. El sistema intentará reconectar automáticamente. Por favor, espera unos segundos e intenta enviar nuevamente.',
+        );
+      } else {
+        Toast.error(`Error al enviar el mensaje: ${errorMessage}`);
+      }
+    }
+  }, [isSending, messageText, queryClient, selectedConversation, sendMessage]);
 
   useEffect(() => {
     return () => {
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current);
       }
-      if (lastTypingSentRef.current && conversationId && isConnected) {
+      if (lastTypingSentRef.current && selectedConversation && isConnected) {
         sendTypingEvent(false);
       }
     };
-  }, [conversationId, isConnected, sendTypingEvent]);
+  }, [selectedConversation, isConnected, sendTypingEvent]);
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
@@ -152,10 +208,9 @@ export default function MessageInput({
           placeholderTextColor="#999"
           multiline
           maxLength={MAX_MESSAGE_LENGTH}
-          editable={!isSending && !isDisabled}
+          editable={!isSending && !!selectedConversation}
           returnKeyType="send"
           onSubmitEditing={canSend ? onSend : undefined}
-          blurOnSubmit={false}
         />
         <IconButton
           icon="send"
