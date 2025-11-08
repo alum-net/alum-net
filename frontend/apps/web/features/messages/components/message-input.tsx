@@ -98,9 +98,8 @@ export default function MessageInput() {
 
       try {
         const destination = WS_ENDPOINTS.SEND_MESSAGE(selectedConversation);
-        const body = { content: trimmedContent };
 
-        send(destination, body);
+        send(destination, { content: trimmedContent });
       } catch (error) {
         setIsSending(false);
         throw error;

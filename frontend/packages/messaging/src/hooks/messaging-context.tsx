@@ -7,8 +7,8 @@ import React, {
   useCallback,
   ReactNode,
 } from 'react';
-import { Client, IFrame } from '@stomp/stompjs';
-import { storage, STORAGE_KEYS } from '@alum-net/storage';
+import { Client, IFrame, StompSubscription } from '@stomp/stompjs';
+import { storage as mmkvStorage, STORAGE_KEYS } from '@alum-net/storage';
 import { useMMKVString } from 'react-native-mmkv';
 import { useQueryClient } from '@tanstack/react-query';
 import { useUserInfo } from '@alum-net/users/src/hooks/useUserInfo';
@@ -22,24 +22,30 @@ import {
 } from '../types';
 import { useConversations } from './useConversations';
 import { WS_ENDPOINTS } from '../constants';
+import { Toast } from '@alum-net/ui';
 
-export type MessageHandler = (
-  message: TypingEvent & Message & ReadReceipt,
-) => void;
+type WSMessage = TypingEvent | Message | ReadReceipt;
+type WSSendBody = { content: string } | { isTyping: boolean };
+
+type MessageHandler<T> = (message: T) => void;
 
 type PendingSubscription = {
   destination: string;
-  handler: MessageHandler;
+  handler: MessageHandler<WSMessage>;
 };
 
 interface MessagingContextType {
   isConnected: boolean;
-  error: any;
-  subscribe: (destination: string, handler: MessageHandler) => () => void;
-  send: (destination: string, body: any) => void;
+  error: Error | IFrame | Event | null;
+  subscribe: <T extends WSMessage>(
+    destination: string,
+    handler: MessageHandler<T>,
+  ) => () => void;
+  send: (destination: string, body: WSSendBody) => void;
   unsubscribe: (destination: string) => void;
   selectedConversation: string | null;
   setSelectedConversation: (conversationId: string | null) => void;
+  conversations: ConversationSummary[] | undefined;
 }
 
 const MessagingContext = createContext<MessagingContextType | undefined>(
@@ -52,13 +58,13 @@ interface MessagingProviderProps {
 
 export const MessagingProvider = ({ children }: MessagingProviderProps) => {
   const [isConnected, setIsConnected] = useState(false);
-  const [error, setError] = useState<any>(null);
+  const [error, setError] = useState<Error | IFrame | Event | null>(null);
   const clientRef = useRef<Client | null>(null);
-  const subscriptionsRef = useRef<Map<string, any>>(new Map());
+  const subscriptionsRef = useRef<Map<string, StompSubscription>>(new Map());
   const pendingSubscriptionsRef = useRef<Map<string, PendingSubscription>>(
     new Map(),
   );
-  const [accessToken] = useMMKVString(STORAGE_KEYS.ACCESS_TOKEN, storage);
+  const [accessToken] = useMMKVString(STORAGE_KEYS.ACCESS_TOKEN, mmkvStorage);
   const [selectedConversation, setSelectedConversation] = useState<
     string | null
   >(null);
@@ -68,13 +74,118 @@ export const MessagingProvider = ({ children }: MessagingProviderProps) => {
 
   const { data: conversations } = useConversations(userInfo?.role);
 
+  const unsubscribe = useCallback((destination: string) => {
+    const subscription = subscriptionsRef.current.get(destination);
+    if (subscription) {
+      subscription.unsubscribe();
+      subscriptionsRef.current.delete(destination);
+    }
+    pendingSubscriptionsRef.current.delete(destination);
+  }, []);
+
+  const subscribe = useCallback(
+    <T extends WSMessage>(destination: string, handler: MessageHandler<T>) => {
+      if (clientRef.current?.connected) {
+        if (subscriptionsRef.current.has(destination)) {
+          return () => unsubscribe(destination);
+        }
+
+        const subscription = clientRef.current.subscribe(
+          destination,
+          message => {
+            try {
+              const messagePayload = JSON.parse(message.body);
+              handler(messagePayload);
+            } catch {}
+          },
+        );
+
+        subscriptionsRef.current.set(destination, subscription);
+      } else {
+        pendingSubscriptionsRef.current.set(destination, {
+          destination,
+          handler: handler as MessageHandler<WSMessage>,
+        });
+      }
+
+      return () => unsubscribe(destination);
+    },
+    [unsubscribe],
+  );
+
+  const send = useCallback((destination: string, body: unknown) => {
+    if (!clientRef.current?.connected) {
+      throw new Error('WebSocket no conectado. Mensaje no enviado.');
+    }
+
+    clientRef.current.publish({
+      destination,
+      body: JSON.stringify(body),
+    });
+  }, []);
+
+  const handleNewMessage = useCallback(
+    (newMessage: Message, conversationId: string) => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.getConversations],
+      });
+
+      if (conversationId === selectedConversation) {
+        queryClient.setQueryData(
+          [QUERY_KEYS.getMessages, conversationId],
+          (previousMessagesData: MessagePage | undefined) => {
+            if (!previousMessagesData) return previousMessagesData;
+
+            const messageAlreadyExists = previousMessagesData.items.some(
+              (existingMessage: Message) =>
+                existingMessage.id === newMessage.id,
+            );
+
+            if (messageAlreadyExists) return previousMessagesData;
+
+            return {
+              ...previousMessagesData,
+              items: [...previousMessagesData.items, newMessage],
+            };
+          },
+        );
+      }
+    },
+    [queryClient, selectedConversation],
+  );
+
+  const handleReadReceipt = useCallback(
+    (readReceipt: ReadReceipt, conversationId: string) => {
+      if (readReceipt.readByUser !== userInfo?.email) {
+        queryClient.setQueryData(
+          [QUERY_KEYS.getMessages, conversationId],
+          (previousMessagesData: MessagePage | undefined) => {
+            if (!previousMessagesData) return previousMessagesData;
+
+            return {
+              ...previousMessagesData,
+              items: previousMessagesData.items.map((message: Message) => ({
+                ...message,
+                read: message.author === userInfo?.email ? true : message.read,
+              })),
+            };
+          },
+        );
+      }
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.getConversations],
+      });
+    },
+    [queryClient, userInfo?.email],
+  );
+
   useEffect(() => {
     if (!accessToken) {
       return;
     }
 
     const client = new Client({
-      brokerURL: process.env.PUBLIC_WS_URL,
+      brokerURL: process.env.EXPO_PUBLIC_WS_URL,
       connectHeaders: {
         Authorization: `Bearer ${accessToken}`,
         token: accessToken,
@@ -111,6 +222,7 @@ export const MessagingProvider = ({ children }: MessagingProviderProps) => {
       },
       onDisconnect: () => {
         setIsConnected(false);
+        pendingSubscriptionsRef.current.clear();
       },
       onStompError: (frame: IFrame) => {
         setError(frame);
@@ -129,150 +241,27 @@ export const MessagingProvider = ({ children }: MessagingProviderProps) => {
 
     try {
       client.activate();
-    } catch (error) {
-      setError(error);
+    } catch (e) {
+      if (e instanceof Error) {
+        setError(e);
+      }
     }
+    const subs = subscriptionsRef.current;
+    const pendings = pendingSubscriptionsRef.current;
 
     return () => {
-      subscriptionsRef.current.forEach(sub => {
+      subs.forEach(sub => {
         sub.unsubscribe();
       });
-      subscriptionsRef.current.clear();
-      pendingSubscriptionsRef.current.clear();
+      subs.clear();
+      pendings.clear();
 
-      client.deactivate();
+      try {
+        client.deactivate();
+      } catch {}
       clientRef.current = null;
     };
   }, [accessToken]);
-
-  const unsubscribe = useCallback((destination: string) => {
-    const subscription = subscriptionsRef.current.get(destination);
-    if (subscription) {
-      subscription.unsubscribe();
-      subscriptionsRef.current.delete(destination);
-    }
-    pendingSubscriptionsRef.current.delete(destination);
-  }, []);
-
-  const subscribe = useCallback(
-    (destination: string, handler: MessageHandler) => {
-      if (clientRef.current?.connected) {
-        if (subscriptionsRef.current.has(destination)) {
-          return () => unsubscribe(destination);
-        }
-
-        const subscription = clientRef.current.subscribe(
-          destination,
-          message => {
-            try {
-              const messagePayload = JSON.parse(message.body);
-              handler(messagePayload);
-            } catch {
-              // Ignorar errores de parsing
-            }
-          },
-        );
-
-        subscriptionsRef.current.set(destination, subscription);
-      } else {
-        pendingSubscriptionsRef.current.set(destination, {
-          destination,
-          handler,
-        });
-      }
-
-      return () => unsubscribe(destination);
-    },
-    [unsubscribe],
-  );
-
-  const send = useCallback((destination: string, body: any) => {
-    if (!clientRef.current) {
-      throw new Error('Cliente STOMP no inicializado');
-    }
-
-    if (!clientRef.current.connected) {
-      if (!clientRef.current.active) {
-        try {
-          clientRef.current.activate();
-        } catch {
-          // Error al activar
-        }
-      }
-
-      throw new Error('WebSocket no conectado');
-    }
-
-    clientRef.current.publish({
-      destination,
-      body: JSON.stringify(body),
-    });
-  }, []);
-
-  const handleNewMessage = useCallback(
-    (newMessage: Message, conversationId: string) => {
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.getConversations],
-      });
-      queryClient.refetchQueries({ queryKey: [QUERY_KEYS.getConversations] });
-
-      if (conversationId === selectedConversation) {
-        queryClient.setQueryData(
-          [QUERY_KEYS.getMessages, conversationId],
-          (previousMessagesData: MessagePage | undefined) => {
-            if (!previousMessagesData) return previousMessagesData;
-
-            const messageAlreadyExists = previousMessagesData.items.some(
-              (existingMessage: Message) =>
-                existingMessage.id === newMessage.id,
-            );
-
-            if (messageAlreadyExists) return previousMessagesData;
-
-            return {
-              ...previousMessagesData,
-              items: [...previousMessagesData.items, newMessage],
-            };
-          },
-        );
-      }
-    },
-    [queryClient, selectedConversation],
-  );
-
-  useEffect(() => {
-    if (!isConnected || !selectedConversation) return;
-
-    const unsubscribe = subscribe(
-      WS_ENDPOINTS.SUBSCRIBE_MESSAGES(selectedConversation),
-      (newMessage: Message) => {
-        queryClient.setQueryData(
-          [QUERY_KEYS.getMessages, selectedConversation],
-          (previousMessagesData: MessagePage | undefined) => {
-            if (!previousMessagesData) return previousMessagesData;
-
-            const messageAlreadyExists = previousMessagesData.items.some(
-              (existingMessage: Message) =>
-                existingMessage.id === newMessage.id,
-            );
-
-            if (messageAlreadyExists) return previousMessagesData;
-
-            return {
-              ...previousMessagesData,
-              items: [...previousMessagesData.items, newMessage],
-            };
-          },
-        );
-
-        queryClient.invalidateQueries({
-          queryKey: [QUERY_KEYS.getConversations],
-        });
-      },
-    );
-
-    return unsubscribe;
-  }, [isConnected, selectedConversation, subscribe, queryClient]);
 
   useEffect(() => {
     if (!isConnected || !conversations || conversations.length === 0) return;
@@ -294,31 +283,6 @@ export const MessagingProvider = ({ children }: MessagingProviderProps) => {
     };
   }, [isConnected, conversations, subscribe, handleNewMessage]);
 
-  const handleReadReceipt = useCallback(
-    (readReceipt: ReadReceipt, conversationId: string) => {
-      if (readReceipt.readByUser !== userInfo?.email) {
-        queryClient.setQueryData(
-          [QUERY_KEYS.getMessages, conversationId],
-          (previousMessagesData: MessagePage | undefined) => {
-            if (!previousMessagesData) return previousMessagesData;
-
-            return {
-              ...previousMessagesData,
-              items: previousMessagesData.items.map((message: Message) => ({
-                ...message,
-                read: message.author === userInfo?.email ? true : message.read,
-              })),
-            };
-          },
-        );
-      }
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.getConversations],
-      });
-    },
-    [queryClient, userInfo?.email],
-  );
-
   useEffect(() => {
     if (!isConnected || !conversations || conversations.length === 0) return;
 
@@ -338,6 +302,13 @@ export const MessagingProvider = ({ children }: MessagingProviderProps) => {
       readReceiptUnsubscribes.forEach(unsubscribe => unsubscribe());
     };
   }, [isConnected, conversations, subscribe, handleReadReceipt]);
+
+  useEffect(() => {
+    if (error) {
+      console.log(error);
+      Toast.error('Error en la conexión, recarga la página por favor');
+    }
+  });
 
   const value = {
     isConnected,

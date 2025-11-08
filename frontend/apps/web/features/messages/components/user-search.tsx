@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -23,12 +23,14 @@ import { Toast } from '@alum-net/ui';
 export default function UserSearch() {
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
   const queryClient = useQueryClient();
   const { setSelectedConversation } = useMessaging();
+
   const { data: searchResults, isLoading: isSearching } = useQuery({
-    queryKey: [QUERY_KEYS.getAvailableConversations, searchQuery],
-    queryFn: () => searchAvailableUsers(searchQuery.trim()),
-    enabled: searchQuery.trim().length >= 2,
+    queryKey: [QUERY_KEYS.getAvailableConversations, debouncedSearchQuery],
+    queryFn: () => searchAvailableUsers(debouncedSearchQuery.trim()),
+    enabled: debouncedSearchQuery.trim().length >= 2,
     staleTime: 30_000,
   });
   const { data: userInfo } = useUserInfo();
@@ -81,6 +83,16 @@ export default function UserSearch() {
       handleSelectUser(user.email);
     }
   };
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 500);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchQuery]);
 
   return (
     <>

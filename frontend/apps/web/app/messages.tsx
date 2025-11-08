@@ -1,13 +1,21 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
-import { useMessaging } from '@alum-net/messaging';
+import { MessagingProvider, useMessaging } from '@alum-net/messaging';
 import ConversationsList from '../features/messages/components/conversations-list';
 import UserSearch from '../features/messages/components/user-search';
 import ChatView from '../features/messages/components/chat-view';
 import MessageInput from '../features/messages/components/message-input';
 
 export default function MessagesPage() {
+  return (
+    <MessagingProvider>
+      <Messages />
+    </MessagingProvider>
+  );
+}
+
+function Messages() {
   const { selectedConversation } = useMessaging();
 
   return (
