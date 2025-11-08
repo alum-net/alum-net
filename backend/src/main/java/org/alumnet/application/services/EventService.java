@@ -135,32 +135,44 @@ public class EventService {
 	public EventDetailDTO getEventById(Integer eventId) {
 		Event event = eventRepository.findById(eventId).orElseThrow(EventNotFoundException::new);
 		EventDetailDTO eventDetailDTO = eventMapper.eventToEventDTO(event);
-		eventDetailDTO.setStudentsWithPendingSubmission(
-				userRepository.findStudentsWithPendingSubmission(eventId, event.getSection().getCourseId()));
 
-        // Si es task devolvemos las entregas de los usuarios
-        if(event.getType() == EventType.TASK){
-            List<SubmissionsDTO> submissions = new ArrayList<>();
+        switch (event.getType()){
+            case EventType.TASK -> {
+                eventDetailDTO.setStudentsWithPendingSubmission(
+                        userRepository.findStudentsWithPendingSubmissionToTask(eventId, event.getSection().getCourseId()));
 
-            for(EventParticipation p : eventParticipationRepository.findAllById_EventId(eventId)){
-                TaskResource tr = p.getResource();
+                // Si es task devolvemos las entregas de los usuarios
+                List<SubmissionsDTO> submissions = new ArrayList<>();
 
-                SubmissionsDTO.SubmissionsDTOBuilder submissionsBuilder = SubmissionsDTO
-                        .builder()
-                        .studentEmail(p.getStudent().getEmail())
-                        .studentName(p.getStudent().getName())
-                        .studentLastname(p.getStudent().getLastname());
+                for(EventParticipation p : eventParticipationRepository.findAllById_EventId(eventId)
+                        .stream().filter(e -> e.getResource() != null)
+                        .collect(Collectors.toSet())){
+                    TaskResource tr = p.getResource();
 
-                if(tr != null){
-                    submissionsBuilder
-                            .fileName(p.getResource() != null ? p.getResource().getName() : null)
-                            .fileUrl(s3FileStorageService.generatePresignedUrl(p.getResource().getUrl()));
+                    SubmissionsDTO.SubmissionsDTOBuilder submissionsBuilder = SubmissionsDTO
+                            .builder()
+                            .studentEmail(p.getStudent().getEmail())
+                            .studentName(p.getStudent().getName())
+                            .studentLastname(p.getStudent().getLastname());
+
+                    if(tr != null){
+                        submissionsBuilder
+                                .fileName(p.getResource() != null ? p.getResource().getName() : null)
+                                .fileUrl(s3FileStorageService.generatePresignedUrl(p.getResource().getUrl()));
+                    }
+
+                    submissions.add(submissionsBuilder.build());
                 }
 
-                submissions.add(submissionsBuilder.build());
-            }
+                eventDetailDTO.setSubmissions(submissions);
 
-            eventDetailDTO.setSubmissions(submissions);
+                break;
+            }
+            case EventType.QUESTIONNAIRE -> {
+                eventDetailDTO.setStudentsWithPendingSubmission(
+                        userRepository.findStudentsWithPendingSubmissionToQuest(eventId, event.getSection().getCourseId()));
+                break;
+            }
         }
 
 		return eventDetailDTO;
