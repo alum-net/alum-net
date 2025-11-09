@@ -196,13 +196,6 @@ public class GlobalExceptionHandler {
 				.body(ResultResponse.error(ex.getMessage(), "No se encontró el usuario"));
 	}
 
-	@ExceptionHandler(InsufficientPermissionsException.class)
-	public ResponseEntity<ResultResponse<Object>> handleInsufficientPermissionsException(
-			InsufficientPermissionsException ex) {
-		return ResponseEntity.status(HttpStatus.FORBIDDEN)
-				.body(ResultResponse.error(ex.getMessage(), "Permisos insuficientes"));
-	}
-
 	@ExceptionHandler(ConversationNotFoundException.class)
 	public ResponseEntity<ResultResponse<Object>> handleConversationNotFound(ConversationNotFoundException ex) {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -227,6 +220,13 @@ public class GlobalExceptionHandler {
 				.body(ResultResponse.error(ex.getMessage(), "Participante invalido"));
 	}
 
+	@ExceptionHandler(InsufficientPermissionsException.class)
+	public ResponseEntity<ResultResponse<Object>> handleInsufficientPermissionsException(
+			InsufficientPermissionsException ex) {
+		return ResponseEntity.status(HttpStatus.FORBIDDEN)
+				.body(ResultResponse.error(ex.getMessage(), "Permisos insuficientes"));
+	}
+
 	@ExceptionHandler(ActiveCourseException.class)
 	public ResponseEntity<ResultResponse<Object>> handleActiveCourseException(ActiveCourseException ex) {
 		return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "El curso se encuentra activo"));
@@ -238,5 +238,4 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(HttpStatus.CONFLICT)
 				.body(ResultResponse.error(ex.getMessage(), "El estudiante ya está matriculado en el curso"));
 	}
-
 }
