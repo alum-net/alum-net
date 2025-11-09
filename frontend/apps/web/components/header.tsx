@@ -28,7 +28,7 @@ export default function WebHeader() {
       | '/users'
       | '/courses'
       | '/library'
-      | '/messages';
+      | '/messaging';
     badge?: number;
   }[] = [
     { label: 'Inicio', route: '/home' },
@@ -40,7 +40,7 @@ export default function WebHeader() {
       ? [
           {
             label: 'Mensajes',
-            route: '/messages' as const,
+            route: '/messaging' as const,
             badge: totalUnreadCount > 0 ? totalUnreadCount : undefined,
           },
         ]

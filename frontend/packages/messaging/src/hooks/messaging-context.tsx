@@ -23,6 +23,8 @@ import {
 import { useConversations } from './useConversations';
 import { WS_ENDPOINTS } from '../constants';
 import { Toast } from '@alum-net/ui';
+import { useFocusEffect } from '@react-navigation/native';
+import { Platform } from 'react-native';
 
 type WSMessage = TypingEvent | Message | ReadReceipt;
 type WSSendBody = { content: string } | { isTyping: boolean };
@@ -96,7 +98,9 @@ export const MessagingProvider = ({ children }: MessagingProviderProps) => {
             try {
               const messagePayload = JSON.parse(message.body);
               handler(messagePayload);
-            } catch {}
+            } catch (error) {
+              console.log(error);
+            }
           },
         );
 
@@ -179,89 +183,100 @@ export const MessagingProvider = ({ children }: MessagingProviderProps) => {
     [queryClient, userInfo?.email],
   );
 
-  useEffect(() => {
-    if (!accessToken) {
-      return;
-    }
-
-    const client = new Client({
-      brokerURL: process.env.EXPO_PUBLIC_WS_URL,
-      connectHeaders: {
-        Authorization: `Bearer ${accessToken}`,
-        token: accessToken,
-      },
-      heartbeatIncoming: 10000,
-      heartbeatOutgoing: 10000,
-      reconnectDelay: 5000,
-      connectionTimeout: 5000,
-      debug: () => {},
-      onConnect: () => {
-        setIsConnected(true);
-        setError(null);
-
-        pendingSubscriptionsRef.current.forEach(pending => {
-          if (!clientRef.current?.connected) return;
-          if (subscriptionsRef.current.has(pending.destination)) return;
-
-          const subscription = clientRef.current.subscribe(
-            pending.destination,
-            message => {
-              try {
-                const payload = JSON.parse(message.body);
-                pending.handler(payload);
-              } catch {
-                // Error parseando mensaje
-              }
-            },
-          );
-
-          subscriptionsRef.current.set(pending.destination, subscription);
-        });
-
-        pendingSubscriptionsRef.current.clear();
-      },
-      onDisconnect: () => {
-        setIsConnected(false);
-        pendingSubscriptionsRef.current.clear();
-      },
-      onStompError: (frame: IFrame) => {
-        setError(frame);
-        setIsConnected(false);
-      },
-      onWebSocketError: event => {
-        setError(event);
-        setIsConnected(false);
-      },
-      onWebSocketClose: () => {
-        setIsConnected(false);
-      },
-    });
-
-    clientRef.current = client;
-
-    try {
-      client.activate();
-    } catch (e) {
-      if (e instanceof Error) {
-        setError(e);
+  useFocusEffect(
+    useCallback(() => {
+      if (!accessToken) {
+        return;
       }
-    }
-    const subs = subscriptionsRef.current;
-    const pendings = pendingSubscriptionsRef.current;
 
-    return () => {
-      subs.forEach(sub => {
-        sub.unsubscribe();
+      const client = new Client({
+        brokerURL: process.env.EXPO_PUBLIC_WS_URL,
+        connectHeaders: {
+          Authorization: `Bearer ${accessToken}`,
+          token: accessToken,
+        },
+        heartbeatIncoming: 10000,
+        heartbeatOutgoing: 10000,
+        reconnectDelay: 5000,
+        connectionTimeout: 5000,
+        ...(Platform.OS !== 'web'
+          ? { forceBinaryWSFrames: true, appendMissingNULLonIncoming: true }
+          : {}),
+        // debug: debug => {
+        //   if (process.env.EXPO_PUBLIC_ENV === 'development') console.log(debug);
+        // },
+        onConnect: () => {
+          console.log('conectado');
+          setIsConnected(true);
+          setError(null);
+
+          pendingSubscriptionsRef.current.forEach(pending => {
+            if (!clientRef.current?.connected) return;
+            if (subscriptionsRef.current.has(pending.destination)) return;
+
+            const subscription = clientRef.current.subscribe(
+              pending.destination,
+              message => {
+                try {
+                  const payload = JSON.parse(message.body);
+                  pending.handler(payload);
+                } catch (error) {
+                  console.log(error);
+                }
+              },
+            );
+
+            subscriptionsRef.current.set(pending.destination, subscription);
+          });
+
+          pendingSubscriptionsRef.current.clear();
+        },
+        onDisconnect: () => {
+          setIsConnected(false);
+          pendingSubscriptionsRef.current.clear();
+        },
+        onStompError: (frame: IFrame) => {
+          setError(frame);
+          setIsConnected(false);
+        },
+        onWebSocketError: event => {
+          setError(event);
+          setIsConnected(false);
+        },
+        onWebSocketClose: () => {
+          setIsConnected(false);
+        },
       });
-      subs.clear();
-      pendings.clear();
+
+      clientRef.current = client;
 
       try {
-        client.deactivate();
-      } catch {}
-      clientRef.current = null;
-    };
-  }, [accessToken]);
+        client.activate();
+      } catch (e) {
+        console.log(e);
+        if (e instanceof Error) {
+          setError(e);
+        }
+      }
+      const subs = subscriptionsRef.current;
+      const pendings = pendingSubscriptionsRef.current;
+
+      return () => {
+        subs.forEach(sub => {
+          sub.unsubscribe();
+        });
+        subs.clear();
+        pendings.clear();
+
+        try {
+          client.deactivate();
+        } catch (error) {
+          console.log(error);
+        }
+        clientRef.current = null;
+      };
+    }, [accessToken]),
+  );
 
   useEffect(() => {
     if (!isConnected || !conversations || conversations.length === 0) return;

@@ -7,20 +7,17 @@ import {
   TextInput,
 } from 'react-native';
 import { Text, ActivityIndicator, IconButton } from 'react-native-paper';
-import {
-  ConversationSummary,
-  getOrCreateConversation,
-  searchAvailableUsers,
-  useConversations,
-  useMessaging,
-} from '@alum-net/messaging';
 import { UserInfo } from '@alum-net/users/src/types';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@alum-net/api';
 import { useUserInfo } from '@alum-net/users';
 import { Toast } from '@alum-net/ui';
+import { useMessaging } from '../hooks/messaging-context';
+import { getOrCreateConversation, searchAvailableUsers } from '../service';
+import { useConversations } from '../hooks/useConversations';
+import { ConversationSummary } from '../types';
 
-export default function UserSearch() {
+export function UserSearch() {
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');

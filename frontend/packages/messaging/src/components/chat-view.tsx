@@ -5,23 +5,26 @@ import React, {
   useState,
   useMemo,
 } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
-import { Text, ActivityIndicator } from 'react-native-paper';
-import {
-  getConversationHistory,
-  markMessagesAsRead,
-  Message,
-  TypingEvent,
-  useConversations,
-  useMessaging,
-  WS_ENDPOINTS,
-} from '@alum-net/messaging';
+import { View, StyleSheet, ScrollView, Platform } from 'react-native';
+import { Text, ActivityIndicator, Appbar } from 'react-native-paper';
 import { useQuery } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@alum-net/api';
 import { useUserInfo } from '@alum-net/users';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { THEME } from '@alum-net/ui';
+import { getConversationHistory, markMessagesAsRead } from '../service';
+import { useConversations } from '../hooks/useConversations';
+import { useMessaging } from '../hooks/messaging-context';
+import { WS_ENDPOINTS } from '../constants';
+import { Message, TypingEvent } from '../types';
 
-export default function ChatView() {
-  const { subscribe, selectedConversation, isConnected } = useMessaging();
+export function ChatView() {
+  const {
+    subscribe,
+    selectedConversation,
+    isConnected,
+    setSelectedConversation,
+  } = useMessaging();
   const {
     data: messages,
     isLoading: isLoading,
@@ -34,6 +37,7 @@ export default function ChatView() {
   });
   const { data: userInfo } = useUserInfo();
   const { data: conversations } = useConversations(userInfo?.role);
+  const nav = useRouter();
   const activeConversation = useMemo(
     () =>
       conversations?.find(
@@ -52,7 +56,12 @@ export default function ChatView() {
   const [typingUser, setTypingUser] = useState<string | null>(null);
 
   const markAsRead = useCallback(() => {
-    if (!activeConversation?.id || !isConnected) return;
+    if (
+      !isConnected ||
+      !activeConversation?.id ||
+      activeConversation.unreadCount === 0
+    )
+      return;
 
     if (markAsReadTimeoutRef.current) {
       clearTimeout(markAsReadTimeoutRef.current);
@@ -62,17 +71,7 @@ export default function ChatView() {
         markMessagesAsRead(selectedConversation).catch(() => {});
       }
     }, 300);
-  }, [selectedConversation, activeConversation?.id, isConnected]);
-
-  useEffect(() => {
-    if (selectedConversation && isConnected) {
-      const timeoutId = setTimeout(() => {
-        markMessagesAsRead(selectedConversation).catch(() => {});
-      }, 500);
-
-      return () => clearTimeout(timeoutId);
-    }
-  }, [selectedConversation, isConnected]);
+  }, [selectedConversation, activeConversation, isConnected]);
 
   useEffect(() => {
     if (
@@ -158,13 +157,32 @@ export default function ChatView() {
     };
   }, [activeConversation?.id]);
 
+  useFocusEffect(
+    useCallback(() => {
+      if (activeConversation && activeConversation.unreadCount > 0) {
+        markAsRead();
+      }
+    }, [activeConversation, markAsRead]),
+  );
+
   return (
     <View style={styles.chatArea}>
-      <View style={styles.chatHeader}>
-        <Text style={styles.chatTitle}>
-          {activeConversation?.otherParticipantName || 'Conversación'}
-        </Text>
-      </View>
+      <Appbar
+        safeAreaInsets={{ bottom: 0, top: 0, left: 0, right: 0 }}
+        style={{ backgroundColor: THEME.colors.background }}
+      >
+        {Platform.OS !== 'web' && (
+          <Appbar.BackAction
+            onPress={() => {
+              setSelectedConversation(null);
+              nav.back();
+            }}
+          />
+        )}
+        <Appbar.Content
+          title={activeConversation?.otherParticipantName || 'Conversación'}
+        />
+      </Appbar>
 
       <ScrollView
         ref={scrollViewRef}

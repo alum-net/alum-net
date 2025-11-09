@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { MAX_MESSAGE_LENGTH, MIN_MESSAGE_LENGTH } from '@alum-net/messaging';
+import { MAX_MESSAGE_LENGTH, MIN_MESSAGE_LENGTH } from './constants';
 
 export const messageContentSchema = z
   .string()

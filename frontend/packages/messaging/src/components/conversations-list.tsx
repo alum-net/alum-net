@@ -1,12 +1,11 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { Text, ActivityIndicator } from 'react-native-paper';
-import {
-  ConversationSummary,
-  useConversations,
-  useMessaging,
-} from '@alum-net/messaging';
+
 import { useUserInfo } from '@alum-net/users';
+import { ConversationSummary } from '../types';
+import { useMessaging } from '../hooks/messaging-context';
+import { useConversations } from '../hooks/useConversations';
 
 const formatMessageTimestamp = (timestamp?: string): string => {
   if (!timestamp) return '';
@@ -27,12 +26,13 @@ const formatMessageTimestamp = (timestamp?: string): string => {
       day: '2-digit',
       month: '2-digit',
     });
-  } catch {
+  } catch (error) {
+    console.log(error);
     return '';
   }
 };
 
-export default function ConversationsList() {
+export function ConversationsList() {
   const { selectedConversation, setSelectedConversation } = useMessaging();
   const { data: userInfo } = useUserInfo();
   const {
@@ -95,7 +95,7 @@ export default function ConversationsList() {
                     {conversation.otherParticipantName}
                   </Text>
                   <View style={styles.headerRight}>
-                    {timeText && (
+                    {!!timeText && (
                       <Text style={styles.timeText}>{timeText}</Text>
                     )}
                     {hasUnread && (

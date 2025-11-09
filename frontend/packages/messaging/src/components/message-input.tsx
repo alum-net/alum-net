@@ -1,18 +1,18 @@
 import React, { useRef, useEffect, useCallback, useState } from 'react';
 import { View, StyleSheet, TextInput } from 'react-native';
 import { IconButton } from 'react-native-paper';
+import { Toast } from '@alum-net/ui';
+import { useQueryClient } from '@tanstack/react-query';
+import { QUERY_KEYS } from '@alum-net/api';
+import { useMessaging } from '../hooks/messaging-context';
 import {
   MAX_MESSAGE_LENGTH,
   MIN_MESSAGE_LENGTH,
   TYPING_DEBOUNCE_MS,
-  useMessaging,
   WS_ENDPOINTS,
-} from '@alum-net/messaging';
-import { Toast } from '@alum-net/ui';
-import { useQueryClient } from '@tanstack/react-query';
-import { QUERY_KEYS } from '@alum-net/api';
+} from '../constants';
 
-export default function MessageInput() {
+export function MessageInput() {
   const { selectedConversation, send, isConnected } = useMessaging();
   const inputRef = useRef(null);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -38,7 +38,9 @@ export default function MessageInput() {
           WS_ENDPOINTS.SEND_TYPING(selectedConversation);
         send(typingDestination, { isTyping });
         lastTypingSentRef.current = isTyping;
-      } catch {}
+      } catch (error) {
+        console.log(error);
+      }
     },
     [selectedConversation, isConnected, send],
   );
@@ -142,7 +144,6 @@ export default function MessageInput() {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : 'Error desconocido';
-
       if (errorMessage === 'WebSocket no conectado') {
         Toast.error(
           'No se pudo conectar al servidor. El sistema intentará reconectar automáticamente. Por favor, espera unos segundos e intenta enviar nuevamente.',
