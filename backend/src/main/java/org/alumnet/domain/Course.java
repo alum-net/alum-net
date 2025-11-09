@@ -3,6 +3,7 @@ package org.alumnet.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import org.alumnet.application.enums.ShiftType;
+import org.alumnet.domain.events.Event;
 import org.alumnet.domain.users.Teacher;
 
 import java.util.Date;
@@ -53,5 +54,8 @@ public class Course {
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Section> sections;
+
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Event> events;
 
 }

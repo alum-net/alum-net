@@ -10,7 +10,7 @@ import { UserRole, useUserInfo } from '@alum-net/users';
 import { QUERY_KEYS } from '@alum-net/api';
 import { isAxiosError } from 'axios';
 
-const mapEventTypeToString = (type: EventType) => {
+export const mapEventTypeToString = (type: EventType) => {
   switch (type.toUpperCase()) {
     case EventType.TASK:
       return 'Tarea';

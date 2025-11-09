@@ -16,7 +16,7 @@ type FormTextInputProps<T extends FieldValues> = Omit<
   rules?: RegisterOptions<T>;
   customOnChange?: (
     value: string,
-    fieldOnChange: (...event: any[]) => void,
+    fieldOnChange: (...event: unknown[]) => void,
   ) => void;
 };
 
