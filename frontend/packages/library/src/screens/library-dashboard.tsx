@@ -33,7 +33,7 @@ const LibraryFilters = ({
   return (
     <View style={{ padding: 10 }}>
       <TextInput
-        label="Buscar por nombre"
+        label="Buscar por nombre del archivo"
         value={nameFilter}
         onChangeText={setNameFilter}
         style={{ marginBottom: 10 }}
