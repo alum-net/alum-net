@@ -12,7 +12,11 @@ export const RichTextEditor = ({ editor }: { editor: EditorBridge }) => (
         bottom: 0,
       }}
     >
-      <Toolbar editor={editor} items={[...MARKDOWN_TOOLBAR_ITEMS]} />
+      <Toolbar
+        editor={editor}
+        items={[...MARKDOWN_TOOLBAR_ITEMS]}
+        hidden={false}
+      />
     </KeyboardAvoidingView>
   </View>
 );

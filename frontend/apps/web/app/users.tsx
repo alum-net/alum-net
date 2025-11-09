@@ -211,7 +211,7 @@ export default function UsersPage() {
                     setActivityVisible(true);
                   }}
                 >
-                  Registro de Actividad
+                  Ver Actividad
                 </Button>
               </DataTable.Cell>
             </DataTable.Row>
