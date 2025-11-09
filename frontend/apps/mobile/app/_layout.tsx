@@ -1,3 +1,4 @@
+import { TextEncoder } from 'text-encoding';
 import { Stack } from 'expo-router';
 import { useEffect } from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
@@ -11,6 +12,7 @@ import { useMMKVString } from 'react-native-mmkv';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { OneSignal, LogLevel } from 'react-native-onesignal';
+global.TextEncoder = TextEncoder;
 export { ErrorBoundary } from 'expo-router';
 
 SplashScreen.preventAutoHideAsync();

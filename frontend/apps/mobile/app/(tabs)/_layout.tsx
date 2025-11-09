@@ -67,6 +67,16 @@ export default function TabLayout() {
           headerShown: false,
         }}
       />
+      <Tabs.Screen
+        name="messaging"
+        options={{
+          title: 'Mensajes',
+          tabBarIcon: ({ color }) => (
+            <TabBarIcon name="comment" color={color} />
+          ),
+          headerShown: false,
+        }}
+      />
     </Tabs>
   );
 }

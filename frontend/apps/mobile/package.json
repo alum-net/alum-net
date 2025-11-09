@@ -15,6 +15,7 @@
     "@alum-net/courses": "*",
     "@alum-net/forums": "*",
     "@alum-net/library": "*",
+    "@alum-net/messaging": "*",
     "@alum-net/storage": "*",
     "@alum-net/ui": "*",
     "@react-navigation/bottom-tabs": "^7.3.10",
@@ -41,7 +42,11 @@
     "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.11.1",
-    "react-native-webview": "13.13.5"
+    "react-native-webview": "13.13.5",
+    "text-encoding": "^0.7.0"
   },
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "@types/text-encoding": "^0.0.40"
+  }
 }
