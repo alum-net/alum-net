@@ -22,6 +22,8 @@ public class ResultResponse <T>{
     @Builder.Default
     private List<String> errors = new ArrayList<>();
 
+    private List<WebNotificationDTO> notifications;
+
     public void addError(String error){
         errors.add(error);
     }
@@ -45,5 +47,4 @@ public class ResultResponse <T>{
     public static <T> ResultResponse<T> error(String error, String message) {
         return error(Collections.singletonList(error), message);
     }
-
 }
