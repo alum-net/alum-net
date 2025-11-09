@@ -12,169 +12,230 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ResultResponse<Object>> handleGeneralException(Exception ex) {
-        return ResponseEntity.internalServerError().body(ResultResponse.error(ex.getMessage(), "Ha ocurrido un error inesperado"));
-    }
-    @ExceptionHandler (ConstraintViolationException.class)
-    public ResponseEntity<ResultResponse<Object>> handleValidationException(ConstraintViolationException ex) {
-        ResultResponse result = ResultResponse.builder().message("Error de validación").build();
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<ResultResponse<Object>> handleGeneralException(Exception ex) {
+		return ResponseEntity.internalServerError()
+				.body(ResultResponse.error(ex.getMessage(), "Ha ocurrido un error inesperado"));
+	}
 
-        ex.getConstraintViolations()
-                .forEach(error -> result.addError(error.getMessage()));
+	@ExceptionHandler(ConstraintViolationException.class)
+	public ResponseEntity<ResultResponse<Object>> handleValidationException(ConstraintViolationException ex) {
+		ResultResponse result = ResultResponse.builder().message("Error de validación").build();
 
-        return ResponseEntity.badRequest().body(result);
-    }
-    @ExceptionHandler (MethodArgumentNotValidException.class)
-    public ResponseEntity<ResultResponse<Object>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
-        ResultResponse result = ResultResponse.builder().message("Error de validación").build();
+		ex.getConstraintViolations()
+				.forEach(error -> result.addError(error.getMessage()));
 
-        ex.getBindingResult().getFieldErrors()
-                .forEach(error -> result.addError(error.getDefaultMessage()));
+		return ResponseEntity.badRequest().body(result);
+	}
 
-        return ResponseEntity.badRequest().body(result);
-    }
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public ResponseEntity<ResultResponse<Object>> handleMethodArgumentNotValidException(
+			MethodArgumentNotValidException ex) {
+		ResultResponse result = ResultResponse.builder().message("Error de validación").build();
 
-    @ExceptionHandler(FileException.class)
-    public ResponseEntity<ResultResponse<Object>> handleInvalidExtensionException(FileException ex) {
-        return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Error validando el archivo"));
-    }
-    @ExceptionHandler(InvalidMimeTypeException.class)
-    public ResponseEntity<ResultResponse<Object>> handleInvalidMimeTypeException(InvalidMimeTypeException ex) {
-        return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Tipo MIME no válido"));
-    }
-    @ExceptionHandler(ExistingUserException.class)
-    public ResponseEntity<ResultResponse<Object>> handleExistingUserException(ExistingUserException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(ResultResponse.error(ex.getMessage(), "El usuario ya existe"));
-    }
-    @ExceptionHandler(EnrollmentNotFoundException.class)
-    public ResponseEntity<ResultResponse<Object>> handleEnrollmentNotFoundException(EnrollmentNotFoundException ex) {
-        return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultResponse.error(ex.getMessage(), "El usuario no está matriculado al curso"));
-    }
+		ex.getBindingResult().getFieldErrors()
+				.forEach(error -> result.addError(error.getDefaultMessage()));
 
-    @ExceptionHandler(CourseNotFoundException.class)
-    public ResponseEntity<ResultResponse<Object>> handleCourseNotFoundException(CourseNotFoundException ex) {
-        return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultResponse.error(ex.getMessage(), "Nose encontró el curso"));
-    }
+		return ResponseEntity.badRequest().body(result);
+	}
 
-    @ExceptionHandler(InvalidPostContentLenghtException.class)
-    public ResponseEntity<ResultResponse<Object>> handleInvalidPostContentLenghtException(InvalidPostContentLenghtException ex) {
-        return  ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "El mensaje supera los 350 caracteres"));
-    }
+	@ExceptionHandler(FileException.class)
+	public ResponseEntity<ResultResponse<Object>> handleInvalidExtensionException(FileException ex) {
+		return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Error validando el archivo"));
+	}
 
-    @ExceptionHandler(InvalidPostTitleException.class)
-    public ResponseEntity<ResultResponse<Object>> handleInvalidPostTitleException(InvalidPostTitleException ex) {
-        return  ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Las respuestas no pueden tener título."));
-    }
+	@ExceptionHandler(InvalidMimeTypeException.class)
+	public ResponseEntity<ResultResponse<Object>> handleInvalidMimeTypeException(InvalidMimeTypeException ex) {
+		return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Tipo MIME no válido"));
+	}
 
-    @ExceptionHandler(PostNotFoundException.class)
-    public ResponseEntity<ResultResponse<Object>> handlePostNotFoundException(PostNotFoundException ex) {
-        return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultResponse.error(ex.getMessage(), "No se encontró el post"));
-    }
+	@ExceptionHandler(ExistingUserException.class)
+	public ResponseEntity<ResultResponse<Object>> handleExistingUserException(ExistingUserException ex) {
+		return ResponseEntity.status(HttpStatus.CONFLICT)
+				.body(ResultResponse.error(ex.getMessage(), "El usuario ya existe"));
+	}
 
-    @ExceptionHandler(PostHasRepliesException.class)
-    public ResponseEntity<ResultResponse<Object>> handlePostHasRepliesException(PostHasRepliesException ex) {
-        return  ResponseEntity.status(HttpStatus.CONFLICT).body(ResultResponse.error(ex.getMessage(), "No se puede modificar el post"));
-    }
+	@ExceptionHandler(EnrollmentNotFoundException.class)
+	public ResponseEntity<ResultResponse<Object>> handleEnrollmentNotFoundException(EnrollmentNotFoundException ex) {
+		return ResponseEntity.status(HttpStatus.NOT_FOUND)
+				.body(ResultResponse.error(ex.getMessage(), "El usuario no está matriculado al curso"));
+	}
 
-    @ExceptionHandler(NoPendingChangesException.class)
-    public ResponseEntity<ResultResponse<Object>> handleNoPendingChangesException(NoPendingChangesException ex) {
-        return  ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).body(ResultResponse.error(ex.getMessage(), "No hay cambios pendientes"));
-    }
+	@ExceptionHandler(CourseNotFoundException.class)
+	public ResponseEntity<ResultResponse<Object>> handleCourseNotFoundException(CourseNotFoundException ex) {
+		return ResponseEntity.status(HttpStatus.NOT_FOUND)
+				.body(ResultResponse.error(ex.getMessage(), "Nose encontró el curso"));
+	}
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ResultResponse<Object>> handleIllegalArgumentException(IllegalArgumentException ex) {
-        return  ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Error en el procesamiento"));
-    }
+	@ExceptionHandler(InvalidPostContentLenghtException.class)
+	public ResponseEntity<ResultResponse<Object>> handleInvalidPostContentLenghtException(
+			InvalidPostContentLenghtException ex) {
+		return ResponseEntity.badRequest()
+				.body(ResultResponse.error(ex.getMessage(), "El mensaje supera los 350 caracteres"));
+	}
 
-    @ExceptionHandler(LabelAlreadyExistsException.class)
-    public ResponseEntity<ResultResponse<Object>> handleLabelAlreadyExistsException(LabelAlreadyExistsException ex){
-        return  ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Ya existe la etiqueta"));
-    }
+	@ExceptionHandler(InvalidPostTitleException.class)
+	public ResponseEntity<ResultResponse<Object>> handleInvalidPostTitleException(InvalidPostTitleException ex) {
+		return ResponseEntity.badRequest()
+				.body(ResultResponse.error(ex.getMessage(), "Las respuestas no pueden tener título."));
+	}
 
-    @ExceptionHandler(LabelNotFoundException.class)
-    public ResponseEntity<ResultResponse<Object>> handleLabelNotFoundException(LabelNotFoundException ex){
-        return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultResponse.error(ex.getMessage(), "No se encontró la etiqueta"));
-    }
+	@ExceptionHandler(PostNotFoundException.class)
+	public ResponseEntity<ResultResponse<Object>> handlePostNotFoundException(PostNotFoundException ex) {
+		return ResponseEntity.status(HttpStatus.NOT_FOUND)
+				.body(ResultResponse.error(ex.getMessage(), "No se encontró el post"));
+	}
 
-    @ExceptionHandler(LibraryResourceAlreadyExistsException.class)
-    public ResponseEntity<ResultResponse<Object>> handleLibraryResourceAlreadyExistsException(LibraryResourceAlreadyExistsException ex) {
-        return  ResponseEntity.status(HttpStatus.CONFLICT).body(ResultResponse.error(ex.getMessage(), "Ya existe el recurso en la librería"));
-    }
+	@ExceptionHandler(PostHasRepliesException.class)
+	public ResponseEntity<ResultResponse<Object>> handlePostHasRepliesException(PostHasRepliesException ex) {
+		return ResponseEntity.status(HttpStatus.CONFLICT)
+				.body(ResultResponse.error(ex.getMessage(), "No se puede modificar el post"));
+	}
 
-    @ExceptionHandler(LibraryResourceNotFoundException.class)
-    public ResponseEntity<ResultResponse<Object>> handleLibraryResourceNotFoundException(LibraryResourceNotFoundException ex) {
-        return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultResponse.error(ex.getMessage(), "No existe el recurso en la librería"));
-    }
+	@ExceptionHandler(NoPendingChangesException.class)
+	public ResponseEntity<ResultResponse<Object>> handleNoPendingChangesException(NoPendingChangesException ex) {
+		return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT)
+				.body(ResultResponse.error(ex.getMessage(), "No hay cambios pendientes"));
+	}
 
-    @ExceptionHandler(InvalidAttributeException.class)
-    public ResponseEntity<ResultResponse<Object>> handleInvalidAttributeException(InvalidAttributeException ex) {
-        return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Atributo inválido"));
-    }
+	@ExceptionHandler(IllegalArgumentException.class)
+	public ResponseEntity<ResultResponse<Object>> handleIllegalArgumentException(IllegalArgumentException ex) {
+		return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Error en el procesamiento"));
+	}
 
-    @ExceptionHandler(QuestionnaireValidationException.class)
-    public ResponseEntity<ResultResponse<Object>> handleQuestionnaireValidationException(QuestionnaireValidationException ex) {
-        return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Error de validación del cuestionario"));
-    }
+	@ExceptionHandler(LabelAlreadyExistsException.class)
+	public ResponseEntity<ResultResponse<Object>> handleLabelAlreadyExistsException(LabelAlreadyExistsException ex) {
+		return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Ya existe la etiqueta"));
+	}
 
-    @ExceptionHandler(EventHasParticipationException.class)
-    public ResponseEntity<ResultResponse<Object>> handleEventHasParticipationException(EventHasParticipationException ex) {
-        return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "El evento tiene participaciones activas"));
-    }
+	@ExceptionHandler(LabelNotFoundException.class)
+	public ResponseEntity<ResultResponse<Object>> handleLabelNotFoundException(LabelNotFoundException ex) {
+		return ResponseEntity.status(HttpStatus.NOT_FOUND)
+				.body(ResultResponse.error(ex.getMessage(), "No se encontró la etiqueta"));
+	}
 
-    @ExceptionHandler(EventNotFoundException.class)
-    public ResponseEntity<ResultResponse<Object>> handleEventNotFoundException(EventNotFoundException ex) {
-        return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "No existe el evento"));
-    }
+	@ExceptionHandler(LibraryResourceAlreadyExistsException.class)
+	public ResponseEntity<ResultResponse<Object>> handleLibraryResourceAlreadyExistsException(
+			LibraryResourceAlreadyExistsException ex) {
+		return ResponseEntity.status(HttpStatus.CONFLICT)
+				.body(ResultResponse.error(ex.getMessage(), "Ya existe el recurso en la librería"));
+	}
 
-    @ExceptionHandler(SectionNotFoundException.class)
-    public ResponseEntity<ResultResponse<Object>> handleSectionNotFoundException(SectionNotFoundException ex){
-        return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "No existe la sección"));
-    }
+	@ExceptionHandler(LibraryResourceNotFoundException.class)
+	public ResponseEntity<ResultResponse<Object>> handleLibraryResourceNotFoundException(
+			LibraryResourceNotFoundException ex) {
+		return ResponseEntity.status(HttpStatus.NOT_FOUND)
+				.body(ResultResponse.error(ex.getMessage(), "No existe el recurso en la librería"));
+	}
 
-    @ExceptionHandler(AuthorizationException.class)
-    public ResponseEntity<ResultResponse<Object>> handleAuthorizationException(AuthorizationException ex){
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResultResponse.error(ex.getMessage(), "Problema en la autorización"));
-    }
+	@ExceptionHandler(InvalidAttributeException.class)
+	public ResponseEntity<ResultResponse<Object>> handleInvalidAttributeException(InvalidAttributeException ex) {
+		return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "Atributo inválido"));
+	}
 
-    @ExceptionHandler(AssignmentDueDateExpiredException.class)
-    public ResponseEntity<ResultResponse<Object>> handleAssignmentDueDateExpiredException(AssignmentDueDateExpiredException ex) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ResultResponse.error(ex.getMessage(), "La fecha de entrega de la tarea ha expirado"));
-    }
+	@ExceptionHandler(QuestionnaireValidationException.class)
+	public ResponseEntity<ResultResponse<Object>> handleQuestionnaireValidationException(
+			QuestionnaireValidationException ex) {
+		return ResponseEntity.badRequest()
+				.body(ResultResponse.error(ex.getMessage(), "Error de validación del cuestionario"));
+	}
 
-    @ExceptionHandler(HomeworkAlreadySubmittedException.class)
-    public ResponseEntity<ResultResponse<Object>> handleHomeworkAlreadySubmittedException(HomeworkAlreadySubmittedException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(ResultResponse.error(ex.getMessage(), "La tarea ya ha sido enviada"));
-    }
+	@ExceptionHandler(EventHasParticipationException.class)
+	public ResponseEntity<ResultResponse<Object>> handleEventHasParticipationException(
+			EventHasParticipationException ex) {
+		return ResponseEntity.badRequest()
+				.body(ResultResponse.error(ex.getMessage(), "El evento tiene participaciones activas"));
+	}
 
-    @ExceptionHandler(CourseParticipationNotFoundException.class)
-    public ResponseEntity<ResultResponse<Object>> handleCourseParticipationNotFoundException(CourseParticipationNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultResponse.error(ex.getMessage(), "El usuario no está matriculado en el curso"));
-    }
+	@ExceptionHandler(EventNotFoundException.class)
+	public ResponseEntity<ResultResponse<Object>> handleEventNotFoundException(EventNotFoundException ex) {
+		return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "No existe el evento"));
+	}
 
-    @ExceptionHandler(InvalidSubmissionException.class)
-    public ResponseEntity<ResultResponse<Object>> handleInvalidSubmissionException(InvalidSubmissionException ex) {
-        return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "El pedido no se pudo completar"));
-    }
+	@ExceptionHandler(SectionNotFoundException.class)
+	public ResponseEntity<ResultResponse<Object>> handleSectionNotFoundException(SectionNotFoundException ex) {
+		return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "No existe la sección"));
+	}
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ResultResponse<Object>> handleUserNotFoundException(UserNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultResponse.error(ex.getMessage(), "No se encontró el usuario"));
-    }
+	@ExceptionHandler(AuthorizationException.class)
+	public ResponseEntity<ResultResponse<Object>> handleAuthorizationException(AuthorizationException ex) {
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+				.body(ResultResponse.error(ex.getMessage(), "Problema en la autorización"));
+	}
 
-    @ExceptionHandler(InsufficientPermissionsException.class)
-    public ResponseEntity<ResultResponse<Object>> handleInsufficientPermissionsException(InsufficientPermissionsException ex) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ResultResponse.error(ex.getMessage(), "Permisos insuficientes"));
-    }
+	@ExceptionHandler(AssignmentDueDateExpiredException.class)
+	public ResponseEntity<ResultResponse<Object>> handleAssignmentDueDateExpiredException(
+			AssignmentDueDateExpiredException ex) {
+		return ResponseEntity.status(HttpStatus.FORBIDDEN)
+				.body(ResultResponse.error(ex.getMessage(), "La fecha de entrega de la tarea ha expirado"));
+	}
 
-    @ExceptionHandler(ActiveCourseException.class)
-    public ResponseEntity<ResultResponse<Object>> handleActiveCourseException(ActiveCourseException ex) {
-        return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "El curso se encuentra activo"));
-    }
+	@ExceptionHandler(HomeworkAlreadySubmittedException.class)
+	public ResponseEntity<ResultResponse<Object>> handleHomeworkAlreadySubmittedException(
+			HomeworkAlreadySubmittedException ex) {
+		return ResponseEntity.status(HttpStatus.CONFLICT)
+				.body(ResultResponse.error(ex.getMessage(), "La tarea ya ha sido enviada"));
+	}
 
-    @ExceptionHandler(AlreadyEnrolledStudentException.class)
-    public ResponseEntity<ResultResponse<Object>> handleAlreadyEnrolledStudentException(AlreadyEnrolledStudentException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(ResultResponse.error(ex.getMessage(), "El estudiante ya está matriculado en el curso"));
-    }
+	@ExceptionHandler(CourseParticipationNotFoundException.class)
+	public ResponseEntity<ResultResponse<Object>> handleCourseParticipationNotFoundException(
+			CourseParticipationNotFoundException ex) {
+		return ResponseEntity.status(HttpStatus.NOT_FOUND)
+				.body(ResultResponse.error(ex.getMessage(), "El usuario no está matriculado en el curso"));
+	}
 
+	@ExceptionHandler(InvalidSubmissionException.class)
+	public ResponseEntity<ResultResponse<Object>> handleInvalidSubmissionException(InvalidSubmissionException ex) {
+		return ResponseEntity.badRequest()
+				.body(ResultResponse.error(ex.getMessage(), "El pedido no se pudo completar"));
+	}
+
+	@ExceptionHandler(UserNotFoundException.class)
+	public ResponseEntity<ResultResponse<Object>> handleUserNotFoundException(UserNotFoundException ex) {
+		return ResponseEntity.status(HttpStatus.NOT_FOUND)
+				.body(ResultResponse.error(ex.getMessage(), "No se encontró el usuario"));
+	}
+
+	@ExceptionHandler(ConversationNotFoundException.class)
+	public ResponseEntity<ResultResponse<Object>> handleConversationNotFound(ConversationNotFoundException ex) {
+		return ResponseEntity.status(HttpStatus.NOT_FOUND)
+				.body(ResultResponse.error(ex.getMessage(), "Conversación no encontrada"));
+	}
+
+	@ExceptionHandler(UnauthorizedConversationAccessException.class)
+	public ResponseEntity<ResultResponse<Object>> handleUnauthorizedAccess(UnauthorizedConversationAccessException ex) {
+		return ResponseEntity.status(HttpStatus.FORBIDDEN)
+				.body(ResultResponse.error(ex.getMessage(), "No tienes acceso a esta conversación"));
+	}
+
+	@ExceptionHandler(InvalidMessageException.class)
+	public ResponseEntity<ResultResponse<Object>> handleInvalidMessage(InvalidMessageException ex) {
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				.body(ResultResponse.error(ex.getMessage(), "Contenido invalido"));
+	}
+
+	@ExceptionHandler(NotFoundParticipationException.class)
+	public ResponseEntity<ResultResponse<Object>> handleNotFoundParticipation(NotFoundParticipationException ex) {
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+				.body(ResultResponse.error(ex.getMessage(), "Participante invalido"));
+	}
+
+	@ExceptionHandler(InsufficientPermissionsException.class)
+	public ResponseEntity<ResultResponse<Object>> handleInsufficientPermissionsException(
+			InsufficientPermissionsException ex) {
+		return ResponseEntity.status(HttpStatus.FORBIDDEN)
+				.body(ResultResponse.error(ex.getMessage(), "Permisos insuficientes"));
+	}
+
+	@ExceptionHandler(ActiveCourseException.class)
+	public ResponseEntity<ResultResponse<Object>> handleActiveCourseException(ActiveCourseException ex) {
+		return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "El curso se encuentra activo"));
+	}
+
+	@ExceptionHandler(AlreadyEnrolledStudentException.class)
+	public ResponseEntity<ResultResponse<Object>> handleAlreadyEnrolledStudentException(
+			AlreadyEnrolledStudentException ex) {
+		return ResponseEntity.status(HttpStatus.CONFLICT)
+				.body(ResultResponse.error(ex.getMessage(), "El estudiante ya está matriculado en el curso"));
+	}
 }

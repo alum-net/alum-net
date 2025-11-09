@@ -6,12 +6,12 @@ import {
   refreshTokenInterceptor,
 } from './interceptors';
 
-export const baseURL =
+const baseURL =
   Platform.OS === 'android' &&
   __DEV__ &&
   Device.isDevice &&
   process.env.EXPO_PUBLIC_ENV === 'development'
-    ? 'http://10.0.2.2:8080/api/'
+    ? 'http://10.0.2.2:8080/api'
     : process.env.EXPO_PUBLIC_API_URI;
 
 const api = axios.create({

@@ -9,4 +9,7 @@ export const QUERY_KEYS = {
   getLibraryResources: 'get-library-resources',
   getEventDetails: 'get-event-details',
   getUserActivity: 'get-user-activity',
+  getConversations: 'get-conversations',
+  getMessages: 'get-messages',
+  getAvailableConversations: 'get-available-conversations',
 };
