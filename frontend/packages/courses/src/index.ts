@@ -5,5 +5,5 @@ export * from './hooks/useCourse';
 export * from './course-context';
 export * from './components/section-content';
 export * from './screens/event-details';
-
+export * from './components/student-grades';
 export { FilterBar };

@@ -153,3 +153,15 @@ export const submitQuestionnaireResponses = async (
 ) => {
   return await api.post<Response>(`/events/${eventId}/submit`, payload);
 };
+
+import { CourseGradesResponse } from './types';
+
+export const getGrades = async (courseId: number, userEmail: string) => {
+  const { data }: AxiosResponse<Response<CourseGradesResponse>> = await api.get(
+    `/courses/${courseId}/grades/${userEmail}`,
+  );
+  if (!data.data) {
+    throw new Error('No grades data found');
+  }
+  return data.data;
+};
