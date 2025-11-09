@@ -12,4 +12,8 @@ export const QUERY_KEYS = {
   getConversations: 'get-conversations',
   getMessages: 'get-messages',
   getAvailableConversations: 'get-available-conversations',
+  getCourseStudents: 'get-course-students',
+  getUnratedEvents: 'get-unrated-events',
+  getAutoGrades: 'get-auto-grades',
+  getEventStudents: 'get-event-students',
 };

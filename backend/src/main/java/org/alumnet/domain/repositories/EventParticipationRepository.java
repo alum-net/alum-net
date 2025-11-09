@@ -14,22 +14,22 @@ import java.util.Set;
 
 @Repository
 public interface EventParticipationRepository extends JpaRepository<EventParticipation, EventParticipationId> {
-    @Query("""
-        SELECT new org.alumnet.application.dtos.StudentSummaryDTO(
-            s.email,s.lastname,s.name)
-        FROM EventParticipation ep
-        JOIN ep.student s
-        WHERE ep.event.id = :eventId
-    """)
-    List<StudentSummaryDTO> findStudentSummaryByEventId(@Param("eventId") Integer eventId);
+	@Query("""
+			    SELECT new org.alumnet.application.dtos.StudentSummaryDTO(
+			        s.name,s.lastname,s.email)
+			    FROM EventParticipation ep
+			    JOIN ep.student s
+			    WHERE ep.event.id = :eventId
+			""")
+	List<StudentSummaryDTO> findStudentSummaryByEventId(@Param("eventId") Integer eventId);
 
-    @Query("SELECT cp FROM EventParticipation cp " +
-            "WHERE cp.id.eventId = :eventId " +
-            "AND cp.id.studentEmail IN :studentEmails")
-    List<EventParticipation> findAllByEventIdAndEmails(int eventId, Set<String> studentEmails);
+	@Query("SELECT cp FROM EventParticipation cp " +
+			"WHERE cp.id.eventId = :eventId " +
+			"AND cp.id.studentEmail IN :studentEmails")
+	List<EventParticipation> findAllByEventIdAndEmails(int eventId, Set<String> studentEmails);
 
+	List<EventParticipation> findAllByIdEventId(Integer eventId);
 
-    List<EventParticipation> findAllByIdEventId(Integer eventId);
-    @EntityGraph(attributePaths = {"student", "resource"})
-    List<EventParticipation> findAllById_EventId(Integer eventId);
+	@EntityGraph(attributePaths = { "student", "resource" })
+	List<EventParticipation> findAllById_EventId(Integer eventId);
 }
