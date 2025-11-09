@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface CourseRepository extends JpaRepository<Course, Integer>, JpaSpecificationExecutor<Course> {
 
@@ -33,4 +35,12 @@ public interface CourseRepository extends JpaRepository<Course, Integer>, JpaSpe
           and t.enabled = true  
     """)
     int countTeachersByCourseId(@Param("courseId") int courseId);
+
+    @Query("""
+    SELECT c.id FROM Course c
+    JOIN c.teachers t
+    WHERE t.email = :teacherEmail
+    AND c.enabled = true
+    """)
+    List<Integer> findCourseIdsByTeacherEmail(@Param("teacherEmail") String teacherEmail);
 }

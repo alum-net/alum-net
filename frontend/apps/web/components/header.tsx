@@ -1,25 +1,50 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useRouter, usePathname } from 'expo-router';
 import { THEME } from '@alum-net/ui';
 import { useUserInfo } from '@alum-net/users/src/hooks/useUserInfo';
 import { UserRole } from '@alum-net/users/src/types';
+import { useConversations } from '@alum-net/messaging';
 
 export default function WebHeader() {
   const router = useRouter();
   const pathname = usePathname();
 
   const { data: userInfo } = useUserInfo();
-  const isAdmin = userInfo?.role === UserRole.admin;
+  const { data: conversations } = useConversations(userInfo?.role);
+
+  const totalUnreadCount = useMemo(() => {
+    if (!conversations) return 0;
+    return conversations.reduce((total, conversation) => {
+      return total + (conversation.unreadCount ?? 0);
+    }, 0);
+  }, [conversations]);
 
   const navItems: {
     label: string;
-    route: '/home' | '/profile' | '/users' | '/courses' | '/library';
+    route:
+      | '/home'
+      | '/profile'
+      | '/users'
+      | '/courses'
+      | '/library'
+      | '/messaging';
+    badge?: number;
   }[] = [
     { label: 'Inicio', route: '/home' },
     { label: 'Cursos', route: '/courses' },
-    ...(isAdmin ? [{ label: 'Usuarios', route: '/users' as const }] : []),
-    // { label: "Mensajes", route: "/messages" },
+    ...(userInfo?.role === UserRole.admin
+      ? [{ label: 'Usuarios', route: '/users' as const }]
+      : []),
+    ...(userInfo && userInfo.role !== UserRole.admin
+      ? [
+          {
+            label: 'Mensajes',
+            route: '/messaging' as const,
+            badge: totalUnreadCount > 0 ? totalUnreadCount : undefined,
+          },
+        ]
+      : []),
     { label: 'Libreria', route: '/library' },
     { label: 'Perfil', route: '/profile' },
   ];
@@ -31,11 +56,22 @@ export default function WebHeader() {
       <View style={styles.nav}>
         {navItems.map(item => {
           const isActive = pathname === item.route;
+          const hasBadge = item.badge !== undefined && item.badge > 0;
+
           return (
             <Pressable key={item.route} onPress={() => router.push(item.route)}>
-              <Text style={[styles.link, isActive && styles.activeLink]}>
-                {item.label}
-              </Text>
+              <View style={styles.navItemContainer}>
+                <Text style={[styles.link, isActive && styles.activeLink]}>
+                  {item.label}
+                </Text>
+                {hasBadge && (
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>
+                      {item.badge! > 99 ? '99+' : String(item.badge)}
+                    </Text>
+                  </View>
+                )}
+              </View>
             </Pressable>
           );
         })}
@@ -64,6 +100,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 24,
   },
+  navItemContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    position: 'relative',
+  },
   link: {
     color: '#C0C3CA',
     fontSize: 15,
@@ -71,5 +112,21 @@ const styles = StyleSheet.create({
   },
   activeLink: {
     color: THEME.colors.secondary,
+  },
+  badge: {
+    backgroundColor: '#FF6B6B',
+    borderRadius: 10,
+    minWidth: 18,
+    height: 18,
+    paddingHorizontal: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 6,
+  },
+  badgeText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: '600',
+    lineHeight: 10,
   },
 });

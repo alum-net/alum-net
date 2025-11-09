@@ -109,7 +109,8 @@ export default function CreateCourseModal({
         const current = getValues('teachersEmails') || [];
         setValue('teachersEmails', [...current, email]);
         setTeacherEmailInput('');
-      } catch {
+      } catch (error) {
+        console.log(error);
         setError('teachersEmails', { message: 'Email inválido' });
       }
     }

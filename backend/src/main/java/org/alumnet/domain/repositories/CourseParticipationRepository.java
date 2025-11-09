@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import org.springframework.data.repository.query.Param;
+
 import java.util.Set;
 
 public interface CourseParticipationRepository extends JpaRepository<CourseParticipation, CourseParticipationId> {
@@ -15,4 +17,11 @@ public interface CourseParticipationRepository extends JpaRepository<CourseParti
     List<CourseParticipation> findAllByCourseIdAndEmails(int courseId, Set<String> studentEmails);
 
     List<CourseParticipation> findAllByCourseId(int courseId);
+
+    @Query("SELECT c.id FROM CourseParticipation cp " +
+            "JOIN cp.course c " +
+            "WHERE cp.student.email = :email " +
+            "AND c.enabled = true")
+    Set<Integer> findActiveCourseIdsByStudentEmail(@Param("email") String email);
+
 }
