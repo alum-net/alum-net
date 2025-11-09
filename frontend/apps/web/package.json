@@ -13,6 +13,7 @@
   "dependencies": {
     "@alum-net/auth": "*",
     "@alum-net/courses": "*",
+    "@alum-net/messaging": "*",
     "@alum-net/storage": "*",
     "@alum-net/ui": "*",
     "@alum-net/users": "*",
