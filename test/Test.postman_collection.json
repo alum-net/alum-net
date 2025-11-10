@@ -43,8 +43,7 @@
 									"",
 									"function runInitProcess() {",
 									"  getAccessToken(function() {",
-									"    initTestUsers(function() {",
-									"    });",
+									"    initUser(\"teachers\", \"profesor1\", function(){})",
 									"  });",
 									"}",
 									"",
@@ -101,15 +100,17 @@
 									"eval(pm.collectionVariables.get(\"utils-Course\"));",
 									"",
 									"function runInitProcess() {",
-									"  getAccessToken(function() {",
-									"    initTestUsers(function() {",
-									"      initTestCourses(function() {",
-									"        getCursoId(\"Test-curso-get-members\", \"curso5-verificar-get-members\", function(){",
-									"            enrollStudent(\"estudiante3@alumnet.com\", function () { })",
-									"        })",
-									"      });",
-									"    });",
-									"  });",
+									"    getAccessToken(function () {",
+									"        initUser(\"teachers\", \"profesor6\", function () {",
+									"            initUser(\"students\", \"estudiante3\", function () {",
+									"                initTestCourses(function () {",
+									"                    getCursoId(\"Test-curso-get-members\", \"curso5-verificar-get-members\", function () {",
+									"                        enrollStudent(\"estudiante3@alumnet.com\", function () { })",
+									"                    })",
+									"                });",
+									"            });",
+									"        });",
+									"    })",
 									"}",
 									"",
 									"runInitProcess();"
@@ -207,7 +208,7 @@
 									"",
 									"function runInitProcess() {",
 									"  getAccessToken(function() {",
-									"    initTestUsers(function() {",
+									"    initUser(\"teachers\", \"profesor3\", function() {",
 									"      initTestCourses(function() {",
 									"        getCursoId(\"Test-curso-delete\", \"curso2-test-eliminar\", function(){})",
 									"      });",
@@ -261,15 +262,17 @@
 									"eval(pm.collectionVariables.get(\"utils-Course\"));",
 									"",
 									"function runInitProcess() {",
-									"  getAccessToken(function() {",
-									"    initTestUsers(function() {",
-									"      initTestCourses(function() {",
-									"        getCursoId(\"Test-curso-unroll-student\", \"curso3-verificar-unroll-student\", function(){",
-									"            enrollStudent(\"estudiante1@alumnet.com\", function (){})",
-									"        })",
-									"      });",
-									"    });",
-									"  });",
+									"    getAccessToken(function () {",
+									"        initUser(\"students\", \"estudiante1\", function () {",
+									"            initUser(\"teachers\", \"profesor4\", function () {",
+									"                initTestCourses(function () {",
+									"                    getCursoId(\"Test-curso-unroll-student\", \"curso3-verificar-unroll-student\", function () {",
+									"                        enrollStudent(\"estudiante1@alumnet.com\", function () {})",
+									"                    })",
+									"                });",
+									"            });",
+									"        });",
+									"    })",
 									"}",
 									"",
 									"runInitProcess();",
@@ -335,13 +338,15 @@
 									"eval(pm.collectionVariables.get(\"utils-Course\"));",
 									"",
 									"function runInitProcess() {",
-									"  getAccessToken(function() {",
-									"    initTestUsers(function() {",
-									"      initTestCourses(function() {",
-									"        getCursoId(\"Test-curso-enroll-student\", \"curso4-verificar-enroll-student\", function(){})",
-									"      });",
-									"    });",
-									"  });",
+									"    getAccessToken(function () {",
+									"        initUser(\"teachers\", \"profesor5\", function () {",
+									"            initUser(\"students\", \"estudiante2\", function () {",
+									"                initTestCourses(function () {",
+									"                    getCursoId(\"Test-curso-enroll-student\", \"curso4-verificar-enroll-student\", function () { })",
+									"                });",
+									"            });",
+									"        });",
+									"    })",
 									"}",
 									"",
 									"runInitProcess();"
@@ -389,7 +394,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"studentEmail\": \"student@alumnet.com\"\r\n}\r\n",
+							"raw": "{\r\n  \"studentEmail\": \"estudiante2@alumnet.com\"\r\n}\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -422,10 +427,10 @@
 									"",
 									"function runInitProcess() {",
 									"  getAccessToken(function() {",
-									"    initTestUsers(function() {",
-									"      initTestCourses(function() {",
-									"      });",
-									"    });",
+									"    // initTestUsers(function() {",
+									"    //   initTestCourses(function() {",
+									"    //   });",
+									"    // });",
 									"  });",
 									"}",
 									"",
@@ -620,6 +625,202 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "CoursesBulkDeletion Copy",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/Users/Gastón/Downloads/courseDelete.csv"
+								},
+								{
+									"key": "hasHeaders",
+									"value": "true",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{alumnetUrl}}/api/courses/bulk-deletion",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"courses",
+								"bulk-deletion"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BulkEnrollment Copy",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/Users/Gastón/Downloads/matriuculacion-masiva.csv"
+								},
+								{
+									"key": "hasHeaders",
+									"value": "true",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{alumnetUrl}}/api/courses/1/participations/bulk-enroll",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"courses",
+								"1",
+								"participations",
+								"bulk-enroll"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BulkUnenrollment Copy",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/Users/Gastón/Downloads/matriuculacion-masiva.csv"
+								},
+								{
+									"key": "hasHeaders",
+									"value": "true",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{alumnetUrl}}/api/courses/1/participations/bulk-unenroll",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"courses",
+								"1",
+								"participations",
+								"bulk-unenroll"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetGrades Copy",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get Students Copy",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Course grade submission Copy",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"students\": [\n        {\n            \"email\": \"student@alumnet.com\",\n            \"grade\": 0.9,\n            \"name\": \"German\",\n            \"lastname\": \"Burgos\"\n        },\n        {\n            \"email\": \"students@alumnet.com\",\n            \"grade\": 0.6,\n            \"name\": \"Pepe\",\n            \"lastname\": \"Guerra\"\n        }\n    ],\n    \"courseId\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{alumnetUrl}}/api/courses/grade-submissions",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"courses",
+								"grade-submissions"
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"event": [
@@ -709,7 +910,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"El loco\",\n    \"lastname\": \"profesor\",\n    \"group\": \"teachers\",\n    \"email\": \"profesor422@alumnet.com\",\n    \"password\": \"test1234\"\n}",
+							"raw": "{\n    \"name\": \"student\",\n    \"lastname\": \"student\",\n    \"group\": \"students\",\n    \"email\": \"student@alumnet.com\",\n    \"password\": \"test1234\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -737,16 +938,15 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"eval(pm.collectionVariables.get(\"utils-User\"));",
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
 									"",
 									"function runInitProcess() {",
 									"  getAccessToken(function() {",
-									"    initTestUsers(function() {",
-									"    });",
-									"  });",
+									"    initUser(\"students\", \"estudiante4\", function(){})",
+									"  })",
 									"}",
-									"",
-									"runInitProcess();"
+									"runInitProcess();",
+									""
 								],
 								"type": "text/javascript",
 								"packages": {},
@@ -765,7 +965,7 @@
 									"    const json = pm.response.json();",
 									"    pm.expect(json).to.have.property('data').that.is.an('array').with.length.greaterThan(0);",
 									"    const emails = json.data.map(item => item.email);",
-									"    pm.expect(emails).to.include(\"estudiante-test-usuario1@alumnet.com\");",
+									"    pm.expect(emails).to.include(\"estudiante4@alumnet.com\");",
 									"});",
 									"",
 									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () {",
@@ -798,7 +998,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{alumnetUrl}}/api/users/?name=estudiante-test-usuario1",
+							"raw": "{{alumnetUrl}}/api/users/?name=estudiante4",
 							"host": [
 								"{{alumnetUrl}}"
 							],
@@ -820,94 +1020,7 @@
 								},
 								{
 									"key": "name",
-									"value": "estudiante-test-usuario1"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "UserSearch by role",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"eval(pm.collectionVariables.get(\"utils-User\"));",
-									"",
-									"function runInitProcess() {",
-									"  getAccessToken(function() {",
-									"    initTestUsers(function() {",
-									"    });",
-									"  });",
-									"}",
-									"",
-									"runInitProcess();"
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"EL status code es el esperado\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"La respuesta contiene los usuarios esperados\", function () {",
-									"    const json = pm.response.json();",
-									"    pm.expect(json).to.have.property('data').that.is.an('array').with.length.greaterThan(0);",
-									"    const emails = json.data.map(item => item.email);",
-									"    pm.expect(emails).to.include(\"profesor7@alumnet.com\", \"profesor8@alumnet.com\");",
-									"});",
-									"",
-									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () {",
-									"    const json = pm.response.json();",
-									"    const requiredKeys = [\"avatarUrl\", \"email\", \"enabled\", \"lastname\", \"name\", \"role\"];",
-									"    json.data.forEach(item => {",
-									"        requiredKeys.forEach(key => {",
-									"            pm.expect(item).to.have.property(key);",
-									"        });",
-									"    });",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{access_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{alumnetUrl}}/api/users/?role=TEACHER",
-							"host": [
-								"{{alumnetUrl}}"
-							],
-							"path": [
-								"api",
-								"users",
-								""
-							],
-							"query": [
-								{
-									"key": "role",
-									"value": "TEACHER"
+									"value": "estudiante4"
 								}
 							]
 						}
@@ -921,16 +1034,15 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"eval(pm.collectionVariables.get(\"utils-User\"));",
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
 									"",
 									"function runInitProcess() {",
 									"  getAccessToken(function() {",
-									"    initTestUsers(function() {",
-									"    });",
-									"  });",
+									"    initUser(\"students\", \"estudiante5\", function(){})",
+									"  })",
 									"}",
-									"",
-									"runInitProcess();"
+									"runInitProcess();",
+									""
 								],
 								"type": "text/javascript",
 								"packages": {},
@@ -1017,14 +1129,100 @@
 							]
 						},
 						"url": {
-							"raw": "{{alumnetUrl}}/api/users/estudiante3@alumnet.com",
+							"raw": "{{alumnetUrl}}/api/users/estudiante5@alumnet.com",
 							"host": [
 								"{{alumnetUrl}}"
 							],
 							"path": [
 								"api",
 								"users",
-								"estudiante3@alumnet.com"
+								"estudiante5@alumnet.com"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UserSearch by role",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"",
+									"function runInitProcess() {",
+									"  getAccessToken(function() {",
+									"    initUser(\"students\", \"estudiante6\", function(){})",
+									"  })",
+									"}",
+									"runInitProcess();",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"EL status code es el esperado\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"La respuesta contiene los usuarios esperados\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('data').that.is.an('array').with.length.greaterThan(0);",
+									"    const emails = json.data.map(item => item.email);",
+									"    pm.expect(emails).to.include(\"profesor4@alumnet.com\", \"profesor5@alumnet.com\");",
+									"});",
+									"",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () {",
+									"    const json = pm.response.json();",
+									"    const requiredKeys = [\"avatarUrl\", \"email\", \"enabled\", \"lastname\", \"name\", \"role\"];",
+									"    json.data.forEach(item => {",
+									"        requiredKeys.forEach(key => {",
+									"            pm.expect(item).to.have.property(key);",
+									"        });",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{alumnetUrl}}/api/users/?role=TEACHER",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								""
+							],
+							"query": [
+								{
+									"key": "role",
+									"value": "TEACHER"
+								}
 							]
 						}
 					},
@@ -1130,19 +1328,19 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"// eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
 									"",
-									"// function runInitProcess() {",
-									"//   getAccessToken(function() {",
-									"//     initTestUsers(function() {",
-									"//       initTestCourses(function() {",
-									"//         getCursoId(\"Test-curso-create-section\", \"curso6-verificar-create-section\", function(){})",
-									"//       });",
-									"//     });",
-									"//   });",
-									"// }",
+									"function runInitProcess() {",
+									"  getAccessToken(function() {",
+									"    initUser(\"teachers\", \"profesor7\", function() {",
+									"      initTestCourses(function() {",
+									"        getCursoId(\"Test-curso-create-section\", \"curso6-verificar-create-section\", function(){})",
+									"      });",
+									"    });",
+									"  });",
+									"}",
 									"",
-									"// runInitProcess();",
+									"runInitProcess();",
 									""
 								],
 								"type": "text/javascript",
@@ -1225,15 +1423,17 @@
 									"eval(pm.collectionVariables.get(\"utils-Course\"));",
 									"",
 									"function runInitProcess() {",
-									"  getAccessToken(function() {",
-									"    initTestUsers(function() {",
-									"      initTestCourses(function() {",
-									"        getCursoId(\"Test-curso-create-section\", \"curso6-verificar-create-section\", function(){",
-									"            enrollStudent(\"estudiante4@alumnet.com\", function (){})",
-									"        })",
-									"      });",
+									"    getAccessToken(function () {",
+									"        initUser(\"teachers\", \"profesor8\", function () {",
+									"            initUser(\"students\", \"estudiante6\", function () {",
+									"                initTestCourses(function () {",
+									"                    getCursoId(\"Test-curso-create-section\", \"curso6-verificar-create-section\", function () {",
+									"                        enrollStudent(\"estudiante6@alumnet.com\", function () { })",
+									"                    })",
+									"                });",
+									"            })",
+									"        });",
 									"    });",
-									"  });",
 									"}",
 									"",
 									"runInitProcess();",
@@ -1324,7 +1524,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{alumnetUrl}}/api/courses/{{id_curso}}/content/?userId=estudiante4@alumnet.com",
+							"raw": "{{alumnetUrl}}/api/courses/{{id_curso}}/content/?userId=estudiante6@alumnet.com",
 							"host": [
 								"{{alumnetUrl}}"
 							],
@@ -1338,7 +1538,7 @@
 							"query": [
 								{
 									"key": "userId",
-									"value": "estudiante4@alumnet.com"
+									"value": "estudiante6@alumnet.com"
 								}
 							]
 						}
@@ -1352,7 +1552,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"eval(pm.collectionVariables.get(\"utils-User\"));",
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
 									"",
 									"function runInitProcess() {",
 									"  getAccessToken(function() {",
@@ -1463,7 +1663,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"eval(pm.collectionVariables.get(\"utils-User\"));",
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
 									"",
 									"function runInitProcess() {",
 									"  getAccessToken(function() {",
@@ -1523,17 +1723,19 @@
 									"eval(pm.collectionVariables.get(\"utils-Course\"));",
 									"",
 									"function runInitProcess() {",
-									"  getAccessToken(function() {",
-									"    initTestUsers(function() {",
-									"      initTestCourses(function() {",
-									"        getCursoId(\"post-get-post\", \"Curso9-verificar-get-post\", function(){",
-									"            enrollStudent(\"estudiante6@alumnet.com\", function(){",
-									"                createPost(\"Obtener un post\", \"estudiante6@alumnet.com\", function (){});",
+									"    getAccessToken(function () {",
+									"        initUser(\"teachers\", \"profesor10\", function () {",
+									"            initUser(\"students\", \"estudiante7\", function () {",
+									"                initTestCourses(function () {",
+									"                    getCursoId(\"post-get-post\", \"Curso9-verificar-get-post\", function () {",
+									"                        enrollStudent(\"estudiante7@alumnet.com\", function () {",
+									"                            createPost(\"Obtener un post\", \"estudiante7@alumnet.com\", function () { });",
+									"                        });",
+									"                    });",
+									"                });",
 									"            });",
 									"        });",
-									"      });",
 									"    });",
-									"  });",
 									"}",
 									"",
 									"runInitProcess();",
@@ -1664,17 +1866,19 @@
 									"eval(pm.collectionVariables.get(\"utils-Course\"));",
 									"",
 									"function runInitProcess() {",
-									"  getAccessToken(function() {",
-									"    initTestUsers(function() {",
-									"      initTestCourses(function() {",
-									"        getCursoId(\"post-get-post\", \"Curso9-verificar-get-post\", function(){",
-									"            enrollStudent(\"estudiante6@alumnet.com\", function(){",
-									"                createPost(\"Obtener un post\", \"estudiante6@alumnet.com\", function (){});",
+									"    getAccessToken(function () {",
+									"        initUser(\"teachers\", \"profesor10\", function () {",
+									"            initUser(\"students\", \"estudiante7\", function () {",
+									"                initTestCourses(function () {",
+									"                    getCursoId(\"post-get-post\", \"Curso9-verificar-get-post\", function () {",
+									"                        enrollStudent(\"estudiante7@alumnet.com\", function () {",
+									"                            createPost(\"Obtener un post\", \"estudiante7@alumnet.com\", function () { });",
+									"                        });",
+									"                    });",
+									"                });",
 									"            });",
 									"        });",
-									"      });",
 									"    });",
-									"  });",
 									"}",
 									"",
 									"runInitProcess();",
@@ -1809,15 +2013,17 @@
 									"eval(pm.collectionVariables.get(\"utils-Course\"));",
 									"",
 									"function runInitProcess() {",
-									"  getAccessToken(function() {",
-									"    initTestUsers(function() {",
-									"      initTestCourses(function() {",
-									"        getCursoId(\"post-create-post\", \"Curso8-verificar-create-post\", function(){",
-									"            enrollStudent(\"estudiante5@alumnet.com\", function (){})",
+									"    getAccessToken(function () {",
+									"        initUser(\"teachers\", \"profesor9\", function () {",
+									"            initUser(\"students\", \"estudiante7\", function () {",
+									"                initTestCourses(function () {",
+									"                    getCursoId(\"post-create-post\", \"Curso8-verificar-create-post\", function () {",
+									"                        enrollStudent(\"estudiante7@alumnet.com\", function () { })",
+									"                    })",
+									"                });",
+									"            });",
 									"        })",
-									"      });",
 									"    });",
-									"  });",
 									"}",
 									"",
 									"runInitProcess();",
@@ -1897,20 +2103,21 @@
 									"eval(pm.collectionVariables.get(\"utils-Course\"));",
 									"",
 									"function runInitProcess() {",
-									"  getAccessToken(function() {",
-									"    initTestUsers(function() {",
-									"      initTestCourses(function() {",
-									"        getCursoId(\"post-delete-post\", \"Curso10-delete-post\", function(){",
-									"            enrollStudent(\"estudiante7@alumnet.com\", function(){",
-									"                createPost(\"Eliminar este post\", \"estudiante7@alumnet.com\", function (){",
-									"                    getPostId(function(){});",
-									"                });",
-									"",
+									"    getAccessToken(function () {",
+									"        initUser(\"teachers\", \"profesor11\", function () {",
+									"            initUser(\"students\", \"estudiante7@alumnet.com\", function () {",
+									"                initTestCourses(function () {",
+									"                    getCursoId(\"post-delete-post\", \"Curso10-delete-post\", function () {",
+									"                        enrollStudent(\"estudiante7@alumnet.com\", function () {",
+									"                            createPost(\"Eliminar este post\", \"estudiante7@alumnet.com\", function () {",
+									"                                getPostId(function () { });",
+									"                            });",
+									"                        });",
+									"                    });",
+									"                })",
 									"            });",
 									"        });",
-									"      });",
 									"    });",
-									"  });",
 									"}",
 									"",
 									"runInitProcess();",
@@ -1978,20 +2185,22 @@
 									"eval(pm.collectionVariables.get(\"utils-Course\"));",
 									"",
 									"function runInitProcess() {",
-									"  getAccessToken(function() {",
-									"    initTestUsers(function() {",
-									"      initTestCourses(function() {",
-									"        getCursoId(\"post-modify-post\", \"Curso11-modify-post\", function(){",
-									"            enrollStudent(\"estudiante8@alumnet.com\", function(){",
-									"                createPost(\"Eliminar este post\", \"estudiante8@alumnet.com\", function (){",
-									"                    getPostId(function(){});",
-									"                });",
+									"    getAccessToken(function () {",
+									"        initUser(\"teachers\", \"profesor12\", function () {",
+									"            initUser(\"students\", \"estudiante8\", function () {",
+									"                initTestCourses(function () {",
+									"                    getCursoId(\"post-modify-post\", \"Curso11-modify-post\", function () {",
+									"                        enrollStudent(\"estudiante8@alumnet.com\", function () {",
+									"                            createPost(\"Eliminar este post\", \"estudiante8@alumnet.com\", function () {",
+									"                                getPostId(function () { });",
+									"                            });",
 									"",
+									"                        });",
+									"                    })",
+									"                });",
 									"            });",
 									"        });",
-									"      });",
 									"    });",
-									"  });",
 									"}",
 									"",
 									"runInitProcess();",
@@ -2085,7 +2294,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"type\": \"QUESTIONNAIRE\",\n    \"sectionId\": 1,\n    \"title\": \"Cuestionario\",\n    \"description\": \"Cuestionario de Java\",\n    \"startDate\": \"2025-11-28 17:00\",\n    \"endDate\": \"2025-12-28 19:00\",\n    \"maxGrade\": \"30\",\n    \"questions\": [\n        {\n            \"text\": \"¿Qué es JPA?\",\n            \"answers\": [\n                {\n                    \"text\": \"Java Persistence API\",\n                    \"correct\": true\n                },\n                {\n                    \"text\": \"Java Programming Application\",\n                    \"correct\": false\n                },\n                {\n                    \"text\": \"Java Platform Architecture\",\n                    \"correct\": false\n                },\n                {\n                    \"text\": \"Java Protocol Access\",\n                    \"correct\": false\n                }\n            ]\n        }\n    ],\n    \"durationInMinutes\": 120\n}",
+							"raw": "{\n    \"type\": \"QUESTIONNAIRE\",\n    \"sectionId\": {{id_section}},\n    \"title\": \"Cuestionario 3\",\n    \"description\": \"Cuestionario de Java\",\n    \"startDate\": \"2025-11-10 17:00\",\n    \"endDate\": \"2025-11-20 19:00\",\n    \"maxGrade\": \"30\",\n    \"questions\": [\n        {\n            \"text\": \"¿Qué es JPA?\",\n            \"answers\": [\n                {\n                    \"text\": \"Java Persistence API\",\n                    \"correct\": true\n                },\n                {\n                    \"text\": \"Java Programming Application\",\n                    \"correct\": false\n                },\n                {\n                    \"text\": \"Java Platform Architecture\",\n                    \"correct\": false\n                },\n                {\n                    \"text\": \"Java Protocol Access\",\n                    \"correct\": false\n                }\n            ]\n        }\n    ],\n    \"durationInMinutes\": 120\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2125,7 +2334,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{token}}",
+									"value": "{{access_token}}",
 									"type": "string"
 								}
 							]
@@ -2138,25 +2347,25 @@
 								{
 									"key": "homeworkFile",
 									"type": "file",
-									"src": "/home/gburgos/Videos/PROPUESTA DE PROYECTO 2025.pdf"
+									"src": "postman-cloud:///1f0bac1b-b875-4b70-9e05-0bd1ce44cf40"
 								}
 							]
 						},
 						"url": {
-							"raw": "{{alumnetUrl}}/api/events/1/submit-homework?studentEmail=students@alumnet.com",
+							"raw": "{{alumnetUrl}}/api/events/3/submit-homework?studentEmail=student@alumnet.com",
 							"host": [
 								"{{alumnetUrl}}"
 							],
 							"path": [
 								"api",
 								"events",
-								"1",
+								"3",
 								"submit-homework"
 							],
 							"query": [
 								{
 									"key": "studentEmail",
-									"value": "students@alumnet.com"
+									"value": "student@alumnet.com"
 								}
 							]
 						}
@@ -2784,7 +2993,7 @@
 									"",
 									"function runInitProcess() {",
 									"    getAccessToken(function () {",
-									"        initTestUsers(function () {",
+									"        initUser(\"teachers\", \"profesor3@alumnet.com\", function () {",
 									"            createLable(\"Etiqueta para modificar\", function () {",
 									"                createLable(\"Etiqueta para modificar\", function () {",
 									"                    createLable(\"Etiqueta para modificar\", function () { ",
@@ -2933,7 +3142,7 @@
 			]
 		},
 		{
-			"name": "LOGIN",
+			"name": "LOGIN admin",
 			"event": [
 				{
 					"listen": "test",
@@ -2972,6 +3181,66 @@
 						{
 							"key": "password",
 							"value": "develop",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{keycloak}}/realms/alumnet-realm/protocol/openid-connect/token",
+					"host": [
+						"{{keycloak}}"
+					],
+					"path": [
+						"realms",
+						"alumnet-realm",
+						"protocol",
+						"openid-connect",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "LOGIN student",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"pm.collectionVariables.set(\"access_token\", jsonData.access_token);"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "alumnet",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "student@alumnet.com",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "test1234",
 							"type": "text"
 						}
 					]
@@ -3330,6 +3599,33 @@
 					"    ]",
 					"  }",
 					"]",
+					"function initUser(group, name, next) {",
+					"    let teacher =   {",
+					"    \"name\": name,",
+					"    \"lastname\": \"test\",",
+					"    \"group\": group,",
+					"    \"email\": name+\"@alumnet.com\",",
+					"    \"password\": \"test1234\"",
+					"  }",
+					"    pm.sendRequest({",
+					"    url: pm.collectionVariables.get(\"alumnetUrl\") + \"/api/users/create-user\",",
+					"    method: \"POST\",",
+					"    header: { ",
+					"        \"Content-Type\": \"application/json\",",
+					"        \"Authorization\": \"Bearer \" + pm.collectionVariables.get(\"access_token\")",
+					"    },",
+					"    body: { mode: \"raw\", raw: JSON.stringify(teacher) }",
+					"    }, (err, res) => {",
+					"    if (err) {",
+					"        console.error(\"❌ Error al crear \" + teacher.email, err);",
+					"    } else if (res.code >= 200 && res.code < 300) {",
+					"        console.log(\"✅ Usuario creado: \" + teacher.email);",
+					"    } else {",
+					"        console.error(\"⚠️ Error al crear \" + teacher.email + \": \" + res.code);",
+					"    }",
+					"        next();",
+					"    });",
+					"}",
 					"",
 					"function getAccessToken(next) {",
 					"  pm.sendRequest({",
@@ -3722,6 +4018,7 @@
 					"});",
 					"}",
 					"`);",
+					"",
 					""
 				]
 			}
@@ -3786,6 +4083,11 @@
 		{
 			"key": "id_label",
 			"value": ""
+		},
+		{
+			"key": "id_recurso",
+			"value": "",
+			"type": "default"
 		}
 	]
 }
