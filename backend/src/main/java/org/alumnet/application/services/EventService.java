@@ -7,17 +7,12 @@ import org.alumnet.application.dtos.requests.SubmissionsDTO;
 import org.alumnet.application.dtos.requests.SubmitQuestionnaireRequestDTO;
 import org.alumnet.application.dtos.responses.EventDetailDTO;
 import org.alumnet.application.dtos.responses.SummaryEventDTO;
-import org.alumnet.application.enums.ActivityType;
-import org.alumnet.application.enums.EventType;
-import org.alumnet.application.enums.GradeContextType;
-import org.alumnet.application.enums.UserRole;
+import org.alumnet.application.enums.*;
 import org.alumnet.application.mapper.EventMapper;
 import org.alumnet.domain.Section;
 import org.alumnet.domain.events.*;
-import org.alumnet.domain.repositories.EventParticipationRepository;
-import org.alumnet.domain.repositories.EventRepository;
-import org.alumnet.domain.repositories.QuestionnaireResponseDetailRepository;
-import org.alumnet.domain.repositories.UserRepository;
+import org.alumnet.domain.notifications.InstantNotification;
+import org.alumnet.domain.repositories.*;
 import org.alumnet.domain.resources.TaskResource;
 import org.alumnet.domain.users.Student;
 import org.alumnet.domain.users.User;
@@ -37,6 +32,7 @@ public class EventService {
 	private final SectionService sectionService;
 	private final QuestionnaireResponseDetailRepository responseDetailRepository;
 	private final EventParticipationRepository participationRepository;
+    private final InstantNotificationRepository instantNotificationRepository;
 	private final NotificationService notificationService;
 	private final EventRepository eventRepository;
 	private final EventMapper eventMapper;
@@ -400,5 +396,20 @@ public class EventService {
 
 		eventParticipationRepository.saveAll(allEventParticipations);
 		notificationService.sendGradeNotifications(request);
+
+        Set<InstantNotification> instantNotifications = allEventParticipations.stream()
+                .map(e ->
+                        InstantNotification
+                            .builder()
+                            .type(NotificationType.GRADE_PUBLICATION)
+                            .message("Están disponibles las notas del evento " + event.getTitle())
+                            .title("Publicación de notas")
+                            .webStatus(NotificationStatus.PENDING)
+                            .recipientId(e.getStudent().getEmail())
+                            .build())
+                .collect(Collectors.toSet());
+
+        instantNotificationRepository.saveAll(instantNotifications);
+
 	}
 }
