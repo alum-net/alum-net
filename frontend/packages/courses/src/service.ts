@@ -6,6 +6,7 @@ import {
   CourseContent,
   Event as Event,
   Homework,
+  CourseGradesResponse,
 } from './types';
 import { AxiosResponse } from 'axios';
 import { UserInfo } from '@alum-net/users/src/types';
@@ -153,8 +154,6 @@ export const submitQuestionnaireResponses = async (
 ) => {
   return await api.post<Response>(`/events/${eventId}/submit`, payload);
 };
-
-import { CourseGradesResponse } from './types';
 
 export const getGrades = async (courseId: number, userEmail: string) => {
   const { data }: AxiosResponse<Response<CourseGradesResponse>> = await api.get(

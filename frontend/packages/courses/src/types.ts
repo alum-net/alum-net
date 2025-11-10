@@ -114,13 +114,15 @@ export type FilesToUpload = {
 export interface EventGradeDetailResponse {
   grade: number | null;
   maxGrade: number | null;
-  isUnrated: boolean;
+  unrated: boolean;
+  type: EventType;
+  title: string;
 }
 
 export interface CourseGradesResponse {
   finalGrade: number | null;
   approvalGrade: number | null;
-  isApproved: boolean;
-  isUnrated: boolean;
+  approved: boolean;
+  unrated: boolean;
   eventGrades: EventGradeDetailResponse[];
 }

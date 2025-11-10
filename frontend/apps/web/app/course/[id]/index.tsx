@@ -4,7 +4,7 @@ import { Button, Card, Dialog, Portal, Text } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams } from 'expo-router';
 import { THEME, Toast } from '@alum-net/ui';
-import { CourseContent, StudentGradesCard, useCourse } from '@alum-net/courses';
+import { CourseContent, useCourse } from '@alum-net/courses';
 import { useUserInfo } from '@alum-net/users';
 import SectionCard from '../../../features/sections/components/section-card';
 import CourseMembersCard from '../../../features/courses/components/course-members-card';
@@ -17,6 +17,7 @@ import { ForumLinks } from '@alum-net/forums';
 import RenderHTML from 'react-native-render-html';
 import EventCreationModal from '../../../features/events/components/event-creation-modal';
 import TeacherGradesCard from '../../../features/grades/components/teacher-grades-card';
+import { StudentGrades } from '../../../features/grades/components/student-grades';
 
 export default function Course() {
   const { id, name } = useLocalSearchParams();
@@ -151,7 +152,7 @@ export default function Course() {
             )}
             {isTeacher && <TeacherGradesCard courseId={id.toString()} />}
             {userInfo?.role === UserRole.student && (
-              <StudentGradesCard
+              <StudentGrades
                 courseId={Number(id.toString())}
                 userEmail={userInfo.email}
               />

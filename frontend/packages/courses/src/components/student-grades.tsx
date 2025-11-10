@@ -1,9 +1,10 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getGrades } from '../service';
-import { CourseGradesResponse, EventGradeDetailResponse } from '../types';
+import { CourseGradesResponse } from '../types';
 import { ActivityIndicator, Card, DataTable, Text } from 'react-native-paper';
 import { QUERY_KEYS } from '@alum-net/api';
+import { mapEventTypeToString } from './section-content';
 
 interface StudentGradesCardProps {
   courseId: number;
@@ -33,43 +34,42 @@ export const StudentGradesCard = ({
 
   return (
     <Card>
-      <Card.Title title="Eventos" />
       <Card.Content>
-        <DataTable>
-          <DataTable.Header>
-            <DataTable.Title>Evento</DataTable.Title>
-            <DataTable.Title numeric>Nota</DataTable.Title>
-            <DataTable.Title numeric>Nota Máxima</DataTable.Title>
-          </DataTable.Header>
-
-          {grades?.eventGrades.map(
-            (eventGrade: EventGradeDetailResponse, index: number) => (
+        <Card.Title title="Eventos" />
+        <Card.Content>
+          <DataTable>
+            <DataTable.Header>
+              <DataTable.Title>Evento</DataTable.Title>
+              <DataTable.Title numeric>Nota</DataTable.Title>
+              <DataTable.Title numeric>Nota Máxima</DataTable.Title>
+            </DataTable.Header>
+            {grades?.eventGrades.map((eventGrade, index: number) => (
               <DataTable.Row key={index}>
-                <DataTable.Cell>{`Evento ${index + 1}`}</DataTable.Cell>
+                <DataTable.Cell>{`${mapEventTypeToString(eventGrade.type)}: ${eventGrade.title}`}</DataTable.Cell>
                 <DataTable.Cell numeric>
-                  {eventGrade.isUnrated ? 'No calificado' : eventGrade.grade}
+                  {eventGrade.unrated ? 'No calificado' : eventGrade.grade}
                 </DataTable.Cell>
                 <DataTable.Cell numeric>{eventGrade.maxGrade}</DataTable.Cell>
               </DataTable.Row>
-            ),
+            ))}
+          </DataTable>
+        </Card.Content>
+        <Card.Title title="Nota final" style={{ marginTop: 10 }} />
+        <Card.Content>
+          {grades?.unrated ? (
+            <Text>El curso aún no ha sido calificado.</Text>
+          ) : (
+            <>
+              <Text>{`Nota final: ${grades?.finalGrade}`}</Text>
+              <Text>{`Nota minima de aprobación: ${grades?.approvalGrade}`}</Text>
+              <Text>
+                {grades?.approved
+                  ? '¡Felicidades! Has aprobado el curso.'
+                  : 'No has aprobado el curso.'}
+              </Text>
+            </>
           )}
-        </DataTable>
-      </Card.Content>
-      <Card.Title title="Nota final" />
-      <Card.Content>
-        {grades?.isUnrated ? (
-          <Text>El curso aún no ha sido calificado.</Text>
-        ) : (
-          <>
-            <Text>{`Nota final: ${grades?.finalGrade}`}</Text>
-            <Text>{`Nota minima de exoneración: ${grades?.approvalGrade}`}</Text>
-            <Text>
-              {grades?.isApproved
-                ? '¡Felicidades! Has aprobado el curso.'
-                : 'No has aprobado el curso.'}
-            </Text>
-          </>
-        )}
+        </Card.Content>
       </Card.Content>
     </Card>
   );
