@@ -10,15 +10,23 @@ import {
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { ForumLinks } from '@alum-net/forums';
 import Screen from '../../../components/screen';
-import { Section, SectionContent, useCourse } from '@alum-net/courses';
+import {
+  Section,
+  SectionContent,
+  StudentGradesCard,
+  useCourse,
+} from '@alum-net/courses';
 import { THEME } from '@alum-net/ui';
+import { useUserInfo } from '@alum-net/users';
 
 export default function Course() {
   const { id, name } = useLocalSearchParams();
   const nav = useNavigation();
   const { data, isLoading } = useCourse(id.toString());
-
-  const [expandedSectionTitle, setExpandedSectionTitle] = useState('General');
+  const { data: userInfo } = useUserInfo();
+  const [expandedSectionTitle, setExpandedSectionTitle] = useState(
+    data?.data?.sections.data[0].title ?? '',
+  );
   const [expandedSection, setExpandedSection] = useState<Section>();
   const [width, setWidth] = useState(0);
   const buttons = useMemo(() => {
@@ -30,6 +38,7 @@ export default function Course() {
           label: section.title,
         })),
       );
+    array.push({ value: 'grades', label: 'Calificaciones' });
     return array;
   }, [data?.data?.sections.data]);
 
@@ -66,15 +75,23 @@ export default function Course() {
               style={{ width: '100%' }}
             />
           </ScrollView>
-          {expandedSection && (
-            <ScrollView>
+
+          <ScrollView>
+            {expandedSectionTitle === 'grades' && (
+              <StudentGradesCard
+                courseId={Number(id.toString())}
+                userEmail={userInfo!.email}
+                style={{ margin: 10 }}
+              />
+            )}
+            {expandedSection && (
               <Card style={{ marginVertical: 8, marginHorizontal: 4 }}>
                 <Card.Content>
                   <SectionContent item={expandedSection} htmlWidth={width} />
                 </Card.Content>
               </Card>
-            </ScrollView>
-          )}
+            )}
+          </ScrollView>
         </View>
       )}
     </Screen>

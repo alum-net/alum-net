@@ -1,4 +1,5 @@
 export const QUERY_KEYS = {
+  getStudentGrades: 'get-student-grades',
   getCourses: 'get-courses',
   getUserInfo: 'get-user-info',
   getCourse: 'get-course',

@@ -16,7 +16,8 @@ import { SectionForm } from '../../../features/sections/components/section-form'
 import { ForumLinks } from '@alum-net/forums';
 import RenderHTML from 'react-native-render-html';
 import EventCreationModal from '../../../features/events/components/event-creation-modal';
-import GradesCard from '../../../features/grades/components/grades-card';
+import TeacherGradesCard from '../../../features/grades/components/teacher-grades-card';
+import { StudentGrades } from '../../../features/grades/components/student-grades';
 
 export default function Course() {
   const { id, name } = useLocalSearchParams();
@@ -149,8 +150,12 @@ export default function Course() {
             {(isTeacher || userInfo?.role === UserRole.admin) && (
               <CourseMembersCard courseId={id.toString()} />
             )}
-            {(isTeacher || (userInfo?.role === UserRole.student && true)) && (
-              <GradesCard courseId={id.toString()} />
+            {isTeacher && <TeacherGradesCard courseId={id.toString()} />}
+            {userInfo?.role === UserRole.student && (
+              <StudentGrades
+                courseId={Number(id.toString())}
+                userEmail={userInfo.email}
+              />
             )}
           </>
         }

@@ -664,6 +664,8 @@ public class CourseService {
 					.grade(ep.getGrade())
 					.isUnrated(isEventUnrated)
 					.maxGrade(ep.getEvent().getMaxGrade().doubleValue())
+					.type(ep.getEvent().getType())
+					.title(ep.getEvent().getTitle())
 					.build());
 		}
 
