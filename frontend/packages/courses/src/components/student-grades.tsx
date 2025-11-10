@@ -5,15 +5,18 @@ import { CourseGradesResponse } from '../types';
 import { ActivityIndicator, Card, DataTable, Text } from 'react-native-paper';
 import { QUERY_KEYS } from '@alum-net/api';
 import { mapEventTypeToString } from './section-content';
+import { Platform, View, ViewStyle } from 'react-native';
 
 interface StudentGradesCardProps {
   courseId: number;
   userEmail: string;
+  style: ViewStyle;
 }
 
 export const StudentGradesCard = ({
   courseId,
   userEmail,
+  style,
 }: StudentGradesCardProps) => {
   const {
     data: grades,
@@ -33,7 +36,7 @@ export const StudentGradesCard = ({
   }
 
   return (
-    <Card>
+    <Card style={style}>
       <Card.Content>
         <Card.Title title="Eventos" />
         <Card.Content>
@@ -45,9 +48,15 @@ export const StudentGradesCard = ({
             </DataTable.Header>
             {grades?.eventGrades.map((eventGrade, index: number) => (
               <DataTable.Row key={index}>
-                <DataTable.Cell>{`${mapEventTypeToString(eventGrade.type)}: ${eventGrade.title}`}</DataTable.Cell>
+                <Text
+                  style={{
+                    alignSelf: 'center',
+                    maxWidth: Platform.OS === 'web' ? '50%' : '30%',
+                  }}
+                  numberOfLines={5}
+                >{`${mapEventTypeToString(eventGrade.type)}: ${eventGrade.title}`}</Text>
                 <DataTable.Cell numeric>
-                  {eventGrade.unrated ? 'No calificado' : eventGrade.grade}
+                  {eventGrade.unrated ? '-' : eventGrade.grade}
                 </DataTable.Cell>
                 <DataTable.Cell numeric>{eventGrade.maxGrade}</DataTable.Cell>
               </DataTable.Row>
