@@ -2,16 +2,22 @@ package org.alumnet.application.services;
 
 import lombok.RequiredArgsConstructor;
 import org.alumnet.application.dtos.*;
+import org.alumnet.application.dtos.requests.GradeSubmissionsRequestDTO;
 import org.alumnet.application.dtos.requests.SubmissionsDTO;
 import org.alumnet.application.dtos.requests.SubmitQuestionnaireRequestDTO;
 import org.alumnet.application.dtos.responses.EventDetailDTO;
+import org.alumnet.application.dtos.responses.SummaryEventDTO;
 import org.alumnet.application.enums.ActivityType;
 import org.alumnet.application.enums.EventType;
+import org.alumnet.application.enums.GradeContextType;
 import org.alumnet.application.enums.UserRole;
 import org.alumnet.application.mapper.EventMapper;
 import org.alumnet.domain.Section;
 import org.alumnet.domain.events.*;
-import org.alumnet.domain.repositories.*;
+import org.alumnet.domain.repositories.EventParticipationRepository;
+import org.alumnet.domain.repositories.EventRepository;
+import org.alumnet.domain.repositories.QuestionnaireResponseDetailRepository;
+import org.alumnet.domain.repositories.UserRepository;
 import org.alumnet.domain.resources.TaskResource;
 import org.alumnet.domain.users.Student;
 import org.alumnet.domain.users.User;
@@ -39,6 +45,7 @@ public class EventService {
 	private final UserRepository userRepository;
 	private final S3FileStorageService s3FileStorageService;
 	private final UserActivityLogService activityLogService;
+	private final GradeSubmissionService gradeSubmissionService;
 
 	public void createEvent(EventDTO eventDTO) {
 		validateDates(eventDTO.getStartDate(), eventDTO.getEndDate());
@@ -48,10 +55,14 @@ public class EventService {
 
 		Section section = sectionService.findSectionById(eventDTO.getSectionId());
 		List<Student> enrolledStudentsInCourse = courseService
-				.findEnrolledStudentsInCourse(section.getCourse().getId());
+				.findEnrolledStudentsInCourse(section.getCourse().getId())
+				.stream()
+				.map(result -> (Student) result[0])
+				.collect(Collectors.toList());
 
 		Event event = eventMapper.eventDTOToEvent(eventDTO);
 		event.setSection(section);
+		event.setCourse(section.getCourse());
 		event.setParticipation(enrollStudentsInEvent(event, enrolledStudentsInCourse));
 
 		eventRepository.save(event);
@@ -63,7 +74,7 @@ public class EventService {
 				enrolledStudentsInCourse.stream()
 						.map(Student::getEmail)
 						.toList(),
-				eventDTO.getEndDate().minusDays(1));
+				eventDTO.getEndDate().minusDays(1), GradeContextType.EVENT.getValue());
 
 		event.setNotificationId(notificationID);
 		eventRepository.save(event);
@@ -181,10 +192,10 @@ public class EventService {
 	public void submitHomework(Integer eventId, MultipartFile homeworkFile, String studentEmail) {
 		Event event = eventRepository.findById(eventId).orElseThrow(EventNotFoundException::new);
 
-		if (LocalDateTime.now().isAfter(event.getEndDate()) || LocalDateTime.now().isBefore(event.getStartDate())){
-            throw new AssignmentDueDateExpiredException(
-                    "No se puede enviar la tarea despues de la fecha de fin del evento o antes de la fecha inicio del evento");
-        }
+		if (LocalDateTime.now().isAfter(event.getEndDate()) || LocalDateTime.now().isBefore(event.getStartDate())) {
+			throw new AssignmentDueDateExpiredException(
+					"No se puede enviar la tarea despues de la fecha de fin del evento o antes de la fecha inicio del evento");
+		}
 
 		fileValidationService.validateFile(homeworkFile, false);
 
@@ -363,5 +374,31 @@ public class EventService {
 						.student(student)
 						.responses(new HashSet<>())
 						.build());
+	}
+
+	public List<SummaryEventDTO> getUnratedEventsByCourseId(Integer courseId) {
+		return eventRepository.findUnratedEventsByCourse(courseId).stream().map(eventMapper::eventToSummaryEventDTO)
+				.toList();
+	}
+
+	public List<StudentSummaryDTO> getEventStudents(Integer eventId) {
+		if (!eventRepository.existsById(eventId))
+			throw new EventNotFoundException();
+		return eventParticipationRepository.findStudentSummaryByEventId(eventId);
+	}
+
+	public void gradeSubmissions(GradeSubmissionsRequestDTO request) {
+		Event event = eventRepository.findById(request.getEventId()).orElseThrow(EventNotFoundException::new);
+
+		List<EventParticipation> allEventParticipations = eventParticipationRepository
+				.findAllByIdEventId(event.getId());
+
+		gradeSubmissionService.gradeStudents(allEventParticipations,
+				request.getStudents(),
+				participation -> participation.getStudent().getEmail(),
+				EventParticipation::setGrade, GradeContextType.EVENT.getValue());
+
+		eventParticipationRepository.saveAll(allEventParticipations);
+		notificationService.sendGradeNotifications(request);
 	}
 }

@@ -6,6 +6,7 @@ import org.alumnet.application.dtos.*;
 import org.alumnet.application.dtos.requests.CourseCreationRequestDTO;
 import org.alumnet.application.dtos.requests.CourseFilterDTO;
 import org.alumnet.application.dtos.requests.EnrollmentRequestDTO;
+import org.alumnet.application.dtos.requests.GradeSubmissionsRequestDTO;
 import org.alumnet.application.dtos.responses.BulkResponseDTO;
 import org.alumnet.application.dtos.responses.CourseGradesResponseDTO;
 import org.alumnet.application.dtos.responses.PageableResultResponse;
@@ -21,6 +22,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
@@ -92,7 +94,11 @@ public class CourseController {
                         @PageableDefault(page = 0, size = 15) Pageable page,
                         @PathVariable int courseId) {
 
+                if (page.getPageNumber() == 0)
+                    page = Pageable.unpaged();
+
                 Page<UserDTO> userPage = courseService.getCourseMembers(courseId, page);
+
 
                 PageableResultResponse<UserDTO> response = PageableResultResponse.fromPage(
                                 userPage,
@@ -234,5 +240,27 @@ public class CourseController {
         CourseGradesResponseDTO grades = courseService.getGrades(courseId, userEmail);
 
         return ResponseEntity.ok(ResultResponse.success(grades, "Se obtuvieron las notas correctamente"));
+    }
+
+    @GetMapping(path = "/{courseId}/students" , produces = "application/json")
+    @PreAuthorize("hasRole('teacher')")
+    public ResponseEntity<ResultResponse<List<StudentSummaryDTO>>> getCourseStudents(@PathVariable int courseId) {
+        return ResponseEntity.ok(ResultResponse.success(courseService.findSummaryEnrolledStudentsInCourse(courseId)
+                , "Se obtuvieron los estudiantes correctamente"));
+
+    }
+
+    @GetMapping("/{courseId}/auto-grade")
+    @PreAuthorize("hasRole('teacher')")
+    public ResponseEntity<ResultResponse<Object>> autoGradeCourse(@PathVariable Integer courseId) {
+        return ResponseEntity.ok(ResultResponse.success(courseService.autoGradeCourse(courseId),
+                "Auto-calificación de eventos del curso iniciada correctamente"));
+    }
+
+    @PostMapping("/grade-submissions")
+    @PreAuthorize("hasRole('teacher')")
+    public ResponseEntity<ResultResponse<Object>> gradeSubmissionsForCourse(@RequestBody GradeSubmissionsRequestDTO requestDTO) {
+        courseService.gradeSubmissionsForCourse(requestDTO);
+        return ResponseEntity.ok(ResultResponse.success(null, "Correcciones realizadas exitosamente"));
     }
 }

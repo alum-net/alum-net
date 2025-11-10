@@ -1,10 +1,14 @@
 package org.alumnet.application.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mailgun.api.v3.MailgunMessagesApi;
 import com.mailgun.model.message.Message;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.alumnet.application.dtos.StudentSubmissionDTO;
+import org.alumnet.application.dtos.requests.GradeSubmissionsRequestDTO;
 import org.alumnet.application.dtos.responses.WebNotificationDTO;
+import org.alumnet.application.enums.GradeContextType;
 import org.alumnet.application.enums.NotificationStatus;
 import org.alumnet.application.enums.NotificationType;
 import org.alumnet.application.query_builders.NotificationQueryBuilder;
@@ -18,10 +22,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -66,15 +67,33 @@ public class NotificationService {
             throw new RuntimeException("Error communicating with OneSignal", e);
         }
     }
+    public void sendGradeNotifications(GradeSubmissionsRequestDTO request) {
+        boolean isCourse = request.getCourseId() != null;
+        Integer targetId = isCourse ? request.getCourseId() : request.getEventId();
+        String context = isCourse ? GradeContextType.COURSE.getValue() : GradeContextType.EVENT.getValue();
+
+        List<String> emails = request.getStudents().stream()
+                .map(StudentSubmissionDTO::getEmail)
+                .toList();
+
+        String title = "Calificaciones publicadas";
+        String message = String.format(
+                "Las calificaciones del %s han sido publicadas.",
+                context
+        );
+
+        sendNotifications(targetId, title, message, emails, LocalDateTime.now(),context);
+    }
+
 
     /**
      * Creates and sends a notification (immediate or scheduled).
      */
     public String sendNotifications(int eventId, String title, String message, List<String> userEmails,
-            LocalDateTime endDate) {
+            LocalDateTime endDate, String notificationType) {
         ScheduledNotification scheduledNotification = null;
         try {
-            scheduledNotification = saveScheduledEmailNotification(eventId, title, message, userEmails, endDate);
+            scheduledNotification = saveScheduledEmailNotification(eventId, title, message, userEmails, endDate,notificationType);
             return sendPushNotifications(title, message, userEmails, endDate);
         } catch (Exception e) {
             log.error("Error sending notification: {}", e.getMessage(), e);
@@ -87,7 +106,7 @@ public class NotificationService {
 
     /**
      * Builds the OneSignal payload and sends it through the client.
-     * 
+     *
      * @throws JsonProcessingException
      */
     private String sendPushNotifications(String title, String message, List<String> userEmails, LocalDateTime endDate)
@@ -109,7 +128,7 @@ public class NotificationService {
      * Saves a notification record in DB before it's sent or scheduled.
      */
     private ScheduledNotification saveScheduledEmailNotification(int eventId, String title, String message,
-            List<String> userEmails, LocalDateTime endDate) {
+            List<String> userEmails, LocalDateTime endDate, String notificationType) {
         LocalDateTime scheduledTime = endDate.minusHours(24);
         if (scheduledTime.isBefore(LocalDateTime.now())) {
             scheduledTime = LocalDateTime.now(); // send immediately if <24h left
@@ -119,6 +138,7 @@ public class NotificationService {
                 .title(title)
                 .eventId(eventId)
                 .message(message)
+                .notificationType(notificationType)
                 .recipientIds(userEmails)
                 .state(NotificationStatus.PENDING)
                 .scheduledSendTime(scheduledTime)

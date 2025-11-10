@@ -3,9 +3,9 @@ package org.alumnet.domain.repositories;
 import org.alumnet.domain.events.Event;
 import org.alumnet.domain.events.Questionnaire;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,6 +25,19 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
     WHERE q.id = :eventId
     """)
     Optional<Questionnaire> findQuestionnaireById(@Param("eventId") Integer eventId);
+
+    @Query("""
+        SELECT e 
+        FROM Event e 
+        WHERE e.course.id = :courseId
+        AND NOT EXISTS (
+            SELECT 1 
+            FROM EventParticipation ep 
+            WHERE ep.event = e 
+            AND ep.grade IS NOT NULL
+        )
+    """)
+    List<Event> findUnratedEventsByCourse(Integer courseId);
 
     @Query("""
     SELECT e FROM Event e

@@ -1,8 +1,12 @@
 package org.alumnet.domain.events;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.alumnet.application.enums.EventType;
+import org.alumnet.domain.Course;
 import org.alumnet.domain.Section;
 
 import java.time.LocalDateTime;
@@ -43,6 +47,10 @@ public abstract class Event {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "section_id", referencedColumnName = "section_id")
     private Section section;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "course_id", referencedColumnName = "id")
+    private Course course;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EventParticipation> participation = new ArrayList<>();
