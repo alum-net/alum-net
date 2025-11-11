@@ -12,11 +12,14 @@ import { THEME } from '@alum-net/ui';
 import { useLabels } from '../hooks/useLables';
 import { PropsWithChildren, ReactElement } from 'react';
 import { useLibraryContext } from '../library-context';
+import { Label, LibraryResource } from '../types';
 
 const LibraryFilters = ({
   deleteLabel,
+  renderModifyLabelForm,
 }: {
   deleteLabel: undefined | (({ id }: { id: number }) => void);
+  renderModifyLabelForm?: (label: Label) => React.ReactElement | null;
 }) => {
   const { data: labels } = useLabels();
   const { appliedFilters, setFilters, nameFilter, setNameFilter } =
@@ -55,6 +58,7 @@ const LibraryFilters = ({
             }
           >
             {label.name}
+            {renderModifyLabelForm && renderModifyLabelForm(label)}
           </Chip>
         ))}
       </View>
@@ -66,10 +70,16 @@ export const LibraryDashboard = ({
   deleteLabel,
   deleteResource,
   filterContainer: FilterContainer,
+  renderModifyLabelForm,
+  renderModifyResourceForm,
 }: {
   deleteLabel?: ({ id }: { id: number }) => void;
   deleteResource?: ({ id }: { id: number }) => void;
   filterContainer?: (props: PropsWithChildren) => ReactElement;
+  renderModifyLabelForm?: (label: Label) => React.ReactElement | null;
+  renderModifyResourceForm?: (
+    resource: LibraryResource,
+  ) => React.ReactElement | null;
 }) => {
   const {
     data: resources,
@@ -120,6 +130,7 @@ export const LibraryDashboard = ({
               Eliminar
             </Button>
           )}
+          {renderModifyResourceForm?.(item)}
         </Card>
       )}
       keyExtractor={resource => resource.id.toString()}
@@ -127,10 +138,16 @@ export const LibraryDashboard = ({
         <>
           {FilterContainer ? (
             <FilterContainer>
-              <LibraryFilters deleteLabel={deleteLabel} />
+              <LibraryFilters
+                deleteLabel={deleteLabel}
+                renderModifyLabelForm={renderModifyLabelForm}
+              />
             </FilterContainer>
           ) : (
-            <LibraryFilters deleteLabel={deleteLabel} />
+            <LibraryFilters
+              deleteLabel={deleteLabel}
+              renderModifyLabelForm={renderModifyLabelForm}
+            />
           )}
         </>
       }

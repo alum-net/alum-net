@@ -4,11 +4,12 @@ import { QUERY_KEYS } from '@alum-net/api';
 import { UserRole } from '@alum-net/users';
 
 export const useConversations = (userRole: UserRole | undefined) => {
+  const refetch = userRole && userRole !== UserRole.admin;
   return useQuery({
     queryKey: [QUERY_KEYS.getConversations],
-    queryFn: getConversations,
-    enabled: userRole && userRole !== UserRole.admin,
+    queryFn: () => (refetch ? getConversations() : []),
+    enabled: refetch,
     staleTime: 10_000,
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: refetch,
   });
 };

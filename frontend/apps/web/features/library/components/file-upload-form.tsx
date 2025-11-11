@@ -14,14 +14,19 @@ import { FormTextInput, Toast } from '@alum-net/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@alum-net/api';
 import { PERMITTED_FILE_TYPES } from '../../courses/constants';
-import { useLabels } from '@alum-net/library';
+import { useLabels, LibraryResource } from '@alum-net/library';
 import { FilesToUpload } from '../../courses/types';
-import { createResource } from '../service';
-import { FormValues, schema } from '../validator';
+import { createResource, modifyResource } from '../service';
+import { FormValues, createSchema, updateSchema } from '../validator';
 import { useUserInfo } from '@alum-net/users';
 import { isAxiosError } from 'axios';
+import { LibraryResourceUpdateRequest } from '../types';
 
-export const FileUploadForm = () => {
+type FileUploadFormProps = {
+  resourceToEdit?: LibraryResource;
+};
+
+export const FileUploadForm = ({ resourceToEdit }: FileUploadFormProps) => {
   const [selectedFile, setSelectedFile] = useState<FilesToUpload>();
   const [isLoading, setIsLoading] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -38,11 +43,11 @@ export const FileUploadForm = () => {
     reset,
     setError,
   } = useForm<FormValues>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(resourceToEdit ? updateSchema : createSchema),
     defaultValues: {
-      creatorEmail: '',
-      title: '',
-      labelIds: [],
+      creatorEmail: userInfo?.email ?? '',
+      title: resourceToEdit?.title ?? '',
+      labelIds: resourceToEdit?.labels.map(l => l.id) ?? [],
       file: undefined,
     },
   });
@@ -51,20 +56,41 @@ export const FileUploadForm = () => {
     if (userInfo?.email) setValue('creatorEmail', userInfo.email);
   }, [userInfo, setValue]);
 
-  const { mutate } = useMutation({
-    mutationFn: createResource,
+  const { mutate: createResourceMutation, isPending: isCreating } = useMutation(
+    {
+      mutationFn: createResource,
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.getLibraryResources],
+        });
+        Toast.success('Recurso creado correctamente');
+        dismissModal();
+      },
+      onError: (err: unknown) => {
+        setIsLoading(false);
+        if (isAxiosError(err))
+          setError('file.name', { message: err.response?.data.message });
+        Toast.error('Error al crear el recurso');
+        console.error(err);
+      },
+    },
+  );
+
+  const { mutate: modifyResourceMutation, isPending: isEditing } = useMutation({
+    mutationFn: (data: LibraryResourceUpdateRequest) =>
+      modifyResource(resourceToEdit!.id, data),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.getLibraryResources],
       });
-      Toast.success('Recurso creado correctamente');
       dismissModal();
+      Toast.success('Recurso modificado correctamente');
     },
     onError: (err: unknown) => {
       setIsLoading(false);
       if (isAxiosError(err))
-        setError('file.name', { message: err.response?.data.message });
-      Toast.error('Error al crear el recurso');
+        setError('root.serverError', { message: err.response?.data.message });
+      Toast.error('Error al modificar el recurso');
       console.error(err);
     },
   });
@@ -92,25 +118,46 @@ export const FileUploadForm = () => {
   };
 
   const onSubmit = (data: FormValues) => {
+    if (!data.creatorEmail) {
+      Toast.error('No se pudo obtener el email del usuario.');
+      return;
+    }
     setIsLoading(true);
-    mutate(data);
+    if (resourceToEdit) {
+      modifyResourceMutation({
+        title: data.title,
+        labelIds: data.labelIds,
+        currentUserEmail: data.creatorEmail,
+      });
+    } else {
+      createResourceMutation(data);
+    }
   };
 
   const dismissModal = () => {
     setIsVisible(false);
     setIsLoading(false);
     setSelectedFile(undefined);
-    reset();
+    reset({
+      creatorEmail: userInfo?.email ?? '',
+      title: resourceToEdit?.title ?? '',
+      labelIds: resourceToEdit?.labels.map(l => l.id) ?? [],
+      file: undefined,
+    });
   };
 
   return (
     <>
-      <Button mode="outlined" onPress={() => setIsVisible(true)}>
-        Subir nuevo recurso a la libreria
+      <Button
+        mode={resourceToEdit ? 'text' : 'outlined'}
+        onPress={() => setIsVisible(true)}
+        icon={resourceToEdit ? 'pencil' : ''}
+      >
+        {resourceToEdit ? 'Editar' : 'Subir nuevo recurso a la libreria'}
       </Button>
       <Modal visible={isVisible} onDismiss={dismissModal}>
         <SafeAreaView style={styles.container}>
-          {isLoading ? (
+          {isLoading || isCreating || isEditing ? (
             <ActivityIndicator />
           ) : (
             <>
@@ -156,25 +203,35 @@ export const FileUploadForm = () => {
                 <HelperText type="error">{errors.labelIds.message}</HelperText>
               )}
 
-              <Text style={styles.label}>Archivo *</Text>
-              <View style={styles.uploadBox}>
-                <Button
-                  icon="cloud-upload"
-                  mode="outlined"
-                  onPress={handleFileSelect}
-                >
-                  {selectedFile ? 'Cambiar archivo' : 'Seleccionar archivo'}
-                </Button>
-                {selectedFile && (
-                  <Text style={styles.fileName}>{selectedFile.name}</Text>
-                )}
-                <Text style={styles.fileHint}>
-                  PDF, PPTX, XLSX, MP4, JPG, PNG, DOCX, ZIP
-                </Text>
-              </View>
-              {errors.file && (
+              {!resourceToEdit && (
+                <>
+                  <Text style={styles.label}>Archivo *</Text>
+                  <View style={styles.uploadBox}>
+                    <Button
+                      icon="cloud-upload"
+                      mode="outlined"
+                      onPress={handleFileSelect}
+                    >
+                      {selectedFile ? 'Cambiar archivo' : 'Seleccionar archivo'}
+                    </Button>
+                    {selectedFile && (
+                      <Text style={styles.fileName}>{selectedFile.name}</Text>
+                    )}
+                    <Text style={styles.fileHint}>
+                      PDF, PPTX, XLSX, MP4, JPG, PNG, DOCX, ZIP
+                    </Text>
+                  </View>
+                  {errors.file && (
+                    <HelperText type="error">
+                      {errors.file.size?.message || errors.file.name?.message}
+                    </HelperText>
+                  )}
+                </>
+              )}
+
+              {errors.root?.serverError && (
                 <HelperText type="error">
-                  {errors.file.size?.message || errors.file.name?.message}
+                  {errors.root.serverError.message}
                 </HelperText>
               )}
 
@@ -182,8 +239,13 @@ export const FileUploadForm = () => {
                 <Button mode="text" onPress={dismissModal}>
                   Cancelar
                 </Button>
-                <Button mode="contained" onPress={handleSubmit(onSubmit)}>
-                  Crear recurso
+                <Button
+                  mode="contained"
+                  onPress={handleSubmit(onSubmit)}
+                  loading={isCreating || isEditing}
+                  disabled={isCreating || isEditing}
+                >
+                  {resourceToEdit ? 'Editar' : 'Crear'} recurso
                 </Button>
               </View>
             </>
