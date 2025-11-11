@@ -17,7 +17,7 @@ import { PERMITTED_FILE_TYPES } from '../../courses/constants';
 import { useLabels, LibraryResource } from '@alum-net/library';
 import { FilesToUpload } from '../../courses/types';
 import { createResource, modifyResource } from '../service';
-import { FormValues, schema } from '../validator';
+import { FormValues, createSchema, updateSchema } from '../validator';
 import { useUserInfo } from '@alum-net/users';
 import { isAxiosError } from 'axios';
 import { LibraryResourceUpdateRequest } from '../types';
@@ -43,9 +43,9 @@ export const FileUploadForm = ({ resourceToEdit }: FileUploadFormProps) => {
     reset,
     setError,
   } = useForm<FormValues>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(resourceToEdit ? updateSchema : createSchema),
     defaultValues: {
-      creatorEmail: '',
+      creatorEmail: userInfo?.email ?? '',
       title: resourceToEdit?.title ?? '',
       labelIds: resourceToEdit?.labels.map(l => l.id) ?? [],
       file: undefined,
@@ -199,10 +199,6 @@ export const FileUploadForm = ({ resourceToEdit }: FileUploadFormProps) => {
                   ))}
                 </View>
               )}
-              {errors.labelIds && (
-                <HelperText type="error">{errors.labelIds.message}</HelperText>
-              )}
-
               {errors.labelIds && (
                 <HelperText type="error">{errors.labelIds.message}</HelperText>
               )}
