@@ -3,7 +3,7 @@ import { EventType, Section } from '../types';
 import { THEME, Toast } from '@alum-net/ui';
 import { Linking, StyleSheet, View } from 'react-native';
 import RenderHtml from 'react-native-render-html';
-import { Link } from 'expo-router';
+import { Link, useLocalSearchParams } from 'expo-router';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteEvent } from '../service';
 import { UserRole, useUserInfo } from '@alum-net/users';
@@ -29,11 +29,14 @@ export function SectionContent({
   htmlWidth: number;
 }) {
   const { data: userInfo } = useUserInfo();
+  const { id: courseId } = useLocalSearchParams<{ id: string }>();
   const queryClient = useQueryClient();
   const { mutate } = useMutation({
     mutationFn: ({ id }: { id: number }) => deleteEvent(id),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.getCourse] });
+      await queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.getCourse, courseId, userInfo?.email],
+      });
       Toast.success('Evento eliminado correctamente');
     },
     onError: error => {

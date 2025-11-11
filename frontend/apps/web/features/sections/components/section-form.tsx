@@ -92,7 +92,9 @@ export const SectionForm: React.FC<SectionFormProps> = ({
       selectedFiles?: FilesToUpload[];
     }) => createSection({ courseId, ...data }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.getCourse] });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.getCourse, courseId],
+      });
       Toast.success('Sección creada correctamente');
       onFinish();
     },
@@ -113,7 +115,9 @@ export const SectionForm: React.FC<SectionFormProps> = ({
         ...data,
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.getCourse] });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.getCourse, courseId],
+      });
       Toast.success('Sección modificada correctamente');
       onFinish();
     },

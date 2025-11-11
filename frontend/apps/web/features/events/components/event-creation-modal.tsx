@@ -144,7 +144,9 @@ export default function EventCreationModal({
     },
     onSuccess: () => {
       Toast.success('Evento creado correctamente');
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.getCourse] });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.getCourse, courseId],
+      });
       reset(defaultValues);
       onClose();
     },
