@@ -1,4 +1,4 @@
-import { fetchCourse } from '@alum-net/courses/src/service';
+import { getCourse } from '@alum-net/courses/src/service';
 import { useUserInfo } from '@alum-net/users';
 import { QUERY_KEYS } from '@alum-net/api';
 import { useQuery } from '@tanstack/react-query';
@@ -10,7 +10,7 @@ export const useCourse = (id: string) => {
   const { data: userInfo } = useUserInfo();
   const { data, isLoading, error } = useQuery({
     queryKey: [QUERY_KEYS.getCourse],
-    queryFn: () => fetchCourse(id, userInfo?.email || ''),
+    queryFn: () => getCourse(id, userInfo?.email || ''),
     enabled: !!userInfo?.email,
   });
   const nav = useNavigation();

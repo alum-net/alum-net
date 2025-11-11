@@ -13,26 +13,27 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class StudentCourseContentStrategy extends CourseContentStrategy {
-    protected StudentCourseContentStrategy(SectionRepository sectionRepository,
-            SectionMapper sectionMapper,
-            ParticipationRepository participationRepository,
-            CourseRepository courseRepository) {
-        super(sectionRepository, sectionMapper, participationRepository, courseRepository);
-    }
+	protected StudentCourseContentStrategy(SectionRepository sectionRepository,
+			SectionMapper sectionMapper,
+			ParticipationRepository participationRepository,
+			CourseRepository courseRepository) {
+		super(sectionRepository, sectionMapper, participationRepository, courseRepository);
+	}
 
-    @Override
-    protected void validate(String userId, Integer courseId) {
-        participationRepository.findById(CourseParticipationId.builder()
-                .courseId(courseId)
-                .studentEmail(userId).build()).orElseThrow(InsufficientPermissionsException::new);
-    }
+	@Override
+	protected void validate(String userId, Integer courseId) {
+		participationRepository.findById(CourseParticipationId.builder()
+				.courseId(courseId)
+				.studentEmail(userId).build()).orElseThrow(InsufficientPermissionsException::new);
+	}
 
-    @Override
-    protected CourseContentDTO buildCourseContentDTO(Integer courseId, String userId,
-            PageableResultResponse<SectionDTO> sectionDTOS) {
-        return CourseContentDTO.builder()
-                .sections(sectionDTOS)
-                .description(getDescription(courseId))
-                .build();
-    }
+	@Override
+	protected CourseContentDTO buildCourseContentDTO(Integer courseId, String userId,
+			PageableResultResponse<SectionDTO> sectionDTOS) {
+		return CourseContentDTO.builder()
+				.sections(sectionDTOS)
+				.description(getDescription(courseId))
+				.name(getName(courseId))
+				.build();
+	}
 }

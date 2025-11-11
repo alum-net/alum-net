@@ -51,7 +51,7 @@ export const deleteCourse = async (courseId: string) => {
   await api.delete(`/courses/${courseId}`);
 };
 
-export const fetchCourse = async (courseId: string, userEmail: string) => {
+export const getCourse = async (courseId: string, userEmail: string) => {
   const { data }: AxiosResponse<Response<CourseContent>> = await api.get(
     `/courses/${courseId}/content/?userId=${userEmail}&size=300`,
   );

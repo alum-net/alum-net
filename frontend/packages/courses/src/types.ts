@@ -68,6 +68,7 @@ export interface CourseContent {
   enrolledStudents?: string[];
   totalEnrollments?: number;
   description: string;
+  name: string;
 }
 
 export enum EventType {

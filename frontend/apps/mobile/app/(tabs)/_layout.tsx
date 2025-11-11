@@ -5,9 +5,11 @@ import { Tabs } from 'expo-router';
 import Colors from '../../constants/Colors';
 import { useColorScheme } from 'react-native';
 import { OneSignal } from 'react-native-onesignal';
-import { useUserInfo } from '@alum-net/users';
+import { UserRole, useUserInfo } from '@alum-net/users';
 import { useMMKVString } from 'react-native-mmkv';
 import { storage, STORAGE_KEYS } from '@alum-net/storage';
+import { logout } from '@alum-net/auth';
+import { Toast } from '@alum-net/ui';
 
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
@@ -22,6 +24,11 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   useEffect(() => {
+    if (refreshToken && data?.role && data.role !== UserRole.student) {
+      logout();
+      Toast.error('La aplicación movil solo esta disponible para estudiantes');
+      return;
+    }
     if (refreshToken && data?.email) {
       OneSignal.login(data.email);
     }

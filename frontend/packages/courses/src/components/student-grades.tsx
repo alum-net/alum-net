@@ -5,7 +5,7 @@ import { CourseGradesResponse } from '../types';
 import { ActivityIndicator, Card, DataTable, Text } from 'react-native-paper';
 import { QUERY_KEYS } from '@alum-net/api';
 import { mapEventTypeToString } from './section-content';
-import { Platform, View, ViewStyle } from 'react-native';
+import { Platform, ViewStyle } from 'react-native';
 
 interface StudentGradesCardProps {
   courseId: number;

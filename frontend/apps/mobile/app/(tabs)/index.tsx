@@ -1,28 +1,16 @@
-import { Text, View, StyleSheet } from 'react-native';
 import Screen from '../../components/screen';
+import { Calendar } from '@alum-net/users';
+import { useState } from 'react';
 
 export default function TabOneScreen() {
+  const [width, setWidth] = useState(0);
+
   return (
-    <Screen style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} />
+    <Screen
+      onLayout={event => setWidth(event.nativeEvent.layout.width)}
+      scrollable={false}
+    >
+      <Calendar width={width - 35} />
     </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
-});
