@@ -20,7 +20,7 @@ import TeacherGradesCard from '../../../features/grades/components/teacher-grade
 import { StudentGrades } from '../../../features/grades/components/student-grades';
 
 export default function Course() {
-  const { id, name } = useLocalSearchParams();
+  const { id } = useLocalSearchParams();
   const queryClient = useQueryClient();
   const { data: userInfo } = useUserInfo();
   const [isEventModalVisible, setIsEventModalVisible] = useState(false);
@@ -94,7 +94,7 @@ export default function Course() {
         onLayout={event => setHtmlWidth(event.nativeEvent.layout.width)}
         ListHeaderComponent={
           <View style={{ gap: 20 }}>
-            <Text variant="headlineLarge">{name}</Text>
+            <Text variant="headlineLarge">{data?.data?.name}</Text>
             <RenderHTML
               source={{ html: data.data?.description || '' }}
               contentWidth={htmlWidth}

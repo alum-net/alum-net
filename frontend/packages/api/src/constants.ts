@@ -17,4 +17,5 @@ export const QUERY_KEYS = {
   getUnratedEvents: 'get-unrated-events',
   getAutoGrades: 'get-auto-grades',
   getEventStudents: 'get-event-students',
+  getUserCalendar: 'get-user-calendar',
 };

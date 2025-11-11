@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import {
   Card,
@@ -20,14 +20,16 @@ import { THEME } from '@alum-net/ui';
 import { useUserInfo } from '@alum-net/users';
 
 export default function Course() {
-  const { id, name } = useLocalSearchParams();
+  const { id } = useLocalSearchParams();
   const nav = useNavigation();
   const { data, isLoading } = useCourse(id.toString());
   const { data: userInfo } = useUserInfo();
   const [expandedSectionTitle, setExpandedSectionTitle] = useState(
     data?.data?.sections.data[0].title ?? '',
   );
-  const [expandedSection, setExpandedSection] = useState<Section>();
+  const [expandedSection, setExpandedSection] = useState<Section | undefined>(
+    data?.data?.sections.data[0],
+  );
   const [width, setWidth] = useState(0);
   const buttons = useMemo(() => {
     const array = [];
@@ -41,6 +43,13 @@ export default function Course() {
     array.push({ value: 'grades', label: 'Calificaciones' });
     return array;
   }, [data?.data?.sections.data]);
+
+  useEffect(() => {
+    if (data?.data?.sections.data[0]) {
+      setExpandedSectionTitle(data?.data?.sections.data[0].title);
+      setExpandedSection(data?.data?.sections.data[0]);
+    }
+  }, [data]);
 
   return (
     <Screen edges={['top']} scrollable={false}>
@@ -56,7 +65,7 @@ export default function Course() {
             style={{ backgroundColor: THEME.colors.background }}
           >
             <Appbar.BackAction onPress={nav.goBack} />
-            <Appbar.Content title={name} />
+            <Appbar.Content title={data.data.name} />
           </Appbar>
           <ForumLinks courseId={id.toString()} />
           <ScrollView horizontal style={{ paddingVertical: 10 }}>
