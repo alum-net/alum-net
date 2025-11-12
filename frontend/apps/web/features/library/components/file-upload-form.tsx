@@ -52,6 +52,12 @@ export const FileUploadForm = () => {
     if (userInfo?.email) setValue('creatorEmail', userInfo.email);
   }, [userInfo, setValue]);
 
+  useEffect(() => {
+    if (isVisible) {
+      setServerMessage(null);
+    }
+  }, [isVisible]);
+
   const { mutate } = useMutation({
     mutationFn: createResource,
     onSuccess: async () => {
@@ -185,7 +191,7 @@ export const FileUploadForm = () => {
                 </HelperText>
               )}
               {serverMessage && (
-                <HelperText type="error" style={styles.serverError}>
+                <HelperText type="error">
                   {serverMessage}
                 </HelperText>
               )}

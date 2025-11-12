@@ -12,6 +12,7 @@ import { THEME } from '@alum-net/ui';
 import { useLabels } from '../hooks/useLables';
 import { PropsWithChildren, ReactElement } from 'react';
 import { useLibraryContext } from '../library-context';
+import { LibraryResource } from '../types';
 
 const LibraryFilters = ({
   deleteLabel,
@@ -68,7 +69,7 @@ export const LibraryDashboard = ({
   filterContainer: FilterContainer,
 }: {
   deleteLabel?: ({ id }: { id: number }) => void;
-  deleteResource?: ({ id }: { id: number }) => void;
+  deleteResource?: (resource: LibraryResource) => void;
   filterContainer?: (props: PropsWithChildren) => ReactElement;
 }) => {
   const {
@@ -115,7 +116,7 @@ export const LibraryDashboard = ({
             <Button
               mode="text"
               textColor={THEME.colors.error}
-              onPress={() => deleteResource({ id: item.id })}
+              onPress={() => deleteResource(item)}
             >
               Eliminar
             </Button>

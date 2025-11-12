@@ -21,6 +21,7 @@ export default function Library() {
   const { data: userInfo } = useUserInfo();
   const queryClient = useQueryClient();
   const [labelIdToDelete, setLabelIdToDelete] = useState<number | null>(null);
+  const [resourceIdToDelete, setResourceIdToDelete] = useState<number | null>(null);
 
   const { mutate: deleteLabelMutation } = useMutation({
     mutationFn: (data: { id: number }) => deleteLabel(data.id),
@@ -42,23 +43,39 @@ export default function Library() {
   const handleDeleteLabel = ({ id }: { id: number }) => {
     setLabelIdToDelete(id);
   };
+
+  const handleDeleteResource = (resource: LibraryResource) => {
+    if (userInfo?.role === UserRole.teacher && resource.creator.email !== userInfo.email) {
+      Toast.error('Solo podés eliminar tus propios recursos.');
+      return;
+    }
+    setResourceIdToDelete(resource.id);
+  };
+
   const { mutate: deleteResourceMutation } = useMutation({
     mutationFn: (data: { id: number }) => deleteResource(data.id),
     onSuccess: async (_, variables) => {
-      await queryClient.setQueryData(
-        [QUERY_KEYS.getLibraryResources],
-        (oldResources: PageableResponse<LibraryResource>) => ({
-          ...oldResources,
-          data: oldResources?.data?.filter(
-            resource => resource.id !== variables.id,
-          ),
-        }),
+      queryClient.setQueriesData(
+        { queryKey: [QUERY_KEYS.getLibraryResources] },
+        (oldResources: PageableResponse<LibraryResource> | undefined) => {
+          if (!oldResources) return oldResources;
+          return {
+            ...oldResources,
+            data: oldResources.data?.filter(
+              resource => resource.id !== variables.id,
+            ),
+          };
+        },
       );
+      await queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.getLibraryResources],
+      });
       Toast.success('Recurso eliminado correctamente.');
+      setResourceIdToDelete(null);
     },
     onError: error => {
-      console.log(error);
-      Toast.error('Error inesperado eliminando el recurso.');
+      const errorMessage = getAxiosErrorMessage(error);
+      Toast.error(errorMessage);
     },
   });
 
@@ -82,7 +99,7 @@ export default function Library() {
             }
             deleteResource={
               userInfo?.role !== UserRole.student
-                ? deleteResourceMutation
+                ? handleDeleteResource
                 : undefined
             }
           />
@@ -115,6 +132,39 @@ export default function Library() {
               onPress={() => {
                 if (labelIdToDelete !== null) {
                   deleteLabelMutation({ id: labelIdToDelete });
+                }
+              }}
+            >
+              Eliminar
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+        <Dialog
+          visible={resourceIdToDelete !== null}
+          onDismiss={() => {
+            setResourceIdToDelete(null);
+          }}
+          style={styles.dialog}
+        >
+          <Dialog.Title>Confirmar eliminación</Dialog.Title>
+          <Dialog.Content style={styles.dialogContent}>
+            <Text>¿Querés eliminar el recurso?</Text>
+          </Dialog.Content>
+          <Dialog.Actions style={styles.dialogActions}>
+            <Button
+              onPress={() => {
+                setResourceIdToDelete(null);
+              }}
+            >
+              Cancelar
+            </Button>
+            <Button
+              mode="contained-tonal"
+              buttonColor={THEME.colors.error}
+              textColor="#fff"
+              onPress={() => {
+                if (resourceIdToDelete !== null) {
+                  deleteResourceMutation({ id: resourceIdToDelete });
                 }
               }}
             >
