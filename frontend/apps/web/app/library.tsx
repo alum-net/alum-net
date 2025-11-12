@@ -102,6 +102,16 @@ export default function Library() {
                 ? handleDeleteResource
                 : undefined
             }
+            renderModifyLabelForm={label =>
+              userInfo?.role === UserRole.admin ? (
+                <CreateLabelForm labelToEdit={label} />
+              ) : null
+            }
+            renderModifyResourceForm={resource =>
+              userInfo?.role !== UserRole.student ? (
+                <FileUploadForm resourceToEdit={resource} />
+              ) : null
+            }
           />
         </LibraryContextProvider>
       </View>

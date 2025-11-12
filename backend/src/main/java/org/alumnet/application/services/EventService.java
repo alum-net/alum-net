@@ -7,17 +7,12 @@ import org.alumnet.application.dtos.requests.SubmissionsDTO;
 import org.alumnet.application.dtos.requests.SubmitQuestionnaireRequestDTO;
 import org.alumnet.application.dtos.responses.EventDetailDTO;
 import org.alumnet.application.dtos.responses.SummaryEventDTO;
-import org.alumnet.application.enums.ActivityType;
-import org.alumnet.application.enums.EventType;
-import org.alumnet.application.enums.GradeContextType;
-import org.alumnet.application.enums.UserRole;
+import org.alumnet.application.enums.*;
 import org.alumnet.application.mapper.EventMapper;
 import org.alumnet.domain.Section;
 import org.alumnet.domain.events.*;
-import org.alumnet.domain.repositories.EventParticipationRepository;
-import org.alumnet.domain.repositories.EventRepository;
-import org.alumnet.domain.repositories.QuestionnaireResponseDetailRepository;
-import org.alumnet.domain.repositories.UserRepository;
+import org.alumnet.domain.notifications.InstantNotification;
+import org.alumnet.domain.repositories.*;
 import org.alumnet.domain.resources.TaskResource;
 import org.alumnet.domain.users.Student;
 import org.alumnet.domain.users.User;
@@ -37,6 +32,7 @@ public class EventService {
 	private final SectionService sectionService;
 	private final QuestionnaireResponseDetailRepository responseDetailRepository;
 	private final EventParticipationRepository participationRepository;
+    private final InstantNotificationRepository instantNotificationRepository;
 	private final NotificationService notificationService;
 	private final EventRepository eventRepository;
 	private final EventMapper eventMapper;
@@ -146,33 +142,45 @@ public class EventService {
 	public EventDetailDTO getEventById(Integer eventId) {
 		Event event = eventRepository.findById(eventId).orElseThrow(EventNotFoundException::new);
 		EventDetailDTO eventDetailDTO = eventMapper.eventToEventDTO(event);
-		eventDetailDTO.setStudentsWithPendingSubmission(
-				userRepository.findStudentsWithPendingSubmission(eventId, event.getSection().getCourseId()));
 
-		// Si es task devolvemos las entregas de los usuarios
-		if (event.getType() == EventType.TASK) {
-			List<SubmissionsDTO> submissions = new ArrayList<>();
+        switch (event.getType()){
+            case EventType.TASK -> {
+                eventDetailDTO.setStudentsWithPendingSubmission(
+                        userRepository.findStudentsWithPendingSubmissionToTask(eventId, event.getSection().getCourseId()));
 
-			for (EventParticipation p : eventParticipationRepository.findAllById_EventId(eventId)) {
-				TaskResource tr = p.getResource();
+                // Si es task devolvemos las entregas de los usuarios
+                List<SubmissionsDTO> submissions = new ArrayList<>();
 
-				SubmissionsDTO.SubmissionsDTOBuilder submissionsBuilder = SubmissionsDTO
-						.builder()
-						.studentEmail(p.getStudent().getEmail())
-						.studentName(p.getStudent().getName())
-						.studentLastname(p.getStudent().getLastname());
+                for(EventParticipation p : eventParticipationRepository.findAllById_EventId(eventId)
+                        .stream().filter(e -> e.getResource() != null)
+                        .collect(Collectors.toSet())){
+                    TaskResource tr = p.getResource();
 
-				if (tr != null) {
-					submissionsBuilder
-							.fileName(p.getResource() != null ? p.getResource().getName() : null)
-							.fileUrl(s3FileStorageService.generatePresignedUrl(p.getResource().getUrl()));
-				}
+                    SubmissionsDTO.SubmissionsDTOBuilder submissionsBuilder = SubmissionsDTO
+                            .builder()
+                            .studentEmail(p.getStudent().getEmail())
+                            .studentName(p.getStudent().getName())
+                            .studentLastname(p.getStudent().getLastname());
 
-				submissions.add(submissionsBuilder.build());
-			}
+                    if(tr != null){
+                        submissionsBuilder
+                                .fileName(p.getResource() != null ? p.getResource().getName() : null)
+                                .fileUrl(s3FileStorageService.generatePresignedUrl(p.getResource().getUrl()));
+                    }
 
-			eventDetailDTO.setSubmissions(submissions);
-		}
+                    submissions.add(submissionsBuilder.build());
+                }
+
+                eventDetailDTO.setSubmissions(submissions);
+
+                break;
+            }
+            case EventType.QUESTIONNAIRE -> {
+                eventDetailDTO.setStudentsWithPendingSubmission(
+                        userRepository.findStudentsWithPendingSubmissionToQuest(eventId, event.getSection().getCourseId()));
+                break;
+            }
+        }
 
 		return eventDetailDTO;
 	}
@@ -339,7 +347,13 @@ public class EventService {
 
 			newResponses.add(responseDetail);
 		}
+
+
 		participation.setResponses(newResponses);
+
+        double score = calculateQuestionnaireGrade(participation, questionnaire);
+        participation.setGrade(score);
+
 		participationRepository.save(participation);
 
 		activityLogService.logActivity(
@@ -348,6 +362,20 @@ public class EventService {
 				"Cuestionario resuelto: " + questionnaire.getTitle(),
 				eventId.toString());
 	}
+
+    private double calculateQuestionnaireGrade(EventParticipation participation,
+                                               Questionnaire questionnaire) {
+        int totalQuestions = questionnaire.getQuestions().size();
+
+        double pointsPerQuestion = (double) questionnaire.getMaxGrade() / totalQuestions;
+
+        long correctAnswers = participation.getResponses().stream()
+                .filter(response -> response.getStudentAnswer() != null
+                        && Boolean.TRUE.equals(response.getStudentAnswer().getCorrect()))
+                .count();
+
+        return correctAnswers * pointsPerQuestion;
+    }
 
 	private EventParticipation getOrCreateParticipation(Student student, Questionnaire questionnaire) {
 		EventParticipationId id = EventParticipationId.builder()
@@ -388,5 +416,20 @@ public class EventService {
 
 		eventParticipationRepository.saveAll(allEventParticipations);
 		notificationService.sendGradeNotifications(request);
+
+        Set<InstantNotification> instantNotifications = allEventParticipations.stream()
+                .map(e ->
+                        InstantNotification
+                            .builder()
+                            .type(NotificationType.GRADE_PUBLICATION)
+                            .message("Están disponibles las notas del evento " + event.getTitle())
+                            .title("Publicación de notas")
+                            .webStatus(NotificationStatus.PENDING)
+                            .recipientId(e.getStudent().getEmail())
+                            .build())
+                .collect(Collectors.toSet());
+
+        instantNotificationRepository.saveAll(instantNotifications);
+
 	}
 }

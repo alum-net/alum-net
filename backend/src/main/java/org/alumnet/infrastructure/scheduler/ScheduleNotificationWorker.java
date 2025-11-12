@@ -5,7 +5,7 @@ import com.mailgun.model.message.Message;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.alumnet.application.services.NotificationService;
-import org.alumnet.domain.ScheduledNotification;
+import org.alumnet.domain.notifications.ScheduledNotification;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -33,7 +33,6 @@ public class ScheduleNotificationWorker {
                     .text(scheduledNotification.getMessage()).build();
             mailgunMessagesApi.sendMessage(DOMAIN,message);
             notificationService.markNotificationAsSent(scheduledNotification);
-
         });
     }
 }

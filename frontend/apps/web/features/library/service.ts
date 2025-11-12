@@ -4,7 +4,9 @@ import { FormValues } from './validator';
 
 export const createLabel = async (name: string) => {
   const { data } = await api.post<Response<Label>>('/library/labels', { name });
-
+  if (!data.data) {
+    throw new Error('Failed to create label');
+  }
   return data.data;
 };
 
@@ -36,3 +38,11 @@ export const createResource = async (formData: FormValues) => {
 
 export const deleteResource = (id: number) =>
   api.delete(`/library/resources/${id}`);
+
+export const modifyLabel = (id: number, name: string) =>
+  api.put(`/library/labels/${id}`, { name });
+
+export const modifyResource = (
+  id: number,
+  data: { title: string; labelIds: number[] },
+) => api.patch(`/library/resources/${id}`, data);

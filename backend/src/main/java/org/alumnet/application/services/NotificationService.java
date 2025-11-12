@@ -1,14 +1,20 @@
 package org.alumnet.application.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.mailgun.api.v3.MailgunMessagesApi;
+import com.mailgun.model.message.Message;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.alumnet.application.dtos.StudentSubmissionDTO;
 import org.alumnet.application.dtos.requests.GradeSubmissionsRequestDTO;
+import org.alumnet.application.dtos.responses.WebNotificationDTO;
 import org.alumnet.application.enums.GradeContextType;
 import org.alumnet.application.enums.NotificationStatus;
+import org.alumnet.application.enums.NotificationType;
 import org.alumnet.application.query_builders.NotificationQueryBuilder;
-import org.alumnet.domain.ScheduledNotification;
+import org.alumnet.domain.notifications.InstantNotification;
+import org.alumnet.domain.notifications.ScheduledNotification;
+import org.alumnet.domain.repositories.InstantNotificationRepository;
 import org.alumnet.domain.repositories.NotificationRepository;
 import org.alumnet.infrastructure.config.OneSignalClient;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,10 +22,11 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -28,7 +35,12 @@ public class NotificationService {
 
     private final OneSignalClient oneSignalClient;
     private final NotificationRepository notificationRepository;
+    private final InstantNotificationRepository instantNotificationRepository;
     private final MongoTemplate mongoTemplate;
+
+    private final MailgunMessagesApi mailgunMessagesApi;
+    @Value("${mailgun.domain}")
+    private String DOMAIN;
 
     @Value("${send.notification.now:false}")
     private boolean sendNotificationNow;
@@ -149,5 +161,70 @@ public class NotificationService {
     public void markNotificationAsSent(ScheduledNotification notification) {
         notification.markAsSent();
         notificationRepository.save(notification);
+    }
+
+    public void sendInstantNotifications(String title, String message, Set<String> userEmailsToNotify, NotificationType type) {
+        for(String userEmail : userEmailsToNotify){
+            sendInstantNotificationWithOneSignal(title, message, userEmail);
+            sendInstantNotificationWithMail(title, message, userEmail);
+
+            InstantNotification notification = InstantNotification
+                    .builder()
+                    .recipientId(userEmail)
+                    .webStatus(NotificationStatus.PENDING)
+                    .title(title)
+                    .message(message)
+                    .type(type)
+                    .build();
+
+            instantNotificationRepository.save(notification);
+        }
+
+    }
+
+    private void sendInstantNotificationWithMail(String title, String message, String userEmail) {
+
+        try{
+            Message mailMessage = Message.builder().from("noreply@alumnet-uy.org")
+                    .to(Collections.singletonList(userEmail))
+                    .subject(title)
+                    .text(message).build();
+            mailgunMessagesApi.sendMessage(DOMAIN, mailMessage);
+        }
+        catch (Exception e) {
+            log.error("Error sending notification: {}", e.getMessage(), e);
+        }
+    }
+
+    private void sendInstantNotificationWithOneSignal(String title, String message, String userEmail){
+        try {
+            oneSignalClient.sendNotification(title, message, Collections.singletonList(userEmail), null);
+        } catch (Exception e) {
+            log.error("Error sending notification: {}", e.getMessage(), e);
+        }
+    }
+
+    public List<WebNotificationDTO> getAndMarkPendingWebNotifications(String recipientEmail) {
+        List<InstantNotification> pendingNotifications = instantNotificationRepository
+                .findByRecipientIdAndWebStatus(recipientEmail, NotificationStatus.PENDING);
+
+        if (pendingNotifications.isEmpty()) {
+            return List.of();
+        }
+
+        List<WebNotificationDTO> dtos = pendingNotifications.stream()
+                .map(notification -> {
+                    notification.markAsWebViewed();
+                    return WebNotificationDTO.builder()
+                            .title(notification.getTitle())
+                            .message(notification.getMessage())
+                            .type(notification.getType())
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        instantNotificationRepository.saveAll(pendingNotifications);
+
+        return dtos;
     }
 }

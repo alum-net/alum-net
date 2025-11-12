@@ -11,6 +11,7 @@ import org.alumnet.application.dtos.responses.CalendarEventDetailDTO;
 import org.alumnet.application.dtos.responses.PageableResultResponse;
 import org.alumnet.application.dtos.responses.ResultResponse;
 import org.alumnet.application.dtos.responses.UserActivityLogDTO;
+import org.alumnet.application.services.UserActivityLogService;
 import org.alumnet.application.services.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +32,7 @@ import java.util.List;
 @RequestMapping("/api/users")
 public class UserController {
     private final UserService userService;
+    private final UserActivityLogService userActivityLogService;
 
     @PostMapping(path = "/create-user", produces = "application/json")
     @PreAuthorize("hasRole('admin')")
@@ -119,5 +121,12 @@ public class UserController {
                         : "No se encontraron registros de actividad para el usuario");
 
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping(path = "/register-login", produces = "application/json")
+    @PreAuthorize("hasAnyRole('admin', 'student', 'teacher')")
+    public ResponseEntity<Object> registerLogin(Principal user){
+        userActivityLogService.logSuccessfulLoginIfNecessary(user.getName());
+        return  ResponseEntity.ok("Login registrado");
     }
 }
