@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { createLabel } from '../service';
 import { QUERY_KEYS } from '@alum-net/api';
 import { Label } from '@alum-net/library';
+import { getAxiosErrorMessage } from '../../users/service';
 
 const schema = z.object({
   name: z.string().min(1, 'El nombre es requerido'),
@@ -44,8 +45,8 @@ export const CreateLabelForm = () => {
       setIsVisible(false);
       Toast.success('Etiqueta creada correctamente');
     } catch (error) {
-      console.log(error);
-      Toast.error('Error inesperado creando la etiqueta');
+      const errorMessage = getAxiosErrorMessage(error);
+      Toast.error(errorMessage);
     }
   };
 
@@ -79,7 +80,7 @@ export const CreateLabelForm = () => {
           <Dialog.Actions style={styles.dialogActions}>
             <Button onPress={dismissModal}>Cancelar</Button>
             <Button mode="contained" onPress={handleSubmit(onSubmit)}>
-              Matricular
+              Crear
             </Button>
           </Dialog.Actions>
         </Dialog>
