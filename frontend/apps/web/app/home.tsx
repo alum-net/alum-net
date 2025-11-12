@@ -1,15 +1,18 @@
-import { Text, View } from "react-native";
+import { Calendar } from '@alum-net/users';
+import { useState } from 'react';
+import { View } from 'react-native';
 
 export default function Home() {
+  const [width, setWidth] = useState(0);
   return (
     <View
       style={{
         flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
+        padding: 15,
       }}
+      onLayout={event => setWidth(event.nativeEvent.layout.width)}
     >
-      <Text>Edit app/index.tsx to edit this screen.</Text>
+      <Calendar width={width - 30} />
     </View>
   );
 }

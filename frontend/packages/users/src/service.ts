@@ -1,7 +1,13 @@
 import api, { PageableResponse, Response } from '@alum-net/api';
 import { AxiosResponse } from 'axios';
 import { getKeyclaokUserInfo, logout } from '@alum-net/auth';
-import { UpdatePayload, UserFilterDTO, UserInfo, UserRole } from './types';
+import {
+  CalendarEvent,
+  UpdatePayload,
+  UserFilterDTO,
+  UserInfo,
+  UserRole,
+} from './types';
 import { storage, STORAGE_KEYS } from '@alum-net/storage';
 import { deleteFalsyKeys } from '@alum-net/courses/src/helpers';
 import { Platform } from 'react-native';
@@ -121,3 +127,6 @@ export const updateUser = async (userEmail: string, data: UpdatePayload) => {
   storage.set(STORAGE_KEYS.USER_INFO, JSON.stringify(updatedUser.data));
   return updatedUser.data;
 };
+
+export const getUserCalendar = async () =>
+  (await api.get<Response<CalendarEvent[]>>('/users/calendar-events')).data;

@@ -15,10 +15,11 @@ import java.util.List;
 @NoArgsConstructor
 
 public class CourseContentDTO {
-    PageableResultResponse<SectionDTO> sections;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    List<String> enrolledStudents;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    Integer totalMembers;
-    String description;
+	String name;
+	PageableResultResponse<SectionDTO> sections;
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	List<String> enrolledStudents;
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	Integer totalMembers;
+	String description;
 }

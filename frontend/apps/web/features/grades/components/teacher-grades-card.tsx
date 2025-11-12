@@ -7,7 +7,7 @@ type Props = {
   courseId: string;
 };
 
-const GradesCard = ({ courseId }: Props) => {
+const TeacherGradesCard = ({ courseId }: Props) => {
   const [tab, setTab] = useState('events');
   const [expanded, setExpanded] = useState(false);
   const toggleExpand = () => setExpanded(prev => !prev);
@@ -51,4 +51,4 @@ const GradesCard = ({ courseId }: Props) => {
   );
 };
 
-export default GradesCard;
+export default TeacherGradesCard;

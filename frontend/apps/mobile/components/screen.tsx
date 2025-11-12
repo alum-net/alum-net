@@ -18,6 +18,7 @@ type ScreenProps = {
   renderHeader?: () => ReactNode;
   style?: StyleProp<ViewStyle>;
   scrollable?: boolean;
+  onLayout?: (event: LayoutChangeEvent) => void;
 };
 
 const Screen = (
@@ -29,6 +30,7 @@ const Screen = (
       : ['top', 'left', 'right', 'bottom'],
     style,
     scrollable = true,
+    onLayout = undefined,
   }: ScreenProps,
   _ref: Ref<ScrollView>,
 ) => {
@@ -60,7 +62,7 @@ const Screen = (
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={edges}>
+    <SafeAreaView style={styles.container} edges={edges} onLayout={onLayout}>
       {renderHeader && renderHeader()}
       {scrollable ? (
         <>

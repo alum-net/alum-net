@@ -1,4 +1,5 @@
 export const QUERY_KEYS = {
+  getStudentGrades: 'get-student-grades',
   getCourses: 'get-courses',
   getUserInfo: 'get-user-info',
   getCourse: 'get-course',
@@ -16,4 +17,5 @@ export const QUERY_KEYS = {
   getUnratedEvents: 'get-unrated-events',
   getAutoGrades: 'get-auto-grades',
   getEventStudents: 'get-event-students',
+  getUserCalendar: 'get-user-calendar',
 };

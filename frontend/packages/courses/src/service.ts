@@ -6,6 +6,7 @@ import {
   CourseContent,
   Event as Event,
   Homework,
+  CourseGradesResponse,
 } from './types';
 import { AxiosResponse } from 'axios';
 import { UserInfo } from '@alum-net/users/src/types';
@@ -50,7 +51,7 @@ export const deleteCourse = async (courseId: string) => {
   await api.delete(`/courses/${courseId}`);
 };
 
-export const fetchCourse = async (courseId: string, userEmail: string) => {
+export const getCourse = async (courseId: string, userEmail: string) => {
   const { data }: AxiosResponse<Response<CourseContent>> = await api.get(
     `/courses/${courseId}/content/?userId=${userEmail}&size=300`,
   );
@@ -152,4 +153,14 @@ export const submitQuestionnaireResponses = async (
   payload: SubmitQuestionnaireRequest,
 ) => {
   return await api.post<Response>(`/events/${eventId}/submit`, payload);
+};
+
+export const getGrades = async (courseId: number, userEmail: string) => {
+  const { data }: AxiosResponse<Response<CourseGradesResponse>> = await api.get(
+    `/courses/${courseId}/grades/${userEmail}`,
+  );
+  if (!data.data) {
+    throw new Error('No grades data found');
+  }
+  return data.data;
 };

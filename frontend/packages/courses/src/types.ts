@@ -68,6 +68,7 @@ export interface CourseContent {
   enrolledStudents?: string[];
   totalEnrollments?: number;
   description: string;
+  name: string;
 }
 
 export enum EventType {
@@ -110,3 +111,19 @@ export type FilesToUpload = {
   name: string;
   type: string;
 };
+
+export interface EventGradeDetailResponse {
+  grade: number | null;
+  maxGrade: number | null;
+  unrated: boolean;
+  type: EventType;
+  title: string;
+}
+
+export interface CourseGradesResponse {
+  finalGrade: number | null;
+  approvalGrade: number | null;
+  approved: boolean;
+  unrated: boolean;
+  eventGrades: EventGradeDetailResponse[];
+}

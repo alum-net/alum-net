@@ -13,28 +13,29 @@ import org.springframework.stereotype.Component;
 @Component
 public class TeacherCourseContentStrategy extends CourseContentStrategy {
 
-    protected TeacherCourseContentStrategy(SectionRepository sectionRepository,
-            SectionMapper sectionMapper,
-            ParticipationRepository participationRepository,
-            CourseRepository courseRepository) {
-        super(sectionRepository, sectionMapper, participationRepository, courseRepository);
-    }
+	protected TeacherCourseContentStrategy(SectionRepository sectionRepository,
+			SectionMapper sectionMapper,
+			ParticipationRepository participationRepository,
+			CourseRepository courseRepository) {
+		super(sectionRepository, sectionMapper, participationRepository, courseRepository);
+	}
 
-    @Override
-    protected void validate(String userId, Integer courseId) {
-        courseRepository.findById(courseId)
-                .filter(course -> course.getTeachers().stream()
-                        .anyMatch(teacher -> teacher.getEmail().equals(userId)))
-                .orElseThrow(InsufficientPermissionsException::new);
-    }
+	@Override
+	protected void validate(String userId, Integer courseId) {
+		courseRepository.findById(courseId)
+				.filter(course -> course.getTeachers().stream()
+						.anyMatch(teacher -> teacher.getEmail().equals(userId)))
+				.orElseThrow(InsufficientPermissionsException::new);
+	}
 
-    @Override
-    protected CourseContentDTO buildCourseContentDTO(Integer courseId, String userId,
-            PageableResultResponse<SectionDTO> sectionDTOS) {
-        return CourseContentDTO.builder()
-                .sections(sectionDTOS)
-                .totalMembers(getTotalMembers(courseId))
-                .description(getDescription(courseId))
-                .build();
-    }
+	@Override
+	protected CourseContentDTO buildCourseContentDTO(Integer courseId, String userId,
+			PageableResultResponse<SectionDTO> sectionDTOS) {
+		return CourseContentDTO.builder()
+				.sections(sectionDTOS)
+				.totalMembers(getTotalMembers(courseId))
+				.name(getName(courseId))
+				.description(getDescription(courseId))
+				.build();
+	}
 }

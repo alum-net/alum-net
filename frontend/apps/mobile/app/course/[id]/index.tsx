@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import {
   Card,
@@ -10,16 +10,26 @@ import {
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { ForumLinks } from '@alum-net/forums';
 import Screen from '../../../components/screen';
-import { Section, SectionContent, useCourse } from '@alum-net/courses';
+import {
+  Section,
+  SectionContent,
+  StudentGradesCard,
+  useCourse,
+} from '@alum-net/courses';
 import { THEME } from '@alum-net/ui';
+import { useUserInfo } from '@alum-net/users';
 
 export default function Course() {
-  const { id, name } = useLocalSearchParams();
+  const { id } = useLocalSearchParams();
   const nav = useNavigation();
   const { data, isLoading } = useCourse(id.toString());
-
-  const [expandedSectionTitle, setExpandedSectionTitle] = useState('General');
-  const [expandedSection, setExpandedSection] = useState<Section>();
+  const { data: userInfo } = useUserInfo();
+  const [expandedSectionTitle, setExpandedSectionTitle] = useState(
+    data?.data?.sections.data[0].title ?? '',
+  );
+  const [expandedSection, setExpandedSection] = useState<Section | undefined>(
+    data?.data?.sections.data[0],
+  );
   const [width, setWidth] = useState(0);
   const buttons = useMemo(() => {
     const array = [];
@@ -30,8 +40,16 @@ export default function Course() {
           label: section.title,
         })),
       );
+    array.push({ value: 'grades', label: 'Calificaciones' });
     return array;
   }, [data?.data?.sections.data]);
+
+  useEffect(() => {
+    if (data?.data?.sections.data[0]) {
+      setExpandedSectionTitle(data?.data?.sections.data[0].title);
+      setExpandedSection(data?.data?.sections.data[0]);
+    }
+  }, [data]);
 
   return (
     <Screen edges={['top']} scrollable={false}>
@@ -47,7 +65,7 @@ export default function Course() {
             style={{ backgroundColor: THEME.colors.background }}
           >
             <Appbar.BackAction onPress={nav.goBack} />
-            <Appbar.Content title={name} />
+            <Appbar.Content title={data.data.name} />
           </Appbar>
           <ForumLinks courseId={id.toString()} />
           <ScrollView horizontal style={{ paddingVertical: 10 }}>
@@ -66,15 +84,23 @@ export default function Course() {
               style={{ width: '100%' }}
             />
           </ScrollView>
-          {expandedSection && (
-            <ScrollView>
+
+          <ScrollView>
+            {expandedSectionTitle === 'grades' && (
+              <StudentGradesCard
+                courseId={Number(id.toString())}
+                userEmail={userInfo!.email}
+                style={{ margin: 10 }}
+              />
+            )}
+            {expandedSection && (
               <Card style={{ marginVertical: 8, marginHorizontal: 4 }}>
                 <Card.Content>
                   <SectionContent item={expandedSection} htmlWidth={width} />
                 </Card.Content>
               </Card>
-            </ScrollView>
-          )}
+            )}
+          </ScrollView>
         </View>
       )}
     </Screen>
