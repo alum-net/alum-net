@@ -1,4 +1,4 @@
-package org.alumnet.domain;
+package org.alumnet.domain.notifications;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

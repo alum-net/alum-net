@@ -1,7 +1,7 @@
 package org.alumnet.domain.repositories;
 
 import org.alumnet.application.enums.NotificationStatus;
-import org.alumnet.domain.ScheduledNotification;
+import org.alumnet.domain.notifications.ScheduledNotification;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,5 +1,6 @@
 package org.alumnet.domain.repositories;
 
+import jakarta.persistence.Entity;
 import org.alumnet.application.dtos.StudentSummaryDTO;
 import org.alumnet.domain.events.EventParticipation;
 import org.alumnet.domain.events.EventParticipationId;
@@ -28,6 +29,7 @@ public interface EventParticipationRepository extends JpaRepository<EventPartici
 			"AND cp.id.studentEmail IN :studentEmails")
 	List<EventParticipation> findAllByEventIdAndEmails(int eventId, Set<String> studentEmails);
 
+    @EntityGraph(attributePaths = { "student" })
 	List<EventParticipation> findAllByIdEventId(Integer eventId);
 
 	@EntityGraph(attributePaths = { "student", "resource" })

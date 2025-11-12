@@ -6,14 +6,15 @@ import org.alumnet.application.dtos.requests.PostCreationRequestDTO;
 import org.alumnet.application.dtos.requests.PostFilterDTO;
 import org.alumnet.application.dtos.requests.UpdatePostRequestDTO;
 import org.alumnet.application.enums.ActivityType;
+import org.alumnet.application.enums.ForumType;
+import org.alumnet.application.enums.NotificationType;
 import org.alumnet.application.mapper.PostMapper;
 import org.alumnet.application.query_builders.PostQueryBuilder;
 import org.alumnet.domain.forums.Post;
+import org.alumnet.domain.repositories.CourseParticipationRepository;
+import org.alumnet.domain.repositories.CourseRepository;
 import org.alumnet.domain.repositories.ForumRepository;
-import org.alumnet.infrastructure.exceptions.InvalidPostContentLenghtException;
-import org.alumnet.infrastructure.exceptions.InvalidPostTitleException;
-import org.alumnet.infrastructure.exceptions.PostHasRepliesException;
-import org.alumnet.infrastructure.exceptions.PostNotFoundException;
+import org.alumnet.infrastructure.exceptions.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -21,19 +22,19 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ForumService {
     private final ForumRepository forumRepository;
+    private final CourseParticipationRepository courseParticipationRepository;
+    private final CourseRepository courseRepository;
     private final PostMapper postMapper;
     private final MongoTemplate mongoTemplate;
     private final UserActivityLogService activityLogService;
+    private final NotificationService notificationService;
 
     public Page<PostDTO> getPosts(PostFilterDTO postFilter, Pageable page) {
         Query query = PostQueryBuilder.byFilters(postFilter).with(page);
@@ -78,6 +79,21 @@ public class ForumService {
                 String.format("Se publicó en el foro del curso ID %s", post.getCourseId()),
                 newPost.getId()
         );
+
+        if(post.getForumType() == ForumType.ANNOUNCE){
+            Set<String> userEmailsToNotify = courseParticipationRepository.findAllById_CourseId(post.getCourseId())
+                     .stream().map(c -> c.getStudent().getEmail())
+                     .collect(Collectors.toSet());
+
+            notificationService.sendInstantNotifications("Foro de anuncios de " +
+                            courseRepository
+                                .findById(post.getCourseId())
+                                    .orElseThrow(CourseNotFoundException::new)
+                                    .getName(),
+                    "Hay una nueva publicación en el foro de anuncios.",
+                    userEmailsToNotify,
+                    NotificationType.ANNOUNCE);
+        }
     }
 
     public void deletePost(String postId) {
