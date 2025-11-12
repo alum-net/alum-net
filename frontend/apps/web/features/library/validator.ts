@@ -4,7 +4,7 @@ import { MAX_FILE_SIZE } from '../courses/constants';
 export const baseSchema = z.object({
   creatorEmail: z.string().email().optional(),
   title: z.string().min(1, 'Título requerido'),
-  labelIds: z.array(z.number()).min(1, 'Selecciona al menos una etiqueta'),
+  labelIds: z.array(z.number()).optional(),
 });
 
 const fileSchema = z.object({

@@ -44,5 +44,5 @@ export const modifyLabel = (id: number, name: string) =>
 
 export const modifyResource = (
   id: number,
-  data: { title: string; labelIds: number[] },
-) => api.patch(`/library/resources/${id}`, data);
+  data: { title: string; labelIds?: number[] },
+) => api.patch(`/library/resources/${id}`, { ...data, labelIds: data.labelIds || [] });
