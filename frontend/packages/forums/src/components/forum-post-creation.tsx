@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { QUERY_KEYS } from '@alum-net/api';
 import { createPost, updatePost } from '../service';
 import { ForumType, Post } from '../types';
@@ -21,7 +22,7 @@ const basePostSchema = z.object({
 });
 
 const postCreationSchema = basePostSchema.extend({
-  title: z.string().min(1, 'El titulo es requerido'),
+  title: z.string().min(1, 'El título no puede estar vacío'),
 });
 
 const postUpdateSchema = basePostSchema;
@@ -53,6 +54,7 @@ export const PostCreationForm = ({
     handleSubmit,
     formState: { errors },
     setValue,
+    reset,
   } = useForm<PostCreationSchema | PostUpdateSchema>({
     resolver: zodResolver(
       updateInitialData || creationParentPost
@@ -68,6 +70,15 @@ export const PostCreationForm = ({
   const { editor, content } = useRichTextEditor(
     updateInitialData?.content || '',
   );
+
+  useEffect(() => {
+    if (!isVisible && !updateInitialData && !creationParentPost) {
+      reset({
+        title: undefined,
+        content: '',
+      });
+    }
+  }, [isVisible, updateInitialData, creationParentPost, reset]);
   const { data: userInfo } = useUserInfo();
   const queryClient = useQueryClient();
   const { mutate: createMutate } = useMutation({
@@ -86,10 +97,18 @@ export const PostCreationForm = ({
       await queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.getForumPosts],
       });
+      reset({
+        title: undefined,
+        content: '',
+      });
       onDismiss();
     },
-    onError: () => {
-      Toast.error('Error creando posteo');
+    onError: (error: any) => {
+      const errorMessage = 
+        error?.response?.data?.message ||
+        error?.response?.data?.errors?.[0] ||
+        'Error de cantidad de caracteres';
+      Toast.error(errorMessage);
     },
   });
 
@@ -133,7 +152,7 @@ export const PostCreationForm = ({
             <FormTextInput
               control={control}
               name="title"
-              label="Titulo"
+              label="Título"
               mode="outlined"
             />
           )}

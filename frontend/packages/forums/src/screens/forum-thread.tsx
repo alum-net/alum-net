@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { View, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
+import { View, StyleSheet, ActivityIndicator, ScrollView, Platform } from 'react-native';
 import { Button, Dialog, Portal, Text, useTheme } from 'react-native-paper';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useUserInfo } from '@alum-net/users';
@@ -90,6 +90,16 @@ export const ForumThread = () => {
   return (
     <>
       <ScrollView contentContainerStyle={styles.container}>
+        {Platform.OS === 'web' && (
+          <Button
+            mode="text"
+            icon="arrow-left"
+            onPress={() => router.back()}
+            style={styles.backButton}
+          >
+            Volver
+          </Button>
+        )}
         <PostCard
           key={parentPost.id}
           post={parentPost}
@@ -171,6 +181,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  backButton: {
+    alignSelf: 'flex-start',
+    marginBottom: 16,
   },
   dialog: {
     backgroundColor: 'white',
