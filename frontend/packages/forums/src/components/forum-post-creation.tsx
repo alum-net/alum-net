@@ -20,7 +20,7 @@ const titleValidation = z.string().min(1, 'El título no puede estar vacío');
 
 const basePostSchema = z.object({
   title: z.string().optional(),
-  content: z.string().min(8, 'El contenido es requerido'),
+  content: z.string(),
 });
 
 const postCreationSchema = basePostSchema.extend({
@@ -66,7 +66,7 @@ export const PostCreationForm = ({
         : postCreationSchema,
     ),
     defaultValues: {
-      title: updateInitialData?.title || undefined,
+      title: updateInitialData?.title || '',
       content: updateInitialData?.content || '',
     },
   });
@@ -78,7 +78,7 @@ export const PostCreationForm = ({
   useEffect(() => {
     if (!isVisible && !updateInitialData && !creationParentPost) {
       reset({
-        title: undefined,
+        title: '',
         content: '',
       });
     }
@@ -102,7 +102,7 @@ export const PostCreationForm = ({
         queryKey: [QUERY_KEYS.getForumPosts],
       });
       reset({
-        title: undefined,
+        title: '',
         content: '',
       });
       onDismiss();
@@ -139,7 +139,20 @@ export const PostCreationForm = ({
   });
 
   const onSubmit = () => {
-    setValue('content', content || '');
+    const contentValue = content || '';
+    const contentLength = contentValue.length;
+    
+    if (contentLength < 8) {
+      Toast.error('El mensaje debe tener al menos 8 caracteres');
+      return;
+    }
+    
+    if (contentLength > 350) {
+      Toast.error('El mensaje supera los 350 caracteres');
+      return;
+    }
+    
+    setValue('content', contentValue);
     handleSubmit(data => {
       if (updateInitialData) {
         updateMutate(data as PostUpdateSchema);
