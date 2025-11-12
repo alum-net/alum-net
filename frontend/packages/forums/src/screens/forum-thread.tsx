@@ -12,6 +12,8 @@ import { useForumPosts } from '../hooks/useForumPosts';
 import { deletePost } from '../service';
 import { PostCard } from '../components/post-card';
 import { PostCreationForm } from '../components/forum-post-creation';
+import { AxiosError } from 'axios';
+import { Response } from '@alum-net/api';
 
 type UserAction = {
   action: 'update' | 'answer' | 'delete' | undefined;
@@ -36,17 +38,25 @@ export const ForumThread = () => {
       deletePost(data.postId),
     onSuccess: async (_, variables) => {
       await queryClient.invalidateQueries({
-        queryKey: [
-          QUERY_KEYS.getForumPosts,
-          variables.isRoot ? undefined : postId,
-        ],
+        queryKey: [QUERY_KEYS.getForumPosts],
       });
-      if (variables.isRoot) router.back();
+      if (variables.isRoot) {
+        router.back();
+        await queryClient.refetchQueries({
+          queryKey: [QUERY_KEYS.getForumPosts],
+        });
+      }
       Toast.success('Posteo eliminado correctamente');
       dismissAction();
     },
-    onError: () => {
-      Toast.error('No pudimos eliminar el posteo');
+    onError: (error: any) => {
+      const axiosError = error as AxiosError<Response>;
+      
+      if (axiosError?.response?.status === 401) {
+        Toast.error('Tu sesión expiró. Por favor, volvé a iniciar sesión');
+      } else {
+        Toast.error('No pudimos eliminar el posteo');
+      }
     },
   });
 
