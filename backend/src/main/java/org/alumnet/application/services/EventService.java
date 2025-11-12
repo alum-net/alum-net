@@ -347,7 +347,13 @@ public class EventService {
 
 			newResponses.add(responseDetail);
 		}
+
+
 		participation.setResponses(newResponses);
+
+        double score = calculateQuestionnaireGrade(participation, questionnaire);
+        participation.setGrade(score);
+
 		participationRepository.save(participation);
 
 		activityLogService.logActivity(
@@ -356,6 +362,20 @@ public class EventService {
 				"Cuestionario resuelto: " + questionnaire.getTitle(),
 				eventId.toString());
 	}
+
+    private double calculateQuestionnaireGrade(EventParticipation participation,
+                                               Questionnaire questionnaire) {
+        int totalQuestions = questionnaire.getQuestions().size();
+
+        double pointsPerQuestion = (double) questionnaire.getMaxGrade() / totalQuestions;
+
+        long correctAnswers = participation.getResponses().stream()
+                .filter(response -> response.getStudentAnswer() != null
+                        && Boolean.TRUE.equals(response.getStudentAnswer().getCorrect()))
+                .count();
+
+        return correctAnswers * pointsPerQuestion;
+    }
 
 	private EventParticipation getOrCreateParticipation(Student student, Questionnaire questionnaire) {
 		EventParticipationId id = EventParticipationId.builder()
