@@ -52,7 +52,12 @@ export async function getUserActivity(
 ): Promise<PageableResponse<UserActivityLog>> {
   const { data } = await api.get<PageableResponse<UserActivityLog>>(
     `/users/${encodeURIComponent(userId)}/user-activity`,
-    { params: page !== undefined ? { page } : {} },
+    { 
+      params: {
+        ...(page !== undefined ? { page } : {}),
+        sort: 'timestamp,desc'
+      }
+    },
   );
 
   return data;
