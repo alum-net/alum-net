@@ -89,6 +89,14 @@ export interface Question {
   answers: Answer[];
 }
 
+export interface Submission {
+  studentName: string;
+  studentLastname: string;
+  studentEmail: string;
+  fileName: string | null;
+  fileUrl: string | null;
+}
+
 export interface Event {
   description: string;
   startDate: string;
@@ -98,6 +106,7 @@ export interface Event {
   questions?: Question[];
   durationInMinutes?: number;
   title: string;
+  submissions?: Submission[];
 }
 
 export type Homework = {
