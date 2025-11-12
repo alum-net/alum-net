@@ -13,7 +13,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { FormTextInput, Toast } from '@alum-net/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@alum-net/api';
-import { PERMITTED_FILE_TYPES, MAX_FILE_SIZE } from '../../courses/constants';
+import { PERMITTED_FILE_TYPES } from '../../courses/constants';
 import { useLabels, LibraryResource } from '@alum-net/library';
 import { FilesToUpload } from '../../courses/types';
 import { createResource, modifyResource } from '../service';
@@ -110,11 +110,6 @@ export const FileUploadForm = ({ resourceToEdit }: FileUploadFormProps) => {
 
       if (res.assets && res.assets.length > 0) {
         const file = res.assets[0];
-
-        if (file.size && file.size > MAX_FILE_SIZE * Math.pow(1024, 2)) {
-          setServerMessage('El archivo pesa más de 10MB');
-          return;
-        }
 
         setSelectedFile({
           uri: file.uri,

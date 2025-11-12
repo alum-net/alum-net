@@ -45,9 +45,11 @@ public interface UserRepository extends JpaRepository<User, String>, JpaSpecific
         SELECT s.email
         FROM Student s
         JOIN CourseParticipation cp ON cp.student = s
-        LEFT JOIN EventParticipation ep ON ep.student = s
-        WHERE cp.course.id = :courseId 
-          AND ep.id.eventId = :eventId 
+        JOIN EventParticipation ep ON ep.student = s
+        LEFT JOIN ep.responses qr
+        WHERE cp.course.id = :courseId
+          AND ep.id.eventId = :eventId
+          AND qr IS NULL
     """)
     Set<String> findStudentsWithPendingSubmissionToQuest(
             @Param("eventId") Integer eventId,
