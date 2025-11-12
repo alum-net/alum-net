@@ -14,7 +14,7 @@ export const createResource = async (formData: FormValues) => {
   const metadata = {
     creatorEmail: formData.creatorEmail,
     title: formData.title,
-    labelIds: formData.labelIds,
+    labelIds: formData.labelIds || [],
   };
 
   const data = new FormData();

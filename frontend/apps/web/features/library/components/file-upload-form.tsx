@@ -13,18 +13,19 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { FormTextInput, Toast } from '@alum-net/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@alum-net/api';
-import { PERMITTED_FILE_TYPES } from '../../courses/constants';
+import { PERMITTED_FILE_TYPES, MAX_FILE_SIZE } from '../../courses/constants';
 import { useLabels } from '@alum-net/library';
 import { FilesToUpload } from '../../courses/types';
 import { createResource } from '../service';
 import { FormValues, schema } from '../validator';
 import { useUserInfo } from '@alum-net/users';
-import { isAxiosError } from 'axios';
+import { getAxiosErrorMessage } from '../../users/service';
 
 export const FileUploadForm = () => {
   const [selectedFile, setSelectedFile] = useState<FilesToUpload>();
   const [isLoading, setIsLoading] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [serverMessage, setServerMessage] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const { data: userInfo } = useUserInfo();
   const { data: labels, isLoading: loadingLabels } = useLabels();
@@ -62,9 +63,8 @@ export const FileUploadForm = () => {
     },
     onError: (err: unknown) => {
       setIsLoading(false);
-      if (isAxiosError(err))
-        setError('file.name', { message: err.response?.data.message });
-      Toast.error('Error al crear el recurso');
+      const errorMessage = getAxiosErrorMessage(err);
+      setServerMessage(errorMessage);
       console.error(err);
     },
   });
@@ -79,12 +79,18 @@ export const FileUploadForm = () => {
       if (res.assets && res.assets.length > 0) {
         const file = res.assets[0];
 
+        if (file.size && file.size > MAX_FILE_SIZE * Math.pow(1024, 2)) {
+          setServerMessage('El archivo pesa más de 10MB');
+          return;
+        }
+
         setSelectedFile({
           uri: file.uri,
           name: file.name,
           type: file.mimeType || 'application/octet-stream',
         });
         setValue('file', file);
+        setServerMessage(null);
       }
     } catch (e) {
       console.error('File selection error:', e);
@@ -100,6 +106,7 @@ export const FileUploadForm = () => {
     setIsVisible(false);
     setIsLoading(false);
     setSelectedFile(undefined);
+    setServerMessage(null);
     reset();
   };
 
@@ -125,7 +132,7 @@ export const FileUploadForm = () => {
                 <HelperText type="error">{errors.title.message}</HelperText>
               )}
 
-              <Text style={styles.label}>Etiquetas *</Text>
+              <Text style={styles.label}>Etiquetas</Text>
               {loadingLabels ? (
                 <ActivityIndicator />
               ) : (
@@ -134,12 +141,12 @@ export const FileUploadForm = () => {
                     <Button
                       key={label.id}
                       mode={
-                        watch('labelIds').includes(label.id)
+                        (watch('labelIds') || []).includes(label.id)
                           ? 'contained'
                           : 'outlined'
                       }
                       onPress={() => {
-                        const current = watch('labelIds');
+                        const current = watch('labelIds') || [];
                         const newSelection = current.includes(label.id)
                           ? current.filter(id => id !== label.id)
                           : [...current, label.id];
@@ -175,6 +182,11 @@ export const FileUploadForm = () => {
               {errors.file && (
                 <HelperText type="error">
                   {errors.file.size?.message || errors.file.name?.message}
+                </HelperText>
+              )}
+              {serverMessage && (
+                <HelperText type="error" style={styles.serverError}>
+                  {serverMessage}
                 </HelperText>
               )}
 
@@ -230,5 +242,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     gap: 8,
+  },
+  serverError: {
+    marginTop: 8,
+    fontSize: 14,
   },
 });
