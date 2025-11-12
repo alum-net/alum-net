@@ -28,7 +28,7 @@ const answerSchema = z.object({
 const questionSchema = z
   .object({
     text: z.string().trim().min(5, 'Mínimo 5 caracteres').max(500),
-    answers: z.array(answerSchema).min(2, 'Al menos dos opciones'),
+    answers: z.array(answerSchema).length(4, 'Debe completar las 4 opciones de respuesta'),
   })
   .refine(question => question.answers.some(answer => answer.correct), {
     message: 'Debe haber al menos una respuesta correcta',
@@ -64,16 +64,21 @@ const onsiteSchema = z.object({
   ...baseEventFields,
 });
 
-const questionnaireSchema = z.object({
-  type: z.literal(EventType.QUESTIONNAIRE),
-  ...baseEventFields,
-  durationInMinutes: z
-    .number()
-    .int()
-    .min(1, 'Mínimo 1 minuto')
-    .max(600, 'Máximo 600 minutos'),
-  questions: z.array(questionSchema).min(1, 'Agregá al menos una pregunta'),
-});
+const questionnaireSchema = z
+  .object({
+    type: z.literal(EventType.QUESTIONNAIRE),
+    ...baseEventFields,
+    durationInMinutes: z.union([z.number(), z.undefined()]),
+    questions: z.array(questionSchema).min(1, 'Agregá al menos una pregunta'),
+  })
+  .refine(
+    data => data.durationInMinutes !== undefined,
+    { message: 'La duración es requerida', path: ['durationInMinutes'] }
+  )
+  .refine(
+    data => typeof data.durationInMinutes === 'number' && Number.isInteger(data.durationInMinutes) && data.durationInMinutes >= 1 && data.durationInMinutes <= 600,
+    { message: 'La duración debe ser un número entero entre 1 y 600 minutos', path: ['durationInMinutes'] }
+  );
 
 const eventSchema = z.discriminatedUnion('type', [
   taskSchema,
@@ -394,9 +399,16 @@ export default function EventCreationModal({
                     render={({ field: { onChange, value } }) => (
                       <TextInput
                         value={value ? String(value) : ''}
-                        onChangeText={text =>
-                          onChange(text ? Number(text) : undefined)
-                        }
+                        onChangeText={text => {
+                          if (text === '') {
+                            onChange(undefined);
+                            return;
+                          }
+                          const numValue = Number(text);
+                          if (!isNaN(numValue) && isFinite(numValue)) {
+                            onChange(numValue);
+                          }
+                        }}
                         mode="flat"
                         keyboardType="numeric"
                         style={styles.input}
@@ -419,6 +431,12 @@ export default function EventCreationModal({
                   <View style={styles.questionsSectionHeader}>
                     <Text style={styles.sectionTitle}>Preguntas</Text>
                   </View>
+
+                  {(errors as any).questions?.message && (
+                    <Text style={styles.errorText}>
+                      {(errors as any).questions.message}
+                    </Text>
+                  )}
 
                   {fields.map((field, questionIndex) => (
                     <View key={field.id}>
@@ -464,30 +482,44 @@ export default function EventCreationModal({
                           <Text style={styles.label}>
                             Opciones de respuesta
                           </Text>
-                          {[0, 1, 2, 3].map(answerIndex => (
-                            <View
-                              key={answerIndex}
-                              style={{ marginTop: answerIndex > 0 ? 8 : 0 }}
-                            >
-                              <Controller
-                                control={control}
-                                name={
-                                  `questions.${questionIndex}.answers.${answerIndex}.text` as any
-                                }
-                                render={({ field: { onChange, value } }) => (
-                                  <TextInput
-                                    value={value || ''}
-                                    onChangeText={onChange}
-                                    placeholder={`Opción ${answerIndex + 1}`}
-                                    mode="flat"
-                                    style={styles.input}
-                                    underlineColor="transparent"
-                                    activeUnderlineColor="transparent"
-                                  />
+                          {[0, 1, 2, 3].map(answerIndex => {
+                            const answerError = (errors as any).questions?.[questionIndex]?.answers?.[answerIndex];
+                            return (
+                              <View
+                                key={answerIndex}
+                                style={{ marginTop: answerIndex > 0 ? 8 : 0 }}
+                              >
+                                <Controller
+                                  control={control}
+                                  name={
+                                    `questions.${questionIndex}.answers.${answerIndex}.text` as any
+                                  }
+                                  render={({ field: { onChange, value } }) => (
+                                    <TextInput
+                                      value={value || ''}
+                                      onChangeText={onChange}
+                                      placeholder={`Opción ${answerIndex + 1}`}
+                                      mode="flat"
+                                      style={styles.input}
+                                      error={!!answerError?.text}
+                                      underlineColor="transparent"
+                                      activeUnderlineColor="transparent"
+                                    />
+                                  )}
+                                />
+                                {answerError?.text?.message && (
+                                  <Text style={styles.errorText}>
+                                    {answerError.text.message}
+                                  </Text>
                                 )}
-                              />
-                            </View>
-                          ))}
+                              </View>
+                            );
+                          })}
+                          {(errors as any).questions?.[questionIndex]?.answers?.message && (
+                            <Text style={styles.errorText}>
+                              {(errors as any).questions[questionIndex]?.answers?.message}
+                            </Text>
+                          )}
                         </View>
 
                         <View style={styles.fieldWrapper}>
@@ -556,6 +588,8 @@ export default function EventCreationModal({
                       append({
                         text: '',
                         answers: [
+                          { text: '', correct: false },
+                          { text: '', correct: false },
                           { text: '', correct: false },
                           { text: '', correct: false },
                         ],
