@@ -16,16 +16,20 @@ import { Button, Dialog, HelperText, Portal } from 'react-native-paper';
 
 import { z } from 'zod';
 
+const titleValidation = z.string().min(1, 'El título no puede estar vacío');
+
 const basePostSchema = z.object({
   title: z.string().optional(),
   content: z.string().min(8, 'El contenido es requerido'),
 });
 
 const postCreationSchema = basePostSchema.extend({
-  title: z.string().min(1, 'El título no puede estar vacío'),
+  title: titleValidation,
 });
 
-const postUpdateSchema = basePostSchema;
+const postUpdateSchema = basePostSchema.extend({
+  title: titleValidation,
+});
 
 export type PostCreationSchema = z.infer<typeof postCreationSchema>;
 export type PostUpdateSchema = z.infer<typeof postUpdateSchema>;
@@ -125,8 +129,12 @@ export const PostCreationForm = ({
       });
       onDismiss();
     },
-    onError: () => {
-      Toast.error('Error actualizando posteo');
+    onError: (error: any) => {
+      const errorMessage = 
+        error?.response?.data?.message ||
+        error?.response?.data?.errors?.[0] ||
+        'Error de cantidad de caracteres';
+      Toast.error(errorMessage);
     },
   });
 
