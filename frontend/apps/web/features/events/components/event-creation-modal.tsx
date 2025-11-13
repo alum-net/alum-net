@@ -373,7 +373,14 @@ export default function EventCreationModal({
                   render={({ field: { onChange, value } }) => (
                     <TextInput
                       value={String(value)}
-                      onChangeText={text => onChange(Number(text) || 0)}
+                      onChangeText={text => {
+                        const num = Number(text);
+                        if (!isNaN(num) && num <= 100) {
+                          onChange(num);
+                        } else if (text === '' || text === '-') {
+                          onChange(0);
+                        }
+                      }}
                       mode="flat"
                       keyboardType="numeric"
                       style={styles.input}
