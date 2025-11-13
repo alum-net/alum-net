@@ -107,6 +107,7 @@ export const TaskDetails: React.FC<TaskDetailsProps> = ({
   );
 
   const isTeacher = userInfo?.role === UserRole.teacher;
+  const isStudent = userInfo?.role === UserRole.student;
   const submissions = data?.submissions || [];
 
   if (isTeacher) {
@@ -139,6 +140,10 @@ export const TaskDetails: React.FC<TaskDetailsProps> = ({
         )}
       </View>
     );
+  }
+
+  if (!isStudent) {
+    return null;
   }
 
   return (
