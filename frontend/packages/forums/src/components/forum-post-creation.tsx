@@ -33,6 +33,7 @@ const postUpdateSchema = basePostSchema.extend({
 
 export type PostCreationSchema = z.infer<typeof postCreationSchema>;
 export type PostUpdateSchema = z.infer<typeof postUpdateSchema>;
+export type BasePostSchema = z.infer<typeof basePostSchema>;
 
 interface PostCreationFormProps {
   forumType: ForumType;
@@ -59,11 +60,15 @@ export const PostCreationForm = ({
     formState: { errors },
     setValue,
     reset,
-  } = useForm<PostCreationSchema | PostUpdateSchema>({
+  } = useForm<PostCreationSchema | PostUpdateSchema | BasePostSchema>({
     resolver: zodResolver(
-      updateInitialData || creationParentPost
-        ? postUpdateSchema
-        : postCreationSchema,
+      updateInitialData
+        ? updateInitialData.parentPost
+          ? basePostSchema
+          : postUpdateSchema
+        : creationParentPost
+          ? basePostSchema
+          : postCreationSchema
     ),
     defaultValues: {
       title: updateInitialData?.title || '',
@@ -86,7 +91,7 @@ export const PostCreationForm = ({
   const { data: userInfo } = useUserInfo();
   const queryClient = useQueryClient();
   const { mutate: createMutate } = useMutation({
-    mutationFn: (data: PostCreationSchema) =>
+    mutationFn: (data: PostCreationSchema | BasePostSchema) =>
       createPost({
         forumType,
         courseId,
@@ -117,9 +122,9 @@ export const PostCreationForm = ({
   });
 
   const { mutate: updateMutate } = useMutation({
-    mutationFn: (data: PostUpdateSchema) =>
+    mutationFn: (data: PostUpdateSchema | BasePostSchema) =>
       updatePost(updateInitialData!.id, {
-        title: data.title,
+        title: updateInitialData?.parentPost ? undefined : data.title,
         content: data.content,
       }),
     onSuccess: async () => {
@@ -155,9 +160,9 @@ export const PostCreationForm = ({
     setValue('content', contentValue);
     handleSubmit(data => {
       if (updateInitialData) {
-        updateMutate(data as PostUpdateSchema);
+        updateMutate(data as PostUpdateSchema | BasePostSchema);
       } else {
-        createMutate(data as PostCreationSchema);
+        createMutate(data as PostCreationSchema | BasePostSchema);
       }
     })();
   };
