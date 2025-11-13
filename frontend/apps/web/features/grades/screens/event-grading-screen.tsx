@@ -27,7 +27,7 @@ const EventGradingScreen = ({ courseId }: Props) => {
     isSavingGrades,
   } = useGrades(courseId, selectedEvent?.id);
 
-  const isTask = selectedEvent?.type?.toUpperCase() === EventType.TASK;
+  const isTask = selectedEvent?.type === EventType.TASK;
   const { data: eventData, isLoading: isLoadingEvent } = useQuery({
     queryKey: [QUERY_KEYS.getEventDetails, selectedEvent?.id],
     queryFn: () => getEventById(selectedEvent!.id.toString()),

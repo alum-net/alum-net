@@ -11,7 +11,7 @@ import { TaskDetails } from '../components/task-details';
 import { QuestionnaireDetails } from '../components/questionnaire-details';
 
 const mapEventTypeToTitle = (type: EventType) => {
-  switch (type.toUpperCase()) {
+  switch (type) {
     case EventType.TASK:
       return 'Tarea';
     case EventType.QUESTIONNAIRE:
@@ -59,11 +59,11 @@ export const EventDetails = () => {
             <Text variant="bodyLarge">{data?.maxGrade} puntos</Text>
           </View>
 
-          {type === EventType.TASK.toLowerCase() && (
+          {type === EventType.TASK && (
             <TaskDetails eventId={id} data={data} userInfo={userInfo!} />
           )}
 
-          {type === EventType.QUESTIONNAIRE.toLowerCase() && (
+          {type === EventType.QUESTIONNAIRE && (
             <QuestionnaireDetails
               data={data}
               eventId={id}

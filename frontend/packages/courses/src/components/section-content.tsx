@@ -12,7 +12,7 @@ import { QUERY_KEYS } from '@alum-net/api';
 import { isAxiosError } from 'axios';
 
 export const mapEventTypeToString = (type: EventType) => {
-  switch (type.toUpperCase()) {
+  switch (type) {
     case EventType.TASK:
       return 'Tarea';
     case EventType.ONSITE:

@@ -7,6 +7,7 @@ import {
   Event as Event,
   Homework,
   CourseGradesResponse,
+  EventType,
 } from './types';
 import { AxiosResponse } from 'axios';
 import { UserInfo } from '@alum-net/users/src/types';
