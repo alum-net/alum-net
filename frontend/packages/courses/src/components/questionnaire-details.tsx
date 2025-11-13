@@ -29,7 +29,7 @@ type QuestionnaireDetailsProps = {
 };
 
 const manual =
-  'Una vez comience el cuestionario, tendras los minutos disponibles para completarlo, si no lo completas en el tiempo indicado el questionario sera completado automaticamente.';
+  'Una vez comience el cuestionario, tendras los minutos disponibles para completarlo, si no lo completas en el tiempo indicado el cuestionario sera completado automaticamente.';
 
 export const QuestionnaireDetails: React.FC<QuestionnaireDetailsProps> = ({
   data,

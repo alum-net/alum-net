@@ -15,7 +15,7 @@ const mapEventTypeToTitle = (type: EventType) => {
     case EventType.TASK:
       return 'Tarea';
     case EventType.QUESTIONNAIRE:
-      return 'Questionario';
+      return 'Cuestionario';
     case EventType.ONSITE:
       return 'Evento presencial';
   }
