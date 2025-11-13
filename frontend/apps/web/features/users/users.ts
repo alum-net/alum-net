@@ -45,9 +45,10 @@ export async function createUser(form: CreateUserForm): Promise<BackendEnvelope>
 }
 
 export function getAxiosErrorMessage(e: any): string {
+  const responseData = e?.response?.data;
   const msg =
-    e?.response?.data?.message ||
-    e?.response?.data?.errors?.[0] ||
+    (responseData?.errors && Array.isArray(responseData.errors) && responseData.errors.length > 0 && responseData.errors[0]) ||
+    responseData?.message ||
     e?.message ||
     'Error inesperado';
   return String(msg);

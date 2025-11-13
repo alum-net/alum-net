@@ -50,7 +50,18 @@ export const TaskDetails: React.FC<TaskDetailsProps> = ({
     },
     onError: (err: unknown) => {
       if (isAxiosError(err)) {
-        Toast.error(err.response?.data.message || 'Error al enviar la tarea');
+        const responseData = err.response?.data;
+        let errorMessage = 'Error al enviar la tarea';
+        
+        if (responseData) {
+          if (Array.isArray(responseData.errors) && responseData.errors.length > 0) {
+            errorMessage = responseData.errors[0];
+          } else if (responseData.message) {
+            errorMessage = responseData.message;
+          }
+        }
+        
+        Toast.error(errorMessage);
       } else {
         Toast.error('Error al enviar la tarea');
       }
