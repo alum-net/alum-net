@@ -99,10 +99,7 @@ export function SectionContent({
       )}
       <View style={styles.childContainer}>
         {item.summaryEvents.map(event => (
-          <View
-            style={{ alignSelf: 'flex-start' }}
-            key={event.title + event.type}
-          >
+          <View style={{ alignSelf: 'flex-start' }} key={event.id + event.type}>
             <Link
               href={{
                 pathname: '/event/[id]',
