@@ -64,7 +64,6 @@ public class NotificationService {
             log.info("Notification {} canceled successfully in OneSignal", notificationId);
         } catch (Exception e) {
             log.error("Error canceling OneSignal notification: {}", e.getMessage(), e);
-            throw new RuntimeException("Error communicating with OneSignal", e);
         }
     }
     public void sendGradeNotifications(GradeSubmissionsRequestDTO request) {
@@ -91,16 +90,12 @@ public class NotificationService {
      */
     public String sendNotifications(int eventId, String title, String message, List<String> userEmails,
             LocalDateTime endDate, String notificationType) {
-        ScheduledNotification scheduledNotification = null;
         try {
-            scheduledNotification = saveScheduledEmailNotification(eventId, title, message, userEmails, endDate,notificationType);
+            saveScheduledEmailNotification(eventId, title, message, userEmails, endDate,notificationType);
             return sendPushNotifications(title, message, userEmails, endDate);
         } catch (Exception e) {
             log.error("Error sending notification: {}", e.getMessage(), e);
-            if (scheduledNotification != null) {
-                notificationRepository.deleteById(scheduledNotification.getId());
-            }
-            throw new RuntimeException("Error communicating with OneSignal", e);
+            return null;
         }
     }
 
@@ -127,7 +122,7 @@ public class NotificationService {
     /**
      * Saves a notification record in DB before it's sent or scheduled.
      */
-    private ScheduledNotification saveScheduledEmailNotification(int eventId, String title, String message,
+    private void saveScheduledEmailNotification(int eventId, String title, String message,
             List<String> userEmails, LocalDateTime endDate, String notificationType) {
         LocalDateTime scheduledTime = endDate.minusHours(24);
         if (scheduledTime.isBefore(LocalDateTime.now())) {
@@ -144,7 +139,7 @@ public class NotificationService {
                 .scheduledSendTime(scheduledTime)
                 .build();
 
-        return notificationRepository.save(notification);
+        notificationRepository.save(notification);
     }
 
     /**

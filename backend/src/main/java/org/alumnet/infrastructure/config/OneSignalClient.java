@@ -60,8 +60,8 @@ public class OneSignalClient {
         } else {
             log.error("Failed to send notification. Status: {}, Body: {}", response.getStatusCode(),
                     response.getBody());
-            throw new RuntimeException("Failed to send OneSignal notification: " + response.getBody());
         }
+        return null;
     }
 
     public void cancelNotification(String notificationId) {
