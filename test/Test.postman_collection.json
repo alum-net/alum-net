@@ -452,7 +452,6 @@
 									"var jsonData = pm.response.json();",
 									"pm.test(\"La respuesta contiene los cursos esperados\", function () {",
 									"    var requiredNames = [",
-									"        'curso1-verificar-curso',",
 									"        'curso2-test-eliminar',",
 									"        'curso3-verificar-unroll-student',",
 									"        'curso4-verificar-enroll-student'",
@@ -571,8 +570,30 @@
 									"eval(pm.collectionVariables.get(\"utils-Course\"));",
 									"",
 									"function runInitProcess() {",
-									"  getAccessToken(function() {",
-									"  });",
+									"    getAccessToken(function () {",
+									"        initUser(\"teachers\", \"docente1@uni.edu\", function () {",
+									"            initUser(\"teachers\", \"docente2@uni.edu\", function () {",
+									"                initUser(\"teachers\", \"docente3@uni.edu\", function () {",
+									"                    initUser(\"teachers\", \"docente4@uni.edu\", function () {",
+									"                        initUser(\"teachers\", \"docente5@uni.edu\", function () {",
+									"                            initUser(\"teachers\", \"docente6@uni.edu\", function () {",
+									"                                initUser(\"teachers\", \"docente7@uni.edu\", function () {",
+									"                                    initUser(\"teachers\", \"docente8@uni.edu\", function () { })",
+									"",
+									"                                })",
+									"",
+									"                            })",
+									"",
+									"                        })",
+									"",
+									"                    })",
+									"",
+									"                })",
+									"",
+									"            })",
+									"",
+									"        })",
+									"    });",
 									"}",
 									"",
 									"runInitProcess();",
@@ -627,14 +648,85 @@
 					"response": []
 				},
 				{
-					"name": "CoursesBulkDeletion Copy",
+					"name": "CoursesBulkDeletion",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"",
+									"function runInitProcess() {",
+									"    getAccessToken(function () {})",
+									"}",
+									"runInitProcess();"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"El status code es el esperado\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test(\"El mensaje de la respuesta es el esperado\", function () {",
+									"    pm.expect(jsonData.message).to.eql(\"Eliminación masiva de cursos completada exitosamente.\");",
+									"});",
+									"",
+									"// Helper para verificar presencia de claves",
+									"function hasAllKeys(obj, keys) {",
+									"    return keys.every(k => Object.prototype.hasOwnProperty.call(obj, k));",
+									"}",
+									"",
+									"const json = pm.response.json();",
+									"",
+									"// ✅ Validar claves dentro de data",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () {",
+									"    const expectedDataKeys = [",
+									"        \"errors\",",
+									"        \"failedRecords\",",
+									"        \"successfulRecords\",",
+									"        \"totalRecords\"",
+									"    ];",
+									"",
+									"    pm.expect(hasAllKeys(json.data, expectedDataKeys)).to.be.true;",
+									"",
+									"    // Validaciones de tipo básicas",
+									"    pm.expect(json.data.errors).to.be.an(\"array\");",
+									"    pm.expect(json.data.failedRecords).to.be.a(\"number\");",
+									"    pm.expect(json.data.successfulRecords).to.be.a(\"number\");",
+									"    pm.expect(json.data.totalRecords).to.be.a(\"number\");",
+									"});",
+									"",
+									"// ✅ Validar valores específicos esperados",
+									"pm.test(\"Los valores de la respuesta son los esperados\", function () {",
+									"    pm.expect(json.data.errors).to.eql([]);",
+									"    pm.expect(json.data.failedRecords).to.eql(0);",
+									"    pm.expect(json.data.successfulRecords).to.eql(1);",
+									"    pm.expect(json.data.totalRecords).to.eql(1);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{token}}",
+									"value": "{{access_token}}",
 									"type": "string"
 								}
 							]
@@ -647,7 +739,7 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": "/C:/Users/Gastón/Downloads/courseDelete.csv"
+									"src": "postman-cloud:///1f0c03a1-843f-4b70-9401-43579c387c08"
 								},
 								{
 									"key": "hasHeaders",
@@ -671,14 +763,88 @@
 					"response": []
 				},
 				{
-					"name": "BulkEnrollment Copy",
+					"name": "BulkEnrollment",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"",
+									"function runInitProcess() {",
+									"    getAccessToken(function () {",
+									"        initUser(\"teachers\", \"profesorBulkEnroll\", function () {",
+									"            initCourse(\"curso-verificar-bulk-enroll\", \"curso-verificar-bulk-enroll\", [\"profesorBulkEnroll@alumnet.com\"], function () {",
+									"                getCursoId(\"curso-verificar-bulk-enroll\", \"curso-verificar-bulk-enroll\", function () {",
+									"                    initUser(\"students\", \"estudianteBulk3\", function () {",
+									"                            initUser(\"students\", \"estudianteBulk4\", function () {",
+									"                            })",
+									"                    });",
+									"                })",
+									"            });",
+									"        });",
+									"    })",
+									"}",
+									"",
+									"runInitProcess();"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"El status code es el esperado\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test(\"El mensaje de la respuesta es el esperado\", function () {",
+									"    pm.expect(jsonData.message).to.eql('Matriculación masiva de cursos completada exitosamente.');",
+									"});",
+									"",
+									"// Helper para verificar presencia de claves",
+									"function hasAllKeys(obj, keys) {",
+									"    return keys.every(k => Object.prototype.hasOwnProperty.call(obj, k));",
+									"}",
+									"",
+									"const json = pm.response.json();",
+									"",
+									"// Validar claves dentro de data",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () {",
+									"    const expectedDataKeys = [",
+									"        \"errors\",",
+									"        \"failedRecords\",",
+									"        \"successfulRecords\",",
+									"        \"totalRecords\"",
+									"    ];",
+									"    pm.expect(hasAllKeys(json.data, expectedDataKeys)).to.be.true;",
+									"",
+									"    // Validaciones de tipo básicas",
+									"    pm.expect(json.data.errors).to.be.an(\"array\");",
+									"    pm.expect(json.data.failedRecords).to.be.a(\"number\");",
+									"    pm.expect(json.data.successfulRecords).to.be.a(\"number\");",
+									"    pm.expect(json.data.totalRecords).to.be.a(\"number\");",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{token}}",
+									"value": "{{access_token}}",
 									"type": "string"
 								}
 							]
@@ -691,7 +857,7 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": "/C:/Users/Gastón/Downloads/matriuculacion-masiva.csv"
+									"src": "postman-cloud:///1f0bf795-9ce0-4f70-a33f-47a225556f92"
 								},
 								{
 									"key": "hasHeaders",
@@ -701,14 +867,14 @@
 							]
 						},
 						"url": {
-							"raw": "{{alumnetUrl}}/api/courses/1/participations/bulk-enroll",
+							"raw": "{{alumnetUrl}}/api/courses/{{id_curso}}/participations/bulk-enroll",
 							"host": [
 								"{{alumnetUrl}}"
 							],
 							"path": [
 								"api",
 								"courses",
-								"1",
+								"{{id_curso}}",
 								"participations",
 								"bulk-enroll"
 							]
@@ -717,14 +883,60 @@
 					"response": []
 				},
 				{
-					"name": "BulkUnenrollment Copy",
+					"name": "BulkUnenrollment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"El status code es el esperado\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test(\"El mensaje de la respuesta es el esperado\", function () {",
+									"    pm.expect(jsonData.message).to.eql('Des-matriculación masiva completada exitosamente.');",
+									"});",
+									"",
+									"// Helper para verificar presencia de claves",
+									"function hasAllKeys(obj, keys) {",
+									"    return keys.every(k => Object.prototype.hasOwnProperty.call(obj, k));",
+									"}",
+									"",
+									"const json = pm.response.json();",
+									"",
+									"// Validar claves dentro de data",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () {",
+									"    const expectedDataKeys = [",
+									"        \"errors\",",
+									"        \"failedRecords\",",
+									"        \"successfulRecords\",",
+									"        \"totalRecords\"",
+									"    ];",
+									"    pm.expect(hasAllKeys(json.data, expectedDataKeys)).to.be.true;",
+									"",
+									"    // Validaciones de tipo básicas",
+									"    pm.expect(json.data.errors).to.be.an(\"array\");",
+									"    pm.expect(json.data.failedRecords).to.be.a(\"number\");",
+									"    pm.expect(json.data.successfulRecords).to.be.a(\"number\");",
+									"    pm.expect(json.data.totalRecords).to.be.a(\"number\");",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{token}}",
+									"value": "{{access_token}}",
 									"type": "string"
 								}
 							]
@@ -737,7 +949,7 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": "/C:/Users/Gastón/Downloads/matriuculacion-masiva.csv"
+									"src": "/Users/fede/Documents/proyectos/tests/proyecto tecnoinf/alum-net/test/courses-bulk-enroll.csv"
 								},
 								{
 									"key": "hasHeaders",
@@ -747,14 +959,14 @@
 							]
 						},
 						"url": {
-							"raw": "{{alumnetUrl}}/api/courses/1/participations/bulk-unenroll",
+							"raw": "{{alumnetUrl}}/api/courses/75/participations/bulk-unenroll",
 							"host": [
 								"{{alumnetUrl}}"
 							],
 							"path": [
 								"api",
 								"courses",
-								"1",
+								"75",
 								"participations",
 								"bulk-unenroll"
 							]
@@ -774,12 +986,115 @@
 					"response": []
 				},
 				{
-					"name": "get Students Copy",
+					"name": "get Students",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"",
+									"function runInitProcess() {",
+									"    getAccessToken(function () {",
+									"        initUser(\"students\", \"estudiante1\", function () {",
+									"            initUser(\"teachers\", \"profesor4\", function () {",
+									"                initTestCourses(function () {",
+									"                    getCursoId(\"Test-curso-unroll-student\", \"curso3-verificar-unroll-student\", function () {",
+									"                        enrollStudent(\"estudiante1@alumnet.com\", function () {})",
+									"                    })",
+									"                });",
+									"            });",
+									"        });",
+									"    })",
+									"}",
+									"",
+									"runInitProcess();",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"El status code es el esperado\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test(\"El mensaje de la respuesta es el esperado\", function () {",
+									"    pm.expect(jsonData.message).to.eql(\"Se obtuvieron los estudiantes correctamente\");",
+									"});",
+									"",
+									"// Helper para verificar presencia de claves",
+									"function hasAllKeys(obj, keys) {",
+									"    return keys.every(k => Object.prototype.hasOwnProperty.call(obj, k));",
+									"}",
+									"",
+									"const json = pm.response.json();",
+									"",
+									"// ✅ Validar estructura principal",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () {",
+									"    // data debe ser array",
+									"    pm.expect(json.data).to.be.an(\"array\");",
+									"    pm.expect(json.data.length).to.be.above(0);",
+									"",
+									"    const expectedStudentKeys = [\"email\", \"lastname\", \"name\"];",
+									"    const student = json.data[0];",
+									"",
+									"    // Validar claves esperadas en el estudiante",
+									"    pm.expect(hasAllKeys(student, expectedStudentKeys)).to.be.true;",
+									"",
+									"    // Validaciones de tipo básicas",
+									"    pm.expect(student.email).to.be.a(\"string\");",
+									"    pm.expect(student.lastname).to.be.a(\"string\");",
+									"    pm.expect(student.name).to.be.a(\"string\");",
+									"});",
+									"",
+									"// ✅ Validar valores exactos esperados",
+									"pm.test(\"Los valores de la respuesta son los esperados\", function () {",
+									"    const student = json.data[0];",
+									"",
+									"    pm.expect(student.email).to.eql(\"estudiante1@alumnet.com\");",
+									"    pm.expect(student.lastname).to.eql(\"test\");",
+									"    pm.expect(student.name).to.eql(\"estudiante1\");",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": ""
+							"raw": "{{alumnetUrl}}/api/courses/{{id_curso}}/students",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"courses",
+								"{{id_curso}}",
+								"students"
+							]
 						}
 					},
 					"response": []
@@ -792,7 +1107,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{token}}",
+									"value": "{{access_token}}",
 									"type": "string"
 								}
 							]
@@ -801,7 +1116,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"students\": [\n        {\n            \"email\": \"student@alumnet.com\",\n            \"grade\": 0.9,\n            \"name\": \"German\",\n            \"lastname\": \"Burgos\"\n        },\n        {\n            \"email\": \"students@alumnet.com\",\n            \"grade\": 0.6,\n            \"name\": \"Pepe\",\n            \"lastname\": \"Guerra\"\n        }\n    ],\n    \"courseId\": 1\n}",
+							"raw": "{\n    \"students\": [\n        {\n            \"email\": \"estudianteBulk1@alumnet.com\",\n            \"grade\": 0.9,\n            \"name\": \"German\",\n            \"lastname\": \"Burgos\"\n        },\n        {\n            \"email\": \"estudianteBulk2@alumnet.com\",\n            \"grade\": 0.6,\n            \"name\": \"Pepe\",\n            \"lastname\": \"Guerra\"\n        }\n    ],\n    \"courseId\": 1\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -809,14 +1124,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{alumnetUrl}}/api/courses/grade-submissions",
+							"raw": "\"/{courseId}/grades/{userEmail}\"",
 							"host": [
-								"{{alumnetUrl}}"
+								"\""
 							],
 							"path": [
-								"api",
-								"courses",
-								"grade-submissions"
+								"{courseId}",
+								"grades",
+								"{userEmail}\""
 							]
 						}
 					},
@@ -910,7 +1225,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"student\",\n    \"lastname\": \"student\",\n    \"group\": \"students\",\n    \"email\": \"student@alumnet.com\",\n    \"password\": \"test1234\"\n}",
+							"raw": "{\n    \"name\": \"bulk\",\n    \"lastname\": \"teachers\",\n    \"group\": \"teachers\",\n    \"email\": \"docenteX@uni.edu\",\n    \"password\": \"test1234\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1315,312 +1630,9 @@
 						}
 					},
 					"response": []
-				}
-			]
-		},
-		{
-			"name": "Section",
-			"item": [
-				{
-					"name": "CreateSection",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"eval(pm.collectionVariables.get(\"utils-Course\"));",
-									"",
-									"function runInitProcess() {",
-									"    getAccessToken(function () {",
-									"        initUser(\"students\", \"student\", function () {",
-									"            initUser(\"teachers\", \"profesor7\", function () {",
-									"                initUser(\"students\", \"student\", function () {",
-									"                    initCourse(\"curso6-verificar-create-section\", \"Test-curso-create-section\", [\"profesorCreateTask@alumnet.com\"], function () {",
-									"                        initTestCourses(function () {",
-									"                            getCursoId(\"Test-curso-create-section\", \"curso6-verificar-create-section\", function () {",
-									"                                enrollStudent(\"student@alumnet.com\", function () {",
-									"                                    enrollStudent(\"student@alumnet.com\", function () {",
-									"                                    })",
-									"                                })",
-									"                            })",
-									"                        });",
-									"                    });",
-									"                });",
-									"            });",
-									"        });",
-									"    })",
-									"}",
-									"",
-									"runInitProcess();",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"EL status code es el esperado\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"const jsonData = pm.response.json();",
-									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () { ",
-									"    pm.expect(jsonData).to.have.all.keys('message');",
-									"});",
-									"",
-									"pm.test(\"El mensaje de la respuesta es el esperado\", function () { ",
-									"    pm.expect(jsonData.message).to.eql('Sección creada exitosamente');",
-									"})"
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{access_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "section",
-									"type": "file",
-									"src": "postman-cloud:///1f0b45b8-d825-4d40-96da-b08516f6c2a3"
-								},
-								{
-									"key": "resources",
-									"type": "file",
-									"src": "postman-cloud:///1f0b3a0a-e2a1-4c60-ad28-a06ba754ebd2"
-								}
-							]
-						},
-						"url": {
-							"raw": "{{alumnetUrl}}/api/sections/{{id_curso}}",
-							"host": [
-								"{{alumnetUrl}}"
-							],
-							"path": [
-								"api",
-								"sections",
-								"{{id_curso}}"
-							]
-						}
-					},
-					"response": []
 				},
 				{
-					"name": "CreateSection to deleteEvent",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"eval(pm.collectionVariables.get(\"utils-Course\"));",
-									"",
-									"function runInitProcess() {",
-									"    getAccessToken(function () {",
-									"        initUser(\"teachers\", \"profesor2Delete\", function () {",
-									"            initUser(\"students\", \"student2delete\", function () {",
-									"                initCourse(\"curso2Delete\", \"curso2Delete\", [\"profesor2Delete@alumnet.com\"], function () {",
-									"                    getCursoId(\"curso2Delete\", \"curso2Delete\", function () {",
-									"                        enrollStudent(\"student2delete@alumnet.com\", function () {",
-									"                            getSectionId(\"student2delete@alumnet.com\", function () {",
-									"                                unrollStudent(\"student2delete@alumnet.com\", function () { })",
-									"                            })",
-									"                        })",
-									"                    })",
-									"                });",
-									"            });",
-									"        });",
-									"    });",
-									"}",
-									"",
-									"runInitProcess();",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"EL status code es el esperado\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"const jsonData = pm.response.json();",
-									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () { ",
-									"    pm.expect(jsonData).to.have.all.keys('message');",
-									"});",
-									"",
-									"pm.test(\"El mensaje de la respuesta es el esperado\", function () { ",
-									"    pm.expect(jsonData.message).to.eql('Sección creada exitosamente');",
-									"})"
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{access_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "section",
-									"type": "file",
-									"src": "postman-cloud:///1f0b45b8-d825-4d40-96da-b08516f6c2a3"
-								},
-								{
-									"key": "resources",
-									"type": "file",
-									"src": "postman-cloud:///1f0b3a0a-e2a1-4c60-ad28-a06ba754ebd2"
-								}
-							]
-						},
-						"url": {
-							"raw": "{{alumnetUrl}}/api/sections/{{id_curso}}",
-							"host": [
-								"{{alumnetUrl}}"
-							],
-							"path": [
-								"api",
-								"sections",
-								"{{id_curso}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Course Content Access",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"eval(pm.collectionVariables.get(\"utils-Course\"));",
-									"",
-									"function runInitProcess() {",
-									"    getAccessToken(function () {",
-									"        initUser(\"teachers\", \"profesor8\", function () {",
-									"            initUser(\"students\", \"estudiante6\", function () {",
-									"                initTestCourses(function () {",
-									"                    getCursoId(\"Test-curso-create-section\", \"curso6-verificar-create-section\", function () {",
-									"                        enrollStudent(\"estudiante6@alumnet.com\", function () { })",
-									"                    })",
-									"                });",
-									"            })",
-									"        });",
-									"    });",
-									"}",
-									"",
-									"runInitProcess();",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"El status code es el esperado\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () {",
-									"    let jsonData;",
-									"    try {",
-									"        jsonData = pm.response.json();",
-									"    } catch (e) {",
-									"        pm.expect.fail(\"La respuesta no es un JSON válido\");",
-									"        return;",
-									"    }",
-									"",
-									"    // data",
-									"    pm.expect(jsonData).to.have.property(\"data\");",
-									"    pm.expect(jsonData.data).to.have.property(\"description\");",
-									"    pm.expect(jsonData.data).to.have.property(\"sections\");",
-									"    pm.expect(jsonData.data.sections).to.have.property(\"data\");",
-									"    pm.expect(jsonData.data.sections).to.have.property(\"errors\");",
-									"    pm.expect(jsonData.data.sections).to.have.property(\"message\");",
-									"    pm.expect(jsonData.data.sections).to.have.property(\"pageNumber\");",
-									"    pm.expect(jsonData.data.sections).to.have.property(\"pageSize\");",
-									"    pm.expect(jsonData.data.sections).to.have.property(\"totalElements\");",
-									"    pm.expect(jsonData.data.sections).to.have.property(\"totalPages\");",
-									"    pm.expect(jsonData).to.have.property(\"message\");",
-									"",
-									"    // data.sections.data (array)",
-									"    pm.expect(jsonData.data.sections.data).to.be.an(\"array\");",
-									"    // data.sections.errors (array)",
-									"    pm.expect(jsonData.data.sections.errors).to.be.an(\"array\");",
-									"",
-									"    // Si hay al menos una sección, validar claves del primer elemento",
-									"    if (jsonData.data.sections.data.length > 0) {",
-									"        const section0 = jsonData.data.sections.data[0];",
-									"        pm.expect(section0).to.have.property(\"description\");",
-									"        pm.expect(section0).to.have.property(\"id\");",
-									"        pm.expect(section0).to.have.property(\"sectionResources\");",
-									"        pm.expect(section0).to.have.property(\"title\");",
-									"        pm.expect(section0.sectionResources).to.be.an(\"array\");",
-									"",
-									"        // Si hay al menos un recurso, validar claves del primer recurso",
-									"        if (section0.sectionResources.length > 0) {",
-									"            const resource0 = section0.sectionResources[0];",
-									"            pm.expect(resource0).to.have.property(\"extension\");",
-									"            pm.expect(resource0).to.have.property(\"id\");",
-									"            pm.expect(resource0).to.have.property(\"name\");",
-									"            pm.expect(resource0).to.have.property(\"order\");",
-									"            pm.expect(resource0).to.have.property(\"url\");",
-									"        }",
-									"    }",
-									"});",
-									"",
-									"",
-									"",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						}
-					],
+					"name": "GetCalendarEvents Copy",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -1635,186 +1647,26 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{alumnetUrl}}/api/courses/{{id_curso}}/content/?userId=student@alumnet.com",
+							"raw": "{{alumnetUrl}}/api/users/calendar-events",
 							"host": [
 								"{{alumnetUrl}}"
 							],
 							"path": [
 								"api",
-								"courses",
-								"{{id_curso}}",
-								"content",
-								""
-							],
-							"query": [
-								{
-									"key": "userId",
-									"value": "student@alumnet.com"
-								}
+								"users",
+								"calendar-events"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Modify Section",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"eval(pm.collectionVariables.get(\"utils-Course\"));",
-									"",
-									"function runInitProcess() {",
-									"  getAccessToken(function() {",
-									"        getSectionId(\"student@alumnet.com\",function(){})",
-									"  });",
-									"}",
-									"",
-									"runInitProcess();",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"El status code es el esperado\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"const jsonData = pm.response.json();",
-									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () { ",
-									"    pm.expect(jsonData).to.have.all.keys('message');",
-									"});",
-									"",
-									"pm.test(\"El mensaje de la respuesta es correcto\", function () { ",
-									"    pm.expect(jsonData.message).to.eql('Sección actualizada exitosamente');",
-									"})"
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						}
-					],
+					"name": "GetUserActivity Copy",
 					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{access_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "PUT",
-						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "resources",
-									"type": "file",
-									"src": "postman-cloud:///1f0b3a0a-e2a1-4c60-ad28-a06ba754ebd2"
-								},
-								{
-									"key": "section",
-									"type": "file",
-									"src": "postman-cloud:///1f0b45f7-74a5-4ba0-9dd9-ffef0ca25c4b"
-								}
-							]
-						},
-						"url": {
-							"raw": "{{alumnetUrl}}/api/sections/{{id_curso}}/{{id_section}}",
-							"host": [
-								"{{alumnetUrl}}"
-							],
-							"path": [
-								"api",
-								"sections",
-								"{{id_curso}}",
-								"{{id_section}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete section",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"El status code es el esperado\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"const jsonData = pm.response.json();",
-									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () { ",
-									"    pm.expect(jsonData).to.have.all.keys('message');",
-									"});",
-									"",
-									"pm.test(\"El mensaje de la respuesta es correcto\", function () { ",
-									"    pm.expect(jsonData.message).to.eql('Sección eliminada exitosamente');",
-									"})"
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"eval(pm.collectionVariables.get(\"utils-Course\"));",
-									"",
-									"function runInitProcess() {",
-									"  getAccessToken(function() {",
-									"        getSectionId(\"student@alumnet.com\", function(){})",
-									"  });",
-									"}",
-									"",
-									"runInitProcess();",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{access_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "DELETE",
+						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{alumnetUrl}}/api/sections/{{id_curso}}/{{id_section}}",
-							"host": [
-								"{{alumnetUrl}}"
-							],
-							"path": [
-								"api",
-								"sections",
-								"{{id_curso}}",
-								"{{id_section}}"
-							]
+							"raw": ""
 						}
 					},
 					"response": []
@@ -2386,432 +2238,6 @@
 			]
 		},
 		{
-			"name": "Event",
-			"item": [
-				{
-					"name": "Create Task",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"// NO SE PUEDEN CREAR SECCIONES PORQUE REQUIEREN ARCHIVOS",
-									"eval(pm.collectionVariables.get(\"utils-Course\"));",
-									"",
-									"function runInitProcess() {",
-									"    getAccessToken(function () {",
-									"        getCursoId(\"Test-curso-create-section\", \"curso6-verificar-create-section\", function () {",
-									"            getSectionId(\"student@alumnet.com\", function () { })",
-									"        })",
-									"    })",
-									"}",
-									"",
-									"runInitProcess();",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"EL status code es el esperado\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"const jsonData = pm.response.json();",
-									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () { ",
-									"    pm.expect(jsonData).to.have.all.keys('message');",
-									"});",
-									"",
-									"pm.test(\"El mensaje de la respuesta es el esperado\", function () { ",
-									"    pm.expect(jsonData.message).to.eql('Tarea creada exitosamente');",
-									"})"
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{access_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"type\": \"QUESTIONNAIRE\",\n    \"sectionId\": {{id_section}},\n    \"title\": \"Cuestionario 3\",\n    \"description\": \"Cuestionario de Java\",\n    \"startDate\": \"2025-11-20 17:00\",\n    \"endDate\": \"2025-11-30 19:00\",\n    \"maxGrade\": \"30\",\n    \"questions\": [\n        {\n            \"text\": \"¿Qué es JPA?\",\n            \"answers\": [\n                {\n                    \"text\": \"Java Persistence API\",\n                    \"correct\": true\n                },\n                {\n                    \"text\": \"Java Programming Application\",\n                    \"correct\": false\n                },\n                {\n                    \"text\": \"Java Platform Architecture\",\n                    \"correct\": false\n                },\n                {\n                    \"text\": \"Java Protocol Access\",\n                    \"correct\": false\n                }\n            ]\n        }\n    ],\n    \"durationInMinutes\": 120\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{alumnetUrl}}/api/events/create",
-							"host": [
-								"{{alumnetUrl}}"
-							],
-							"path": [
-								"api",
-								"events",
-								"create"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Task By Id",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"// Safe JSON parsing with clear error messages",
-									"let json;",
-									"",
-									"pm.test(\"El status code es el esperado\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () {",
-									"    // Content-Type should be JSON",
-									"    pm.response.to.have.header(\"Content-Type\");",
-									"",
-									"    const body = pm.response.text();",
-									"    try {",
-									"        json = pm.response.json();",
-									"    } catch (e) {",
-									"        throw new Error(\"El cuerpo de la respuesta no es JSON válido. Error: \" + e.message + \"\\nCuerpo recibido: \" + body);",
-									"    }",
-									"",
-									"    // Helpers",
-									"    const ensure = (cond, msg) => { if (!cond) { throw new Error(msg); } };",
-									"    const isString = (v) => typeof v === 'string';",
-									"    const isNumber = (v) => typeof v === 'number' && Number.isFinite(v);",
-									"    const isBoolean = (v) => typeof v === 'boolean';",
-									"    const isArray = (v) => Array.isArray(v);",
-									"",
-									"    // Top-level shape",
-									"    ensure(json && typeof json === 'object', 'La respuesta JSON debe ser un objeto.');",
-									"    ensure('data' in json, 'Falta la clave requerida: data');",
-									"    ensure('message' in json, 'Falta la clave requerida a nivel superior: message');",
-									"",
-									"    // message",
-									"    ensure(isString(json.message), `El tipo de message debe ser string. Tipo actual: ${typeof json.message}`);",
-									"",
-									"    // data shape",
-									"    const data = json.data;",
-									"    ensure(data && typeof data === 'object', 'data debe ser un objeto.');",
-									"",
-									"    // Required fields in data",
-									"    const requiredDataFields = {",
-									"        description: 'string',",
-									"        durationInMinutes: 'number',",
-									"        endDate: 'string',",
-									"        maxGrade: 'number',",
-									"        questions: 'array',",
-									"        sectionId: 'number',",
-									"        startDate: 'string',",
-									"        studentsWithPendingSubmission: 'array',",
-									"        title: 'string'",
-									"    };",
-									"",
-									"    Object.entries(requiredDataFields).forEach(([key, type]) => {",
-									"        ensure(key in data, `Falta la clave en data: ${key}`);",
-									"        const val = data[key];",
-									"        switch (type) {",
-									"            case 'string':",
-									"                ensure(isString(val), `data.${key} debe ser string. Tipo actual: ${typeof val}`);",
-									"                break;",
-									"            case 'number':",
-									"                ensure(isNumber(val), `data.${key} debe ser number finito. Valor actual: ${val}`);",
-									"                break;",
-									"            case 'array':",
-									"                ensure(isArray(val), `data.${key} debe ser un array. Tipo actual: ${typeof val}`);",
-									"                break;",
-									"        }",
-									"    });",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"eval(pm.collectionVariables.get(\"utils-Course\"));",
-									"",
-									"function runInitProcess() {",
-									"    getAccessToken(function () {})",
-									"}",
-									"",
-									"runInitProcess();",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{access_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{alumnetUrl}}/api/events/1",
-							"host": [
-								"{{alumnetUrl}}"
-							],
-							"path": [
-								"api",
-								"events",
-								"1"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Submit Task",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"eval(pm.collectionVariables.get(\"utils-Course\"));",
-									"",
-									"function runInitProcess() {",
-									"    loginStudent(function(){});",
-									"}",
-									"",
-									"runInitProcess();",
-									"",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"EL status code es el esperado\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"const jsonData = pm.response.json();",
-									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () { ",
-									"    pm.expect(jsonData).to.have.all.keys('message');",
-									"});",
-									"",
-									"pm.test(\"El mensaje de la respuesta es el esperado\", function () { ",
-									"    pm.expect(jsonData.message).to.eql('Tarea enviada exitosamente');",
-									"})"
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{access_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "homeworkFile",
-									"type": "file",
-									"src": "postman-cloud:///1f0bac1b-b875-4b70-9e05-0bd1ce44cf40"
-								}
-							]
-						},
-						"url": {
-							"raw": "{{alumnetUrl}}/api/events/1/submit-homework?studentEmail=student@alumnet.com",
-							"host": [
-								"{{alumnetUrl}}"
-							],
-							"path": [
-								"api",
-								"events",
-								"1",
-								"submit-homework"
-							],
-							"query": [
-								{
-									"key": "studentEmail",
-									"value": "student@alumnet.com"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Task to deleteEvent",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"// NO SE PUEDEN CREAR SECCIONES PORQUE REQUIEREN ARCHIVOS",
-									"eval(pm.collectionVariables.get(\"utils-Course\"));",
-									"",
-									"function runInitProcess() {",
-									"    getAccessToken(function () {",
-									"        // initUser(\"students\", \"student\", function () {",
-									"            // initUser(\"teachers\", \"profesorCreateTask\", function () {",
-									"                // initCourse(\"curso-verificar-create-task\", \"curso-verificar-create-task\", [\"profesorCreateTask@alumnet.com\"], function () {",
-									"                    getCursoId(\"curso2Delete\", \"curso2Delete\", function () {",
-									"                        // enrollStudent(\"student@alumnet.com\", function () {",
-									"                            getSectionId(\"student2delete@alumnet.com\", function(){})",
-									"                        })",
-									"                    })",
-									"                // });",
-									"            // });",
-									"        // });",
-									"    // })",
-									"}",
-									"",
-									"runInitProcess();",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"EL status code es el esperado\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"const jsonData = pm.response.json();",
-									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () { ",
-									"    pm.expect(jsonData).to.have.all.keys('message');",
-									"});",
-									"",
-									"pm.test(\"El mensaje de la respuesta es el esperado\", function () { ",
-									"    pm.expect(jsonData.message).to.eql('Tarea creada exitosamente');",
-									"})"
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{access_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"type\": \"QUESTIONNAIRE\",\n    \"sectionId\": {{id_section}},\n    \"title\": \"Cuestionario 3\",\n    \"description\": \"Cuestionario de Java\",\n    \"startDate\": \"2025-11-20 17:00\",\n    \"endDate\": \"2025-11-30 19:00\",\n    \"maxGrade\": \"30\",\n    \"questions\": [\n        {\n            \"text\": \"¿Qué es JPA?\",\n            \"answers\": [\n                {\n                    \"text\": \"Java Persistence API\",\n                    \"correct\": true\n                },\n                {\n                    \"text\": \"Java Programming Application\",\n                    \"correct\": false\n                },\n                {\n                    \"text\": \"Java Platform Architecture\",\n                    \"correct\": false\n                },\n                {\n                    \"text\": \"Java Protocol Access\",\n                    \"correct\": false\n                }\n            ]\n        }\n    ],\n    \"durationInMinutes\": 120\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{alumnetUrl}}/api/events/create",
-							"host": [
-								"{{alumnetUrl}}"
-							],
-							"path": [
-								"api",
-								"events",
-								"create"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "DeleteEvent",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{access_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{alumnetUrl}}/api/events/5",
-							"host": [
-								"{{alumnetUrl}}"
-							],
-							"path": [
-								"api",
-								"events",
-								"5"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
 			"name": "Library",
 			"item": [
 				{
@@ -3202,7 +2628,7 @@
 							"script": {
 								"exec": [
 									"pm.test(\"El status code es el esperado\", function () {",
-									"    pm.response.to.have.status(200);",
+									"    pm.response.to.have.status(201);",
 									"});",
 									"",
 									"const jsonData = pm.response.json();",
@@ -3550,6 +2976,1240 @@
 			]
 		},
 		{
+			"name": "Section",
+			"item": [
+				{
+					"name": "CreateSection",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"",
+									"function runInitProcess() {",
+									"    getAccessToken(function () {",
+									"        initUser(\"students\", \"student\", function () {",
+									"            initUser(\"teachers\", \"profesor7\", function () {",
+									"                initUser(\"students\", \"student\", function () {",
+									"                    initCourse(\"curso6-verificar-create-section\", \"Test-curso-create-section\", [\"profesorCreateTask@alumnet.com\"], function () {",
+									"                        initTestCourses(function () {",
+									"                            getCursoId(\"Test-curso-create-section\", \"curso6-verificar-create-section\", function () {",
+									"                                enrollStudent(\"student@alumnet.com\", function () {",
+									"                                    enrollStudent(\"student@alumnet.com\", function () {",
+									"                                    })",
+									"                                })",
+									"                            })",
+									"                        });",
+									"                    });",
+									"                });",
+									"            });",
+									"        });",
+									"    })",
+									"}",
+									"",
+									"runInitProcess();",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"EL status code es el esperado\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () { ",
+									"    pm.expect(jsonData).to.have.all.keys('message');",
+									"});",
+									"",
+									"pm.test(\"El mensaje de la respuesta es el esperado\", function () { ",
+									"    pm.expect(jsonData.message).to.eql('Sección creada exitosamente');",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "section",
+									"type": "file",
+									"src": "postman-cloud:///1f0b45b8-d825-4d40-96da-b08516f6c2a3"
+								},
+								{
+									"key": "resources",
+									"type": "file",
+									"src": "postman-cloud:///1f0b3a0a-e2a1-4c60-ad28-a06ba754ebd2"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{alumnetUrl}}/api/sections/{{id_curso}}",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"sections",
+								"{{id_curso}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateSection to deleteEvent",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"",
+									"function runInitProcess() {",
+									"    getAccessToken(function () {",
+									"        initUser(\"teachers\", \"profesor2Delete\", function () {",
+									"            initUser(\"students\", \"student2delete\", function () {",
+									"                initCourse(\"curso2Delete\", \"curso2Delete\", [\"profesor2Delete@alumnet.com\"], function () {",
+									"                    getCursoId(\"curso2Delete\", \"curso2Delete\", function () {",
+									"                        enrollStudent(\"student2delete@alumnet.com\", function () {",
+									"                            getSectionId(\"student2delete@alumnet.com\", function () {",
+									"                                unrollStudent(\"student2delete@alumnet.com\", function () { })",
+									"                            })",
+									"                        })",
+									"                    })",
+									"                });",
+									"            });",
+									"        });",
+									"    });",
+									"}",
+									"",
+									"runInitProcess();",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"EL status code es el esperado\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () { ",
+									"    pm.expect(jsonData).to.have.all.keys('message');",
+									"});",
+									"",
+									"pm.test(\"El mensaje de la respuesta es el esperado\", function () { ",
+									"    pm.expect(jsonData.message).to.eql('Sección creada exitosamente');",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "section",
+									"type": "file",
+									"src": "postman-cloud:///1f0b45b8-d825-4d40-96da-b08516f6c2a3"
+								},
+								{
+									"key": "resources",
+									"type": "file",
+									"src": "postman-cloud:///1f0b3a0a-e2a1-4c60-ad28-a06ba754ebd2"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{alumnetUrl}}/api/sections/{{id_curso}}",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"sections",
+								"{{id_curso}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Course Content Access",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"",
+									"function runInitProcess() {",
+									"    getAccessToken(function () {",
+									"        initUser(\"teachers\", \"profesor8\", function () {",
+									"            initUser(\"students\", \"estudiante6\", function () {",
+									"                initTestCourses(function () {",
+									"                    getCursoId(\"Test-curso-create-section\", \"curso6-verificar-create-section\", function () {",
+									"                        enrollStudent(\"estudiante6@alumnet.com\", function () { })",
+									"                    })",
+									"                });",
+									"            })",
+									"        });",
+									"    });",
+									"}",
+									"",
+									"runInitProcess();",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"El status code es el esperado\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () {",
+									"    let jsonData;",
+									"    try {",
+									"        jsonData = pm.response.json();",
+									"    } catch (e) {",
+									"        pm.expect.fail(\"La respuesta no es un JSON válido\");",
+									"        return;",
+									"    }",
+									"",
+									"    // data",
+									"    pm.expect(jsonData).to.have.property(\"data\");",
+									"    pm.expect(jsonData.data).to.have.property(\"description\");",
+									"    pm.expect(jsonData.data).to.have.property(\"sections\");",
+									"    pm.expect(jsonData.data.sections).to.have.property(\"data\");",
+									"    pm.expect(jsonData.data.sections).to.have.property(\"errors\");",
+									"    pm.expect(jsonData.data.sections).to.have.property(\"message\");",
+									"    pm.expect(jsonData.data.sections).to.have.property(\"pageNumber\");",
+									"    pm.expect(jsonData.data.sections).to.have.property(\"pageSize\");",
+									"    pm.expect(jsonData.data.sections).to.have.property(\"totalElements\");",
+									"    pm.expect(jsonData.data.sections).to.have.property(\"totalPages\");",
+									"    pm.expect(jsonData).to.have.property(\"message\");",
+									"",
+									"    // data.sections.data (array)",
+									"    pm.expect(jsonData.data.sections.data).to.be.an(\"array\");",
+									"    // data.sections.errors (array)",
+									"    pm.expect(jsonData.data.sections.errors).to.be.an(\"array\");",
+									"",
+									"    // Si hay al menos una sección, validar claves del primer elemento",
+									"    if (jsonData.data.sections.data.length > 0) {",
+									"        const section0 = jsonData.data.sections.data[0];",
+									"        pm.expect(section0).to.have.property(\"description\");",
+									"        pm.expect(section0).to.have.property(\"id\");",
+									"        pm.expect(section0).to.have.property(\"sectionResources\");",
+									"        pm.expect(section0).to.have.property(\"title\");",
+									"        pm.expect(section0.sectionResources).to.be.an(\"array\");",
+									"",
+									"        // Si hay al menos un recurso, validar claves del primer recurso",
+									"        if (section0.sectionResources.length > 0) {",
+									"            const resource0 = section0.sectionResources[0];",
+									"            pm.expect(resource0).to.have.property(\"extension\");",
+									"            pm.expect(resource0).to.have.property(\"id\");",
+									"            pm.expect(resource0).to.have.property(\"name\");",
+									"            pm.expect(resource0).to.have.property(\"order\");",
+									"            pm.expect(resource0).to.have.property(\"url\");",
+									"        }",
+									"    }",
+									"});",
+									"",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{alumnetUrl}}/api/courses/{{id_curso}}/content/?userId=student@alumnet.com",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"courses",
+								"{{id_curso}}",
+								"content",
+								""
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "student@alumnet.com"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Modify Section",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"",
+									"function runInitProcess() {",
+									"  getAccessToken(function() {",
+									"        getSectionId(\"student@alumnet.com\",function(){})",
+									"  });",
+									"}",
+									"",
+									"runInitProcess();",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"El status code es el esperado\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () { ",
+									"    pm.expect(jsonData).to.have.all.keys('message');",
+									"});",
+									"",
+									"pm.test(\"El mensaje de la respuesta es correcto\", function () { ",
+									"    pm.expect(jsonData.message).to.eql('Sección actualizada exitosamente');",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "resources",
+									"type": "file",
+									"src": "postman-cloud:///1f0b3a0a-e2a1-4c60-ad28-a06ba754ebd2"
+								},
+								{
+									"key": "section",
+									"type": "file",
+									"src": "postman-cloud:///1f0b45f7-74a5-4ba0-9dd9-ffef0ca25c4b"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{alumnetUrl}}/api/sections/{{id_curso}}/{{id_section}}",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"sections",
+								"{{id_curso}}",
+								"{{id_section}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete section",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"El status code es el esperado\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () { ",
+									"    pm.expect(jsonData).to.have.all.keys('message');",
+									"});",
+									"",
+									"pm.test(\"El mensaje de la respuesta es correcto\", function () { ",
+									"    pm.expect(jsonData.message).to.eql('Sección eliminada exitosamente');",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"",
+									"function runInitProcess() {",
+									"  getAccessToken(function() {",
+									"        getSectionId(\"student@alumnet.com\", function(){})",
+									"  });",
+									"}",
+									"",
+									"runInitProcess();",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{alumnetUrl}}/api/sections/{{id_curso}}/{{id_section}}",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"sections",
+								"{{id_curso}}",
+								"{{id_section}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Event",
+			"item": [
+				{
+					"name": "Create Task",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// NO SE PUEDEN CREAR SECCIONES PORQUE REQUIEREN ARCHIVOS",
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"",
+									"function runInitProcess() {",
+									"    getAccessToken(function () {",
+									"        getCursoId(\"Test-curso-create-section\", \"curso6-verificar-create-section\", function () {",
+									"            getSectionId(\"student@alumnet.com\", function () { })",
+									"        })",
+									"    })",
+									"}",
+									"",
+									"runInitProcess();",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"EL status code es el esperado\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () { ",
+									"    pm.expect(jsonData).to.have.all.keys('message');",
+									"});",
+									"",
+									"pm.test(\"El mensaje de la respuesta es el esperado\", function () { ",
+									"    pm.expect(jsonData.message).to.eql('Tarea creada exitosamente');",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"type\": \"QUESTIONNAIRE\",\n    \"sectionId\": {{id_section}},\n    \"title\": \"Cuestionario 3\",\n    \"description\": \"Cuestionario de Java\",\n    \"startDate\": \"2025-11-20 17:00\",\n    \"endDate\": \"2025-11-30 19:00\",\n    \"maxGrade\": \"30\",\n    \"questions\": [\n        {\n            \"text\": \"¿Qué es JPA?\",\n            \"answers\": [\n                {\n                    \"text\": \"Java Persistence API\",\n                    \"correct\": true\n                },\n                {\n                    \"text\": \"Java Programming Application\",\n                    \"correct\": false\n                },\n                {\n                    \"text\": \"Java Platform Architecture\",\n                    \"correct\": false\n                },\n                {\n                    \"text\": \"Java Protocol Access\",\n                    \"correct\": false\n                }\n            ]\n        }\n    ],\n    \"durationInMinutes\": 120\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{alumnetUrl}}/api/events/create",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"events",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Task By Id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Safe JSON parsing with clear error messages",
+									"let json;",
+									"",
+									"pm.test(\"El status code es el esperado\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () {",
+									"    // Content-Type should be JSON",
+									"    pm.response.to.have.header(\"Content-Type\");",
+									"",
+									"    const body = pm.response.text();",
+									"    try {",
+									"        json = pm.response.json();",
+									"    } catch (e) {",
+									"        throw new Error(\"El cuerpo de la respuesta no es JSON válido. Error: \" + e.message + \"\\nCuerpo recibido: \" + body);",
+									"    }",
+									"",
+									"    // Helpers",
+									"    const ensure = (cond, msg) => { if (!cond) { throw new Error(msg); } };",
+									"    const isString = (v) => typeof v === 'string';",
+									"    const isNumber = (v) => typeof v === 'number' && Number.isFinite(v);",
+									"    const isBoolean = (v) => typeof v === 'boolean';",
+									"    const isArray = (v) => Array.isArray(v);",
+									"",
+									"    // Top-level shape",
+									"    ensure(json && typeof json === 'object', 'La respuesta JSON debe ser un objeto.');",
+									"    ensure('data' in json, 'Falta la clave requerida: data');",
+									"    ensure('message' in json, 'Falta la clave requerida a nivel superior: message');",
+									"",
+									"    // message",
+									"    ensure(isString(json.message), `El tipo de message debe ser string. Tipo actual: ${typeof json.message}`);",
+									"",
+									"    // data shape",
+									"    const data = json.data;",
+									"    ensure(data && typeof data === 'object', 'data debe ser un objeto.');",
+									"",
+									"    // Required fields in data",
+									"    const requiredDataFields = {",
+									"        description: 'string',",
+									"        durationInMinutes: 'number',",
+									"        endDate: 'string',",
+									"        maxGrade: 'number',",
+									"        questions: 'array',",
+									"        sectionId: 'number',",
+									"        startDate: 'string',",
+									"        studentsWithPendingSubmission: 'array',",
+									"        title: 'string'",
+									"    };",
+									"",
+									"    Object.entries(requiredDataFields).forEach(([key, type]) => {",
+									"        ensure(key in data, `Falta la clave en data: ${key}`);",
+									"        const val = data[key];",
+									"        switch (type) {",
+									"            case 'string':",
+									"                ensure(isString(val), `data.${key} debe ser string. Tipo actual: ${typeof val}`);",
+									"                break;",
+									"            case 'number':",
+									"                ensure(isNumber(val), `data.${key} debe ser number finito. Valor actual: ${val}`);",
+									"                break;",
+									"            case 'array':",
+									"                ensure(isArray(val), `data.${key} debe ser un array. Tipo actual: ${typeof val}`);",
+									"                break;",
+									"        }",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"",
+									"function runInitProcess() {",
+									"    getAccessToken(function () {})",
+									"}",
+									"",
+									"runInitProcess();",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{alumnetUrl}}/api/events/1",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"events",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Submit Task",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"",
+									"function runInitProcess() {",
+									"    loginStudent(function(){});",
+									"}",
+									"",
+									"runInitProcess();",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"EL status code es el esperado\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () { ",
+									"    pm.expect(jsonData).to.have.all.keys('message');",
+									"});",
+									"",
+									"pm.test(\"El mensaje de la respuesta es el esperado\", function () { ",
+									"    pm.expect(jsonData.message).to.eql('Tarea enviada exitosamente');",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "homeworkFile",
+									"type": "file",
+									"src": "postman-cloud:///1f0bac1b-b875-4b70-9e05-0bd1ce44cf40"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{alumnetUrl}}/api/events/1/submit-homework?studentEmail=student@alumnet.com",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"events",
+								"1",
+								"submit-homework"
+							],
+							"query": [
+								{
+									"key": "studentEmail",
+									"value": "student@alumnet.com"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetQuestById",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// NO SE PUEDEN CREAR SECCIONES PORQUE REQUIEREN ARCHIVOS",
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"",
+									"function runInitProcess() {",
+									"    getAccessToken(function () {",
+									"    })",
+									"}",
+									"",
+									"runInitProcess();",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"El status code es el esperado\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test(\"El mensaje de la respuesta es el esperado\", function () {",
+									"    pm.expect(jsonData.message).to.eql(\"Cuestionario obtenido exitosamente\");",
+									"});",
+									"",
+									"// Helper para verificar presencia de claves",
+									"function hasAllKeys(obj, keys) {",
+									"    return keys.every(k => Object.prototype.hasOwnProperty.call(obj, k));",
+									"}",
+									"",
+									"const json = pm.response.json();",
+									"",
+									"// ✅ Validar claves dentro de data",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () {",
+									"    const expectedDataKeys = [",
+									"        \"description\",",
+									"        \"durationInMinutes\",",
+									"        \"endDate\",",
+									"        \"maxGrade\",",
+									"        \"questions\",",
+									"        \"startDate\",",
+									"        \"title\",",
+									"        \"type\"",
+									"    ];",
+									"",
+									"    pm.expect(hasAllKeys(json.data, expectedDataKeys)).to.be.true;",
+									"",
+									"    // Validaciones de tipo básicas",
+									"    pm.expect(json.data.description).to.be.a(\"string\");",
+									"    pm.expect(json.data.durationInMinutes).to.be.a(\"number\");",
+									"    pm.expect(json.data.endDate).to.be.a(\"string\");",
+									"    pm.expect(json.data.maxGrade).to.be.a(\"number\");",
+									"    pm.expect(json.data.questions).to.be.an(\"array\");",
+									"    pm.expect(json.data.startDate).to.be.a(\"string\");",
+									"    pm.expect(json.data.title).to.be.a(\"string\");",
+									"    pm.expect(json.data.type).to.be.a(\"string\");",
+									"});",
+									"",
+									"// ✅ Validar valores específicos esperados (sin depender del orden de las respuestas)",
+									"pm.test(\"Los valores de la respuesta son los esperados\", function () {",
+									"    const expectedData = {",
+									"        description: \"Cuestionario de Java\",",
+									"        durationInMinutes: 120,",
+									"        endDate: \"2025-11-30 19:00\",",
+									"        maxGrade: 30,",
+									"        startDate: \"2025-11-20 17:00\",",
+									"        title: \"Cuestionario 3\",",
+									"        type: \"QUESTIONNAIRE\"",
+									"    };",
+									"",
+									"    // Comparar campos simples",
+									"    pm.expect(json.data.description).to.eql(expectedData.description);",
+									"    pm.expect(json.data.durationInMinutes).to.eql(expectedData.durationInMinutes);",
+									"    pm.expect(json.data.endDate).to.eql(expectedData.endDate);",
+									"    pm.expect(json.data.maxGrade).to.eql(expectedData.maxGrade);",
+									"    pm.expect(json.data.startDate).to.eql(expectedData.startDate);",
+									"    pm.expect(json.data.title).to.eql(expectedData.title);",
+									"    pm.expect(json.data.type).to.eql(expectedData.type);",
+									"",
+									"    // Validar pregunta",
+									"    pm.expect(json.data.questions).to.have.lengthOf(1);",
+									"    const question = json.data.questions[0];",
+									"    pm.expect(question.text).to.eql(\"¿Qué es JPA?\");",
+									"    pm.expect(question.id).to.eql(1);",
+									"",
+									"    // Validar respuestas esperadas (no dependemos del orden)",
+									"    const expectedAnswers = [",
+									"        { id: 2, text: \"Java Programming Application\", correct: false },",
+									"        { id: 1, text: \"Java Persistence API\", correct: true },",
+									"        { id: 4, text: \"Java Protocol Access\", correct: false },",
+									"        { id: 3, text: \"Java Platform Architecture\", correct: false }",
+									"    ];",
+									"",
+									"    pm.expect(question.answers).to.be.an(\"array\").with.lengthOf(expectedAnswers.length);",
+									"",
+									"    expectedAnswers.forEach(expected => {",
+									"        const found = question.answers.find(a => a.id === expected.id);",
+									"        pm.expect(found, `No se encontró la respuesta con id ${expected.id}`).to.exist;",
+									"        pm.expect(found.id).to.eql(expected.id);",
+									"        pm.expect(found.text).to.eql(expected.text);",
+									"        pm.expect(found.correct).to.eql(expected.correct);",
+									"    });",
+									"",
+									"    // Extra: asegurar que no haya respuestas adicionales inesperadas",
+									"    const receivedIds = question.answers.map(a => a.id).sort((a,b)=>a-b);",
+									"    const expectedIds = expectedAnswers.map(e => e.id).sort((a,b)=>a-b);",
+									"    pm.expect(receivedIds).to.eql(expectedIds);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{alumnetUrl}}/api/events/1/details?userEmail=student@alumnet.com",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"events",
+								"1",
+								"details"
+							],
+							"query": [
+								{
+									"key": "userEmail",
+									"value": "student@alumnet.com"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "SubmitQuest Copy",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userEmail\": \"student@alumnnet.com\",\r\n    \"responses\": [\r\n        {\r\n            \"questionId\": 1,\r\n            \"answerId\": 4,\r\n            \"timeStamp\": \"2025-11-04T14:55:00\" \r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{alumnetUrl}}/api/events/1/submit",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"events",
+								"1",
+								"submit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Unrated Events By Course ID Copy",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Students assigned to event Copy",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Event Submission",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// NO SE PUEDEN CREAR SECCIONES PORQUE REQUIEREN ARCHIVOS",
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"",
+									"function runInitProcess() {",
+									"    getAccessToken(function () {",
+									"    })",
+									"}",
+									"",
+									"runInitProcess();",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"EL status code es el esperado\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () { ",
+									"    pm.expect(jsonData).to.have.all.keys('message');",
+									"});",
+									"",
+									"pm.test(\"El mensaje de la respuesta es el esperado\", function () { ",
+									"    pm.expect(jsonData.message).to.eql('Calificaciones guardadas exitosamente');",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"students\": [\n\t\t{\n\t\t\t\"email\": \"student@alumnet.com\",\n\t\t\t\"grade\": 0.6,\n            \"name\": \"German\",\n            \"lastname\": \"Burgos\"\n\t\t}\n\t],\n\t\"eventId\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{alumnetUrl}}/api/events/grade-submissions",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"events",
+								"grade-submissions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Task to deleteEvent",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// NO SE PUEDEN CREAR SECCIONES PORQUE REQUIEREN ARCHIVOS",
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"",
+									"function runInitProcess() {",
+									"    getAccessToken(function () {",
+									"        // initUser(\"students\", \"student\", function () {",
+									"            // initUser(\"teachers\", \"profesorCreateTask\", function () {",
+									"                // initCourse(\"curso-verificar-create-task\", \"curso-verificar-create-task\", [\"profesorCreateTask@alumnet.com\"], function () {",
+									"                    getCursoId(\"curso2Delete\", \"curso2Delete\", function () {",
+									"                        // enrollStudent(\"student@alumnet.com\", function () {",
+									"                            getSectionId(\"student2delete@alumnet.com\", function(){})",
+									"                        })",
+									"                    })",
+									"                // });",
+									"            // });",
+									"        // });",
+									"    // })",
+									"}",
+									"",
+									"runInitProcess();",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"EL status code es el esperado\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () { ",
+									"    pm.expect(jsonData).to.have.all.keys('message');",
+									"});",
+									"",
+									"pm.test(\"El mensaje de la respuesta es el esperado\", function () { ",
+									"    pm.expect(jsonData.message).to.eql('Tarea creada exitosamente');",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"type\": \"QUESTIONNAIRE\",\n    \"sectionId\": {{id_section}},\n    \"title\": \"Cuestionario 3\",\n    \"description\": \"Cuestionario de Java\",\n    \"startDate\": \"2025-11-20 17:00\",\n    \"endDate\": \"2025-11-30 19:00\",\n    \"maxGrade\": \"30\",\n    \"questions\": [\n        {\n            \"text\": \"¿Qué es JPA?\",\n            \"answers\": [\n                {\n                    \"text\": \"Java Persistence API\",\n                    \"correct\": true\n                },\n                {\n                    \"text\": \"Java Programming Application\",\n                    \"correct\": false\n                },\n                {\n                    \"text\": \"Java Platform Architecture\",\n                    \"correct\": false\n                },\n                {\n                    \"text\": \"Java Protocol Access\",\n                    \"correct\": false\n                }\n            ]\n        }\n    ],\n    \"durationInMinutes\": 120\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{alumnetUrl}}/api/events/create",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"events",
+								"create"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "DeleteEvent",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{alumnetUrl}}/api/events/5",
+					"host": [
+						"{{alumnetUrl}}"
+					],
+					"path": [
+						"api",
+						"events",
+						"5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "LOGIN admin",
 			"event": [
 				{
@@ -3676,33 +4336,7 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"function getSectionId(email=\"student@alumnet.com\", next){",
-							"    pm.sendRequest({",
-							"    url: pm.collectionVariables.get(\"alumnetUrl\") + \"/api/courses/\" + pm.collectionVariables.get(\"id_curso\") + \"/content/?userId=\" + email,",
-							"    method: 'GET',",
-							"    header: {",
-							"        'Authorization': 'Bearer ' + pm.collectionVariables.get('access_token')",
-							"    }",
-							"}, function (err, res) {",
-							"    if (err) {",
-							"        console.error('Error en la petición GET:', err);",
-							"        return;",
-							"    }",
-							"",
-							"    const json = res.json();",
-							"",
-							"if (json.data && json.data.sections && json.data.sections.data.length > 0) {",
-							"    const sectionResourceId = String(json.data.sections.data[0].id);",
-							"    pm.collectionVariables.set('id_section', sectionResourceId);",
-							"    console.log('id_section guardado:', sectionResourceId);",
-							"} else {",
-							"    console.warn('No se encontró ninguna sección o recurso');",
-							"    pm.collectionVariables.unset('id_section');",
-							"}",
-							"    next();",
-							"});",
-							"}",
-							"getSectionId(function(){})"
+							""
 						],
 						"type": "text/javascript",
 						"packages": {},
@@ -4403,6 +5037,68 @@
 					"    console.log(\"Estudiante desmatriculado\")",
 					"    next();",
 					"});",
+					"}",
+					"function createEvent(next) {",
+					"    const evento = {",
+					"        type: \"QUESTIONNAIRE\",",
+					"        sectionId: pm.collectionVariables.get(\"id_section\"),",
+					"        title: \"Cuestionario 3\",",
+					"        description: \"Cuestionario de Java\",",
+					"        startDate: \"2025-11-20 17:00\",",
+					"        endDate: \"2025-11-30 19:00\",",
+					"        maxGrade: 30,",
+					"        questions: [",
+					"            {",
+					"                text: \"¿Qué es JPA?\",",
+					"                answers: [",
+					"                    { text: \"Java Persistence API\", correct: true },",
+					"                    { text: \"Java Programming Application\", correct: false },",
+					"                    { text: \"Java Platform Architecture\", correct: false },",
+					"                    { text: \"Java Protocol Access\", correct: false }",
+					"                ]",
+					"            }",
+					"        ],",
+					"        durationInMinutes: 120",
+					"    };",
+					"",
+					"    pm.sendRequest({",
+					"        url: pm.collectionVariables.get(\"alumnetUrl\") + \"/api/events/create\",",
+					"        method: \"POST\",",
+					"        header: {",
+					"            \"Content-Type\": \"application/json\",",
+					"            \"Authorization\": \"Bearer \" + pm.collectionVariables.get(\"access_token\")",
+					"        },",
+					"        body: {",
+					"            mode: \"raw\",",
+					"            raw: JSON.stringify(evento)",
+					"        }",
+					"    }, function (err, res) {",
+					"        if (err) {",
+					"            console.error(\"❌ Error al crear el evento:\", err);",
+					"            return;",
+					"        }",
+					"",
+					"        if (!res) {",
+					"            console.error(\"❌ No se recibió respuesta del servidor\");",
+					"            return;",
+					"        }",
+					"",
+					"        const jsonData = res.json();",
+					"",
+					"        if (res.code === 201) {",
+					"            console.log(\"✅ Evento creado exitosamente\");",
+					"        } else {",
+					"            console.warn(\"⚠️ El servidor respondió con un código diferente:\", res.code);",
+					"        }",
+					"",
+					"        // Ejemplo: guardar el id del evento si existe en la respuesta",
+					"        if (jsonData.data && jsonData.data.id) {",
+					"            pm.collectionVariables.set(\"id_event\", jsonData.data.id);",
+					"            console.log(\"📦 id_event guardado:\", jsonData.data.id);",
+					"        }",
+					"",
+					"        if (next) next();",
+					"    });",
 					"}",
 					"`",
 					");",
