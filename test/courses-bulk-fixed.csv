@@ -1,0 +1,9 @@
+name,description,approvalGrade,shift,teacherEmails,startDate,endDate
+Curso Introducción a Ciberseguridad,Aprenderás a proteger sistemas,0.7,VESPERTINO,docente1@uni.edu|docente2@uni.edu,2025-10-01,2026-03-31
+Taller de Patrones de Diseño,Diseño de software profesional,0.85,NOCTURNO,docente3@uni.edu,2025-11-01,2026-01-15
+Fundamentos de Base de Datos,Modelado y SQL,0.6,MATUTINO,docente4@uni.edu,2026-02-01,2026-06-30
+Curso Introducción a Java,Curso de Java intermedio,0.75,VESPERTINO,docente5@uni.edu,2026-01-01,2026-04-30
+Taller de Robótica,Programación de microcontroladores,0.7,MATUTINO,docente6@uni.edu,2026-05-01,2026-10-31
+Redes Avanzadas,Configuración de routers,0.9,NOCTURNO,docente7@uni.edu,2026-03-01,2026-07-31
+Curso con Email Inválido,Debe tener un docente con email válido,0.65,NOCTURNO,docente@malo.com,2025-12-01,2026-05-31
+Proyecto Final,Proyecto Integrador,0.7,MATUTINO,docente8@uni.edu,2026-01-01,2026-07-01
