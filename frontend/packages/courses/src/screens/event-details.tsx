@@ -59,11 +59,11 @@ export const EventDetails = () => {
             <Text variant="bodyLarge">{data?.maxGrade} puntos</Text>
           </View>
 
-          {type === EventType.TASK.toLowerCase() && (
+          {type === EventType.TASK && (
             <TaskDetails eventId={id} data={data} userInfo={userInfo!} />
           )}
 
-          {type === EventType.QUESTIONNAIRE.toLowerCase() && (
+          {type === EventType.QUESTIONNAIRE && (
             <QuestionnaireDetails
               data={data}
               eventId={id}
