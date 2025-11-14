@@ -16,7 +16,7 @@ export const createResource = async (formData: FormValues) => {
   const metadata = {
     creatorEmail: formData.creatorEmail,
     title: formData.title,
-    labelIds: formData.labelIds,
+    labelIds: formData.labelIds || [],
   };
 
   const data = new FormData();
@@ -44,5 +44,5 @@ export const modifyLabel = (id: number, name: string) =>
 
 export const modifyResource = (
   id: number,
-  data: { title: string; labelIds: number[] },
-) => api.patch(`/library/resources/${id}`, data);
+  data: { title: string; labelIds?: number[] },
+) => api.patch(`/library/resources/${id}`, { ...data, labelIds: data.labelIds || [] });

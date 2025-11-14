@@ -4,6 +4,6 @@ export type UpdateLabelRequest = {
 
 export type LibraryResourceUpdateRequest = {
   title: string;
-  labelIds: number[];
+  labelIds?: number[];
   currentUserEmail: string;
 };

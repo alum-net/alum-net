@@ -3,7 +3,7 @@ import { View, StyleSheet, Modal, ScrollView } from 'react-native';
 import { Button, Text, SegmentedButtons } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { FormTextInput, THEME } from '@alum-net/ui';
+import { FormTextInput, THEME, Toast } from '@alum-net/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@alum-net/api';
 import { UserRole } from '@alum-net/users/src/types';
@@ -57,16 +57,17 @@ export default function CreateUserModal({ visible, onDismiss }: Props) {
         };
 
         const res = await mutateAsync(payload);
-
-        if (res?.success) {
-          // cerrar modal e invalidar lista
+        const isSuccess = !res?.errors || res?.errors?.length === 0;
+        
+        if (isSuccess) {
+          setServerMessage(null);
+          Toast.success(res?.message);
           reset();
           onDismiss();
           await queryClient.invalidateQueries({
             queryKey: [QUERY_KEYS.getUsers],
           });
         } else {
-          // Error (success:false) -> mostrar mensaje del back y no cerrar
           const msg =
             res?.message || res?.errors?.[0] || 'No se pudo crear el usuario';
           setServerMessage(String(msg));

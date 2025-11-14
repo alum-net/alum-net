@@ -74,7 +74,9 @@ export default function CourseMembersCard({ courseId }: Props) {
       reset({ email: '' });
       focusTrigger();
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.getCourse] }),
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.getCourse, courseId, user?.email],
+        }),
         queryClient.invalidateQueries({
           queryKey: [QUERY_KEYS.getCourseMembers, courseId],
         }),

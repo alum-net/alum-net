@@ -11,7 +11,7 @@ import { TaskDetails } from '../components/task-details';
 import { QuestionnaireDetails } from '../components/questionnaire-details';
 
 const mapEventTypeToTitle = (type: EventType) => {
-  switch (type.toUpperCase()) {
+  switch (type) {
     case EventType.TASK:
       return 'Tarea';
     case EventType.QUESTIONNAIRE:

@@ -1,27 +1,25 @@
+import { useState } from 'react';
 import { useUserInfo } from '@alum-net/users';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Platform, StyleSheet } from 'react-native';
-import { Button } from 'react-native-paper';
+import { Button, Dialog, Portal, Text } from 'react-native-paper';
 import { deleteCourse } from '../service';
-import { Toast } from '@alum-net/ui';
-import { PageableResponse, QUERY_KEYS } from '@alum-net/api';
-import { CourseDisplay } from '../types';
+import { Toast, THEME } from '@alum-net/ui';
+import { QUERY_KEYS } from '@alum-net/api';
 import { UserRole } from '@alum-net/users/src/types';
 
 export default function DeleteCourseButton({ courseId }: { courseId: string }) {
   const { data } = useUserInfo();
   const queryClient = useQueryClient();
+  const [confirmVisible, setConfirmVisible] = useState(false);
   const { mutate } = useMutation({
     mutationFn: async () => await deleteCourse(courseId),
     onError: () => {
       Toast.error('Error al eliminar curso');
     },
     onSuccess: async () => {
-      const oldData: PageableResponse<CourseDisplay> | undefined =
-        await queryClient.getQueryData([QUERY_KEYS.getCourses]);
-      await queryClient.setQueryData([QUERY_KEYS.getCourses], {
-        ...oldData,
-        data: oldData?.data?.filter(course => course?.id !== courseId),
+      await queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.getCourses],
       });
       Toast.success('Curso eliminado correctamente');
     },
@@ -29,15 +27,45 @@ export default function DeleteCourseButton({ courseId }: { courseId: string }) {
 
   if (Platform.OS !== 'web' || data?.role !== UserRole.admin) return null;
 
+  const handleDelete = () => {
+    mutate();
+    setConfirmVisible(false);
+  };
+
   return (
-    <Button
-      mode="text"
-      style={styles.button}
-      labelStyle={styles.buttonLabel}
-      onPress={() => mutate()}
-    >
-      Eliminar
-    </Button>
+    <>
+      <Button
+        mode="text"
+        style={styles.button}
+        labelStyle={styles.buttonLabel}
+        onPress={() => setConfirmVisible(true)}
+      >
+        Eliminar
+      </Button>
+      <Portal>
+        <Dialog
+          visible={confirmVisible}
+          onDismiss={() => setConfirmVisible(false)}
+          style={styles.dialog}
+        >
+          <Dialog.Title>Confirmar eliminación</Dialog.Title>
+          <Dialog.Content style={styles.dialogContent}>
+            <Text>¿Querés eliminar el curso?</Text>
+          </Dialog.Content>
+          <Dialog.Actions style={styles.dialogActions}>
+            <Button onPress={() => setConfirmVisible(false)}>Cancelar</Button>
+            <Button
+              mode="contained-tonal"
+              buttonColor={THEME.colors.error}
+              textColor="#fff"
+              onPress={handleDelete}
+            >
+              Eliminar
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
+    </>
   );
 }
 
@@ -49,5 +77,18 @@ const styles = StyleSheet.create({
   buttonLabel: {
     fontSize: 12,
     color: '#9e0000ff',
+  },
+  dialog: {
+    backgroundColor: 'white',
+    alignSelf: 'center',
+    width: 420,
+    maxWidth: '90%',
+    borderRadius: 12,
+  },
+  dialogContent: {
+    paddingTop: 4,
+  },
+  dialogActions: {
+    justifyContent: 'flex-end',
   },
 });

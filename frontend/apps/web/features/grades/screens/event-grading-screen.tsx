@@ -6,8 +6,9 @@ import { StudentGrade, UnratedEvent } from '../types';
 import GradesTable from '../components/grades-table';
 import { Toast } from '@alum-net/ui';
 import { validateAllGrades } from '../validations';
-import { mapEventTypeToString } from '@alum-net/courses';
-import { useQueryClient } from '@tanstack/react-query';
+import { mapEventTypeToString, EventType } from '@alum-net/courses';
+import { getEventById } from '@alum-net/courses/src/service';
+import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { QUERY_KEYS, Response } from '@alum-net/api';
 
 type Props = {
@@ -25,6 +26,13 @@ const EventGradingScreen = ({ courseId }: Props) => {
     saveGrades,
     isSavingGrades,
   } = useGrades(courseId, selectedEvent?.id);
+
+  const isTask = selectedEvent?.type === EventType.TASK;
+  const { data: eventData, isLoading: isLoadingEvent } = useQuery({
+    queryKey: [QUERY_KEYS.getEventDetails, selectedEvent?.id],
+    queryFn: () => getEventById(selectedEvent!.id.toString()),
+    enabled: !!selectedEvent && isTask,
+  });
 
   useEffect(() => {
     if (eventStudents) {
@@ -97,6 +105,8 @@ const EventGradingScreen = ({ courseId }: Props) => {
               students={grades}
               onGradeChange={handleGradeChange}
               maxGrade={selectedEvent.maxGrade}
+              submissions={isTask ? eventData?.submissions : undefined}
+              showSubmissionsColumn={isTask}
             />
             <Button
               mode="contained"

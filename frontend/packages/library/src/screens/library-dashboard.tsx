@@ -74,7 +74,7 @@ export const LibraryDashboard = ({
   renderModifyResourceForm,
 }: {
   deleteLabel?: ({ id }: { id: number }) => void;
-  deleteResource?: ({ id }: { id: number }) => void;
+  deleteResource?: (resource: LibraryResource) => void;
   filterContainer?: (props: PropsWithChildren) => ReactElement;
   renderModifyLabelForm?: (label: Label) => React.ReactElement | null;
   renderModifyResourceForm?: (
@@ -125,7 +125,7 @@ export const LibraryDashboard = ({
             <Button
               mode="text"
               textColor={THEME.colors.error}
-              onPress={() => deleteResource({ id: item.id })}
+              onPress={() => deleteResource(item)}
             >
               Eliminar
             </Button>

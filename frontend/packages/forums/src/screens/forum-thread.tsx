@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { View, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
+import { View, StyleSheet, ActivityIndicator, ScrollView, Platform } from 'react-native';
 import { Button, Dialog, Portal, Text, useTheme } from 'react-native-paper';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useUserInfo } from '@alum-net/users';
@@ -12,7 +12,8 @@ import { useForumPosts } from '../hooks/useForumPosts';
 import { deletePost } from '../service';
 import { PostCard } from '../components/post-card';
 import { PostCreationForm } from '../components/forum-post-creation';
-import { isAxiosError } from 'axios';
+import { AxiosError } from 'axios';
+import { Response } from '@alum-net/api';
 
 type UserAction = {
   action: 'update' | 'answer' | 'delete' | undefined;
@@ -37,18 +38,25 @@ export const ForumThread = () => {
       deletePost(data.postId),
     onSuccess: async (_, variables) => {
       await queryClient.invalidateQueries({
-        queryKey: [
-          QUERY_KEYS.getForumPosts,
-          variables.isRoot ? undefined : postId,
-        ],
+        queryKey: [QUERY_KEYS.getForumPosts],
       });
-      if (variables.isRoot) router.back();
+      if (variables.isRoot) {
+        router.back();
+        await queryClient.refetchQueries({
+          queryKey: [QUERY_KEYS.getForumPosts],
+        });
+      }
       Toast.success('Posteo eliminado correctamente');
       dismissAction();
     },
-    onError: error => {
-      if (isAxiosError(error)) Toast.error(error.response?.data.message);
-      else Toast.error('Error inesperado eliminando el posteo');
+    onError: (error: any) => {
+      const axiosError = error as AxiosError<Response>;
+      
+      if (axiosError?.response?.status === 401) {
+        Toast.error('Tu sesión expiró. Por favor, volvé a iniciar sesión');
+      } else {
+        Toast.error('No pudimos eliminar el posteo');
+      }
     },
   });
 
@@ -92,6 +100,16 @@ export const ForumThread = () => {
   return (
     <>
       <ScrollView contentContainerStyle={styles.container}>
+        {Platform.OS === 'web' && (
+          <Button
+            mode="text"
+            icon="arrow-left"
+            onPress={() => router.back()}
+            style={styles.backButton}
+          >
+            Volver
+          </Button>
+        )}
         <PostCard
           key={parentPost.id}
           post={parentPost}
@@ -173,6 +191,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  backButton: {
+    alignSelf: 'flex-start',
+    marginBottom: 16,
   },
   dialog: {
     backgroundColor: 'white',

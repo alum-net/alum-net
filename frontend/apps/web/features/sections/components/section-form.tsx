@@ -39,6 +39,7 @@ import { FilesToUpload, SectionData } from '../types';
 import { createSection, updateSection } from '../service';
 import { Section } from '@alum-net/courses';
 import { MAX_FILE_SIZE, PERMITTED_FILE_TYPES } from '../constants';
+import { getAxiosErrorMessage } from '../../users/service';
 
 interface SectionFormProps {
   onFinish: () => void;
@@ -53,6 +54,7 @@ export const SectionForm: React.FC<SectionFormProps> = ({
 }) => {
   const isEditMode = Boolean(initialData);
   const [isLoadingMutation, setIsLoadingMutation] = useState(false);
+  const [serverMessage, setServerMessage] = useState<string | null>(null);
   const [selectedFiles, setSelectedFiles] = useState<FilesToUpload[]>(
     initialData?.sectionResources
       ?.sort((a, b) => a.order - b.order)
@@ -92,12 +94,14 @@ export const SectionForm: React.FC<SectionFormProps> = ({
       selectedFiles?: FilesToUpload[];
     }) => createSection({ courseId, ...data }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.getCourse] });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.getCourse, courseId],
+      });
       Toast.success('Sección creada correctamente');
       onFinish();
     },
-    onError: () => {
-      Toast.error('Error creando la sección');
+    onError: (error: any) => {
+      setServerMessage(getAxiosErrorMessage(error) || 'Error creando la sección');
       setIsLoadingMutation(false);
     },
   });
@@ -113,12 +117,14 @@ export const SectionForm: React.FC<SectionFormProps> = ({
         ...data,
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.getCourse] });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.getCourse, courseId],
+      });
       Toast.success('Sección modificada correctamente');
       onFinish();
     },
-    onError: () => {
-      Toast.error('Error modificando la sección');
+    onError: (error: any) => {
+      setServerMessage(getAxiosErrorMessage(error) || 'Error modificando la sección');
       setIsLoadingMutation(false);
     },
   });
@@ -161,6 +167,7 @@ export const SectionForm: React.FC<SectionFormProps> = ({
           order: i,
         })),
       );
+      setServerMessage(null);
       return updated;
     });
   };
@@ -189,8 +196,11 @@ export const SectionForm: React.FC<SectionFormProps> = ({
           setValue('resourcesMetadata', metadata);
           return combined;
         });
-        if (newFiles.length < res.assets.length)
-          Toast.info('Uno de los archivos seleccionados pesa más de 10 MB');
+        if (newFiles.length < res.assets.length) {
+          setServerMessage('Uno de los archivos seleccionados pesa más de 10 MB');
+        } else {
+          setServerMessage(null);
+        }
       }
     } catch (e) {
       console.error('File selection error:', e);
@@ -199,26 +209,23 @@ export const SectionForm: React.FC<SectionFormProps> = ({
 
   const onSubmit = async (data: SectionCreationFormSchema) => {
     setIsLoadingMutation(true);
-    try {
-      const sectionData = {
-        title: data.title,
-        description: content || '',
-        resourcesMetadata: selectedFiles.map((file, index) => ({
-          filename: file.name,
-          order: index,
-        })),
-      };
+    setServerMessage(null);
+    const sectionData = {
+      title: data.title,
+      description: content || '',
+      resourcesMetadata: selectedFiles.map((file, index) => ({
+        filename: file.name,
+        order: index,
+      })),
+    };
 
-      if (isEditMode && initialData) {
-        updateMutate({
-          sectionData: { ...sectionData, eliminatedResourcesIds },
-          selectedFiles: selectedFiles.filter(file => !Boolean(file.id)),
-        });
-      } else {
-        createMutate({ sectionData, selectedFiles });
-      }
-    } catch (error) {
-      console.log(error);
+    if (isEditMode && initialData) {
+      updateMutate({
+        sectionData: { ...sectionData, eliminatedResourcesIds },
+        selectedFiles: selectedFiles.filter(file => !Boolean(file.id)),
+      });
+    } else {
+      createMutate({ sectionData, selectedFiles });
     }
   };
 
@@ -242,6 +249,12 @@ export const SectionForm: React.FC<SectionFormProps> = ({
           <Text style={styles.label}>Contenido</Text>
           <RichTextEditor editor={editor} />
           <Text style={styles.label}>Recursos multimedia</Text>
+
+          {serverMessage && (
+            <View style={[styles.banner, styles.bannerError]}>
+              <Text style={styles.bannerText}>{serverMessage}</Text>
+            </View>
+          )}
 
           <View style={styles.uploadBox}>
             <Button
@@ -313,5 +326,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     gap: 8,
+  },
+  banner: {
+    marginTop: 8,
+    marginBottom: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+  },
+  bannerError: {
+    backgroundColor: '#FEF2F2',
+    borderColor: '#FCA5A5',
+  },
+  bannerText: {
+    fontSize: 14,
+    color: '#111827',
   },
 });

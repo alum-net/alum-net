@@ -40,7 +40,7 @@ export default function Course() {
     onSuccess: (_, variables) => {
       Toast.success('Sección eliminada correctamente');
       queryClient.setQueryData(
-        [QUERY_KEYS.getCourse],
+        [QUERY_KEYS.getCourse, id.toString(), userInfo?.email],
         (oldData: Response<CourseContent>) => ({
           ...oldData,
           data: {

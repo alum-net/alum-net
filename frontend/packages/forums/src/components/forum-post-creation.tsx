@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { QUERY_KEYS } from '@alum-net/api';
 import { createPost, updatePost } from '../service';
 import { ForumType, Post } from '../types';
@@ -16,19 +17,28 @@ import { Button, Dialog, HelperText, Portal } from 'react-native-paper';
 import { z } from 'zod';
 import { isAxiosError } from 'axios';
 
+const titleValidation = z.string().min(1, 'El título no puede estar vacío');
+
 const basePostSchema = z.object({
   title: z.string().optional(),
-  content: z.string().min(8, 'El contenido es requerido'),
+  content: z.string(),
 });
 
 const postCreationSchema = basePostSchema.extend({
-  title: z.string().min(1, 'El titulo es requerido'),
+  title: titleValidation,
 });
 
-const postUpdateSchema = basePostSchema;
+const postUpdateSchema = basePostSchema.extend({
+  title: titleValidation,
+});
+
+const replySchema = z.object({
+  content: z.string(),
+});
 
 export type PostCreationSchema = z.infer<typeof postCreationSchema>;
 export type PostUpdateSchema = z.infer<typeof postUpdateSchema>;
+export type ReplySchema = z.infer<typeof replySchema>;
 
 interface PostCreationFormProps {
   forumType: ForumType;
@@ -55,14 +65,18 @@ export const PostCreationForm = ({
     formState: { errors },
     setValue,
     reset,
-  } = useForm<PostCreationSchema | PostUpdateSchema>({
+  } = useForm<PostCreationSchema | PostUpdateSchema | ReplySchema>({
     resolver: zodResolver(
-      updateInitialData || creationParentPost
-        ? postUpdateSchema
-        : postCreationSchema,
+      updateInitialData
+        ? updateInitialData.parentPost
+          ? replySchema
+          : postUpdateSchema
+        : creationParentPost
+          ? replySchema
+          : postCreationSchema
     ),
     defaultValues: {
-      title: updateInitialData?.title || undefined,
+      title: updateInitialData?.title || '',
       content: updateInitialData?.content || '',
     },
   });
@@ -70,15 +84,24 @@ export const PostCreationForm = ({
   const { editor, content } = useRichTextEditor(
     updateInitialData?.content || '',
   );
+
+  useEffect(() => {
+    if (!isVisible && !updateInitialData && !creationParentPost) {
+      reset({
+        title: '',
+        content: '',
+      });
+    }
+  }, [isVisible, updateInitialData, creationParentPost, reset]);
   const { data: userInfo } = useUserInfo();
   const queryClient = useQueryClient();
   const { mutate: createMutate } = useMutation({
-    mutationFn: (data: PostCreationSchema) =>
+    mutationFn: (data: PostCreationSchema | ReplySchema) =>
       createPost({
         forumType,
         courseId,
         author: { email: userInfo!.email, name: userInfo!.name },
-        title: creationParentPost ? undefined : data.title,
+        title: creationParentPost ? undefined : (data as PostCreationSchema).title,
         content: data.content,
         parentPost: creationParentPost,
         rootPost: creationRootPost,
@@ -88,19 +111,26 @@ export const PostCreationForm = ({
       await queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.getForumPosts],
       });
+      reset({
+        title: '',
+        content: '',
+      });
       onDismiss();
       reset();
     },
-    onError: error => {
-      if (isAxiosError(error)) Toast.error(error.response?.data.message);
-      else Toast.error('Error inesperado');
+    onError: (error: any) => {
+      const errorMessage = 
+        error?.response?.data?.message ||
+        error?.response?.data?.errors?.[0] ||
+        'Error de cantidad de caracteres';
+      Toast.error(errorMessage);
     },
   });
 
   const { mutate: updateMutate } = useMutation({
-    mutationFn: (data: PostUpdateSchema) =>
+    mutationFn: (data: PostUpdateSchema | ReplySchema) =>
       updatePost(updateInitialData!.id, {
-        title: data.title,
+        title: updateInitialData?.parentPost ? undefined : (data as PostUpdateSchema).title,
         content: data.content,
       }),
     onSuccess: async () => {
@@ -111,19 +141,35 @@ export const PostCreationForm = ({
       onDismiss();
       reset();
     },
-    onError: error => {
-      if (isAxiosError(error)) Toast.error(error.response?.data.message);
-      else Toast.error('Error inesperado');
+    onError: (error: any) => {
+      const errorMessage = 
+        error?.response?.data?.message ||
+        error?.response?.data?.errors?.[0] ||
+        'Error de cantidad de caracteres';
+      Toast.error(errorMessage);
     },
   });
 
   const onSubmit = () => {
-    setValue('content', content || '');
+    const contentValue = content || '';
+    const contentLength = contentValue.length;
+    
+    if (contentLength < 8) {
+      Toast.error('El mensaje debe tener al menos 8 caracteres');
+      return;
+    }
+    
+    if (contentLength > 350) {
+      Toast.error('El mensaje supera los 350 caracteres');
+      return;
+    }
+    
+    setValue('content', contentValue);
     handleSubmit(data => {
       if (updateInitialData) {
-        updateMutate(data as PostUpdateSchema);
+        updateMutate(data as PostUpdateSchema | ReplySchema);
       } else {
-        createMutate(data as PostCreationSchema);
+        createMutate(data as PostCreationSchema | ReplySchema);
       }
     })();
   };
@@ -139,11 +185,11 @@ export const PostCreationForm = ({
             <FormTextInput
               control={control}
               name="title"
-              label="Titulo"
+              label="Título"
               mode="outlined"
             />
           )}
-          {errors.title && (
+          {'title' in errors && errors.title && (
             <HelperText type="error">{errors.title.message}</HelperText>
           )}
           <RichTextEditor editor={editor} />

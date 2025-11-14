@@ -19,6 +19,7 @@ import { FilesToUpload } from '../../courses/types';
 import { createResource, modifyResource } from '../service';
 import { FormValues, createSchema, updateSchema } from '../validator';
 import { useUserInfo } from '@alum-net/users';
+import { getAxiosErrorMessage } from '../../users/service';
 import { isAxiosError } from 'axios';
 import { LibraryResourceUpdateRequest } from '../types';
 
@@ -30,6 +31,7 @@ export const FileUploadForm = ({ resourceToEdit }: FileUploadFormProps) => {
   const [selectedFile, setSelectedFile] = useState<FilesToUpload>();
   const [isLoading, setIsLoading] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [serverMessage, setServerMessage] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const { data: userInfo } = useUserInfo();
   const { data: labels, isLoading: loadingLabels } = useLabels();
@@ -56,6 +58,12 @@ export const FileUploadForm = ({ resourceToEdit }: FileUploadFormProps) => {
     if (userInfo?.email) setValue('creatorEmail', userInfo.email);
   }, [userInfo, setValue]);
 
+  useEffect(() => {
+    if (isVisible) {
+      setServerMessage(null);
+    }
+  }, [isVisible]);
+
   const { mutate: createResourceMutation, isPending: isCreating } = useMutation(
     {
       mutationFn: createResource,
@@ -68,9 +76,8 @@ export const FileUploadForm = ({ resourceToEdit }: FileUploadFormProps) => {
       },
       onError: (err: unknown) => {
         setIsLoading(false);
-        if (isAxiosError(err))
-          setError('file.name', { message: err.response?.data.message });
-        Toast.error('Error al crear el recurso');
+        const errorMessage = getAxiosErrorMessage(err);
+        setServerMessage(errorMessage);
         console.error(err);
       },
     },
@@ -88,9 +95,8 @@ export const FileUploadForm = ({ resourceToEdit }: FileUploadFormProps) => {
     },
     onError: (err: unknown) => {
       setIsLoading(false);
-      if (isAxiosError(err))
-        setError('root.serverError', { message: err.response?.data.message });
-      Toast.error('Error al modificar el recurso');
+      const errorMessage = getAxiosErrorMessage(err);
+      setServerMessage(errorMessage);
       console.error(err);
     },
   });
@@ -111,6 +117,7 @@ export const FileUploadForm = ({ resourceToEdit }: FileUploadFormProps) => {
           type: file.mimeType || 'application/octet-stream',
         });
         setValue('file', file);
+        setServerMessage(null);
       }
     } catch (e) {
       console.error('File selection error:', e);
@@ -138,6 +145,7 @@ export const FileUploadForm = ({ resourceToEdit }: FileUploadFormProps) => {
     setIsVisible(false);
     setIsLoading(false);
     setSelectedFile(undefined);
+    setServerMessage(null);
     reset({
       creatorEmail: userInfo?.email ?? '',
       title: resourceToEdit?.title ?? '',
@@ -172,7 +180,7 @@ export const FileUploadForm = ({ resourceToEdit }: FileUploadFormProps) => {
                 <HelperText type="error">{errors.title.message}</HelperText>
               )}
 
-              <Text style={styles.label}>Etiquetas *</Text>
+              <Text style={styles.label}>Etiquetas</Text>
               {loadingLabels ? (
                 <ActivityIndicator />
               ) : (
@@ -181,12 +189,12 @@ export const FileUploadForm = ({ resourceToEdit }: FileUploadFormProps) => {
                     <Button
                       key={label.id}
                       mode={
-                        watch('labelIds').includes(label.id)
+                        (watch('labelIds') || []).includes(label.id)
                           ? 'contained'
                           : 'outlined'
                       }
                       onPress={() => {
-                        const current = watch('labelIds');
+                        const current = watch('labelIds') || [];
                         const newSelection = current.includes(label.id)
                           ? current.filter(id => id !== label.id)
                           : [...current, label.id];
@@ -232,6 +240,11 @@ export const FileUploadForm = ({ resourceToEdit }: FileUploadFormProps) => {
               {errors.root?.serverError && (
                 <HelperText type="error">
                   {errors.root.serverError.message}
+                </HelperText>
+              )}
+              {serverMessage && (
+                <HelperText type="error">
+                  {serverMessage}
                 </HelperText>
               )}
 
@@ -292,5 +305,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     gap: 8,
+  },
+  serverError: {
+    marginTop: 8,
+    fontSize: 14,
   },
 });

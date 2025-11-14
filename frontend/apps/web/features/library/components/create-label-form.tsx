@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { createLabel, modifyLabel } from '../service';
 import { QUERY_KEYS } from '@alum-net/api';
 import { Label } from '@alum-net/library';
+import { getAxiosErrorMessage } from '../../users/service';
 import { UpdateLabelRequest } from '../types';
 import { FontAwesome } from '@expo/vector-icons';
 
@@ -48,8 +49,8 @@ export const CreateLabelForm = ({ labelToEdit }: CreateLabelFormProps) => {
       Toast.success('Etiqueta creada correctamente');
     },
     onError: (error: unknown) => {
-      console.log(error);
-      Toast.error('Error inesperado creando la etiqueta');
+      const errorMessage = getAxiosErrorMessage(error);
+      Toast.error(errorMessage);
     },
   });
 
@@ -70,8 +71,8 @@ export const CreateLabelForm = ({ labelToEdit }: CreateLabelFormProps) => {
       Toast.success('Etiqueta modificada correctamente');
     },
     onError: (error: unknown) => {
-      console.log(error);
-      Toast.error('Error inesperado modificando la etiqueta');
+      const errorMessage = getAxiosErrorMessage(error);
+      Toast.error(errorMessage);
     },
   });
 

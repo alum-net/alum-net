@@ -52,16 +52,22 @@ export async function getUserActivity(
 ): Promise<PageableResponse<UserActivityLog>> {
   const { data } = await api.get<PageableResponse<UserActivityLog>>(
     `/users/${encodeURIComponent(userId)}/user-activity`,
-    { params: page !== undefined ? { page } : {} },
+    { 
+      params: {
+        ...(page !== undefined ? { page } : {}),
+        sort: 'timestamp,desc'
+      }
+    },
   );
 
   return data;
 }
 
 export function getAxiosErrorMessage(e: any): string {
+  const responseData = e?.response?.data;
   const msg =
-    e?.response?.data?.message ||
-    e?.response?.data?.errors?.[0] ||
+    (responseData?.errors && Array.isArray(responseData.errors) && responseData.errors.length > 0 && responseData.errors[0]) ||
+    responseData?.message ||
     e?.message ||
     'Error inesperado';
   return String(msg);
