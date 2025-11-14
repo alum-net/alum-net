@@ -73,7 +73,7 @@ export interface CourseContent {
 
 export enum EventType {
   QUESTIONNAIRE = 'questionnaire',
-  ONSITE = 'on-site',
+  ONSITE = 'onsite',
   TASK = 'task',
 }
 

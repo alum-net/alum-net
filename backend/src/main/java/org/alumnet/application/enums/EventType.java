@@ -1,17 +1,16 @@
 package org.alumnet.application.enums;
 
-
 import lombok.Getter;
 
 @Getter
 public enum EventType {
-    TASK("task"),
-    QUESTIONNAIRE("questionnaire"),
-    ONSITE("on-site");
+	TASK("task"),
+	QUESTIONNAIRE("questionnaire"),
+	ONSITE("onsite");
 
-    private final String value;
+	private final String value;
 
-     EventType(String value) {
-        this.value = value;
-    }
+	EventType(String value) {
+		this.value = value;
+	}
 }

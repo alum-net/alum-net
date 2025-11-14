@@ -9,10 +9,10 @@ import org.alumnet.application.enums.EventType;
 @Getter
 @Setter
 @Entity
-@DiscriminatorValue("on-site")
-public class OnSite extends Event{
-    @Override
-    public EventType getType(){
-        return EventType.ONSITE;
-    }
+@DiscriminatorValue("onsite")
+public class OnSite extends Event {
+	@Override
+	public EventType getType() {
+		return EventType.ONSITE;
+	}
 }

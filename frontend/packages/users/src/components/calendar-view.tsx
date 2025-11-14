@@ -13,9 +13,9 @@ import {
   mapDateToString,
 } from '../helpers';
 import AgendaItem from './agenda-item';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { QUERY_KEYS } from '@alum-net/api';
-import { View } from 'react-native';
+import { useFocusEffect } from 'expo-router';
 
 const today = new Date();
 const todayDateData: DateData = {
@@ -28,7 +28,7 @@ const todayDateData: DateData = {
 
 export const Calendar = ({ width }: { width: number }) => {
   const [activeDate, setActiveDate] = useState<DateData>(todayDateData);
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, refetch } = useQuery({
     queryKey: [QUERY_KEYS.getUserCalendar],
     queryFn: getUserCalendar,
   });
@@ -42,6 +42,12 @@ export const Calendar = ({ width }: { width: number }) => {
   useEffect(() => {
     setMarkedDates(getMarkedDates(mapEventsToAgendaItems(data?.data ?? [])));
   }, [data]);
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch]),
+  );
 
   return (
     <CalendarProvider

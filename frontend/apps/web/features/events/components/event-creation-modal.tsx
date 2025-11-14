@@ -28,7 +28,9 @@ const answerSchema = z.object({
 const questionSchema = z
   .object({
     text: z.string().trim().min(5, 'Mínimo 5 caracteres').max(500),
-    answers: z.array(answerSchema).length(4, 'Debe completar las 4 opciones de respuesta'),
+    answers: z
+      .array(answerSchema)
+      .length(4, 'Debe completar las 4 opciones de respuesta'),
   })
   .refine(question => question.answers.some(answer => answer.correct), {
     message: 'Debe haber al menos una respuesta correcta',
@@ -71,13 +73,20 @@ const questionnaireSchema = z
     durationInMinutes: z.union([z.number(), z.undefined()]),
     questions: z.array(questionSchema).min(1, 'Agregá al menos una pregunta'),
   })
+  .refine(data => data.durationInMinutes !== undefined, {
+    message: 'La duración es requerida',
+    path: ['durationInMinutes'],
+  })
   .refine(
-    data => data.durationInMinutes !== undefined,
-    { message: 'La duración es requerida', path: ['durationInMinutes'] }
-  )
-  .refine(
-    data => typeof data.durationInMinutes === 'number' && Number.isInteger(data.durationInMinutes) && data.durationInMinutes >= 1 && data.durationInMinutes <= 600,
-    { message: 'La duración debe ser un número entero entre 1 y 600 minutos', path: ['durationInMinutes'] }
+    data =>
+      typeof data.durationInMinutes === 'number' &&
+      Number.isInteger(data.durationInMinutes) &&
+      data.durationInMinutes >= 1 &&
+      data.durationInMinutes <= 600,
+    {
+      message: 'La duración debe ser un número entero entre 1 y 600 minutos',
+      path: ['durationInMinutes'],
+    },
   );
 
 const eventSchema = z.discriminatedUnion('type', [
@@ -490,7 +499,9 @@ export default function EventCreationModal({
                             Opciones de respuesta
                           </Text>
                           {[0, 1, 2, 3].map(answerIndex => {
-                            const answerError = (errors as any).questions?.[questionIndex]?.answers?.[answerIndex];
+                            const answerError = (errors as any).questions?.[
+                              questionIndex
+                            ]?.answers?.[answerIndex];
                             return (
                               <View
                                 key={answerIndex}
@@ -522,9 +533,13 @@ export default function EventCreationModal({
                               </View>
                             );
                           })}
-                          {(errors as any).questions?.[questionIndex]?.answers?.message && (
+                          {(errors as any).questions?.[questionIndex]?.answers
+                            ?.message && (
                             <Text style={styles.errorText}>
-                              {(errors as any).questions[questionIndex]?.answers?.message}
+                              {
+                                (errors as any).questions[questionIndex]
+                                  ?.answers?.message
+                              }
                             </Text>
                           )}
                         </View>

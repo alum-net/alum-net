@@ -31,10 +31,10 @@ export default function WebHeader() {
       | '/messaging';
     badge?: number;
   }[] = [
-    { label: 'Cursos', route: '/courses' },
     ...(userInfo?.role !== UserRole.admin
       ? [{ label: 'Inicio', route: '/home' as const }]
       : []),
+    { label: 'Cursos', route: '/courses' },
     ...(userInfo?.role === UserRole.admin
       ? [{ label: 'Usuarios', route: '/users' as const }]
       : []),

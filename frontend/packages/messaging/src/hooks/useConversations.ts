@@ -7,7 +7,7 @@ export const useConversations = (userRole: UserRole | undefined) => {
   const refetch = userRole && userRole !== UserRole.admin;
   return useQuery({
     queryKey: [QUERY_KEYS.getConversations],
-    queryFn: () => (refetch ? getConversations() : []),
+    queryFn: () => getConversations(),
     enabled: refetch,
     staleTime: 10_000,
     refetchOnWindowFocus: refetch,

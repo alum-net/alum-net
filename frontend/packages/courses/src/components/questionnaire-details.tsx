@@ -253,24 +253,6 @@ export const QuestionnaireDetails: React.FC<QuestionnaireDetailsProps> = ({
                   (new Date(data!.startDate) < new Date() ? (
                     data?.studentsWithPendingSubmission.includes(
                       userInfo!.email,
-                    ) && (
-                      <Button
-                        mode="contained"
-                        onPress={handleStart}
-                        style={styles.startButton}
-                      >
-                        Comenzar cuestionario
-                      </Button>
-                    )
-                  ) : (
-                    <HelperText type="info">
-                      Todavia no puedes comenzar el cuestionario
-                    </HelperText>
-                  ))}
-                {!started &&
-                  (new Date(data!.startDate) < new Date() ? (
-                    data?.studentsWithPendingSubmission.includes(
-                      userInfo!.email,
                     ) ? (
                       <Button
                         mode="contained"
@@ -281,7 +263,7 @@ export const QuestionnaireDetails: React.FC<QuestionnaireDetailsProps> = ({
                       </Button>
                     ) : (
                       <Text style={{ color: 'green' }}>
-                        Estamos corrigiendo tu cuestionario!
+                        Estamos corrigiendo tus resultados
                       </Text>
                     )
                   ) : (

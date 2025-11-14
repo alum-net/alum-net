@@ -48,8 +48,6 @@ export const logout = async () => {
     const logoutUrl = `${discoveryDocument!
       .endSessionEndpoint!}?client_id=${keycloakClientId}&post_logout_redirect_uri=${redirectUrl}&id_token_hint=${idToken}`;
     await WebBrowser.openAuthSessionAsync(logoutUrl, redirectUrl);
-  } catch (error) {
-    console.log(error);
   } finally {
     storage.clearAll();
   }

@@ -12,7 +12,7 @@ import { QUERY_KEYS } from '@alum-net/api';
 import { isAxiosError } from 'axios';
 
 export const mapEventTypeToString = (type: EventType) => {
-  switch (type) {
+  switch (type.toLowerCase()) {
     case EventType.TASK:
       return 'Tarea';
     case EventType.ONSITE:
@@ -34,7 +34,7 @@ export function SectionContent({
   const queryClient = useQueryClient();
   const [confirmVisible, setConfirmVisible] = useState(false);
   const [eventIdToDelete, setEventIdToDelete] = useState<number | null>(null);
-  
+
   const { mutate } = useMutation({
     mutationFn: (id: number) => deleteEvent(id),
     onSuccess: async () => {
@@ -108,6 +108,7 @@ export function SectionContent({
                 pathname: '/event/[id]',
                 params: { id: event.id, type: event.type },
               }}
+              disabled={userInfo?.role === UserRole.admin}
               asChild
             >
               <Button

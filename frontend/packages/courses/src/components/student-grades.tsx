@@ -70,7 +70,9 @@ export const StudentGradesCard = ({
           ) : (
             <>
               <Text>{`Nota final: ${grades?.finalGrade}`}</Text>
-              <Text>{`Nota minima de aprobación: ${grades?.approvalGrade}`}</Text>
+              {grades?.approvalGrade && (
+                <Text>{`Nota minima de aprobación: ${grades?.approvalGrade * 100}`}</Text>
+              )}
               <Text>
                 {grades?.approved
                   ? '¡Felicidades! Has aprobado el curso.'
