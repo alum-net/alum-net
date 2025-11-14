@@ -975,12 +975,128 @@
 					"response": []
 				},
 				{
-					"name": "GetGrades Copy",
+					"name": "GetGrades",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"",
+									"function runInitProcess() {",
+									"    loginStudent(function(){});",
+									"}",
+									"",
+									"runInitProcess();",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"El status code es el esperado\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test(\"El mensaje de la respuesta es el esperado\", function () {",
+									"    pm.expect(jsonData.message).to.eql(\"Se obtuvieron las notas correctamente\");",
+									"});",
+									"",
+									"// Helper para verificar presencia de claves",
+									"function hasAllKeys(obj, keys) {",
+									"    return keys.every(k => Object.prototype.hasOwnProperty.call(obj, k));",
+									"}",
+									"",
+									"const json = pm.response.json();",
+									"",
+									"// ✅ Validar claves dentro de data",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () {",
+									"    const expectedDataKeys = [",
+									"        \"approvalGrade\",",
+									"        \"approved\",",
+									"        \"eventGrades\",",
+									"        \"finalGrade\",",
+									"        \"unrated\"",
+									"    ];",
+									"",
+									"    pm.expect(hasAllKeys(json.data, expectedDataKeys)).to.be.true;",
+									"",
+									"    // Validaciones de tipo básicas",
+									"    pm.expect(json.data.approvalGrade).to.be.a(\"number\");",
+									"    pm.expect(json.data.approved).to.be.a(\"boolean\");",
+									"    pm.expect(json.data.eventGrades).to.be.an(\"array\");",
+									"    pm.expect(json.data.unrated).to.be.a(\"boolean\");",
+									"});",
+									"",
+									"// ✅ Validar valores exactos esperados",
+									"pm.test(\"Los valores de la respuesta son los esperados\", function () {",
+									"    pm.expect(json.data.approvalGrade).to.eql(0.7);",
+									"    pm.expect(json.data.approved).to.eql(false);",
+									"    pm.expect(json.data.unrated).to.eql(true);",
+									"",
+									"    // finalGrade debe ser null",
+									"    pm.expect(json.data.finalGrade).to.eql(null);",
+									"",
+									"    // Validar eventGrades",
+									"    pm.expect(json.data.eventGrades.length).to.eql(1);",
+									"",
+									"    const event = json.data.eventGrades[0];",
+									"",
+									"    const expectedEvent = {",
+									"        grade: 0.6,",
+									"        maxGrade: 30.0,",
+									"        title: \"Cuestionario 3\",",
+									"        type: \"QUESTIONNAIRE\",",
+									"        unrated: false",
+									"    };",
+									"",
+									"    pm.expect(event.grade).to.eql(expectedEvent.grade);",
+									"    pm.expect(event.maxGrade).to.eql(expectedEvent.maxGrade);",
+									"    pm.expect(event.title).to.eql(expectedEvent.title);",
+									"    pm.expect(event.type).to.eql(expectedEvent.type);",
+									"    pm.expect(event.unrated).to.eql(expectedEvent.unrated);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": ""
+							"raw": "{{alumnetUrl}}/api/courses/{{id_curso}}/grades/student@alumnet.com",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"courses",
+								"{{id_curso}}",
+								"grades",
+								"student@alumnet.com"
+							]
 						}
 					},
 					"response": []
@@ -1100,7 +1216,7 @@
 					"response": []
 				},
 				{
-					"name": "Course grade submission Copy",
+					"name": "Course grade submission ???",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -1124,15 +1240,7 @@
 							}
 						},
 						"url": {
-							"raw": "\"/{courseId}/grades/{userEmail}\"",
-							"host": [
-								"\""
-							],
-							"path": [
-								"{courseId}",
-								"grades",
-								"{userEmail}\""
-							]
+							"raw": ""
 						}
 					},
 					"response": []
@@ -1632,7 +1740,101 @@
 					"response": []
 				},
 				{
-					"name": "GetCalendarEvents Copy",
+					"name": "GetCalendarEvents",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"",
+									"function runInitProcess() {",
+									"    loginStudent(function(){});",
+									"}",
+									"",
+									"runInitProcess();",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"El status code es el esperado\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test(\"El mensaje de la respuesta es el esperado\", function () {",
+									"    pm.expect(jsonData.message).to.eql(\"Se devuelven los eventos asociados\");",
+									"});",
+									"",
+									"// Helper para verificar presencia de claves",
+									"function hasAllKeys(obj, keys) {",
+									"    return keys.every(k => Object.prototype.hasOwnProperty.call(obj, k));",
+									"}",
+									"",
+									"const json = pm.response.json();",
+									"",
+									"// ✅ Validar estructura principal y claves",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () {",
+									"    // data debe ser array",
+									"    pm.expect(json.data).to.be.an(\"array\");",
+									"    pm.expect(json.data.length).to.be.above(0);",
+									"",
+									"    const expectedKeys = [",
+									"        \"courseId\",",
+									"        \"courseName\",",
+									"        \"description\",",
+									"        \"endDate\",",
+									"        \"eventId\",",
+									"        \"startDate\",",
+									"        \"title\",",
+									"        \"type\"",
+									"    ];",
+									"",
+									"    const item = json.data[0];",
+									"",
+									"    pm.expect(hasAllKeys(item, expectedKeys)).to.be.true;",
+									"",
+									"    // Validaciones de tipo básicas",
+									"    pm.expect(item.courseId).to.be.a(\"number\");",
+									"    pm.expect(item.courseName).to.be.a(\"string\");",
+									"    pm.expect(item.description).to.be.a(\"string\");",
+									"    pm.expect(item.endDate).to.be.a(\"string\");",
+									"    pm.expect(item.eventId).to.be.a(\"number\");",
+									"    pm.expect(item.startDate).to.be.a(\"string\");",
+									"    pm.expect(item.title).to.be.a(\"string\");",
+									"    pm.expect(item.type).to.be.a(\"string\");",
+									"});",
+									"",
+									"// ✅ Validar valores exactos esperados",
+									"pm.test(\"Los valores de la respuesta son los esperados\", function () {",
+									"    const item = json.data[0];",
+									"",
+									"    pm.expect(item.courseId).to.eql(1);",
+									"    pm.expect(item.courseName).to.eql(\"curso6-verificar-create-section\");",
+									"    pm.expect(item.description).to.eql(\"Cuestionario de Java\");",
+									"    pm.expect(item.endDate).to.eql(\"2025-11-30T19:00:00\");",
+									"    pm.expect(item.eventId).to.eql(1);",
+									"    pm.expect(item.startDate).to.eql(\"2025-11-20T17:00:00\");",
+									"    pm.expect(item.title).to.eql(\"Cuestionario 3\");",
+									"    pm.expect(item.type).to.eql(\"QUESTIONNAIRE\");",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -1661,12 +1863,97 @@
 					"response": []
 				},
 				{
-					"name": "GetUserActivity Copy",
+					"name": "GetUserActivity",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"",
+									"function runInitProcess() {",
+									"    getAccessToken(function () {})",
+									"}",
+									"runInitProcess();"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"",
+									"pm.test(\"La solicitud fue exitosa (status 200)\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"El mensaje de la respuesta es el esperado\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.message).to.eql(\"Registros de actividad obtenidos exitosamente\");",
+									"});",
+									"",
+									"",
+									"pm.test(\"Los elementos de 'data' contienen las claves esperadas\", function () {",
+									"    const json = pm.response.json();",
+									"",
+									"    const requiredKeys = [",
+									"        \"description\",",
+									"        \"id\",",
+									"        \"resourceId\",",
+									"        \"timestamp\",",
+									"        \"type\",",
+									"        \"userEmail\"",
+									"    ];",
+									"",
+									"    json.data.forEach((item, index) => {",
+									"        requiredKeys.forEach(key => {",
+									"            pm.expect(item, `El elemento ${index} debe contener la clave '${key}'`).to.have.property(key);",
+									"        });",
+									"",
+									"    pm.expect(json).to.have.property(\"data\");",
+									"    pm.expect(json).to.have.property(\"errors\");",
+									"    pm.expect(json).to.have.property(\"message\");",
+									"    pm.expect(json).to.have.property(\"pageNumber\");",
+									"    pm.expect(json).to.have.property(\"pageSize\");",
+									"    pm.expect(json).to.have.property(\"totalElements\");",
+									"    pm.expect(json).to.have.property(\"totalPages\");",
+									"    });",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": ""
+							"raw": "{{alumnetUrl}}/api/users/student@alumnet.com/user-activity",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"student@alumnet.com",
+								"user-activity"
+							]
 						}
 					},
 					"response": []
