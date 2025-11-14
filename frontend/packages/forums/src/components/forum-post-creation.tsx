@@ -15,6 +15,7 @@ import { useForm } from 'react-hook-form';
 import { Button, Dialog, HelperText, Portal } from 'react-native-paper';
 
 import { z } from 'zod';
+import { isAxiosError } from 'axios';
 
 const titleValidation = z.string().min(1, 'El título no puede estar vacío');
 
@@ -115,6 +116,7 @@ export const PostCreationForm = ({
         content: '',
       });
       onDismiss();
+      reset();
     },
     onError: (error: any) => {
       const errorMessage = 
@@ -137,6 +139,7 @@ export const PostCreationForm = ({
         queryKey: [QUERY_KEYS.getForumPosts],
       });
       onDismiss();
+      reset();
     },
     onError: (error: any) => {
       const errorMessage = 

@@ -16,6 +16,7 @@ type ToastConfig = {
   message: string;
   type: ToastType;
   duration?: number;
+  position?: 'top' | 'bottom';
 };
 
 type ToastContextType = {
@@ -49,7 +50,7 @@ type ToastProviderProps = {
 export function ToastProvider({ children }: ToastProviderProps) {
   const [toastConfig, setToastConfig] = useState<ToastConfig | null>(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const translateY = useRef(new Animated.Value(20)).current;
+  const translateY = useRef(new Animated.Value(0)).current;
   const timeoutRef = useRef<NodeJS.Timeout | number>();
   const insets = useSafeAreaInsets();
 
@@ -59,7 +60,12 @@ export function ToastProvider({ children }: ToastProviderProps) {
         clearTimeout(timeoutRef.current);
       }
 
+      const position = config.position || 'bottom';
+      const initialTranslateY = position === 'top' ? -100 : 20;
+      const targetTranslateY = 0;
+
       setToastConfig(config);
+      translateY.setValue(initialTranslateY);
 
       Animated.parallel([
         Animated.timing(fadeAnim, {
@@ -68,7 +74,7 @@ export function ToastProvider({ children }: ToastProviderProps) {
           useNativeDriver: true,
         }),
         Animated.timing(translateY, {
-          toValue: 0,
+          toValue: targetTranslateY,
           duration: 200,
           useNativeDriver: true,
         }),
@@ -82,7 +88,7 @@ export function ToastProvider({ children }: ToastProviderProps) {
             useNativeDriver: true,
           }),
           Animated.timing(translateY, {
-            toValue: 20,
+            toValue: initialTranslateY,
             duration: 200,
             useNativeDriver: true,
           }),
@@ -123,7 +129,9 @@ export function ToastProvider({ children }: ToastProviderProps) {
           style={[
             styles.container,
             getToastStyle(toastConfig.type),
-            { bottom: insets.bottom + 16 },
+            toastConfig.position === 'top'
+              ? { top: insets.top + 16 }
+              : { bottom: insets.bottom + 16 },
             { opacity: fadeAnim, transform: [{ translateY }] },
           ]}
         >
@@ -198,36 +206,52 @@ const styles = StyleSheet.create({
 
 // Component with static methods that use the ToastService
 export const Toast = {
-  success: (message: string, duration?: number) => {
+  success: (
+    message: string,
+    duration?: number,
+    position?: 'top' | 'bottom',
+  ) => {
     if (ToastService.showToast) {
-      ToastService.showToast({ message, type: 'success', duration });
+      ToastService.showToast({ message, type: 'success', duration, position });
     } else {
       console.warn(
         'Toast service not initialized. Make sure ToastProvider is mounted.',
       );
     }
   },
-  error: (message: string, duration?: number) => {
+  error: (
+    message: string,
+    duration?: number,
+    position?: 'top' | 'bottom',
+  ) => {
     if (ToastService.showToast) {
-      ToastService.showToast({ message, type: 'error', duration });
+      ToastService.showToast({ message, type: 'error', duration, position });
     } else {
       console.warn(
         'Toast service not initialized. Make sure ToastProvider is mounted.',
       );
     }
   },
-  info: (message: string, duration?: number) => {
+  info: (
+    message: string,
+    duration?: number,
+    position?: 'top' | 'bottom',
+  ) => {
     if (ToastService.showToast) {
-      ToastService.showToast({ message, type: 'info', duration });
+      ToastService.showToast({ message, type: 'info', duration, position });
     } else {
       console.warn(
         'Toast service not initialized. Make sure ToastProvider is mounted.',
       );
     }
   },
-  subtle: (message: string, duration?: number) => {
+  subtle: (
+    message: string,
+    duration?: number,
+    position?: 'top' | 'bottom',
+  ) => {
     if (ToastService.showToast) {
-      ToastService.showToast({ message, type: 'subtle', duration });
+      ToastService.showToast({ message, type: 'subtle', duration, position });
     } else {
       console.warn(
         'Toast service not initialized. Make sure ToastProvider is mounted.',

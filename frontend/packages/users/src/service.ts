@@ -129,4 +129,8 @@ export const updateUser = async (userEmail: string, data: UpdatePayload) => {
 };
 
 export const getUserCalendar = async () =>
-  (await api.get<Response<CalendarEvent[]>>('/users/calendar-events')).data;
+  (
+    await api.get<Response<CalendarEvent[]>>(
+      `/users/calendar-events?since=${new Date().toISOString()}`,
+    )
+  ).data;

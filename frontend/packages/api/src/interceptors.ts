@@ -1,6 +1,13 @@
-import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import axios, {
+  AxiosError,
+  AxiosResponse,
+  InternalAxiosRequestConfig,
+} from 'axios';
 import { storage, STORAGE_KEYS } from '@alum-net/storage';
 import { logout, refresh } from '@alum-net/auth';
+import { Response } from './types';
+import { Platform } from 'react-native';
+import { Toast } from '@alum-net/ui';
 
 export const accessTokenInterceptor = (config: InternalAxiosRequestConfig) => {
   const token = storage.getString(STORAGE_KEYS.ACCESS_TOKEN);
@@ -32,4 +39,16 @@ export const refreshTokenInterceptor = async (error: AxiosError<Response>) => {
     console.log(error);
     return await logout();
   }
+};
+
+export const notificationHandlerInterceptor = (
+  response: AxiosResponse<Response>,
+) => {
+  if (Platform.OS !== 'web') return response;
+  if (response.data.notifications && response.data.notifications.length > 0) {
+    response.data.notifications.forEach(notification => {
+      Toast.info(notification.message, 5000, 'top');
+    });
+  }
+  return response;
 };

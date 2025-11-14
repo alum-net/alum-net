@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Platform } from 'react-native';
 import {
   Card,
   Text,
@@ -21,6 +21,7 @@ import {
   submitQuestionnaireResponses,
   SubmitQuestionnaireRequest,
 } from '../service';
+import { isAxiosError } from 'axios';
 
 type QuestionnaireDetailsProps = {
   data?: Event;
@@ -100,8 +101,8 @@ export const QuestionnaireDetails: React.FC<QuestionnaireDetailsProps> = ({
       Toast.success('Respuestas enviadas correctamente');
     },
     onError: err => {
-      console.error(err);
-      Toast.error('Error al enviar las respuestas');
+      if (isAxiosError(err)) Toast.error(err.response?.data.message);
+      else Toast.error('Error al enviar las respuestas');
       setConfirmOpen(false);
     },
   });
@@ -242,103 +243,140 @@ export const QuestionnaireDetails: React.FC<QuestionnaireDetailsProps> = ({
           </View>
         ) : (
           <View style={styles.quizBox}>
-            {!started &&
-              (new Date(data!.startDate) < new Date() ? (
-                data?.studentsWithPendingSubmission.includes(
-                  userInfo!.email,
-                ) ? (
-                  <Button
-                    mode="contained"
-                    onPress={handleStart}
-                    style={styles.startButton}
-                  >
-                    Comenzar cuestionario
-                  </Button>
-                ) : (
-                  <Text style={{ color: 'green' }}>
-                    Estamos corrigiendo tu cuestionario!
-                  </Text>
-                )
-              ) : (
-                <HelperText type="info">
-                  Todavia no puedes comenzar el cuestionario
-                </HelperText>
-              ))}
-
-            {started && (
+            {submitted ? (
+              <Text style={{ color: 'green' }}>
+                Estamos corrigiendo tus resultados
+              </Text>
+            ) : (
               <>
-                {remainingSeconds !== null && (
-                  <Text variant="bodyLarge" style={{ marginBottom: 8 }}>
-                    <Text style={{ fontWeight: '700' }}>Tiempo restante: </Text>
-                    {Math.floor((remainingSeconds ?? 0) / 60)}:
-                    {String((remainingSeconds ?? 0) % 60).padStart(2, '0')}
-                  </Text>
-                )}
-                <Text variant="titleMedium">
-                  Pregunta {currentIndex + 1} de {totalQuestions}
-                </Text>
-                <Text style={styles.questionText}>{currentQuestion.text}</Text>
-
-                <RadioButton.Group
-                  onValueChange={value =>
-                    selectAnswer(currentQuestion.id, Number(value))
-                  }
-                  value={
-                    answers[currentQuestion.id]
-                      ? String(answers[currentQuestion.id])
-                      : ''
-                  }
-                >
-                  {(currentQuestion.answers as unknown as EventAnswer[]).map(
-                    ans => (
-                      <RadioButton.Item
-                        key={ans.id}
-                        label={ans.text}
-                        value={String(ans.id)}
-                      />
-                    ),
-                  )}
-                </RadioButton.Group>
-
-                <View style={styles.navRow}>
-                  <Button
-                    mode="outlined"
-                    onPress={handlePrevious}
-                    disabled={currentIndex === 0 || submitted}
-                  >
-                    Anterior pregunta
-                  </Button>
-                  {currentIndex < totalQuestions - 1 ? (
-                    <Button
-                      mode="contained"
-                      onPress={handleNext}
-                      disabled={submitted}
-                    >
-                      Siguiente pregunta
-                    </Button>
+                {!started &&
+                  (new Date(data!.startDate) < new Date() ? (
+                    data?.studentsWithPendingSubmission.includes(
+                      userInfo!.email,
+                    ) && (
+                      <Button
+                        mode="contained"
+                        onPress={handleStart}
+                        style={styles.startButton}
+                      >
+                        Comenzar cuestionario
+                      </Button>
+                    )
                   ) : (
-                    <Button
-                      mode="contained"
-                      onPress={() => setConfirmOpen(true)}
-                      disabled={submitted}
-                    >
-                      Enviar respuestas
-                    </Button>
-                  )}
-                </View>
+                    <HelperText type="info">
+                      Todavia no puedes comenzar el cuestionario
+                    </HelperText>
+                  ))}
+                {!started &&
+                  (new Date(data!.startDate) < new Date() ? (
+                    data?.studentsWithPendingSubmission.includes(
+                      userInfo!.email,
+                    ) ? (
+                      <Button
+                        mode="contained"
+                        onPress={handleStart}
+                        style={styles.startButton}
+                      >
+                        Comenzar cuestionario
+                      </Button>
+                    ) : (
+                      <Text style={{ color: 'green' }}>
+                        Estamos corrigiendo tu cuestionario!
+                      </Text>
+                    )
+                  ) : (
+                    <HelperText type="info">
+                      Todavia no puedes comenzar el cuestionario
+                    </HelperText>
+                  ))}
+                {started && (
+                  <>
+                    {remainingSeconds !== null && (
+                      <Text variant="bodyLarge" style={{ marginBottom: 8 }}>
+                        <Text style={{ fontWeight: '700' }}>
+                          Tiempo restante:{' '}
+                        </Text>
+                        {Math.floor((remainingSeconds ?? 0) / 60)}:
+                        {String((remainingSeconds ?? 0) % 60).padStart(2, '0')}
+                      </Text>
+                    )}
+                    <Text variant="titleMedium">
+                      Pregunta {currentIndex + 1} de {totalQuestions}
+                    </Text>
+                    <Text style={styles.questionText}>
+                      {currentQuestion.text}
+                    </Text>
 
-                <View style={{ marginTop: 12 }}>
-                  <Button mode="text" onPress={handleSkip} disabled={submitted}>
-                    Omitir pregunta
-                  </Button>
-                </View>
+                    <RadioButton.Group
+                      onValueChange={value =>
+                        selectAnswer(currentQuestion.id, Number(value))
+                      }
+                      value={
+                        answers[currentQuestion.id]
+                          ? String(answers[currentQuestion.id])
+                          : ''
+                      }
+                    >
+                      {(
+                        currentQuestion.answers as unknown as EventAnswer[]
+                      ).map(ans => (
+                        <RadioButton.Item
+                          key={ans.id}
+                          label={ans.text}
+                          value={String(ans.id)}
+                        />
+                      ))}
+                    </RadioButton.Group>
+
+                    <View style={styles.navRow}>
+                      <Button
+                        mode="outlined"
+                        onPress={handlePrevious}
+                        disabled={currentIndex === 0 || submitted}
+                      >
+                        Anterior pregunta
+                      </Button>
+                      {currentIndex < totalQuestions - 1 ? (
+                        <Button
+                          mode="contained"
+                          onPress={handleNext}
+                          disabled={submitted}
+                        >
+                          Siguiente pregunta
+                        </Button>
+                      ) : (
+                        <Button
+                          mode="contained"
+                          onPress={() => setConfirmOpen(true)}
+                          disabled={submitted}
+                        >
+                          Enviar respuestas
+                        </Button>
+                      )}
+                    </View>
+                    <View style={{ marginTop: 12 }}>
+                      <Button
+                        mode="text"
+                        onPress={handleSkip}
+                        disabled={
+                          submitted || currentIndex === totalQuestions - 1
+                        }
+                      >
+                        Omitir pregunta
+                      </Button>
+                    </View>
+                  </>
+                )}
               </>
             )}
             {confirmOpen && (
               <Portal>
                 <Dialog
                   visible
-                  style={{ maxWidth: 400, alignSelf: 'center' }}
+                  style={{
+                    maxWidth: 400,
+                    alignSelf: Platform.OS === 'web' ? 'center' : undefined,
+                  }}
                   onDismiss={() => setConfirmOpen(false)}
                 >
                   <Dialog.Title>Enviar cuestionario</Dialog.Title>
@@ -377,8 +415,11 @@ const styles = StyleSheet.create({
   },
   navRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    gap: 20,
     marginTop: 12,
+    alignItems: 'center',
+    flexWrap: 'wrap',
   },
   teacherBox: {
     marginTop: 12,
