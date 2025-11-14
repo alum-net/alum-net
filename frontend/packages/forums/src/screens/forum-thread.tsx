@@ -12,6 +12,7 @@ import { useForumPosts } from '../hooks/useForumPosts';
 import { deletePost } from '../service';
 import { PostCard } from '../components/post-card';
 import { PostCreationForm } from '../components/forum-post-creation';
+import { isAxiosError } from 'axios';
 
 type UserAction = {
   action: 'update' | 'answer' | 'delete' | undefined;
@@ -45,8 +46,9 @@ export const ForumThread = () => {
       Toast.success('Posteo eliminado correctamente');
       dismissAction();
     },
-    onError: () => {
-      Toast.error('No pudimos eliminar el posteo');
+    onError: error => {
+      if (isAxiosError(error)) Toast.error(error.response?.data.message);
+      else Toast.error('Error inesperado eliminando el posteo');
     },
   });
 

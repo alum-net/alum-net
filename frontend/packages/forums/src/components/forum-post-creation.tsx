@@ -14,6 +14,7 @@ import { useForm } from 'react-hook-form';
 import { Button, Dialog, HelperText, Portal } from 'react-native-paper';
 
 import { z } from 'zod';
+import { isAxiosError } from 'axios';
 
 const basePostSchema = z.object({
   title: z.string().optional(),
@@ -53,6 +54,7 @@ export const PostCreationForm = ({
     handleSubmit,
     formState: { errors },
     setValue,
+    reset,
   } = useForm<PostCreationSchema | PostUpdateSchema>({
     resolver: zodResolver(
       updateInitialData || creationParentPost
@@ -87,9 +89,11 @@ export const PostCreationForm = ({
         queryKey: [QUERY_KEYS.getForumPosts],
       });
       onDismiss();
+      reset();
     },
-    onError: () => {
-      Toast.error('Error creando posteo');
+    onError: error => {
+      if (isAxiosError(error)) Toast.error(error.response?.data.message);
+      else Toast.error('Error inesperado');
     },
   });
 
@@ -105,9 +109,11 @@ export const PostCreationForm = ({
         queryKey: [QUERY_KEYS.getForumPosts],
       });
       onDismiss();
+      reset();
     },
-    onError: () => {
-      Toast.error('Error actualizando posteo');
+    onError: error => {
+      if (isAxiosError(error)) Toast.error(error.response?.data.message);
+      else Toast.error('Error inesperado');
     },
   });
 

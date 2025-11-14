@@ -17,7 +17,7 @@ export const mapEventTypeToString = (type: EventType) => {
     case EventType.ONSITE:
       return 'Evento presencial';
     case EventType.QUESTIONNAIRE:
-      return 'Questionario';
+      return 'Cuestionario';
   }
 };
 

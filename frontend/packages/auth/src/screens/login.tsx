@@ -12,6 +12,7 @@ import {
 import { useMMKVString } from 'react-native-mmkv';
 import { storage, STORAGE_KEYS } from '@alum-net/storage';
 import { useEffect } from 'react';
+import { registerLogin } from '../service';
 import { keycloakClientId, keycloakRealm, authScheme } from '../constants';
 
 WebBrowser.maybeCompleteAuthSession();
@@ -53,10 +54,11 @@ export const LoginScreen = () => {
           },
         },
         discovery!,
-      ).then(({ accessToken, refreshToken, idToken }) => {
+      ).then(async ({ accessToken, refreshToken, idToken }) => {
         storage.set(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
         if (idToken) storage.set(STORAGE_KEYS.ID_TOKEN, idToken);
         setRefreshToken(refreshToken);
+        await registerLogin();
       });
     }
   }, [response, discovery, request, setRefreshToken]);

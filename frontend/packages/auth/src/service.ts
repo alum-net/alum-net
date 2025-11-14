@@ -104,3 +104,8 @@ export const getKeyclaokUserInfo = async () => {
     }>;
   }
 };
+
+export const registerLogin = async () => {
+  const { default: api } = await import('@alum-net/api');
+  return await api.post('/users/register-login');
+};

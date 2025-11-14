@@ -1,9 +1,16 @@
+export type WebNotifications = {
+  type: 'ANNOUNCE' | 'GRADE_PUBLICATION';
+  title: string;
+  message: string;
+};
+
 export type Response<T = undefined> = {
   errors: string[];
   message: string;
   success: boolean;
   data?: T;
   statusCode: number;
+  notifications: WebNotifications[];
 };
 
 type Pageable = {

@@ -24,12 +24,8 @@ export default function Course() {
   const nav = useNavigation();
   const { data, isLoading } = useCourse(id.toString());
   const { data: userInfo } = useUserInfo();
-  const [expandedSectionTitle, setExpandedSectionTitle] = useState(
-    data?.data?.sections.data[0].title ?? '',
-  );
-  const [expandedSection, setExpandedSection] = useState<Section | undefined>(
-    data?.data?.sections.data[0],
-  );
+  const [expandedSectionTitle, setExpandedSectionTitle] = useState('');
+  const [expandedSection, setExpandedSection] = useState<Section>();
   const [width, setWidth] = useState(0);
   const buttons = useMemo(() => {
     const array = [];

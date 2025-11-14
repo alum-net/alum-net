@@ -3,6 +3,7 @@ import axios from 'axios';
 import * as Device from 'expo-device';
 import {
   accessTokenInterceptor,
+  notificationHandlerInterceptor,
   refreshTokenInterceptor,
 } from './interceptors';
 
@@ -19,6 +20,7 @@ const api = axios.create({
 });
 
 api.interceptors.request.use(accessTokenInterceptor);
+api.interceptors.response.use(notificationHandlerInterceptor);
 api.interceptors.response.use(res => res, refreshTokenInterceptor);
 
 export default api;
