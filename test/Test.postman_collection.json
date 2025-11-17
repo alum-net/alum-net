@@ -3854,6 +3854,96 @@
 					"response": []
 				},
 				{
+					"name": "Get Unrated Events By Course ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"",
+									"pm.test(\"El status code es el esperado\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () {",
+									"    const json = pm.response.json();",
+									"",
+									"    pm.expect(json).to.have.property(\"data\");",
+									"    pm.expect(json).to.have.property(\"message\");",
+									"        const expectedKeys = [\"id\", \"maxGrade\", \"title\", \"type\"];",
+									"",
+									"    json.data.forEach((item, index) => {",
+									"        expectedKeys.forEach(key => {",
+									"            pm.expect(item, `El elemento ${index} debe contener la clave '${key}'`).to.have.property(key);",
+									"        });",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"El mensaje de la respuesta es el esperado\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.message).to.eql(\"Eventos sin calificar obtenidos exitosamente\");",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// NO SE PUEDEN CREAR SECCIONES PORQUE REQUIEREN ARCHIVOS",
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"",
+									"function runInitProcess() {",
+									"    getAccessToken(function () {",
+									"        getCursoId(\"Test-curso-create-section\", \"curso6-verificar-create-section\", function () {",
+									"            getSectionId(\"student@alumnet.com\", function () { })",
+									"        })",
+									"    })",
+									"}",
+									"",
+									"runInitProcess();",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{alumnetUrl}}/api/events/course/{{id_curso}}",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"events",
+								"course",
+								"{{id_curso}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get Task By Id",
 					"event": [
 						{
@@ -4230,7 +4320,50 @@
 					"response": []
 				},
 				{
-					"name": "SubmitQuest Copy",
+					"name": "SubmitQuest",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"EL status code es el esperado\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () { ",
+									"    pm.expect(jsonData).to.have.all.keys('message');",
+									"});",
+									"",
+									"pm.test(\"El mensaje de la respuesta es el esperado\", function () { ",
+									"    pm.expect(jsonData.message).to.eql('Se guardaron las respuestas exitosamente');",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"",
+									"function runInitProcess() {",
+									"    loginStudent(function(){});",
+									"}",
+									"",
+									"runInitProcess();",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -4246,7 +4379,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"userEmail\": \"student@alumnnet.com\",\r\n    \"responses\": [\r\n        {\r\n            \"questionId\": 1,\r\n            \"answerId\": 4,\r\n            \"timeStamp\": \"2025-11-04T14:55:00\" \r\n        }\r\n    ]\r\n}",
+							"raw": "{\r\n    \"userEmail\": \"student@alumnet.com\",\r\n    \"responses\": [\r\n        {\r\n            \"questionId\": 1,\r\n            \"answerId\": 4,\r\n            \"timeStamp\": \"2025-11-04T14:55:00\" \r\n        }\r\n    ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4269,23 +4402,91 @@
 					"response": []
 				},
 				{
-					"name": "Get Unrated Events By Course ID Copy",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": ""
+					"name": "Students assigned to event",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// NO SE PUEDEN CREAR SECCIONES PORQUE REQUIEREN ARCHIVOS",
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"",
+									"function runInitProcess() {",
+									"    getAccessToken(function () {",
+									"        getCursoId(\"Test-curso-create-section\", \"curso6-verificar-create-section\", function () {",
+									"            getSectionId(\"student@alumnet.com\", function () { })",
+									"        })",
+									"    })",
+									"}",
+									"",
+									"runInitProcess();",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"EL status code es el esperado\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () {",
+									"    const json = pm.response.json();",
+									"",
+									"    pm.expect(json).to.have.property(\"data\");",
+									"    pm.expect(json).to.have.property(\"message\");",
+									"",
+									"    const expectedKeys = [\"email\", \"lastname\", \"name\"];",
+									"",
+									"    json.data.forEach((item, index) => {",
+									"        expectedKeys.forEach(key => {",
+									"            pm.expect(item, `El elemento ${index} debe contener la clave '${key}'`).to.have.property(key);",
+									"        });",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"El mensaje de la respuesta es el esperado\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.message).to.eql(\"Libro de calificaciones obtenido exitosamente\");",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
 						}
-					},
-					"response": []
-				},
-				{
-					"name": "Students assigned to event Copy",
+					],
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": ""
+							"raw": "{{alumnetUrl}}/api/events/1/students",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"events",
+								"1",
+								"students"
+							]
 						}
 					},
 					"response": []
