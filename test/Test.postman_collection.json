@@ -1216,7 +1216,54 @@
 					"response": []
 				},
 				{
-					"name": "Course grade submission ???",
+					"name": "Course grade submission",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// NO SE PUEDEN CREAR SECCIONES PORQUE REQUIEREN ARCHIVOS",
+									"eval(pm.collectionVariables.get(\"utils-Course\"));",
+									"",
+									"function runInitProcess() {",
+									"    getAccessToken(function () {",
+									"        getCursoId(\"Test-curso-create-section\", \"curso6-verificar-create-section\", function () {",
+									"            getSectionId(\"student@alumnet.com\", function () { })",
+									"        })",
+									"    })",
+									"}",
+									"",
+									"runInitProcess();",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"EL status code es el esperado\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"pm.test(\"La respuesta contiene todas las clave/valor esperadas\", function () {",
+									"    pm.expect(jsonData).to.have.all.keys('message');",
+									"});",
+									"",
+									"pm.test(\"El mensaje de respuesta es el esperado\", function (){",
+									"    pm.expect(jsonData.message).to.eql('Correcciones realizadas exitosamente');",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -1232,7 +1279,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"students\": [\n        {\n            \"email\": \"estudianteBulk1@alumnet.com\",\n            \"grade\": 0.9,\n            \"name\": \"German\",\n            \"lastname\": \"Burgos\"\n        },\n        {\n            \"email\": \"estudianteBulk2@alumnet.com\",\n            \"grade\": 0.6,\n            \"name\": \"Pepe\",\n            \"lastname\": \"Guerra\"\n        }\n    ],\n    \"courseId\": 1\n}",
+							"raw": "{\n    \"students\": [\n        {\n            \"email\": \"student@alumnet.com\",\n            \"grade\": 0.9,\n            \"name\": \"test\",\n            \"lastname\": \"test\"\n        }\n    ],\n    \"courseId\": {{id_curso}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1240,7 +1287,15 @@
 							}
 						},
 						"url": {
-							"raw": ""
+							"raw": "{{alumnetUrl}}/api/courses/grade-submissions",
+							"host": [
+								"{{alumnetUrl}}"
+							],
+							"path": [
+								"api",
+								"courses",
+								"grade-submissions"
+							]
 						}
 					},
 					"response": []
