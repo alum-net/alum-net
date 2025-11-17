@@ -15,7 +15,6 @@ public class ConversationSummaryDTO {
     private String id;
     private String otherParticipantEmail;
     private String otherParticipantName;
-    private String otherParticipantAvatarUrl;
     private String otherParticipantRole;
     private MessageDTO lastMessage;
     private long unreadCount;

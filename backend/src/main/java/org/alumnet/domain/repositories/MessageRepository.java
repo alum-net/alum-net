@@ -29,8 +29,8 @@ public interface MessageRepository extends MongoRepository<Message, String> {
 
     @Aggregation(pipeline = {
             "{ $match: { conversationId: { $in: ?0 }, read: false, author: { $ne: ?1 } } }",
-            "{ $group: { _id: '$conversationId', count: { $sum: 1 } } }",
-            "{ $project: { conversationId: '$_id', count: '$count', _id: 0 } }"
+            "{ $group: { _id: '$conversationId', unreadMessages: { $sum: 1 } } }",
+            "{ $project: { conversationId: '$_id', unreadMessages: '$unreadMessages', _id: 0 } }"
     })
     List<ConversationCount> countUnreadByConversationIds(List<String> conversationIds, String userEmail);
 }

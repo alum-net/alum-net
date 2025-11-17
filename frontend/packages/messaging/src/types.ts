@@ -12,7 +12,6 @@ export interface ConversationSummary {
   id: string;
   otherParticipantEmail: string;
   otherParticipantName: string;
-  otherParticipantAvatarUrl?: string;
   otherParticipantRole: 'TEACHER' | 'STUDENT' | 'ADMIN';
   lastMessage?: Message;
   unreadCount: number;
