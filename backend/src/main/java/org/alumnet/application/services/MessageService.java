@@ -281,12 +281,15 @@ public class MessageService {
     }
 
     private ConversationSummaryDTO buildConversationSummaryDTO(Conversation conversation, String otherParticipantEmail, User otherParticipant, MessageDTO lastMessageDTO, long unreadCount, Message lastMessage) {
+        if (otherParticipant == null) {
+            log.warn("Other participant not found for email: {} in conversation: {}", otherParticipantEmail, conversation.getId());
+        }
+        
         return ConversationSummaryDTO.builder()
                 .id(conversation.getId())
                 .otherParticipantEmail(otherParticipantEmail)
-                .otherParticipantName(formatUserFullName(otherParticipant))
-                .otherParticipantAvatarUrl(otherParticipant.getAvatarUrl())
-                .otherParticipantRole(otherParticipant.getRole().toString())
+                .otherParticipantName(otherParticipant != null ? formatUserFullName(otherParticipant) : "Usuario desconocido")
+                .otherParticipantRole(otherParticipant != null ? otherParticipant.getRole().toString() : "")
                 .lastMessage(lastMessageDTO)
                 .unreadCount(unreadCount)
                 .lastMessageAt(lastMessage != null ? lastMessage.getTimestamp() : null)
@@ -376,6 +379,9 @@ public class MessageService {
     }
 
     private String formatUserFullName(User user) {
+        if (user == null) {
+            return "Usuario desconocido";
+        }
         return user.getName() + " " + user.getLastname();
     }
 

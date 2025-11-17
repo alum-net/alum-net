@@ -24,6 +24,11 @@ public class MessageWsController {
             Authentication authentication) {
 
         String senderEmail = authentication.getName();
+        
+        if (request.getContent() == null || request.getContent().trim().isEmpty()) {
+            return;
+        }
+        
         messageService.sendMessage(conversationId, senderEmail, request.getContent());
     }
 

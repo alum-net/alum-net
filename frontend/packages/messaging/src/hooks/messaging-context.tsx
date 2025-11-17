@@ -138,7 +138,15 @@ export const MessagingProvider = ({ children }: MessagingProviderProps) => {
         queryClient.setQueryData(
           [QUERY_KEYS.getMessages, conversationId],
           (previousMessagesData: MessagePage | undefined) => {
-            if (!previousMessagesData) return previousMessagesData;
+            if (!previousMessagesData) {
+              const isUnreadMessageFromOther = newMessage.author !== userInfo?.email && !newMessage.read;
+              const initialUnreadCount = isUnreadMessageFromOther ? 1 : 0;
+              return {
+                items: [newMessage],
+                hasMore: false,
+                totalUnread: initialUnreadCount,
+              };
+            }
 
             const messageAlreadyExists = previousMessagesData.items.some(
               (existingMessage: Message) =>
@@ -147,35 +155,49 @@ export const MessagingProvider = ({ children }: MessagingProviderProps) => {
 
             if (messageAlreadyExists) return previousMessagesData;
 
+            const isUnreadMessageFromOther = newMessage.author !== userInfo?.email && !newMessage.read;
+            const updatedUnreadCount = isUnreadMessageFromOther 
+              ? previousMessagesData.totalUnread + 1 
+              : previousMessagesData.totalUnread;
+
             return {
               ...previousMessagesData,
               items: [...previousMessagesData.items, newMessage],
+              totalUnread: updatedUnreadCount,
             };
           },
         );
       }
     },
-    [queryClient, selectedConversation],
+    [queryClient, selectedConversation, userInfo?.email],
   );
 
   const handleReadReceipt = useCallback(
     (readReceipt: ReadReceipt, conversationId: string) => {
-      if (readReceipt.readByUser !== userInfo?.email) {
+      const isReadReceiptFromOtherUser = readReceipt.readByUser !== userInfo?.email;
+      
+      if (isReadReceiptFromOtherUser) {
         queryClient.setQueryData(
           [QUERY_KEYS.getMessages, conversationId],
           (previousMessagesData: MessagePage | undefined) => {
             if (!previousMessagesData) return previousMessagesData;
 
+            const myMessagesMarkedAsRead = previousMessagesData.items.map((message: Message) => ({
+              ...message,
+              read: message.author === userInfo?.email ? true : message.read,
+            }));
+
             return {
               ...previousMessagesData,
-              items: previousMessagesData.items.map((message: Message) => ({
-                ...message,
-                read: message.author === userInfo?.email ? true : message.read,
-              })),
+              items: myMessagesMarkedAsRead,
             };
           },
         );
       }
+
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.getMessages, conversationId],
+      });
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.getConversations],
       });
@@ -320,10 +342,12 @@ export const MessagingProvider = ({ children }: MessagingProviderProps) => {
 
   useEffect(() => {
     if (error) {
-      console.log(error);
-      Toast.error('Error en la conexión, recarga la página por favor');
+      console.error('WebSocket error:', error);
+      if (!isConnected) {
+        Toast.error('Error en la conexión. Intentando reconectar...');
+      }
     }
-  });
+  }, [error, isConnected]);
 
   const value = {
     isConnected,

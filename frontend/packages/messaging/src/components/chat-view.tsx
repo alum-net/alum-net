@@ -16,7 +16,8 @@ import { getConversationHistory, markMessagesAsRead } from '../service';
 import { useConversations } from '../hooks/useConversations';
 import { useMessaging } from '../hooks/messaging-context';
 import { WS_ENDPOINTS } from '../constants';
-import { Message, TypingEvent } from '../types';
+import { useQueryClient } from '@tanstack/react-query';
+import { Message, MessagePage, TypingEvent } from '../types';
 
 export function ChatView() {
   const {
@@ -25,6 +26,7 @@ export function ChatView() {
     isConnected,
     setSelectedConversation,
   } = useMessaging();
+  const queryClient = useQueryClient();
   const {
     data: messages,
     isLoading: isLoading,
@@ -68,10 +70,39 @@ export function ChatView() {
     }
     markAsReadTimeoutRef.current = setTimeout(() => {
       if (selectedConversation && isConnected) {
-        markMessagesAsRead(selectedConversation).catch(() => {});
+        markMessagesAsRead(selectedConversation)
+          .then(() => {
+            queryClient.setQueryData(
+              [QUERY_KEYS.getMessages, selectedConversation],
+              (previousMessagesData: MessagePage | undefined) => {
+                if (!previousMessagesData) return previousMessagesData;
+
+                const messagesMarkedAsRead = previousMessagesData.items.map((message: Message) => ({
+                  ...message,
+                  read: message.author !== userInfo?.email ? true : message.read,
+                }));
+
+                const unreadMessagesFromOthers = messagesMarkedAsRead.filter(
+                  (message: Message) => !message.read && message.author !== userInfo?.email,
+                ).length;
+
+                return {
+                  ...previousMessagesData,
+                  items: messagesMarkedAsRead,
+                  totalUnread: unreadMessagesFromOthers,
+                };
+              },
+            );
+            queryClient.invalidateQueries({
+              queryKey: [QUERY_KEYS.getConversations],
+            });
+          })
+          .catch((error) => {
+            console.error('Error al marcar mensajes como leídos:', error);
+          });
       }
     }, 300);
-  }, [selectedConversation, activeConversation, isConnected]);
+  }, [selectedConversation, activeConversation, isConnected, queryClient, userInfo?.email]);
 
   useEffect(() => {
     if (
