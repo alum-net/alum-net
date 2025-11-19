@@ -23,10 +23,8 @@ import org.alumnet.domain.CourseParticipation;
 import org.alumnet.domain.CourseParticipationId;
 import org.alumnet.domain.events.Event;
 import org.alumnet.domain.events.EventParticipation;
-import org.alumnet.domain.repositories.CourseParticipationRepository;
-import org.alumnet.domain.repositories.CourseRepository;
-import org.alumnet.domain.repositories.ParticipationRepository;
-import org.alumnet.domain.repositories.UserRepository;
+import org.alumnet.domain.events.EventParticipationId;
+import org.alumnet.domain.repositories.*;
 import org.alumnet.domain.strategies.CourseContentStrategyFactory;
 import org.alumnet.domain.users.Administrator;
 import org.alumnet.domain.users.Student;
@@ -46,10 +44,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -60,6 +55,7 @@ public class CourseService {
 	private final CourseRepository courseRepository;
 	private final UserRepository userRepository;
 	private final CourseParticipationRepository courseParticipationRepository;
+    private final EventParticipationRepository eventParticipationRepository;
 	private final ParticipationRepository participationRepository;
 	private final CourseContentStrategyFactory courseContentStrategyFactory;
 	private final S3FileStorageService s3FileStorageService;
@@ -126,6 +122,25 @@ public class CourseService {
 				.build();
 
 		courseParticipationRepository.save(participation);
+
+        List<Event> events = course.getEvents();
+
+        if (events != null && !events.isEmpty()) {
+            List<EventParticipation> newEventParticipations = events.stream()
+                    .map(event -> {
+                        EventParticipationId eventParticipationId = new EventParticipationId(studentEmail, event.getId());
+
+                        return EventParticipation.builder()
+                                .id(eventParticipationId)
+                                .student(student)
+                                .event(event)
+                                .grade(null)
+                                .build();
+                    })
+                    .toList();
+
+            eventParticipationRepository.saveAll(newEventParticipations);
+        }
 	}
 
 	public void deleteCourse(int courseId) {
