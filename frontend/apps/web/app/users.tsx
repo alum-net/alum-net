@@ -6,6 +6,7 @@ import {
   DataTable,
   ActivityIndicator,
   Menu,
+  Avatar,
 } from 'react-native-paper';
 import { FormTextInput, THEME } from '@alum-net/ui';
 import { useForm } from 'react-hook-form';
@@ -177,6 +178,7 @@ export default function UsersPage() {
 
         <DataTable>
           <DataTable.Header>
+            <DataTable.Title style={{ flex: 1.2 }}>Avatar</DataTable.Title>
             <DataTable.Title style={{ flex: 1.2 }}>Nombre</DataTable.Title>
             <DataTable.Title style={{ flex: 1.2 }}>Apellido</DataTable.Title>
             <DataTable.Title style={{ flex: 2 }}>Email</DataTable.Title>
@@ -187,6 +189,13 @@ export default function UsersPage() {
 
           {rows.map(u => (
             <DataTable.Row key={u.email}>
+              <DataTable.Cell>
+                {u.avatarUrl ? (
+                  <Avatar.Image size={40} source={{ uri: u.avatarUrl }} />
+                ) : (
+                  <Avatar.Icon size={40} icon="account-edit" />
+                )}
+              </DataTable.Cell>
               <DataTable.Cell style={{ flex: 1.2 }}>{u.name}</DataTable.Cell>
               <DataTable.Cell style={{ flex: 1.2 }}>
                 {u.lastname}

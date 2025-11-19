@@ -25,10 +25,7 @@ const AgendaItem = ({ item }: ItemProps) => {
 
   return (
     <TouchableOpacity onPress={itemPressed} style={styles.item}>
-      <View>
-        <Text style={styles.itemHourText}>{item.hour}</Text>
-        <Text style={styles.itemDurationText}>{item.duration}</Text>
-      </View>
+      <Text style={styles.itemHourText}>{item.hour}</Text>
       <Text style={styles.itemTitleText}>{item.title}</Text>
     </TouchableOpacity>
   );

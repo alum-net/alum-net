@@ -27,7 +27,7 @@ const FinalGradesScreen = ({ courseId }: Props) => {
     fetchingCalculatedGrades,
   } = useGrades(courseId);
   const isCourseClosed = useMemo(
-    () => students?.data?.every(student => Boolean(student.finalGrade)),
+    () => students?.data?.every(student => student.finalGrade !== undefined),
     [students],
   );
   const [grades, setGrades] = useState<StudentSummary[]>([]);

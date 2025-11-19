@@ -10,7 +10,7 @@ import { Platform, ViewStyle } from 'react-native';
 interface StudentGradesCardProps {
   courseId: number;
   userEmail: string;
-  style: ViewStyle;
+  style?: ViewStyle;
 }
 
 export const StudentGradesCard = ({

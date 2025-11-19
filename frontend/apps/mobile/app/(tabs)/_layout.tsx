@@ -10,6 +10,7 @@ import { useMMKVString } from 'react-native-mmkv';
 import { storage, STORAGE_KEYS } from '@alum-net/storage';
 import { logout } from '@alum-net/auth';
 import { Toast } from '@alum-net/ui';
+import { Avatar } from 'react-native-paper';
 
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
@@ -60,7 +61,15 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: 'Perfil',
-          tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
+          tabBarIcon: ({ color }) =>
+            data?.avatarUrl ? (
+              <Avatar.Image
+                source={{ uri: data.avatarUrl, width: 28 }}
+                style={{ marginBottom: -3 }}
+              />
+            ) : (
+              <TabBarIcon name="user" color={color} />
+            ),
           headerShown: false,
         }}
       />

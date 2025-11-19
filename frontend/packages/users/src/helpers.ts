@@ -7,10 +7,10 @@ export function mapEventsToAgendaItems(data: CalendarEvent[]) {
   const groupedByDate: Record<string, AgendaEvent[]> = {};
 
   data.forEach(event => {
-    const start = new Date(event.startDate);
-    const dateKey = start.toISOString().split('T')[0];
+    const end = new Date(event.endDate);
+    const dateKey = end.toISOString().split('T')[0];
 
-    const hour = start
+    const hour = end
       .toLocaleTimeString('en-US', {
         hour: 'numeric',
         hour12: true,

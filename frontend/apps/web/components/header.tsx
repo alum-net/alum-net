@@ -5,6 +5,7 @@ import { THEME } from '@alum-net/ui';
 import { useUserInfo } from '@alum-net/users/src/hooks/useUserInfo';
 import { UserRole } from '@alum-net/users/src/types';
 import { useConversations } from '@alum-net/messaging';
+import { Avatar } from 'react-native-paper';
 
 export default function WebHeader() {
   const router = useRouter();
@@ -66,6 +67,13 @@ export default function WebHeader() {
                 <Text style={[styles.link, isActive && styles.activeLink]}>
                   {item.label}
                 </Text>
+                {userInfo?.avatarUrl && item.route === '/profile' && (
+                  <Avatar.Image
+                    size={20}
+                    style={{ marginLeft: 10 }}
+                    source={{ uri: userInfo.avatarUrl }}
+                  />
+                )}
                 {hasBadge && (
                   <View style={styles.badge}>
                     <Text style={styles.badgeText}>
