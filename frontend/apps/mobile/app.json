@@ -19,7 +19,10 @@
       "adaptiveIcon": {
         "foregroundImage": "../../packages/ui/src/assets/alumnet_logo.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "ios": {
       "bundleIdentifier": "alumnet.mobile"
@@ -44,6 +47,29 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "build": {
+          "experimental": {
+            "ios": {
+              "appExtensions": [
+                {
+                  "targetName": "OneSignalNotificationServiceExtension",
+                  "bundleIdentifier": "alumnet.mobile.OneSignalNotificationServiceExtension",
+                  "entitlements": {
+                    "com.apple.security.application-groups": [
+                      "group.alumnet.mobile.onesignal"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "projectId": "1d0d9e2f-eb16-465d-83fc-23558c655bb1"
+      },
+      "router": {}
     }
   }
 }

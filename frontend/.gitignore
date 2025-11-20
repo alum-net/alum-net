@@ -1,7 +1,8 @@
 **/node_modules
 **/.expo/
 **/.env
-**/.env.prod
-**/.env.dev
+**/.env.production
+**/.env.development
+**/*.apk
 **/google-services.json
-**/DS_Store
+**/.DS_Store
