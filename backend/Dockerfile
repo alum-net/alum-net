@@ -41,4 +41,4 @@ ARG JAR_FILE=/app/build/libs/*.jar
 COPY --from=builder ${JAR_FILE} /app.jar
 
 # Comando de entrada: Ejecuta la aplicación
-ENTRYPOINT ["java","-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8787", "-jar", "/app.jar", "--spring.profiles.active=dev"]
+ENTRYPOINT ["java","-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8787", "-jar", "/app.jar", "--spring.profiles.active=default,prod"]
