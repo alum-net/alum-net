@@ -2,8 +2,6 @@ import React, { useEffect } from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
 
-import Colors from '../../constants/Colors';
-import { useColorScheme } from 'react-native';
 import { OneSignal } from 'react-native-onesignal';
 import { UserRole, useUserInfo } from '@alum-net/users';
 import { useMMKVString } from 'react-native-mmkv';
@@ -22,7 +20,6 @@ function TabBarIcon(props: {
 export default function TabLayout() {
   const [refreshToken] = useMMKVString(STORAGE_KEYS.REFRESH_TOKEN, storage);
   const { data } = useUserInfo(!!refreshToken);
-  const colorScheme = useColorScheme();
 
   useEffect(() => {
     if (refreshToken && data?.role && data.role !== UserRole.student) {
@@ -38,7 +35,7 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: '#2f95dc',
       }}
     >
       <Tabs.Screen

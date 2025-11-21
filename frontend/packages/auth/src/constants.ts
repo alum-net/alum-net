@@ -2,7 +2,7 @@ export const keycloakRealm = 'alumnet-realm';
 
 export const keycloakClientId = 'alumnet';
 
-const mobileScheme = 'alumnet.mobile://';
+const mobileScheme = 'alumnet://';
 
 export const authScheme = `${mobileScheme}auth`;
 

@@ -6,12 +6,12 @@
   "dependencies": {
     "@alum-net/storage": "*",
     "@alum-net/ui": "*",
-    "expo-auth-session": "^7.0.8",
+    "expo-auth-session": "~6.2.1",
     "expo-random": "^14.0.1"
   },
   "peerDependencies": {
+    "expo": "~53.0.22",
     "react": "19.0.0",
-    "react-native": "0.79.6",
-    "expo": "53.0.22"
+    "react-native": "0.79.6"
   }
 }
