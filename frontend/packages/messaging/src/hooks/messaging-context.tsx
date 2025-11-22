@@ -139,7 +139,8 @@ export const MessagingProvider = ({ children }: MessagingProviderProps) => {
           [QUERY_KEYS.getMessages, conversationId],
           (previousMessagesData: MessagePage | undefined) => {
             if (!previousMessagesData) {
-              const isUnreadMessageFromOther = newMessage.author !== userInfo?.email && !newMessage.read;
+              const isUnreadMessageFromOther =
+                newMessage.author !== userInfo?.email && !newMessage.read;
               const initialUnreadCount = isUnreadMessageFromOther ? 1 : 0;
               return {
                 items: [newMessage],
@@ -155,9 +156,10 @@ export const MessagingProvider = ({ children }: MessagingProviderProps) => {
 
             if (messageAlreadyExists) return previousMessagesData;
 
-            const isUnreadMessageFromOther = newMessage.author !== userInfo?.email && !newMessage.read;
-            const updatedUnreadCount = isUnreadMessageFromOther 
-              ? previousMessagesData.totalUnread + 1 
+            const isUnreadMessageFromOther =
+              newMessage.author !== userInfo?.email && !newMessage.read;
+            const updatedUnreadCount = isUnreadMessageFromOther
+              ? previousMessagesData.totalUnread + 1
               : previousMessagesData.totalUnread;
 
             return {
@@ -174,18 +176,21 @@ export const MessagingProvider = ({ children }: MessagingProviderProps) => {
 
   const handleReadReceipt = useCallback(
     (readReceipt: ReadReceipt, conversationId: string) => {
-      const isReadReceiptFromOtherUser = readReceipt.readByUser !== userInfo?.email;
-      
+      const isReadReceiptFromOtherUser =
+        readReceipt.readByUser !== userInfo?.email;
+
       if (isReadReceiptFromOtherUser) {
         queryClient.setQueryData(
           [QUERY_KEYS.getMessages, conversationId],
           (previousMessagesData: MessagePage | undefined) => {
             if (!previousMessagesData) return previousMessagesData;
 
-            const myMessagesMarkedAsRead = previousMessagesData.items.map((message: Message) => ({
-              ...message,
-              read: message.author === userInfo?.email ? true : message.read,
-            }));
+            const myMessagesMarkedAsRead = previousMessagesData.items.map(
+              (message: Message) => ({
+                ...message,
+                read: message.author === userInfo?.email ? true : message.read,
+              }),
+            );
 
             return {
               ...previousMessagesData,
@@ -228,7 +233,6 @@ export const MessagingProvider = ({ children }: MessagingProviderProps) => {
         //   if (process.env.EXPO_PUBLIC_ENV === 'development') console.log(debug);
         // },
         onConnect: () => {
-          console.log('conectado');
           setIsConnected(true);
           setError(null);
 

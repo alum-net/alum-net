@@ -57,7 +57,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Perfil',
+          title: data?.avatarUrl ? '' : 'Perfil',
           tabBarIcon: ({ color }) =>
             data?.avatarUrl ? (
               <Avatar.Image

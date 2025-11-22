@@ -7,7 +7,7 @@ import React, {
 } from 'react';
 import { View, StyleSheet, ScrollView, Platform } from 'react-native';
 import { Text, ActivityIndicator, Appbar } from 'react-native-paper';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@alum-net/api';
 import { useUserInfo } from '@alum-net/users';
 import { useFocusEffect, useRouter } from 'expo-router';
@@ -16,7 +16,6 @@ import { getConversationHistory, markMessagesAsRead } from '../service';
 import { useConversations } from '../hooks/useConversations';
 import { useMessaging } from '../hooks/messaging-context';
 import { WS_ENDPOINTS } from '../constants';
-import { useQueryClient } from '@tanstack/react-query';
 import { Message, MessagePage, TypingEvent } from '../types';
 
 export function ChatView() {
@@ -77,13 +76,17 @@ export function ChatView() {
               (previousMessagesData: MessagePage | undefined) => {
                 if (!previousMessagesData) return previousMessagesData;
 
-                const messagesMarkedAsRead = previousMessagesData.items.map((message: Message) => ({
-                  ...message,
-                  read: message.author !== userInfo?.email ? true : message.read,
-                }));
+                const messagesMarkedAsRead = previousMessagesData.items.map(
+                  (message: Message) => ({
+                    ...message,
+                    read:
+                      message.author !== userInfo?.email ? true : message.read,
+                  }),
+                );
 
                 const unreadMessagesFromOthers = messagesMarkedAsRead.filter(
-                  (message: Message) => !message.read && message.author !== userInfo?.email,
+                  (message: Message) =>
+                    !message.read && message.author !== userInfo?.email,
                 ).length;
 
                 return {
@@ -97,12 +100,18 @@ export function ChatView() {
               queryKey: [QUERY_KEYS.getConversations],
             });
           })
-          .catch((error) => {
+          .catch(error => {
             console.error('Error al marcar mensajes como leídos:', error);
           });
       }
     }, 300);
-  }, [selectedConversation, activeConversation, isConnected, queryClient, userInfo?.email]);
+  }, [
+    selectedConversation,
+    activeConversation,
+    isConnected,
+    queryClient,
+    userInfo?.email,
+  ]);
 
   useEffect(() => {
     if (

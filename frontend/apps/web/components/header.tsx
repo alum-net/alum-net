@@ -64,15 +64,16 @@ export default function WebHeader() {
           return (
             <Pressable key={item.route} onPress={() => router.push(item.route)}>
               <View style={styles.navItemContainer}>
-                <Text style={[styles.link, isActive && styles.activeLink]}>
-                  {item.label}
-                </Text>
-                {userInfo?.avatarUrl && item.route === '/profile' && (
+                {item.route === '/profile' && userInfo?.avatarUrl ? (
                   <Avatar.Image
                     size={20}
                     style={{ marginLeft: 10 }}
                     source={{ uri: userInfo.avatarUrl }}
                   />
+                ) : (
+                  <Text style={[styles.link, isActive && styles.activeLink]}>
+                    {item.label}
+                  </Text>
                 )}
                 {hasBadge && (
                   <View style={styles.badge}>

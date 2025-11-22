@@ -72,7 +72,10 @@ export function UpdateProfile() {
           )
         ) {
           setAvatar({
-            type: 'image/jpeg',
+            type:
+              result.assets[0].mimeType ||
+              result.assets[0].file?.type ||
+              'image/jpeg',
             filename:
               result.assets[0].fileName ||
               result.assets[0].file?.name ||

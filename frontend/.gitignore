@@ -6,3 +6,4 @@
 **/*.apk
 **/google-services.json
 **/.DS_Store
+**/.env.backup
