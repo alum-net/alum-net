@@ -1,0 +1,41 @@
+# Stage 1: Build
+FROM node:22-alpine AS build
+
+WORKDIR /app
+
+# Instalar dependencias del sistema
+RUN apk add --no-cache git
+
+# Copiar archivos de dependencias
+COPY package.json yarn.lock ./
+COPY apps/web/package.json ./apps/web/
+
+# Copiar packages compartidos
+COPY packages ./packages
+
+# Instalar dependencias
+RUN yarn install --frozen-lockfile
+
+# Copiar código fuente de web
+COPY apps/web ./apps/web
+
+# Copiar el .env de la raíz a apps/web
+COPY .env ./apps/web/.env
+
+# Build
+WORKDIR /app
+RUN cd apps/web && npx expo export --platform web
+
+# Stage 2: Serve
+FROM node:22-alpine
+
+WORKDIR /app
+
+RUN yarn global add serve
+
+# Copiar build desde dist
+COPY --from=build /app/apps/web/dist ./build
+
+EXPOSE 8081
+
+CMD ["serve", "-s", "build", "-l", "8081"]

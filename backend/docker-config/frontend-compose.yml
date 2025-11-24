@@ -1,0 +1,15 @@
+services:
+  frontend:
+    build:
+      context: ../../frontend
+      dockerfile: Dockerfile.web
+    container_name: alumnet_frontend
+    ports:
+      - "8081:8081"
+    restart: always
+    networks:
+      - red-alumnet
+
+networks:
+  red-alumnet:
+    driver: bridge
