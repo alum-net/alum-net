@@ -1,4 +1,4 @@
-name: Deploy to prod
+name: ci cd sin git push
 
 on:
   pull_request:
