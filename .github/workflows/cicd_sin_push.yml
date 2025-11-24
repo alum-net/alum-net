@@ -48,10 +48,16 @@ jobs:
       # --------------------------------------------------------------
       # 3) Instalar Docker y AWS CLI
       # --------------------------------------------------------------
-      - name: Install Docker and AWS CLI
+      - name: Install Docker
+        run: |
+          curl -fsSL https://get.docker.com -o get-docker.sh
+          sudo sh get-docker.sh
+          sudo usermod -aG docker $USER
+
+      - name: Install AWS CLI
         run: |
           sudo apt-get update
-          sudo apt-get install -y docker.io unzip
+          sudo apt-get install -y unzip
           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
           unzip awscliv2.zip
           sudo ./aws/install
