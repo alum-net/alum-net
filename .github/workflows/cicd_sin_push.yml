@@ -102,8 +102,10 @@ jobs:
       # --------------------------------------------------------------
       - name: Build backend image
         run: |
-          cd backend
-          docker build -t alumnet-backend .
+              docker build \
+                -t alumnet-backend \
+                -f backend/Dockerfile \
+                ./backend
 
       - name: Push backend image
         run: |
