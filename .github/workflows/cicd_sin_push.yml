@@ -1,0 +1,146 @@
+name: Deploy to prod
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    # Corre si:
+    # - el PR se mergeó
+    # - o se ejecuta manualmente
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      # --------------------------------------------------------------
+      # 1) Checkout de deploy-test con toda la historia
+      # --------------------------------------------------------------
+      - name: Checkout deploy-test
+        uses: actions/checkout@v4
+        with:
+          ref: deploy-test
+          fetch-depth: 0
+
+      # --------------------------------------------------------------
+      # 2) Merge LOCAL de main → deploy-test
+      #    Sin push (la rama remota no cambia)
+      # --------------------------------------------------------------
+      - name: Merge main into deploy-test locally
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+
+          echo "[FETCHING LATEST]"
+          git fetch origin
+
+          echo "[MERGING MAIN → DEPLOY-TEST WITHOUT PUSH]"
+          git merge origin/main --no-edit || true
+
+          echo "[LOCAL MERGE DONE]"
+          git log --oneline -5
+
+      # --------------------------------------------------------------
+      # 3) Instalar Docker y AWS CLI
+      # --------------------------------------------------------------
+      - name: Install Docker and AWS CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker.io unzip
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          sudo ./aws/install
+
+      # --------------------------------------------------------------
+      # 4) Login en AWS ECR
+      # --------------------------------------------------------------
+      - name: AWS ECR Login
+        run: |
+          aws ecr get-login-password --region us-east-1 | \
+          docker login \
+            --username AWS \
+            --password-stdin 205292723184.dkr.ecr.us-east-1.amazonaws.com
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      # --------------------------------------------------------------
+      # 5) Build & Push FRONTEND
+      # --------------------------------------------------------------
+      - name: Build frontend image
+        run: |
+          cd frontend
+          docker build -t alumnet-frontend -f Dockerfile.web .
+
+      - name: Push frontend image
+        run: |
+          docker tag alumnet-frontend:latest \
+            205292723184.dkr.ecr.us-east-1.amazonaws.com/alumnet-frontend:latest
+          docker push \
+            205292723184.dkr.ecr.us-east-1.amazonaws.com/alumnet-frontend:latest
+
+      # --------------------------------------------------------------
+      # 6) Build & Push BACKEND
+      # --------------------------------------------------------------
+      - name: Build backend image
+        run: |
+          cd backend
+          docker build -t alumnet-backend .
+
+      - name: Push backend image
+        run: |
+          docker tag alumnet-backend:latest \
+            205292723184.dkr.ecr.us-east-1.amazonaws.com/alumnet-backend:latest
+          docker push \
+            205292723184.dkr.ecr.us-east-1.amazonaws.com/alumnet-backend:latest
+
+      # --------------------------------------------------------------
+      # 7) Copiar clave SSH desde los secretos
+      # --------------------------------------------------------------
+      - name: Add SSH key
+        run: |
+          echo "${{ secrets.EC2_SSH_KEY }}" > key.pem
+          chmod 600 key.pem
+
+      # --------------------------------------------------------------
+      # 8) Ejecutar despliegue remoto en EC2
+      # --------------------------------------------------------------
+      - name: Connect & deploy on EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@ec2-54-233-24-108.sa-east-1.compute.amazonaws.com << 'EOF'
+
+          echo "[STOPPING OLD CONTAINERS]"
+          docker stop keycloak_server || true
+          docker stop alumnet_nginx || true
+          docker stop mongo_db || true
+          docker stop postgres_db || true
+          docker stop alumnet_frontend || true
+          docker stop backend || true
+
+          docker system prune -f
+
+          echo "[AWS ECR LOGIN]"
+          aws ecr get-login-password --region us-east-1 | \
+            docker login \
+              --username AWS \
+              --password-stdin 205292723184.dkr.ecr.us-east-1.amazonaws.com
+
+          echo "[PULL NEW IMAGES]"
+          docker pull 205292723184.dkr.ecr.us-east-1.amazonaws.com/alumnet-frontend:latest
+          docker pull 205292723184.dkr.ecr.us-east-1.amazonaws.com/alumnet-backend:latest
+
+          echo "[RUN DOCKER COMPOSE]"
+          docker-compose \
+            -f db-compose.yml \
+            -f keycloak-compose.yml \
+            -f nginx-compose.yml \
+            -f backend-compose.yml up -d
+
+          docker-compose -f frontend-compose.yml up -d
+
+          EOF
