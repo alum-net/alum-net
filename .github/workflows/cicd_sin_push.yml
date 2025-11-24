@@ -45,31 +45,31 @@ jobs:
           echo "[LOCAL MERGE DONE]"
           git log --oneline -5
 
-      # --------------------------------------------------------------
-      # 3) Instalar Docker y AWS CLI
-      # --------------------------------------------------------------
-      - name: Install Docker
-        run: |
-          curl -fsSL https://get.docker.com -o get-docker.sh
-          sudo sh get-docker.sh
-          sudo usermod -aG docker $USER
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y docker.io unzip
-
-          # Si AWS CLI no existe, lo instala
-          if ! command -v aws &> /dev/null
-          then
-            echo "AWS CLI not found. Installing..."
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/install
-          else
-            echo "AWS CLI already installed."
-            aws --version
-          fi
+          # --------------------------------------------------------------
+          # 3) Instalar Docker y AWS CLI
+          # --------------------------------------------------------------
+          - name: Install Docker
+            run: |
+              curl -fsSL https://get.docker.com -o get-docker.sh
+              sudo sh get-docker.sh
+              sudo usermod -aG docker runner
+          
+          - name: Install dependencies
+            run: |
+              sudo apt-get update
+              sudo apt-get install -y docker.io unzip
+          
+              # Si AWS CLI no existe, lo instala
+              if ! command -v aws &> /dev/null
+              then
+                echo "AWS CLI not found. Installing..."
+                curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+                unzip awscliv2.zip
+                sudo ./aws/install --update
+              else
+                echo "AWS CLI already installed."
+                aws --version
+              fi
 
       # --------------------------------------------------------------
       # 4) Login en AWS ECR
