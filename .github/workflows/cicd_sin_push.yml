@@ -44,7 +44,7 @@ jobs:
 
           echo "[LOCAL MERGE DONE]"
           git log --oneline -5
-
+          
       # --------------------------------------------------------------
       # 3) Instalar Docker y AWS CLI
       # --------------------------------------------------------------
@@ -54,18 +54,18 @@ jobs:
           sudo sh get-docker.sh
           sudo usermod -aG docker runner
       
-      - name: Install dependencies
+      - name: Install dependencies and AWS CLI
         run: |
           sudo apt-get update
           sudo apt-get install -y docker.io unzip
       
-          # Si AWS CLI no existe, lo instala
+          # Verificar si AWS CLI existe
           if ! command -v aws &> /dev/null
           then
             echo "AWS CLI not found. Installing..."
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
-            sudo ./aws/install --update
+            sudo ./aws/install --update || true
           else
             echo "AWS CLI already installed."
             aws --version
