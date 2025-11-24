@@ -78,11 +78,18 @@ jobs:
       # --------------------------------------------------------------
       # 5) Build & Push FRONTEND
       # --------------------------------------------------------------
+      
+      - name: Generate .env for frontend
+        run: |
+          cd frontend
+          echo "${{ secrets.FRONTEND_ENV_FILE }}" > .env
+          echo "[INFO] .env generated"
+      
       - name: Build frontend image
         run: |
           cd frontend
           docker build -t alumnet-frontend -f Dockerfile.web .
-
+      
       - name: Push frontend image
         run: |
           docker tag alumnet-frontend:latest \
