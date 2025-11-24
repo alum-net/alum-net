@@ -100,6 +100,12 @@ jobs:
       # --------------------------------------------------------------
       # 6) Build & Push BACKEND
       # --------------------------------------------------------------
+      - name: List backend folder contents
+        run: |
+          echo "[BACKEND DIRECTORY CONTENTS]"
+          ls -R backend
+
+      
       - name: Build backend image
         run: |
               docker build \
