@@ -45,6 +45,7 @@ const styles = StyleSheet.create({
     minWidth: Platform.OS === 'web' ? 200 : undefined,
     width: Platform.OS === 'android' ? '45%' : undefined,
     marginBottom: 16,
+    maxWidth: 300,
   },
   cardHeader: {
     marginBottom: 8,

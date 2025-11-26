@@ -5,15 +5,16 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "../../packages/ui/src/assets/alumnet_logo.png",
-    "scheme": "alumnet.mobile",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "scheme": "alumnet",
     "splash": {
       "image": "../../packages/ui/src/assets/alumnet_logo.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "android": {
+      "softwareKeyboardLayoutMode": "resize",
       "package": "alumnet.mobile",
       "edgeToEdgeEnabled": true,
       "adaptiveIcon": {

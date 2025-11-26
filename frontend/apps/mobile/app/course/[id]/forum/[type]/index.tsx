@@ -1,7 +1,6 @@
 import { ForumPostList } from '@alum-net/forums';
 import Screen from '../../../../../components/screen';
-import { FAB } from 'react-native-paper';
-import { StyleSheet } from 'react-native';
+import { Appbar } from 'react-native-paper';
 import { THEME } from '@alum-net/ui';
 import { useNavigation } from 'expo-router';
 
@@ -9,25 +8,13 @@ export default function ForumScreen() {
   const nav = useNavigation();
   return (
     <Screen edges={['top', 'bottom']} scrollable={false}>
+      <Appbar
+        safeAreaInsets={{ bottom: 0, top: 0, left: 0, right: 0 }}
+        style={{ backgroundColor: THEME.colors.background }}
+      >
+        <Appbar.BackAction onPress={nav.goBack} />
+      </Appbar>
       <ForumPostList />
-      <FAB
-        icon="keyboard-backspace"
-        label="Volver"
-        style={styles.fab}
-        mode="flat"
-        onPress={() => nav.goBack()}
-      />
     </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  fab: {
-    position: 'absolute',
-    left: 30,
-    bottom: 24,
-    backgroundColor: 'white',
-    borderColor: THEME.colors.secondary,
-    borderWidth: 1,
-  },
-});

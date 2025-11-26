@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "web",
-    "slug": "web",
+    "name": "Alum-Net",
+    "slug": "Alum-Net",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "../../packages/ui/src/assets/alumnet_logo.png",

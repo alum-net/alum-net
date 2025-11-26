@@ -11,7 +11,6 @@ interface ItemProps {
 const AgendaItem = ({ item }: ItemProps) => {
   const nav = useRouter();
   const itemPressed = useCallback(() => {
-    console.log('item pressed');
     nav.push(`/course/${item.eventData.courseId}`);
   }, [nav, item]);
 

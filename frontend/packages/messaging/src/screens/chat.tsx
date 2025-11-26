@@ -2,20 +2,23 @@ import { KeyboardAvoidingView, StyleSheet, Text, View } from 'react-native';
 import { useMessaging } from '../hooks/messaging-context';
 import { ChatView } from '../components/chat-view';
 import { MessageInput } from '../components/message-input';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export const ChatScreen = () => {
   const { selectedConversation } = useMessaging();
+  const insets = useSafeAreaInsets();
 
   return selectedConversation ? (
-    <KeyboardAvoidingView
-      style={{
-        flex: 1,
-        width: '100%',
-      }}
-    >
+    <>
       <ChatView />
-      <MessageInput />
-    </KeyboardAvoidingView>
+      <KeyboardAvoidingView
+        behavior="padding"
+        keyboardVerticalOffset={insets.top}
+        style={{ width: '100%' }}
+      >
+        <MessageInput />
+      </KeyboardAvoidingView>
+    </>
   ) : (
     <View style={styles.emptyState}>
       <Text style={styles.emptyText}>
