@@ -39,11 +39,10 @@ jobs:
       # --------------------------------------------------------------
       # 3) Instalar Docker y AWS CLI
       # --------------------------------------------------------------
-      - name: Install dependencies
+      - name: Check environment
         run: |
-          sudo apt-get update
-          sudo apt-get install -y docker.io
-          sudo snap install aws-cli --classic
+          docker --version
+          aws --version
 
       # --------------------------------------------------------------
       # 4) Login a AWS ECR
