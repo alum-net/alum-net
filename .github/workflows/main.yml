@@ -27,9 +27,9 @@ jobs:
           fetch-depth: 0
 
       # --------------------------------------------------------------
-      # 2) Merge LOCAL de main → deploy-test (sin push)
+      # 2) Merge LOCAL de main → deploy-test 
       # --------------------------------------------------------------
-      - name: Merge main into deploy-test locally
+      - name: Merge main into deploy-test and push
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
@@ -37,14 +37,17 @@ jobs:
           echo "[FETCHING LATEST]"
           git fetch origin
           
-          echo "[MERGING MAIN → DEPLOY-TEST WITHOUT PUSH]"
-          git merge origin/main --no-edit || true
+          echo "[MERGING MAIN → DEPLOY-TEST]"
+          git merge origin/main --no-edit
           
-          echo "[LOCAL MERGE DONE]"
+          echo "[PUSHING TO REMOTE]"
+          git push origin deploy-test
+          
+          echo "[MERGE & PUSH DONE]"
           git log --oneline -5
 
       # --------------------------------------------------------------
-      # 3) Verificar herramientas (ya vienen instaladas)
+      # 3) Verificar herramientas 
       # --------------------------------------------------------------
       - name: Check environment
         run: |
