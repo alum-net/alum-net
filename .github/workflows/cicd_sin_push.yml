@@ -133,7 +133,7 @@ jobs:
       # --------------------------------------------------------------
       - name: Connect & deploy on EC2
         run: |
-          ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@ec2-54-233-24-108.sa-east-1.compute.amazonaws.com << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@${{ secrets.EC2_HOST }} << 'EOF'
 
           echo "[STOPPING OLD CONTAINERS]"
           docker stop keycloak_server || true
