@@ -20,39 +20,51 @@ jobs:
       # --------------------------------------------------------------
       # 1) Checkout de código
       # --------------------------------------------------------------
-      - name: Checkout main
-        uses: actions/checkout@v3
+      - name: Checkout deploy-test
+        uses: actions/checkout@v4
         with:
+          ref: deploy-test
           fetch-depth: 0
 
       # --------------------------------------------------------------
-      # 2) Merge main → deploy-test
+      # 2) Merge LOCAL de main → deploy-test 
       # --------------------------------------------------------------
-      - name: Merge changes into deploy-test
+      - name: Merge main into deploy-test and push
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git checkout deploy-test
+          
+          echo "[FETCHING LATEST]"
+          git fetch origin
+          
+          echo "[MERGING MAIN → DEPLOY-TEST]"
           git merge origin/main --no-edit
+          
+          echo "[PUSHING TO REMOTE]"
           git push origin deploy-test
+          
+          echo "[MERGE & PUSH DONE]"
+          git log --oneline -5
 
       # --------------------------------------------------------------
-      # 3) Instalar Docker y AWS CLI
+      # 3) Verificar herramientas 
       # --------------------------------------------------------------
       - name: Check environment
         run: |
+          echo "Docker version:"
           docker --version
+          echo "AWS CLI version:"
           aws --version
 
       # --------------------------------------------------------------
       # 4) Login a AWS ECR
       # --------------------------------------------------------------
-      - name: AWS Login
+      - name: AWS ECR Login
         run: |
           aws ecr get-login-password --region us-east-1 | \
           docker login \
-          --username AWS \
-          --password-stdin 205292723184.dkr.ecr.us-east-1.amazonaws.com
+            --username AWS \
+            --password-stdin 205292723184.dkr.ecr.us-east-1.amazonaws.com
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -60,6 +72,12 @@ jobs:
       # --------------------------------------------------------------
       # 5) Build & push FRONTEND
       # --------------------------------------------------------------
+      - name: Generate .env for frontend
+        run: |
+          cd frontend
+          echo "${{ secrets.FRONTEND_ENV_FILE }}" > .env
+          echo "[INFO] .env generated"
+      
       - name: Build frontend image
         run: |
           cd frontend
@@ -75,10 +93,17 @@ jobs:
       # --------------------------------------------------------------
       # 6) Build & push BACKEND
       # --------------------------------------------------------------
+      - name: List backend folder contents
+        run: |
+          echo "[BACKEND DIRECTORY CONTENTS]"
+          ls -R backend
+      
       - name: Build backend image
         run: |
-          cd backend
-          docker build -t alumnet-backend .
+          docker build \
+            -t alumnet-backend \
+            -f backend/Dockerfile \
+            ./backend
 
       - name: Push backend
         run: |
@@ -115,8 +140,8 @@ jobs:
           echo "[ECR LOGIN]"
           aws ecr get-login-password --region us-east-1 | \
           docker login \
-          --username AWS \
-          --password-stdin 205292723184.dkr.ecr.us-east-1.amazonaws.com
+            --username AWS \
+            --password-stdin 205292723184.dkr.ecr.us-east-1.amazonaws.com
 
           echo "[PULL IMAGES]"
           docker pull 205292723184.dkr.ecr.us-east-1.amazonaws.com/alumnet-frontend:latest
