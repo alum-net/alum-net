@@ -134,6 +134,7 @@ jobs:
           docker stop postgres_db || true
           docker stop alumnet_frontend || true
           docker stop backend || true
+          docker stop keycloak_db || true
 
           docker system prune -f
 
