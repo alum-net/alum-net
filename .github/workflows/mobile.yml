@@ -37,6 +37,7 @@ jobs:
         run: |
           printf '%s' "${{ secrets.GOOGLE_SERVICES }}" > frontend/apps/mobile/google-services.json
           chmod 600 frontend/apps/mobile/google-services.json
+          ls -l frontend/apps/mobile
         env:
           GOOGLE_SERVICES: ${{ secrets.GOOGLE_SERVICES }}
 
