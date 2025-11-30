@@ -24,13 +24,13 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
           eas-version: latest
 
-       - name: Write frontend .env from secret
-         shell: bash
-         run: |
-           printf '%s' "${{ secrets.FRONTEND_ENV_FILE }}" > frontend/.env
-           chmod 600 frontend/.env
-         env:
-           FRONTEND_ENV_FILE: ${{ secrets.FRONTEND_ENV_FILE }}
+      - name: Write frontend .env from secret
+        shell: bash
+        run: |
+          printf '%s' "${{ secrets.FRONTEND_ENV_FILE }}" > frontend/.env
+          chmod 600 frontend/.env
+        env:
+          FRONTEND_ENV_FILE: ${{ secrets.FRONTEND_ENV_FILE }}
 
       - name: Install dependencies
         run: |
@@ -69,3 +69,4 @@ jobs:
           files: ${{ steps.apk.outputs.apk_path }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
