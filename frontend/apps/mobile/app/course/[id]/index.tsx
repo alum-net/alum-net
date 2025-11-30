@@ -27,6 +27,7 @@ export default function Course() {
   const [expandedSectionTitle, setExpandedSectionTitle] = useState('');
   const [expandedSection, setExpandedSection] = useState<Section>();
   const [width, setWidth] = useState(0);
+
   const buttons = useMemo(() => {
     const array = [];
     if (data?.data?.sections.data)
@@ -44,6 +45,9 @@ export default function Course() {
     if (data?.data?.sections.data[0]) {
       setExpandedSectionTitle(data?.data?.sections.data[0].title);
       setExpandedSection(data?.data?.sections.data[0]);
+    } else {
+      setExpandedSectionTitle('grades');
+      setExpandedSection(undefined);
     }
   }, [data]);
 

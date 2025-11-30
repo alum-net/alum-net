@@ -23,6 +23,7 @@ export default function TabLayout() {
 
   useEffect(() => {
     if (refreshToken && data?.role && data.role !== UserRole.student) {
+      OneSignal.logout();
       logout();
       Toast.error('La aplicación movil solo esta disponible para estudiantes');
       return;

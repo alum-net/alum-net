@@ -27,15 +27,16 @@ const InitialLayout = () => {
         ? LogLevel.Verbose
         : LogLevel.None,
     );
+    OneSignal.Debug.setAlertLevel(
+      process.env.EXPO_PUBLIC_ENV === 'development'
+        ? LogLevel.Verbose
+        : LogLevel.None,
+    );
     OneSignal.initialize(process.env.EXPO_PUBLIC_ONE_SIGNAL_ID as string);
     OneSignal.Notifications.requestPermission(true);
     OneSignal.Notifications.addEventListener('foregroundWillDisplay', event => {
       event.getNotification().display();
     });
-
-    // OneSignal.Notifications.addEventListener('click', event => {
-    //   console.log('Notification clicked:', event);
-    // });
   }, []);
 
   return (
