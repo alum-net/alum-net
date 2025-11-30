@@ -30,6 +30,15 @@ jobs:
         env:
           FRONTEND_ENV_FILE: ${{ secrets.FRONTEND_ENV_FILE }}
 
+      - name: Write google-services.json from secret
+        shell: bash
+        run: |
+          printf '%s' "${{ secrets.GOOGLE_SERVICES }}" > frontend/apps/mobile/google-services.json
+          chmod 600 frontend/apps/mobile/google-services.json
+        env:
+          GOOGLE_SERVICES: ${{ secrets.GOOGLE_SERVICES }}
+
+
       - name: Install dependencies
         run: |
           cd frontend
