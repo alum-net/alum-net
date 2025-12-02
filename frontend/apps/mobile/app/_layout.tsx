@@ -11,7 +11,6 @@ import { THEME, ToastProvider } from '@alum-net/ui';
 import { useMMKVString } from 'react-native-mmkv';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
-import { OneSignal, LogLevel } from 'react-native-onesignal';
 global.TextEncoder = TextEncoder;
 export { ErrorBoundary } from 'expo-router';
 
@@ -20,24 +19,6 @@ const queryClient = new QueryClient();
 
 const InitialLayout = () => {
   const [refreshToken] = useMMKVString(STORAGE_KEYS.REFRESH_TOKEN, storage);
-
-  useEffect(() => {
-    OneSignal.Debug.setLogLevel(
-      process.env.EXPO_PUBLIC_ENV === 'development'
-        ? LogLevel.Verbose
-        : LogLevel.None,
-    );
-    OneSignal.Debug.setAlertLevel(
-      process.env.EXPO_PUBLIC_ENV === 'development'
-        ? LogLevel.Verbose
-        : LogLevel.None,
-    );
-    OneSignal.initialize(process.env.EXPO_PUBLIC_ONE_SIGNAL_ID as string);
-    OneSignal.Notifications.requestPermission(true);
-    OneSignal.Notifications.addEventListener('foregroundWillDisplay', event => {
-      event.getNotification().display();
-    });
-  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
