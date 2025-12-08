@@ -105,7 +105,6 @@ public class CourseService {
 				.orElseThrow(UserNotFoundException::new);
 
 		Course course = courseRepository.findById(courseId)
-				.filter(Course::isEnabled)
 				.orElseThrow(CourseNotFoundException::new);
 
 		CourseParticipationId id = new CourseParticipationId(studentEmail, courseId);
@@ -123,12 +122,15 @@ public class CourseService {
 
 		courseParticipationRepository.save(participation);
 
-        List<Event> events = course.getEvents();
+        associateEventParicipations(course.getEvents(), student);
+    }
 
+    private void associateEventParicipations(List<Event> events, Student student) {
         if (events != null && !events.isEmpty()) {
             List<EventParticipation> newEventParticipations = events.stream()
                     .map(event -> {
-                        EventParticipationId eventParticipationId = new EventParticipationId(studentEmail, event.getId());
+                        EventParticipationId eventParticipationId =
+                                new EventParticipationId(student.getEmail(), event.getId());
 
                         return EventParticipation.builder()
                                 .id(eventParticipationId)
@@ -141,9 +143,9 @@ public class CourseService {
 
             eventParticipationRepository.saveAll(newEventParticipations);
         }
-	}
+    }
 
-	public void deleteCourse(int courseId) {
+    public void deleteCourse(int courseId) {
 		Course course = courseRepository
 				.findById(courseId)
 				.orElseThrow(CourseNotFoundException::new);
