@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -98,40 +97,59 @@ public class SectionService {
     public void updateSection(Integer courseId, Integer sectionId, UpdateRequestDTO sectionDTO,
             List<MultipartFile> files) {
         Course course = courseService.findById(courseId);
-        course.getSections().stream().filter(section -> section.getSectionId().equals(sectionId))
-                .findFirst()
-                .ifPresent(section -> {
-                    List<Integer> resourcesToDelete = sectionDTO.getEliminatedResourcesIds();
-                    fileValidationService.validateUpdateResourcesMetadataAndFiles(sectionDTO.getResourcesMetadata(),
-                            files, filterSectionResourcesToBeDeleted(section, resourcesToDelete).toList());
 
-                    section.setTitle(sectionDTO.getTitle());
-                    section.setDescription(sectionDTO.getDescription());
-                    resourcesToEliminate(resourcesToDelete, section);
-                    List<ResourceMetadataDTO> metadata = sectionDTO.getResourcesMetadata();
-                    if (metadata != null && metadata.size() > 0) {
-                        Map<String, Integer> fileNameToOrder = getFilenameAndOrderFromMetadata(metadata);
-                        filterSectionResourcesToBeDeleted(section, resourcesToDelete)
-                                .forEach(resource -> {
-                                    resource.setOrder(fileNameToOrder.get(resource.getOriginalFilename()));
-                                });
-                    }
-                    if (files != null && !files.isEmpty()) {
-                        uploadAndLinkFilesToSection(files, section, metadata);
-                    }
-                    sectionRepository.save(section);
-                });
+        Section section = getSectionFromCourse(sectionId, course);
 
+        List<SectionResource> sectionResources =
+                filterSectionResourcesToBeDeleted(
+                    section, sectionDTO.getEliminatedResourcesIds());
+
+        fileValidationService.validateUpdateResourcesMetadataAndFiles(
+                sectionDTO.getResourcesMetadata(),
+                files, sectionResources);
+
+
+        updateSection(sectionDTO, files, section);
+        sectionRepository.save(section);
     }
 
-    private Stream<SectionResource> filterSectionResourcesToBeDeleted(Section section,
+    private void updateSection(UpdateRequestDTO sectionDTO, List<MultipartFile> files, Section section) {
+        section.setTitle(sectionDTO.getTitle());
+        section.setDescription(sectionDTO.getDescription());
+
+        updateSectionResources(sectionDTO, files, sectionDTO.getEliminatedResourcesIds(), section);
+    }
+
+    private void updateSectionResources(UpdateRequestDTO sectionDTO, List<MultipartFile> files, List<Integer> resourcesToDelete, Section section) {
+        deleteSectionResources(resourcesToDelete, section);
+        List<ResourceMetadataDTO> metadata = sectionDTO.getResourcesMetadata();
+        if (metadata != null && !metadata.isEmpty()) {
+            Map<String, Integer> fileNameToOrder = getFilenameAndOrderFromMetadata(metadata);
+            filterSectionResourcesToBeDeleted(section, resourcesToDelete)
+                    .forEach(resource -> {
+                        resource.setOrder(fileNameToOrder.get(resource.getOriginalFilename()));
+                    });
+        }
+        if (files != null && !files.isEmpty()) {
+            uploadAndLinkFilesToSection(files, section, metadata);
+        }
+    }
+
+    private Section getSectionFromCourse(Integer sectionId, Course course) {
+        return course.getSections().stream()
+                .filter(s -> s.getSectionId().equals(sectionId))
+                .findFirst().orElseThrow(SectionNotFoundException::new);
+    }
+
+    private List<SectionResource> filterSectionResourcesToBeDeleted(Section section,
             List<Integer> resourcesToBeDeleted) {
         return section.getSectionResources().stream()
                 .filter(resource -> resourcesToBeDeleted == null
-                        || !resourcesToBeDeleted.contains(resource.getId()));
+                        || !resourcesToBeDeleted.contains(resource.getId()))
+                .toList();
     }
 
-    private void resourcesToEliminate(List<Integer> resourceIds, Section section) {
+    private void deleteSectionResources(List<Integer> resourceIds, Section section) {
         if (resourceIds == null || resourceIds.isEmpty())
             return;
         s3FileStorageService.deleteMultipleFiles(section.getSectionResources()
