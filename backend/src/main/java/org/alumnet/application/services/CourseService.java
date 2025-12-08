@@ -148,21 +148,21 @@ public class CourseService {
 				.findById(courseId)
 				.orElseThrow(CourseNotFoundException::new);
 
-		if (!course.isEnabled()) {
-			throw new CourseNotFoundException();
-		}
-
 		boolean hasEnrolledStudents = participationRepository.hasEnrolledStudents(courseId);
 
-		if (course.isEnabled() && hasEnrolledStudents) {
-			throw new ActiveCourseException("El curso está activo y tiene estudiantes matriculados.");
+		if (hasEnrolledStudents) {
+			throw new ActiveCourseException("El curso tiene estudiantes matriculados.");
 		}
 
-		course.setEnabled(false);
-		courseRepository.save(course);
-	}
+        deactivateCourse(course);
+    }
 
-	public void removeMemberFromCourse(Integer courseId, String userEmail) {
+    private void deactivateCourse(Course course) {
+        course.setEnabled(false);
+        courseRepository.save(course);
+    }
+
+    public void removeMemberFromCourse(Integer courseId, String userEmail) {
 		CourseParticipation userParticipation = participationRepository
 				.findById(CourseParticipationId.builder()
 						.studentEmail(userEmail)
