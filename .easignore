@@ -4,6 +4,6 @@
 **/.env.production
 **/.env.development
 **/*.apk
-**/google-services.json
 **/.DS_Store
 **/.env.backup
+!**/google-services.json

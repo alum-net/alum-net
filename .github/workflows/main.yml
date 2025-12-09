@@ -1,11 +1,9 @@
 name: Deploy to prod
 
 on:
-  pull_request:
+  push:
     branches:
       - main
-    types:
-      - closed
   workflow_dispatch:
   
 permissions:

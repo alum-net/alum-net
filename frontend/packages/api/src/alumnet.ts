@@ -10,7 +10,7 @@ import {
 const baseURL =
   Platform.OS === 'android' &&
   __DEV__ &&
-  Device.isDevice &&
+  !Device.isDevice &&
   process.env.EXPO_PUBLIC_ENV === 'development'
     ? 'http://10.0.2.2:8080/api'
     : process.env.EXPO_PUBLIC_API_URI;

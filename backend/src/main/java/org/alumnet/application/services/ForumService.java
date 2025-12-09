@@ -65,13 +65,7 @@ public class ForumService {
 
         forumRepository.save(newPost);
 
-        if (post.getParentPost() != null) {
-            Post parentPost = forumRepository.findById(post.getParentPost()).orElseThrow(PostNotFoundException::new);
-
-            parentPost.setTotalResponses(parentPost.getTotalResponses() + 1);
-
-            forumRepository.save(parentPost);
-        }
+        updateParentPost(newPost, 1);
 
         activityLogService.logActivity(
                 post.getAuthor().getEmail(),
@@ -99,15 +93,24 @@ public class ForumService {
     public void deletePost(String postId) {
         Post post = forumRepository.findById(postId).orElseThrow(PostNotFoundException::new);
 
+        updateParentPost(post, -1);
+
+        deactivatePost(post);
+
+        forumRepository.save(post);
+    }
+
+    private void deactivatePost(Post post) {
+        post.setEnabled(false);
+    }
+
+    private void updateParentPost(Post post, int addition) {
         if (post.getParentPost() != null) {
             Post parentPost = forumRepository.findById(post.getParentPost()).orElseThrow(PostNotFoundException::new);
-            parentPost.setTotalResponses(parentPost.getTotalResponses() - 1);
+            parentPost.setTotalResponses(parentPost.getTotalResponses() + addition);
 
             forumRepository.save(parentPost);
         }
-
-        post.setEnabled(false);
-        forumRepository.save(post);
     }
 
     public void updatePost(String postId, UpdatePostRequestDTO postContent) {
@@ -118,6 +121,12 @@ public class ForumService {
         if (post.getTotalResponses() > 0)
             throw new PostHasRepliesException();
 
+        updatePost(postContent, post);
+
+        forumRepository.save(post);
+    }
+
+    private void updatePost(UpdatePostRequestDTO postContent, Post post) {
         if (postContent.getContent() != null) {
             post.setContent(postContent.getContent());
         }
@@ -125,8 +134,6 @@ public class ForumService {
         if (postContent.getTitle() != null && post.getParentPost() == null) {
             post.setTitle(postContent.getTitle());
         }
-
-        forumRepository.save(post);
     }
 
     private void validateTitle(PostCreationRequestDTO post) {
@@ -137,7 +144,7 @@ public class ForumService {
 
     private void validatePostCharacterLength(String content) {
         if (content.length() > 350)
-            throw new InvalidPostContentLenghtException();
+            throw new InvalidPostContentLengthException();
     }
 
     private List<PostDTO> buildHierarchy(List<Post> posts) {

@@ -1,1 +1,41 @@
-**/DS_Store
+**/node_modules
+**/.expo/
+**/.env
+**/.env.production
+**/.env.development
+**/*.apk
+**/google-services.json
+**/.DS_Store
+**/.env.backup
+**/android
+**/expo-env.d.ts
+
+# Expo
+dist/
+web-build/
+
+# Native
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files
+.env*.local
+
+# typescript
+*.tsbuildinfo

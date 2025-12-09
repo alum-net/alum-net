@@ -67,9 +67,9 @@ public class GlobalExceptionHandler {
 				.body(ResultResponse.error(ex.getMessage(), "Nose encontró el curso"));
 	}
 
-	@ExceptionHandler(InvalidPostContentLenghtException.class)
+	@ExceptionHandler(InvalidPostContentLengthException.class)
 	public ResponseEntity<ResultResponse<Object>> handleInvalidPostContentLenghtException(
-			InvalidPostContentLenghtException ex) {
+			InvalidPostContentLengthException ex) {
 		return ResponseEntity.badRequest()
 				.body(ResultResponse.error(ex.getMessage(), "El mensaje supera los 350 caracteres"));
 	}
@@ -77,7 +77,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(InvalidPostTitleException.class)
 	public ResponseEntity<ResultResponse<Object>> handleInvalidPostTitleException(InvalidPostTitleException ex) {
 		return ResponseEntity.badRequest()
-				.body(ResultResponse.error(ex.getMessage(), "Las respuestas no pueden tener título."));
+				.body(ResultResponse.error(ex.getMessage(), "El título ingresado no es válido."));
 	}
 
 	@ExceptionHandler(PostNotFoundException.class)
@@ -89,7 +89,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(PostHasRepliesException.class)
 	public ResponseEntity<ResultResponse<Object>> handlePostHasRepliesException(PostHasRepliesException ex) {
 		return ResponseEntity.status(HttpStatus.CONFLICT)
-				.body(ResultResponse.error(ex.getMessage(), "No se puede modificar el post"));
+				.body(ResultResponse.error(ex.getMessage(), "No se puede modificar el post porque tiene respuestas"));
 	}
 
 	@ExceptionHandler(NoPendingChangesException.class)
@@ -149,12 +149,12 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(EventNotFoundException.class)
 	public ResponseEntity<ResultResponse<Object>> handleEventNotFoundException(EventNotFoundException ex) {
-		return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "No existe el evento"));
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultResponse.error(ex.getMessage(), "No existe el evento"));
 	}
 
 	@ExceptionHandler(SectionNotFoundException.class)
 	public ResponseEntity<ResultResponse<Object>> handleSectionNotFoundException(SectionNotFoundException ex) {
-		return ResponseEntity.badRequest().body(ResultResponse.error(ex.getMessage(), "No existe la sección"));
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultResponse.error(ex.getMessage(), "No existe la sección"));
 	}
 
 	@ExceptionHandler(AuthorizationException.class)

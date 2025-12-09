@@ -44,7 +44,9 @@ export const StudentGradesCard = ({
             <DataTable.Header>
               <DataTable.Title>Evento</DataTable.Title>
               <DataTable.Title numeric>Nota</DataTable.Title>
-              <DataTable.Title numeric>Nota Máxima</DataTable.Title>
+              {Platform.OS === 'web' && (
+                <DataTable.Title numeric>Nota Máxima</DataTable.Title>
+              )}
             </DataTable.Header>
             {grades?.eventGrades.map((eventGrade, index: number) => (
               <DataTable.Row key={index}>
@@ -58,7 +60,9 @@ export const StudentGradesCard = ({
                 <DataTable.Cell numeric>
                   {eventGrade.unrated ? '-' : eventGrade.grade}
                 </DataTable.Cell>
-                <DataTable.Cell numeric>{eventGrade.maxGrade}</DataTable.Cell>
+                {Platform.OS === 'web' && (
+                  <DataTable.Cell numeric>{eventGrade.maxGrade}</DataTable.Cell>
+                )}
               </DataTable.Row>
             ))}
           </DataTable>

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
 
-import { OneSignal } from 'react-native-onesignal';
+import { LogLevel, OneSignal } from 'react-native-onesignal';
 import { UserRole, useUserInfo } from '@alum-net/users';
 import { useMMKVString } from 'react-native-mmkv';
 import { storage, STORAGE_KEYS } from '@alum-net/storage';
@@ -22,7 +22,26 @@ export default function TabLayout() {
   const { data } = useUserInfo(!!refreshToken);
 
   useEffect(() => {
+    OneSignal.Debug.setLogLevel(
+      process.env.EXPO_PUBLIC_ENV === 'development'
+        ? LogLevel.Verbose
+        : LogLevel.None,
+    );
+    OneSignal.Debug.setAlertLevel(
+      process.env.EXPO_PUBLIC_ENV === 'development'
+        ? LogLevel.Verbose
+        : LogLevel.None,
+    );
+    OneSignal.initialize(process.env.EXPO_PUBLIC_ONE_SIGNAL_ID || '');
+    OneSignal.Notifications.requestPermission(true);
+    OneSignal.Notifications.addEventListener('foregroundWillDisplay', event => {
+      event.getNotification().display();
+    });
+  }, []);
+
+  useEffect(() => {
     if (refreshToken && data?.role && data.role !== UserRole.student) {
+      OneSignal.logout();
       logout();
       Toast.error('La aplicación movil solo esta disponible para estudiantes');
       return;

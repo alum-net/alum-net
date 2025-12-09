@@ -9,9 +9,15 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CourseRepository extends JpaRepository<Course, Integer>, JpaSpecificationExecutor<Course> {
+    @Query("""
+      select c from Course c
+      where c.enabled = true and c.id = :courseId
+    """)
+    Optional<Course> findById(@Param("courseId") int courseId);
 
     @Query("""
       select count(c) from Course c
