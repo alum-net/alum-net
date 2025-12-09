@@ -25,7 +25,7 @@ public class EventController {
     public ResponseEntity<ResultResponse<Object>> createEvent(@RequestBody @Valid EventDTO eventDTO) {
         eventService.createEvent(eventDTO);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ResultResponse.success(null, "Tarea creada exitosamente"));
+                .body(ResultResponse.success(null, "Evento creado exitosamente"));
     }
 
     @GetMapping("/{eventId}")
@@ -49,7 +49,7 @@ public class EventController {
     public ResponseEntity<ResultResponse<Object>> deleteEvent(@PathVariable(required = true) int eventId) {
         eventService.deleteEvent(eventId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
-                .body(ResultResponse.success(null, "Tarea eliminada exitosamente"));
+                .body(ResultResponse.success(null, "Evento eliminado exitosamente"));
     }
 
     @GetMapping(value = "/{eventId}/details", produces = "application/json")

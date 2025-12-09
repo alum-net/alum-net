@@ -56,12 +56,9 @@ public class EventService {
 				.map(result -> (Student) result[0])
 				.collect(Collectors.toList());
 
-		Event event = eventMapper.eventDTOToEvent(eventDTO);
-		event.setSection(section);
-		event.setCourse(section.getCourse());
-		event.setParticipation(enrollStudentsInEvent(event, enrolledStudentsInCourse));
+        Event event = createEvent(eventDTO, section, enrolledStudentsInCourse);
 
-		eventRepository.save(event);
+        eventRepository.save(event);
 
 		String notificationID = notificationService.sendNotifications(
 				event.getId(),
@@ -76,14 +73,22 @@ public class EventService {
 		eventRepository.save(event);
 	}
 
-	public void deleteEvent(int eventId) {
+    private Event createEvent(EventDTO eventDTO, Section section, List<Student> enrolledStudentsInCourse) {
+        Event event = eventMapper.eventDTOToEvent(eventDTO);
+        event.setSection(section);
+        event.setCourse(section.getCourse());
+        event.setParticipation(enrollStudentsInEvent(event, enrolledStudentsInCourse));
+        return event;
+    }
+
+    public void deleteEvent(int eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(EventNotFoundException::new);
+
 		boolean hasParticipations = someParticipationByEventId(eventId);
 
 		if (hasParticipations)
 			throw new EventHasParticipationException();
-
-		Event event = eventRepository.findById(eventId)
-				.orElseThrow(EventNotFoundException::new);
 
 		eventRepository.delete(event);
 
@@ -188,12 +193,9 @@ public class EventService {
 	public void submitHomework(Integer eventId, MultipartFile homeworkFile, String studentEmail) {
 		Event event = eventRepository.findById(eventId).orElseThrow(EventNotFoundException::new);
 
-		if (LocalDateTime.now().isAfter(event.getEndDate()) || LocalDateTime.now().isBefore(event.getStartDate())) {
-			throw new AssignmentDueDateExpiredException(
-					"No se puede enviar la tarea despues de la fecha de fin del evento o antes de la fecha inicio del evento");
-		}
+        validDueDate(event);
 
-		fileValidationService.validateFile(homeworkFile, false);
+        fileValidationService.validateFile(homeworkFile, false);
 
 		validateHomeworkAlreadySubmitted(eventId, studentEmail);
 
@@ -235,7 +237,14 @@ public class EventService {
 				eventId.toString());
 	}
 
-	private void validateHomeworkAlreadySubmitted(Integer eventId, String studentEmail) {
+    private static void validDueDate(Event event) {
+        if (LocalDateTime.now().isAfter(event.getEndDate()) || LocalDateTime.now().isBefore(event.getStartDate())) {
+            throw new AssignmentDueDateExpiredException(
+                    "No se puede enviar la tarea despues de la fecha de fin del evento o antes de la fecha inicio del evento");
+        }
+    }
+
+    private void validateHomeworkAlreadySubmitted(Integer eventId, String studentEmail) {
 		eventParticipationRepository.findById(EventParticipationId.builder()
 				.eventId(eventId)
 				.studentEmail(studentEmail)
