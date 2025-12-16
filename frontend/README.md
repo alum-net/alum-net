@@ -1,7 +1,3 @@
-Here’s a clear and contributor-friendly `README.md` you can drop into the root of your monorepo 👇
-
----
-
 # Alum-Net Frontend
 
 A monorepo for the **Alum-Net** frontend applications built with **Expo SDK 53**, **React Native 0.79**, and **TypeScript**.
