@@ -35,7 +35,7 @@ const FinalGradesTable = ({ students, onGradeChange }: Props) => {
           <DataTable.Cell>{student.lastname}</DataTable.Cell>
           <DataTable.Cell>{student.email}</DataTable.Cell>
           <DataTable.Cell>
-            {!student.finalGrade === undefined ? (
+            {student.finalGrade === undefined ? (
               <Controller
                 control={control}
                 name={`grades[${index}].grade`}
